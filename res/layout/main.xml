@@ -16,8 +16,8 @@
 	<LinearLayout android:layout_height="wrap_content"
 		android:layout_width="fill_parent"
 		android:layout_alignParentBottom="true" android:orientation="vertical" android:id="@+id/loggedout">
-		<Button style="@style/mh_button" android:layout_width="fill_parent" android:id="@+id/btn_loggedout_about" android:layout_height="106dp" android:text="@string/main_about"></Button>
-		<Button style="@style/mh_button" android:layout_width="fill_parent" android:id="@+id/btn_loggedout_login" android:layout_height="106dp" android:text="@string/main_login"></Button>
+		<Button style="@style/mh_button" android:layout_width="fill_parent" android:id="@+id/btn_loggedout_about" android:layout_height="106dp" android:text="@string/main_about" android:onClick="clickAbout"></Button>
+		<Button style="@style/mh_button" android:layout_width="fill_parent" android:id="@+id/btn_loggedout_login" android:layout_height="106dp" android:text="@string/main_login" android:onClick="clickLogin"></Button>
 	</LinearLayout>
 	<LinearLayout android:layout_height="wrap_content" android:id="@+id/loggedin" android:layout_width="fill_parent" android:orientation="vertical" android:layout_alignParentBottom="true" android:visibility="gone">
 		<Button style="@style/mh_button" android:layout_width="fill_parent" android:id="@+id/btn_contacts" android:text="@string/main_contacts" android:layout_height="106dp"></Button>
