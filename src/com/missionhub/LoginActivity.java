@@ -9,10 +9,12 @@ public class LoginActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		overridePendingTransition(R.anim.fadein, R.anim.fadeout);
 		setContentView(R.layout.login);
 	}
 	
 	public void clickClose(View view) {
 		finish();
+		overridePendingTransition(R.anim.fadein, R.anim.fadeout);
 	}
 }
