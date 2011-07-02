@@ -12,6 +12,8 @@
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
-
+		<activity android:theme="@android:style/Theme.Translucent.NoTitleBar" android:name=".LoginActivity"></activity>
+		<activity android:theme="@android:style/Theme.NoTitleBar" android:name=".ContactsActivity"></activity>
+		<activity android:theme="@android:style/Theme.NoTitleBar" android:name=".ContactActivity"></activity>
 	</application>
 </manifest>
