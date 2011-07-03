@@ -3,6 +3,7 @@ package com.missionhub;
 public class Config {
 
 	public static final String baseUrl = "https://www.missionhub.com";
+	public static final String cookieHost = "www.missionhub.com";
 	public static final String oauthUrl = baseUrl + "/oauth";
 	public static final String apiUrl = baseUrl + "/api/v1";
 	public static final String oauthClientId = "5";

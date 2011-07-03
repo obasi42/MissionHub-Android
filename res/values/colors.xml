@@ -2,4 +2,5 @@
 <resources>
 	<color name="white">#fff</color>
 	<color name="opaque_background">#99000000</color>
+	<color name="webview_background">#f0f0f0</color>
 </resources>
