@@ -6,9 +6,12 @@ import java.util.Iterator;
 
 import org.apache.http.cookie.CookieSpecFactory;
 import org.apache.http.impl.cookie.BasicClientCookie;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.PersistentCookieStore;
 import com.loopj.android.http.RequestParams;
 
@@ -70,6 +73,7 @@ public class LoginActivity extends Activity {
 	}
 	
 	private class InternalWebViewClient extends WebViewClient {
+		
 	    @Override
 	    public boolean shouldOverrideUrlLoading(WebView view, String url) {
 	        view.loadUrl(url);
@@ -91,59 +95,26 @@ public class LoginActivity extends Activity {
 	    
 	    @Override
 	    public void onPageFinished(WebView view, String url) {
-	    	Log.d(TAG, "WebView Loaded: " + url);
+	    	Log.e(TAG, "WebView Loaded: " + url);
 	    	if (mProgressDialog.isShowing()) {
 	    		mProgressDialog.hide();
 	    	}
 	    	Uri uri = Uri.parse(url);
-	    	if (uri.getPath().equalsIgnoreCase("/users/sign_in")) {
-	    		mWebView.loadUrl(wvUrl);
+	    	
+	    	String authorization = uri.getQueryParameter("authorization");
+	    	if (authorization != null && uri.getPath().equalsIgnoreCase("/oauth/authorize")) {
+	    		mWebView.stopLoading();
+	    		mWebView.setVisibility(View.GONE);
+	    		mCloseBtn.setVisibility(View.GONE);
+	    		mWebView.loadUrl(Config.oauthUrl + "/grant.json?authorization=" + authorization);
 	    		return;
 	    	}
-	    	String authorization = uri.getQueryParameter("authorization");
-	    	if (authorization != null) {
-	    		CookieSyncManager.createInstance(LoginActivity.this);
-	    		CookieManager mgr = CookieManager.getInstance();
-	    		String cookieString = mgr.getCookie(Config.cookieHost);	    		
-	    		if (cookieString != null && cookieString.contains("_bonfire_session=")) {
-		    		grantAccess(authorization, cookieString);
-		    		return;
-	    		}
-	    		//TODO: Throw Error
+	    	String code = uri.getQueryParameter("code");
+	    	if (code != null && uri.getPath().equalsIgnoreCase("/oauth/done.json")) {
+	    		mWebView.stopLoading();
+	    		getTokenFromCode(code);
 	    	}
 	    }
-	}
-	
-	private void grantAccess(String authorization, String cookieString) {
-		AsyncHttpClient client = new AsyncHttpClient();
-		client.addHeader("Set-Cookie", cookieString);
-		
-		Log.i(TAG, "GRANT: " + Config.oauthUrl + "/grant.json?authorization=" + authorization);
-		Log.i(TAG, "COOKIE:" + cookieString);
-		
-		client.get(Config.oauthUrl + "/grant.json?authorization=" + authorization, new AsyncHttpResponseHandler() {
-			@Override
-		     public void onStart() {
-		         mProgressDialog.show();
-		     }
-
-		     @Override
-		     public void onSuccess(String response) {
-		         Log.i(TAG, "GRANT: " + response);
-		         
-		         getTokenFromCode(response);
-		     }
-		 
-		     @Override
-		     public void onFailure(Throwable e) {
-		         Log.i(TAG, "GRANT FAIL: " + e.toString());
-		     }
-
-		     @Override
-		     public void onFinish() {
-		         mProgressDialog.hide();
-		     }
-		});
 	}
 	
 	private void getTokenFromCode(String code) {
@@ -157,18 +128,25 @@ public class LoginActivity extends Activity {
 		params.put("scope", Config.oauthScope);
 		params.put("redirect_uri", Config.oauthUrl + "/done.json");
 		
-		client.post(Config.oauthUrl + "/access_token", params, new AsyncHttpResponseHandler() {
+		client.post(Config.oauthUrl + "/access_token", params, new JsonHttpResponseHandler() {
 			@Override
 		     public void onStart() {
 		         mProgressDialog.show();
 		     }
 
 		     @Override
-		     public void onSuccess(String response) {
-		         Log.i(TAG, "GET TOKEN: " + response);
-		         
-		         
-		         returnWithToken();
+		     public void onSuccess(JSONObject response) {
+		         try {
+					Log.i(TAG, "GET TOKEN: " + response.toString(4));
+					
+					token = response.getString("access_token");
+					Log.e(TAG, "TOKEN: " + token);
+					
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		         //returnWithToken();
 		     }
 		 
 		     @Override
