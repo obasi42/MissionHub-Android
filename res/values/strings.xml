@@ -5,4 +5,11 @@
     <string name="main_about">About</string>
     <string name="main_login">Login</string>
     <string name="main_contacts">Contacts</string>
+    
+    <string name="alert_ok">OK</string>
+    <string name="alert_cancel">Cancel</string>
+    <string name="alert_learn_more">Learn More</string>
+    <string name="alert_learn_more_msg">Clicking OK will take you to www.missionhub.com to learn more.</string>
+    
+    <string name="toast_no_browser">Could not find a web browser</string>
 </resources>
