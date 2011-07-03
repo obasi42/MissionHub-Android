@@ -49,6 +49,8 @@ public class LoginActivity extends Activity {
 		overridePendingTransition(R.anim.fadein, R.anim.fadeout);
 		setContentView(R.layout.login);
 		
+		clearCookies();
+		
 		mProgressDialog = ProgressDialog.show(LoginActivity.this, "", LoginActivity.this.getString(R.string.alert_loading), true);
 		
 		mCloseBtn = (Button) findViewById(R.id.btn_logout_close);
@@ -59,7 +61,20 @@ public class LoginActivity extends Activity {
 	    mWebView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
 	    mWebView.setWebViewClient(new InternalWebViewClient());
 	    mWebView.loadUrl(wvUrl);
-	    
+	}
+	
+	private void clearCookies() {
+		CookieSyncManager csm = CookieSyncManager.createInstance(LoginActivity.this);
+		CookieManager mgr = CookieManager.getInstance();
+		mgr.removeAllCookie();
+		csm.sync();
+		csm.startSync();
+	}
+	
+	@Override
+	public void finish() {
+		clearCookies();
+		super.finish();
 	}
 	
 	private void returnWithToken() {
@@ -73,7 +88,6 @@ public class LoginActivity extends Activity {
 	}
 	
 	private class InternalWebViewClient extends WebViewClient {
-		
 	    @Override
 	    public boolean shouldOverrideUrlLoading(WebView view, String url) {
 	        view.loadUrl(url);
@@ -99,19 +113,20 @@ public class LoginActivity extends Activity {
 	    	if (mProgressDialog.isShowing()) {
 	    		mProgressDialog.hide();
 	    	}
-	    	Uri uri = Uri.parse(url);
-	    	
+	    	Uri uri = Uri.parse(url);	    	
 	    	String authorization = uri.getQueryParameter("authorization");
 	    	if (authorization != null && uri.getPath().equalsIgnoreCase("/oauth/authorize")) {
-	    		mWebView.stopLoading();
-	    		mWebView.setVisibility(View.GONE);
-	    		mCloseBtn.setVisibility(View.GONE);
-	    		mWebView.loadUrl(Config.oauthUrl + "/grant.json?authorization=" + authorization);
-	    		return;
+	    		CookieSyncManager.createInstance(LoginActivity.this);
+	    		CookieManager mgr = CookieManager.getInstance();
+	    		String cookieString = mgr.getCookie(Config.cookieHost);          
+	    		if (cookieString != null && cookieString.contains("_bonfire_session=")) {
+	    			mWebView.loadUrl(Config.oauthUrl + "/grant.json?authorization=" + authorization);
+	    		}
 	    	}
 	    	String code = uri.getQueryParameter("code");
 	    	if (code != null && uri.getPath().equalsIgnoreCase("/oauth/done.json")) {
-	    		mWebView.stopLoading();
+	    		mWebView.setVisibility(View.GONE);
+	    		mCloseBtn.setVisibility(View.GONE);
 	    		getTokenFromCode(code);
 	    	}
 	    }
@@ -136,6 +151,9 @@ public class LoginActivity extends Activity {
 
 		     @Override
 		     public void onSuccess(JSONObject response) {
+		    	 
+		    	 Log.e(TAG, "HERE");
+		    	 
 		         try {
 					Log.i(TAG, "GET TOKEN: " + response.toString(4));
 					
@@ -146,7 +164,7 @@ public class LoginActivity extends Activity {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-		         //returnWithToken();
+		        returnWithToken();
 		     }
 		 
 		     @Override
