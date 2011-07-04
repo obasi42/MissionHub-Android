@@ -152,6 +152,17 @@ public class Api {
 		return true;
 	}
 	
+	public static boolean deleteComment(int id, AsyncHttpResponseHandler responseHandler) {
+		RequestParams params = new RequestParams();
+		params.put("access_token", LoginActivity.token);
+		params.put("org_id", ORGID);
+		params.put("_method", "delete");
+		
+		String url = getAbsoluteUrl("/followup_comments/") + String.valueOf(id) + ".json";
+		
+		post(url, params, responseHandler);
+	}
+	
 	private static String buildIds(ArrayList<Integer> ids) {
 		String listOfIds = "";
 		Iterator<Integer> itr = ids.iterator();
