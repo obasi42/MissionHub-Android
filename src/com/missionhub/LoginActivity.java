@@ -1,20 +1,18 @@
 package com.missionhub;
 
-import java.sql.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-
-import org.apache.http.cookie.CookieSpecFactory;
-import org.apache.http.impl.cookie.BasicClientCookie;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.loopj.android.http.PersistentCookieStore;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -28,127 +26,133 @@ import android.webkit.WebViewClient;
 import android.widget.Button;
 
 public class LoginActivity extends Activity {
-	
+
 	public static final String TAG = "LoginActivity";
 	public static String token;
 	public static boolean isLoggedIn = false;
 	
+	public static final String PREFS_NAME = "MissionHubPrivate";
+
 	private ProgressDialog mProgressDialog;
 	private WebView mWebView;
 	private Button mCloseBtn;
 	private String wvUrl = Config.oauthUrl + "/authorize?display=touch&simple=true&response_type=code&redirect_uri=" + Config.oauthUrl + "/done.json&client_id=" + Config.oauthClientId + "&scope=" + Config.oauthScope;
-	private String wvLogoutUrl = Config.baseUrl + "/auth/facebook/logout";
+
+	public String getStoredToken() {
+		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+		return settings.getString("token", null);
+	}
 	
-	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		overridePendingTransition(R.anim.fadein, R.anim.fadeout);
 		setContentView(R.layout.login);
-		
-		mProgressDialog = ProgressDialog.show(LoginActivity.this, "", LoginActivity.this.getString(R.string.alert_loading), true);
-		
+
+		clearCookies();
+
+		mProgressDialog = ProgressDialog.show(LoginActivity.this, "",
+				LoginActivity.this.getString(R.string.alert_loading), true);
+		mProgressDialog.setCancelable(true);
+		mProgressDialog.setOnCancelListener(new OnCancelListener() {
+			@Override
+			public void onCancel(DialogInterface iface) {
+				finish();
+			}
+		});
+
 		mCloseBtn = (Button) findViewById(R.id.btn_logout_close);
-		
+
 		mWebView = (WebView) findViewById(R.id.webview_login);
 		mWebView.getSettings().setJavaScriptEnabled(true);
-	    mWebView.getSettings().setSupportZoom(false);
-	    mWebView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
-	    mWebView.setWebViewClient(new InternalWebViewClient());
-	    mWebView.loadUrl(wvUrl);
-	    
+		mWebView.getSettings().setSupportZoom(false);
+		mWebView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
+		mWebView.setWebViewClient(new InternalWebViewClient());
+		mWebView.loadUrl(wvUrl);
 	}
-	
-	private void returnWithToken() {
+
+	private void clearCookies() {
+		CookieSyncManager csm = CookieSyncManager
+				.createInstance(LoginActivity.this);
+		CookieManager mgr = CookieManager.getInstance();
+		mgr.removeAllCookie();
+		csm.sync();
+		csm.startSync();
+	}
+
+	@Override
+	public void finish() {
 		mWebView.stopLoading();
 		mProgressDialog.dismiss();
+		clearCookies();
+		super.finish();
+		overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+	}
+
+	private void returnWithToken() {
 		Intent i = new Intent();
 		i.putExtra("token", token);
 		this.setResult(RESULT_OK, i);
 		finish();
-		overridePendingTransition(R.anim.fadein, R.anim.fadeout);
 	}
-	
+
 	private class InternalWebViewClient extends WebViewClient {
-	    @Override
-	    public boolean shouldOverrideUrlLoading(WebView view, String url) {
-	        view.loadUrl(url);
-	        return true;
-	    }
-	    
-	    @Override
-	    public void onPageStarted(WebView view, String url, Bitmap favicon) {
-	    	mProgressDialog.show();
-	    }
-	    
-	    @Override
-	    public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-	    	if (mProgressDialog.isShowing()) {
-	    		mProgressDialog.hide();
-	    	}
-	    	//TODO Throw Error
-	    }
-	    
-	    @Override
-	    public void onPageFinished(WebView view, String url) {
-	    	Log.d(TAG, "WebView Loaded: " + url);
-	    	if (mProgressDialog.isShowing()) {
-	    		mProgressDialog.hide();
-	    	}
-	    	Uri uri = Uri.parse(url);
-	    	if (uri.getPath().equalsIgnoreCase("/users/sign_in")) {
-	    		mWebView.loadUrl(wvUrl);
-	    		return;
-	    	}
-	    	String authorization = uri.getQueryParameter("authorization");
-	    	if (authorization != null) {
-	    		CookieSyncManager.createInstance(LoginActivity.this);
-	    		CookieManager mgr = CookieManager.getInstance();
-	    		String cookieString = mgr.getCookie(Config.cookieHost);	    		
-	    		if (cookieString != null && cookieString.contains("_bonfire_session=")) {
-		    		grantAccess(authorization, cookieString);
-		    		return;
-	    		}
-	    		//TODO: Throw Error
-	    	}
-	    }
-	}
-	
-	private void grantAccess(String authorization, String cookieString) {
-		AsyncHttpClient client = new AsyncHttpClient();
-		client.addHeader("Set-Cookie", cookieString);
-		
-		Log.i(TAG, "GRANT: " + Config.oauthUrl + "/grant.json?authorization=" + authorization);
-		Log.i(TAG, "COOKIE:" + cookieString);
-		
-		client.get(Config.oauthUrl + "/grant.json?authorization=" + authorization, new AsyncHttpResponseHandler() {
-			@Override
-		     public void onStart() {
-		         mProgressDialog.show();
-		     }
+		@Override
+		public boolean shouldOverrideUrlLoading(WebView view, String url) {
+			view.loadUrl(url);
+			return true;
+		}
 
-		     @Override
-		     public void onSuccess(String response) {
-		         Log.i(TAG, "GRANT: " + response);
-		         
-		         getTokenFromCode(response);
-		     }
-		 
-		     @Override
-		     public void onFailure(Throwable e) {
-		         Log.i(TAG, "GRANT FAIL: " + e.toString());
-		     }
+		@Override
+		public void onPageStarted(WebView view, String url, Bitmap favicon) {
+			mProgressDialog.show();
+		}
 
-		     @Override
-		     public void onFinish() {
-		         mProgressDialog.hide();
-		     }
-		});
+		@Override
+		public void onReceivedError(WebView view, int errorCode,
+				String description, String failingUrl) {
+			if (mProgressDialog.isShowing()) {
+				mProgressDialog.hide();
+			}
+			Log.e(TAG, description);
+			// TODO Throw Error
+		}
+
+		@Override
+		public void onPageFinished(WebView view, String url) {
+			Uri uri = Uri.parse(url);
+			String authorization = uri.getQueryParameter("authorization");
+			if (authorization != null
+					&& uri.getPath().equalsIgnoreCase("/oauth/authorize")) {
+				CookieSyncManager.createInstance(LoginActivity.this);
+				CookieManager mgr = CookieManager.getInstance();
+				String cookieString = mgr.getCookie(Config.cookieHost);
+				if (cookieString != null
+						&& cookieString.contains("_bonfire_session=")) {
+					mWebView.loadUrl(Config.oauthUrl
+							+ "/grant.json?authorization=" + authorization);
+					return;
+				}
+			}
+			String code = uri.getQueryParameter("code");
+			if (code != null
+					&& uri.getPath().equalsIgnoreCase("/oauth/done.json")) {
+				mWebView.setVisibility(View.GONE);
+				mCloseBtn.setVisibility(View.GONE);
+				getTokenFromCode(code);
+				return;
+			}
+
+			Log.e(TAG, "WebView Loaded: " + url);
+			if (mProgressDialog.isShowing()) {
+				mProgressDialog.hide();
+			}
+		}
 	}
-	
+
 	private void getTokenFromCode(String code) {
 		AsyncHttpClient client = new AsyncHttpClient();
-		
+
 		RequestParams params = new RequestParams();
 		params.put("client_id", Config.oauthClientId);
 		params.put("client_secret", Config.oauthClientSecret);
@@ -156,46 +160,49 @@ public class LoginActivity extends Activity {
 		params.put("grant_type", "authorization_code");
 		params.put("scope", Config.oauthScope);
 		params.put("redirect_uri", Config.oauthUrl + "/done.json");
-		
-		client.post(Config.oauthUrl + "/access_token", params, new AsyncHttpResponseHandler() {
-			@Override
-		     public void onStart() {
-		         mProgressDialog.show();
-		     }
 
-		     @Override
-		     public void onSuccess(String response) {
-		         Log.i(TAG, "GET TOKEN: " + response);
-		         
-		         
-		         returnWithToken();
-		     }
-		 
-		     @Override
-		     public void onFailure(Throwable e) {
-		         Log.i(TAG, "GET TOKEN FAIL: " + e.toString());
-		     }
+		client.post(Config.oauthUrl + "/access_token", params,
+				new JsonHttpResponseHandler() {
+					@Override
+					public void onStart() {
+						mProgressDialog.show();
+					}
 
-		     @Override
-		     public void onFinish() {
-		         mProgressDialog.hide();
-		     }
-		});
+					@Override
+					public void onSuccess(JSONObject response) {
+						isLoggedIn = true;
+						try {
+							token = response.getString("access_token");
+							SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+							SharedPreferences.Editor editor = settings.edit();
+							editor.putString("token", token);
+						} catch (JSONException e) {
+							onFailure(new Throwable());
+						}
+						returnWithToken();
+					}
+
+					@Override
+					public void onFailure(Throwable e) {
+						Log.i(TAG, "GET TOKEN FAIL: " + e.toString());
+					}
+
+					@Override
+					public void onFinish() {
+						mProgressDialog.hide();
+					}
+				});
 	}
-	
+
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
-	    if ((keyCode == KeyEvent.KEYCODE_BACK)) {
-	    	finish();
-	    	overridePendingTransition(R.anim.fadein, R.anim.fadeout);
-	    }
-	    return super.onKeyDown(keyCode, event);
+		if ((keyCode == KeyEvent.KEYCODE_BACK)) {
+			finish();
+		}
+		return super.onKeyDown(keyCode, event);
 	}
-	
+
 	public void clickClose(View view) {
-		mWebView.stopLoading();
-		mProgressDialog.dismiss();
 		finish();
-		overridePendingTransition(R.anim.fadein, R.anim.fadeout);
-	}	
+	}
 }
