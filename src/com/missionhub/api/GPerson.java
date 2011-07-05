@@ -1,6 +1,7 @@
 package com.missionhub.api;
 
-public class GPerson {
+public class GPerson {	
+	
 	private String first_name;
 	private String last_name;
 	private String name;
@@ -15,6 +16,8 @@ public class GPerson {
 	private String phone_number;
 	private String email_address;
 	private String first_contact_date;
+	private GIdNameProvider location;
+	private GIdNameProvider[] interests;
 	
 	public String getFirst_name() { return first_name; }
 	public String getLast_name() { return last_name; }
@@ -30,6 +33,8 @@ public class GPerson {
 	public String getPhone_number() { return phone_number; }
 	public String getEmail_address() { return email_address; }
 	public String getFirst_contact_date() { return first_contact_date; }
+	public GIdNameProvider getLocation() { return location; }
+	public GIdNameProvider[] getInterests() { return interests; }
 	
 	public void setFirst_name(String s) { first_name = s; }
 	public void setLast_name(String s) { last_name = s; }	
@@ -45,4 +50,6 @@ public class GPerson {
 	public void setPhone_number(String s) { phone_number = s; }
 	public void setEmail_address(String s) { email_address = s; }
 	public void setFirst_contact_date(String s) { first_contact_date = s; }
+	public void setLocation(GIdNameProvider x) { location = x; }
+	public void setInterests(GIdNameProvider[] i) { interests = i; }
 }

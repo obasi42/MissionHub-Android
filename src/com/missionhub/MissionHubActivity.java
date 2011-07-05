@@ -22,6 +22,7 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.missionhub.api.Api;
 import com.missionhub.api.GContact;
 import com.missionhub.api.GError;
+import com.missionhub.api.GIdNameProvider;
 import com.missionhub.api.GPerson;
 import com.missionhub.api.User;
 
@@ -180,13 +181,26 @@ public class MissionHubActivity extends Activity {
 				Log.i(TAG2, response);
 				Gson gson = new Gson();
 				try{
-//					GPerson[] peeps = gson.fromJson(response, GPerson[].class);
-//					Log.i(TAG2, peeps[0].getName());
+					GPerson[] peeps = gson.fromJson(response, GPerson[].class);
+					Log.i(TAG2, peeps[0].getName());
 					
-					GContact[] contacts = gson.fromJson(response, GContact[].class);
-					Log.i(TAG2, contacts[0].getPerson().getName());
-					Log.i(TAG2, contacts[0].getPerson().getPicture());
-					Log.i(TAG2, contacts[0].getPerson().getStatus());
+//					GContact[] contacts = gson.fromJson(response, GContact[].class);
+//					Log.i(TAG2, contacts[0].getPerson().getName());
+//					Log.i(TAG2, contacts[0].getPerson().getPicture());
+//					Log.i(TAG2, contacts[0].getPerson().getStatus());
+					
+					try {
+						Log.i(TAG2, peeps[0].getLocation().getName());
+					} catch(Exception e) {
+						Log.i(TAG2, "ARGGG", e);
+					}
+					try {
+						Log.i(TAG2, peeps[0].getInterests()[0].getName());
+					}
+					catch(Exception e) {
+						Log.i(TAG2, "ARGGG2", e);
+					}
+
 					
 				} catch(Exception e) {
 					Log.i(TAG2, "CRAP", e);
@@ -207,7 +221,7 @@ public class MissionHubActivity extends Activity {
 			}
 		};
 		
-//		Api.getPeople(1282204, responseHandler2);
+		Api.getPeople(1282204, responseHandler2);
 //		Api.getPeople("me", responseHandler);
 //		
 //		ArrayList<Integer> ids = new ArrayList<Integer>();
@@ -221,9 +235,9 @@ public class MissionHubActivity extends Activity {
 		options.put("assigned_to_id", "none");
 		options.put("sort", "time");
 		options.put("direction", "ASC");
-		Api.getContactsList(options, responseHandler2);
+//		Api.getContactsList(options, responseHandler2);
 		
-//		Api.getContacts(1282204, responseHandler);
+//		Api.getContacts(1282204, responseHandler2);
 		
 		
 //		ArrayList<String> rejoicables = new ArrayList<String>();
