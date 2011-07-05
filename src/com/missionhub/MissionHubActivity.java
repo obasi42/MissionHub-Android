@@ -56,7 +56,7 @@ public class MissionHubActivity extends Activity {
 			JsonHttpResponseHandler responseHandler = new JsonHttpResponseHandler() {
 				@Override
 				public void onStart() {
-					Log.i(TAG2, "Starting");
+					//mProgressDialog
 				}
 				
 				@Override
