@@ -75,7 +75,7 @@ public class MissionHubActivity extends Activity {
 				
 				@Override
 				public void onFinish() {
-					Log.i(TAG2, "I'm finished!");
+					mProgressDialog.dismiss();
 				}
 			};
 			Api.getPeople("me", responseHandler);
