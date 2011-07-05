@@ -2,8 +2,6 @@ package com.missionhub;
 
 import java.util.HashMap;
 
-import org.json.JSONObject;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -21,7 +19,6 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.loopj.android.http.JsonHttpResponseHandler;
 import com.missionhub.api.Api;
 import com.missionhub.api.GContact;
 import com.missionhub.api.GPerson;
@@ -41,7 +38,6 @@ public class MissionHubActivity extends Activity {
 	
 	public static final String PREFS_NAME = "MissionHubPrivate";
 	
-	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -58,6 +54,7 @@ public class MissionHubActivity extends Activity {
 		User.isLoggedIn = false;
 		if (User.token != null && !User.token.equalsIgnoreCase("")) {
 			AsyncHttpResponseHandler responseHandler = new AsyncHttpResponseHandler() {
+				
 				@Override
 				public void onStart() {
 					mProgressDialog = ProgressDialog.show(MissionHubActivity.this, "", MissionHubActivity.this.getString(R.string.alert_logging_in), true);
@@ -73,7 +70,6 @@ public class MissionHubActivity extends Activity {
 					} catch(Exception e) {
 						Log.i(TAG2, "CRAP", e);
 					}
-					
 				}
 				
 				@Override
@@ -91,6 +87,15 @@ public class MissionHubActivity extends Activity {
 		} else {
 			refreshView();
 		}
+		
+		Intent i = new Intent(this, ContactsActivity.class);
+		startActivity(i);
+	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		refreshView();
 	}
 
 	public final int LOGIN_WINDOW_ACTIVITY = 0;
@@ -127,7 +132,22 @@ public class MissionHubActivity extends Activity {
 	}
 
 	public void clickContact(View view) {
-
+		Intent i = new Intent(this, ContactsActivity.class);
+		startActivity(i);
+	}
+	
+	public void clickLogout(View view) {
+		User.token = null;
+		User.isLoggedIn = false;
+		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+		SharedPreferences.Editor editor = settings.edit();
+		editor.remove("token");
+		editor.commit();
+		refreshView();
+	}
+	
+	public void clickProfile(View view) {
+		
 	}
 
 	public void testingApi() {
