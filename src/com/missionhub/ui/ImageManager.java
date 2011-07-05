@@ -132,7 +132,7 @@ public class ImageManager {
 	}
 	
 	private class ImageQueueManager implements Runnable {
-		@Override
+		//@Override
 		public void run() {
 			try {
 				while(true) {
