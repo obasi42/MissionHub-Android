@@ -51,14 +51,11 @@ public class LoginActivity extends Activity {
 
 		clearCookies();
 
-		mProgressDialog = ProgressDialog.show(LoginActivity.this, "",
-				LoginActivity.this.getString(R.string.alert_loading), true);
+		mProgressDialog = ProgressDialog.show(LoginActivity.this, "", LoginActivity.this.getString(R.string.alert_loading), true);
 		mProgressDialog.setCancelable(true);
 		mProgressDialog.setOnCancelListener(new OnCancelListener() {
-
 			public void onCancel(DialogInterface dialog) {
 				finish();
-				
 			}
 		});
 
