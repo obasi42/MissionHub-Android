@@ -3,6 +3,8 @@ package com.missionhub.ui;
 import java.util.ArrayList;
 
 import com.missionhub.R;
+import com.missionhub.api.GContact;
+import com.missionhub.api.GPerson;
 
 import android.app.Activity;
 import android.content.Context;
@@ -13,14 +15,14 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class ContactItemAdapter extends ArrayAdapter<Person> {
-	private ArrayList<Person> people;
+public class ContactItemAdapter extends ArrayAdapter<GContact> {
+	private ArrayList<GContact> contacts;
 	private Activity activity;
 	public ImageManager imageManager;
 
-	public ContactItemAdapter(Activity a, int textViewResourceId, ArrayList<Person> people) {
-		super(a, textViewResourceId, people);
-		this.people = people;
+	public ContactItemAdapter(Activity a, int textViewResourceId, ArrayList<GContact> contacts) {
+		super(a, textViewResourceId, contacts);
+		this.contacts = contacts;
 		activity = a;
 		
 		imageManager = new ImageManager(activity.getApplicationContext());
@@ -48,12 +50,13 @@ public class ContactItemAdapter extends ArrayAdapter<Person> {
 		else
 			holder=(ViewHolder)v.getTag();
 
-		final Person person = people.get(position);
-		if (person != null) {
-			holder.name.setText(person.name);
-			holder.status.setText(person.status);
-			holder.image.setTag(person.image);
-			imageManager.displayImage(person.image, activity, holder.image);
+		final GContact contact = contacts.get(position);
+		final GPerson person = contact.getPerson();
+		if (contact != null) {
+			holder.name.setText(person.getName());
+			holder.status.setText(person.getStatus());
+			holder.image.setTag(person.getPicture());
+			imageManager.displayImage(person.getPicture(), activity, holder.image);
 		}
 		return v;
 	}
