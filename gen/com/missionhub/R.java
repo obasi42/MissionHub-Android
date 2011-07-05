@@ -60,13 +60,14 @@ public final class R {
         public static final int alert_learn_more=0x7f060007;
         public static final int alert_learn_more_msg=0x7f060008;
         public static final int alert_loading=0x7f060009;
+        public static final int alert_logging_in=0x7f06000a;
         public static final int alert_ok=0x7f060005;
         public static final int app_name=0x7f060000;
         public static final int main_about=0x7f060002;
         public static final int main_contacts=0x7f060004;
         public static final int main_login=0x7f060003;
         public static final int main_logout=0x7f060001;
-        public static final int toast_no_browser=0x7f06000a;
+        public static final int toast_no_browser=0x7f06000b;
     }
     public static final class style {
         public static final int mh_button=0x7f070000;

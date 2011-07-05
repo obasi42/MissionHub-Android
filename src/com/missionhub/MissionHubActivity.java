@@ -56,7 +56,7 @@ public class MissionHubActivity extends Activity {
 			JsonHttpResponseHandler responseHandler = new JsonHttpResponseHandler() {
 				@Override
 				public void onStart() {
-					//mProgressDialog
+					mProgressDialog = ProgressDialog.show(MissionHubActivity.this, "", MissionHubActivity.this.getString(R.string.alert_logging_in), true);
 				}
 				
 				@Override
