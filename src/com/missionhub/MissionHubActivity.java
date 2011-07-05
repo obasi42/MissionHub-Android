@@ -63,23 +63,23 @@ public class MissionHubActivity extends Activity {
 				
 				@Override
 				public void onSuccess(String response) {
-					
 					Log.i(TAG, response);
 					Gson gson = new Gson();
 					try{
 						GError error = gson.fromJson(response, GError.class);
-						Log.e(TAG, error.getMesage() + ":" + error.getCode());
+						Log.e(TAG, error.getError().getMessage() + ":" + error.getError().getCode());
 						// TODO: DISPLAY ERROR;
-					} catch (Exception e){
+					} catch (Exception out){
 						try {
 							GPerson[] people = gson.fromJson(response, GPerson[].class);
 							if (people.length > 0) {
-								//User.contact = contacts[0];
+								User.contact = new GContact();
+								User.contact.setPerson(people[0]);
 								User.isLoggedIn = true;
 								refreshView();
 							}
-						} catch(Exception e1) {
-							onFailure(e1);
+						} catch(Exception e) {
+							onFailure(e);
 						}
 					}
 				}
@@ -94,7 +94,7 @@ public class MissionHubActivity extends Activity {
 					mProgressDialog.dismiss();
 				}
 			};
-			User.orgID = "5380";
+			User.orgID = "56";
 			Api.getPeople("me", responseHandler);
 		} else {
 			refreshView();

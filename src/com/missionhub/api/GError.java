@@ -1,6 +1,6 @@
 package com.missionhub.api;
 
-public class Error {
+public class GError {
 	public static class InnerError {
 		private String message;
 		private String code;
