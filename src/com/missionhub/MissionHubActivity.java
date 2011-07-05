@@ -1,27 +1,25 @@
 package com.missionhub;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.missionhub.api.Api;
+import com.missionhub.api.User;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.Animation.AnimationListener;
-import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -38,6 +36,8 @@ public class MissionHubActivity extends Activity {
 	private RelativeLayout logoutBar;
 	private TextView txtLogoutbarName;
 	
+	public static final String PREFS_NAME = "MissionHubPrivate";
+	
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -50,11 +50,39 @@ public class MissionHubActivity extends Activity {
 		logoutBar = (RelativeLayout) findViewById(R.id.logoutbar);
 		txtLogoutbarName = (TextView) findViewById(R.id.txt_logoutbar_name);
 		
-		
-		
-		
-		
-		refreshView();
+		User.token = getStoredToken();
+		User.isLoggedIn = false;
+		if (User.token != null && !User.token.equalsIgnoreCase("")) {
+			JsonHttpResponseHandler responseHandler = new JsonHttpResponseHandler() {
+				@Override
+				public void onStart() {
+					Log.i(TAG2, "Starting");
+				}
+				
+				@Override
+				public void onSuccess(JSONObject object) {
+					
+					Log.i(TAG2, "SUCCESS!");
+					Log.i(TAG2, object.toString());
+					
+				}
+				
+				@Override
+				public void onFailure(Throwable e) {
+					Log.i(TAG2, e.toString());
+					Log.i(TAG2, "stuff");
+				}
+				
+				@Override
+				public void onFinish() {
+					Log.i(TAG2, "I'm finished!");
+				}
+			};
+			Api.getPeople("me", responseHandler);
+		} else {
+			refreshView();
+		}
+		// FUTURE END OF MAIN
 
 		JsonHttpResponseHandler responseHandler = new JsonHttpResponseHandler() {
 
@@ -122,10 +150,11 @@ public class MissionHubActivity extends Activity {
 	}
 	
 	public void refreshView() {
-		if (LoginActivity.token != null && LoginActivity.isLoggedIn) {
+		if (User.isLoggedIn) {
 			loggedOut.setVisibility(View.GONE);
 			loggedIn.setVisibility(View.VISIBLE);
 			logoutBar.setVisibility(View.VISIBLE);
+			txtLogoutbarName.setText("My Name");
 		} else {
 			loggedIn.setVisibility(View.GONE);
 			loggedOut.setVisibility(View.VISIBLE);
@@ -155,5 +184,10 @@ public class MissionHubActivity extends Activity {
 
 	public void clickContact(View view) {
 
+	}
+	
+	public String getStoredToken() {
+		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+		return settings.getString("token", null);
 	}
 }

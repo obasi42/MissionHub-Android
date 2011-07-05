@@ -6,6 +6,7 @@ import org.json.JSONObject;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+import com.missionhub.api.User;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -28,21 +29,20 @@ import android.widget.Button;
 public class LoginActivity extends Activity {
 
 	public static final String TAG = "LoginActivity";
-	public static String token;
-	public static boolean isLoggedIn = false;
-	
+
 	public static final String PREFS_NAME = "MissionHubPrivate";
 
 	private ProgressDialog mProgressDialog;
 	private WebView mWebView;
 	private Button mCloseBtn;
-	private String wvUrl = Config.oauthUrl + "/authorize?display=touch&simple=true&response_type=code&redirect_uri=" + Config.oauthUrl + "/done.json&client_id=" + Config.oauthClientId + "&scope=" + Config.oauthScope;
+	private String wvUrl = Config.oauthUrl + "/authorize?display=touch&simple=true&response_type=code&redirect_uri=" + Config.oauthUrl
+			+ "/done.json&client_id=" + Config.oauthClientId + "&scope=" + Config.oauthScope;
 
 	public String getStoredToken() {
 		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 		return settings.getString("token", null);
 	}
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -70,8 +70,7 @@ public class LoginActivity extends Activity {
 	}
 
 	private void clearCookies() {
-		CookieSyncManager csm = CookieSyncManager
-				.createInstance(LoginActivity.this);
+		CookieSyncManager csm = CookieSyncManager.createInstance(LoginActivity.this);
 		CookieManager mgr = CookieManager.getInstance();
 		mgr.removeAllCookie();
 		csm.sync();
@@ -89,7 +88,7 @@ public class LoginActivity extends Activity {
 
 	private void returnWithToken() {
 		Intent i = new Intent();
-		i.putExtra("token", token);
+		i.putExtra("token", User.token);
 		this.setResult(RESULT_OK, i);
 		finish();
 	}
@@ -107,8 +106,7 @@ public class LoginActivity extends Activity {
 		}
 
 		@Override
-		public void onReceivedError(WebView view, int errorCode,
-				String description, String failingUrl) {
+		public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
 			if (mProgressDialog.isShowing()) {
 				mProgressDialog.hide();
 			}
@@ -120,21 +118,17 @@ public class LoginActivity extends Activity {
 		public void onPageFinished(WebView view, String url) {
 			Uri uri = Uri.parse(url);
 			String authorization = uri.getQueryParameter("authorization");
-			if (authorization != null
-					&& uri.getPath().equalsIgnoreCase("/oauth/authorize")) {
+			if (authorization != null && uri.getPath().equalsIgnoreCase("/oauth/authorize")) {
 				CookieSyncManager.createInstance(LoginActivity.this);
 				CookieManager mgr = CookieManager.getInstance();
 				String cookieString = mgr.getCookie(Config.cookieHost);
-				if (cookieString != null
-						&& cookieString.contains("_bonfire_session=")) {
-					mWebView.loadUrl(Config.oauthUrl
-							+ "/grant.json?authorization=" + authorization);
+				if (cookieString != null && cookieString.contains("_bonfire_session=")) {
+					mWebView.loadUrl(Config.oauthUrl + "/grant.json?authorization=" + authorization);
 					return;
 				}
 			}
 			String code = uri.getQueryParameter("code");
-			if (code != null
-					&& uri.getPath().equalsIgnoreCase("/oauth/done.json")) {
+			if (code != null && uri.getPath().equalsIgnoreCase("/oauth/done.json")) {
 				mWebView.setVisibility(View.GONE);
 				mCloseBtn.setVisibility(View.GONE);
 				getTokenFromCode(code);
@@ -159,37 +153,38 @@ public class LoginActivity extends Activity {
 		params.put("scope", Config.oauthScope);
 		params.put("redirect_uri", Config.oauthUrl + "/done.json");
 
-		client.post(Config.oauthUrl + "/access_token", params,
-				new JsonHttpResponseHandler() {
-					@Override
-					public void onStart() {
-						mProgressDialog.show();
-					}
+		client.post(Config.oauthUrl + "/access_token", params, new JsonHttpResponseHandler() {
+			@Override
+			public void onStart() {
+				mProgressDialog.show();
+			}
 
-					@Override
-					public void onSuccess(JSONObject response) {
-						isLoggedIn = true;
-						try {
-							token = response.getString("access_token");
-							SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-							SharedPreferences.Editor editor = settings.edit();
-							editor.putString("token", token);
-						} catch (JSONException e) {
-							onFailure(new Throwable());
-						}
-						returnWithToken();
-					}
+			@Override
+			public void onSuccess(JSONObject response) {
+				try {
+					User.token = response.getString("access_token");
+					SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+					SharedPreferences.Editor editor = settings.edit();
+					editor.putString("token", User.token);
+					User.isLoggedIn = true;
+				} catch (Exception e) {
+					onFailure(new Throwable());
+					return;
+				}
+				Log.i(TAG, "Logged In With Token: " + User.token);
+				returnWithToken();
+			}
 
-					@Override
-					public void onFailure(Throwable e) {
-						Log.i(TAG, "GET TOKEN FAIL: " + e.toString());
-					}
+			@Override
+			public void onFailure(Throwable e) {
+				Log.i(TAG, "GET TOKEN FAIL: " + e.toString());
+			}
 
-					@Override
-					public void onFinish() {
-						mProgressDialog.hide();
-					}
-				});
+			@Override
+			public void onFinish() {
+				mProgressDialog.hide();
+			}
+		});
 	}
 
 	@Override
