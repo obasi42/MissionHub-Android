@@ -50,27 +50,6 @@ public class MissionHubActivity extends Activity {
 		logoutBar = (RelativeLayout) findViewById(R.id.logoutbar);
 		txtLogoutbarName = (TextView) findViewById(R.id.txt_logoutbar_name);
 		
-<<<<<<< HEAD
-		
-		
-		
-		
-		refreshView();
-}
-
-	public final int LOGIN_WINDOW_ACTIVITY = 0;
-	public void clickLogin(View view) {
-		Intent i = new Intent(this, LoginActivity.class);
-		startActivityForResult(i, LOGIN_WINDOW_ACTIVITY);
-	}
-	
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == LOGIN_WINDOW_ACTIVITY && resultCode == RESULT_OK) {
-			Log.i(TAG, data.getStringExtra("token"));
-			refreshView();
-		}
-	}
-=======
 		User.token = getStoredToken();
 		User.isLoggedIn = false;
 		if (User.token != null && !User.token.equalsIgnoreCase("")) {
@@ -103,8 +82,20 @@ public class MissionHubActivity extends Activity {
 		} else {
 			refreshView();
 		}
-		// FUTURE END OF MAIN
->>>>>>> 837a14104605a0446eae3d18bb30b3741954fccc
+	}
+
+	public final int LOGIN_WINDOW_ACTIVITY = 0;
+	public void clickLogin(View view) {
+		Intent i = new Intent(this, LoginActivity.class);
+		startActivityForResult(i, LOGIN_WINDOW_ACTIVITY);
+	}
+	
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == LOGIN_WINDOW_ACTIVITY && resultCode == RESULT_OK) {
+			Log.i(TAG, data.getStringExtra("token"));
+			refreshView();
+		}
+	}
 
 	public void clickAbout(View view) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -132,7 +123,7 @@ public class MissionHubActivity extends Activity {
 
 	public void testingApi() {
 		
-		LoginActivity.token = "43941a348dbb0b6c6e88763338baa5bedc08ddaa3c139106c700b8a45e1e8205";
+		User.token = "43941a348dbb0b6c6e88763338baa5bedc08ddaa3c139106c700b8a45e1e8205";
 		JsonHttpResponseHandler responseHandler = new JsonHttpResponseHandler() {
 
 			@Override
@@ -224,36 +215,9 @@ public class MissionHubActivity extends Activity {
 			logoutBar.setVisibility(View.GONE);
 		}
 	}
-<<<<<<< HEAD
-=======
-
-	public void clickAbout(View view) {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(R.string.alert_learn_more)
-				.setIcon(R.drawable.ic_dialog_info)
-				.setMessage(R.string.alert_learn_more_msg)
-				.setPositiveButton(R.string.alert_ok, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						Uri uri = Uri.parse("http://missionhub.com?mobile=0");
-						startActivity(new Intent(Intent.ACTION_VIEW, uri));
-					}
-				})
-				.setNegativeButton(R.string.alert_cancel, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						dialog.cancel();
-					}
-				});
-		AlertDialog alert = builder.create();
-		alert.show();
-	}
-
-	public void clickContact(View view) {
-
-	}
 	
 	public String getStoredToken() {
 		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 		return settings.getString("token", null);
 	}
->>>>>>> 837a14104605a0446eae3d18bb30b3741954fccc
 }
