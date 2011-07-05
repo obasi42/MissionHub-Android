@@ -113,41 +113,11 @@ public class MissionHubActivity extends Activity {
 	
 	public void refreshView() {
 		if (LoginActivity.token != null && LoginActivity.isLoggedIn) {
-			Animation slideOut = AnimationUtils.loadAnimation(this, R.anim.slide_in_bottom);
-			slideOut.setAnimationListener(new AnimationListener() {
-				@Override
-				public void onAnimationEnd(Animation animation) {
-					loggedOut.setVisibility(View.GONE);
-					Animation slideIn = AnimationUtils.loadAnimation(MissionHubActivity.this, R.anim.slide_in_bottom);
-					loggedIn.startAnimation(slideIn);
-				}
-				@Override
-				public void onAnimationRepeat(Animation animation) {}
-
-				@Override
-				public void onAnimationStart(Animation animation) {
-					loggedIn.setVisibility(View.VISIBLE);
-				}
-			});
-			loggedOut.startAnimation(slideOut);
+			loggedOut.setVisibility(View.GONE);
+			loggedIn.setVisibility(View.VISIBLE);
 		} else {
-			Animation slideOut = AnimationUtils.loadAnimation(this, R.anim.slide_in_bottom);
-			slideOut.setAnimationListener(new AnimationListener() {
-				@Override
-				public void onAnimationEnd(Animation animation) {
-					loggedIn.setVisibility(View.GONE);
-					Animation slideIn = AnimationUtils.loadAnimation(MissionHubActivity.this, R.anim.slide_in_bottom);
-					loggedOut.startAnimation(slideIn);
-				}
-				@Override
-				public void onAnimationRepeat(Animation animation) {}
-
-				@Override
-				public void onAnimationStart(Animation animation) {
-					loggedOut.setVisibility(View.VISIBLE);
-				}
-			});
-			loggedIn.startAnimation(slideOut);
+			loggedIn.setVisibility(View.GONE);
+			loggedOut.setVisibility(View.VISIBLE);
 		}
 	}
 
