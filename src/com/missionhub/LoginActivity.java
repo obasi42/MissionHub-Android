@@ -55,9 +55,10 @@ public class LoginActivity extends Activity {
 				LoginActivity.this.getString(R.string.alert_loading), true);
 		mProgressDialog.setCancelable(true);
 		mProgressDialog.setOnCancelListener(new OnCancelListener() {
-			@Override
-			public void onCancel(DialogInterface iface) {
+
+			public void onCancel(DialogInterface dialog) {
 				finish();
+				
 			}
 		});
 
