@@ -42,7 +42,6 @@ public class MissionHubActivity extends Activity {
 	
 	public static final String PREFS_NAME = "MissionHubPrivate";
 	
-	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -54,26 +53,26 @@ public class MissionHubActivity extends Activity {
 		logoutBar = (RelativeLayout) findViewById(R.id.logoutbar);
 		txtLogoutbarName = (TextView) findViewById(R.id.txt_logoutbar_name);
 		
-		
-		checkToken();
-		//Intent i = new Intent(this, ContactsActivity.class);
-		//startActivity(i);
+		if (!checkToken()) {
+			refreshView();
+		}
 	}
 	
-	private void checkToken() {
+	/**
+	 * Check Stored Access Token
+	 * @return true if has stored token
+	 */
+	private boolean checkToken() {
 		User.token = getStoredToken();
 		User.isLoggedIn = false;
 		if (User.token != null && !User.token.equalsIgnoreCase("")) {
 			AsyncHttpResponseHandler responseHandler = new AsyncHttpResponseHandler() {
-				
 				@Override
 				public void onStart() {
 					mProgressDialog = ProgressDialog.show(MissionHubActivity.this, "", MissionHubActivity.this.getString(R.string.alert_logging_in), true);
 				}
-				
 				@Override
 				public void onSuccess(String response) {
-					Log.i(TAG, response);
 					Gson gson = new Gson();
 					try{
 						GError error = gson.fromJson(response, GError.class);
@@ -92,7 +91,6 @@ public class MissionHubActivity extends Activity {
 						}
 					}
 				}
-				
 				@Override
 				public void onFailure(Throwable e) {
 					Log.e(TAG, "Auto Login Failed", e);
@@ -105,17 +103,15 @@ public class MissionHubActivity extends Activity {
 					});
 					ad.show();
 				}
-				
 				@Override
 				public void onFinish() {
 					mProgressDialog.dismiss();
 				}
 			};
-			User.orgID = "123123";
-			//Api.getPeople("me", responseHandler);
-		} else {
-			refreshView();
+			Api.getPeople("me", responseHandler);
+			return true;
 		}
+		return false;
 	}
 	
 	@Override
@@ -179,7 +175,6 @@ public class MissionHubActivity extends Activity {
 	public void testingApi() {
 		User.token = "43941a348dbb0b6c6e88763338baa5bedc08ddaa3c139106c700b8a45e1e8205";
 		User.orgID = "56";
-
 		
 		AsyncHttpResponseHandler responseHandler2 = new AsyncHttpResponseHandler() {
 
