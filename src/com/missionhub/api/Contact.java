@@ -10,6 +10,10 @@ public class Contact {
 		
 	}
 	
+	public Contact (Person person) {
+		setPerson(person);
+	}
+	
 	public void setPerson(Person person) {
 		this.person = person;
 	}
