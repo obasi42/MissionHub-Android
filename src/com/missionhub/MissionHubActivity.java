@@ -1,5 +1,14 @@
 package com.missionhub;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.missionhub.api.Api;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -18,6 +27,7 @@ import android.widget.LinearLayout;
 public class MissionHubActivity extends Activity {
 	
 	public static final String TAG = "MissionHubActivity";
+	public static final String TAG2 = "API";
 	final Handler mHandler = new Handler();
 	private ProgressDialog mProgressDialog;
 	
@@ -35,6 +45,57 @@ public class MissionHubActivity extends Activity {
 		loggedIn = (LinearLayout) findViewById(R.id.loggedin);
 		
 		refreshView();
+
+		JsonHttpResponseHandler responseHandler = new JsonHttpResponseHandler() {
+
+			@Override
+			public void onStart() {
+				Log.i(TAG2, "Starting");
+			}
+			
+			@Override
+			public void onSuccess(JSONArray object) {
+
+				Log.i(TAG2, "SUCCESS!");
+				Log.i(TAG2, object.toString());
+				
+			}
+			
+			@Override
+			public void onFailure(Throwable e) {
+				Log.i(TAG2, e.toString());
+				Log.i(TAG2, "stuff");
+			}
+			
+			@Override
+			public void onFinish() {
+				Log.i(TAG2, "I'm finished!");
+			}
+		};
+		
+//		Api.getPeople(1282204, responseHandler);
+//		Api.getPeople("me", responseHandler);
+//		
+//		ArrayList<Integer> ids = new ArrayList<Integer>();
+//		ids.add(1282204);
+//		ids.add(244771);
+//		Api.getPeople(ids, responseHandler);
+//		
+//		HashMap<String,String> options = new HashMap<String,String>();
+//		options.put("limit","15");
+//		options.put("start", "0");
+//		options.put("assigned_to_id", "none");
+//		options.put("sort", "time");
+//		options.put("direction", "ASC");
+//		
+//		Api.getContactsList(options, responseHandler);
+//		Api.getContacts(1282204, responseHandler);
+		
+		
+		ArrayList<String> rejoicables = new ArrayList<String>();
+		rejoicables.add("gospel_presentation");
+		
+		Api.postFollowupComment(1282204, 244771, "completed", "Hi from the Android API", responseHandler, rejoicables);
 	}
 
 	public final int LOGIN_WINDOW_ACTIVITY = 0;
