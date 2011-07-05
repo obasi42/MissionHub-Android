@@ -40,22 +40,112 @@ public class MissionHubActivity extends Activity {
 	private RelativeLayout logoutBar;
 	private TextView txtLogoutbarName;
 	
+	public final int LOGIN_WINDOW_ACTIVITY = 0;
+	
 	public static final String PREFS_NAME = "MissionHubPrivate";
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		testingApi();
+		//testingApi();
 		
 		loggedOut = (LinearLayout) findViewById(R.id.loggedout);
 		loggedIn = (LinearLayout) findViewById(R.id.loggedin);
 		logoutBar = (RelativeLayout) findViewById(R.id.logoutbar);
 		txtLogoutbarName = (TextView) findViewById(R.id.txt_logoutbar_name);
 		
-		if (!checkToken()) {
+		if (Config.debug) {
+			User.token = getStoredToken();
+			User.orgID = "56";
+			User.isLoggedIn = true;
+			refreshView();
+		} else if (!checkToken()) {
 			refreshView();
 		}
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == LOGIN_WINDOW_ACTIVITY && resultCode == RESULT_OK) {
+			Log.i(TAG, data.getStringExtra("token"));
+			refreshView();
+		}
+	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		refreshView();
+	}
+
+	public void clickAbout(View view) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(R.string.alert_learn_more)
+				.setIcon(R.drawable.ic_dialog_info)
+				.setMessage(R.string.alert_learn_more_msg)
+				.setPositiveButton(R.string.alert_ok, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						Uri uri = Uri.parse("http://missionhub.com?mobile=0");
+						startActivity(new Intent(Intent.ACTION_VIEW, uri));
+					}
+				})
+				.setNegativeButton(R.string.alert_cancel, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.cancel();
+					}
+				});
+		AlertDialog alert = builder.create();
+		alert.show();
+	}
+
+	public void clickLogin(View view) {
+		Intent i = new Intent(this, LoginActivity.class);
+		startActivityForResult(i, LOGIN_WINDOW_ACTIVITY);
+	}
+
+	public void clickContacts(View view) {
+		Intent i = new Intent(this, ContactsActivity.class);
+		startActivity(i);
+	}
+	
+	public void clickLogout(View view) {
+		User.token = null;
+		User.isLoggedIn = false;
+		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+		SharedPreferences.Editor editor = settings.edit();
+		editor.remove("token");
+		editor.commit();
+		refreshView();
+	}
+	
+	public void clickProfile(View view) {
+		
+	}	
+	
+	/**
+	 * Refreshes the main view based on user's logged in status
+	 */
+	public void refreshView() {
+		if (User.isLoggedIn) {
+			loggedOut.setVisibility(View.GONE);
+			loggedIn.setVisibility(View.VISIBLE);
+			logoutBar.setVisibility(View.VISIBLE);
+			txtLogoutbarName.setText("My Name");
+		} else {
+			loggedIn.setVisibility(View.GONE);
+			loggedOut.setVisibility(View.VISIBLE);
+			logoutBar.setVisibility(View.GONE);
+		}
+	}
+	
+	/**
+	 * Returns a users stored access token
+	 * @return stored access token
+	 */
+	public String getStoredToken() {
+		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+		return settings.getString("token", null);
 	}
 	
 	/**
@@ -113,83 +203,6 @@ public class MissionHubActivity extends Activity {
 		}
 		return false;
 	}
-	
-	@Override
-	public void onResume() {
-		super.onResume();
-		refreshView();
-	}
-
-	public final int LOGIN_WINDOW_ACTIVITY = 0;
-	public void clickLogin(View view) {
-		Intent i = new Intent(this, LoginActivity.class);
-		startActivityForResult(i, LOGIN_WINDOW_ACTIVITY);
-	}
-	
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == LOGIN_WINDOW_ACTIVITY && resultCode == RESULT_OK) {
-			Log.i(TAG, data.getStringExtra("token"));
-			refreshView();
-		}
-	}
-
-	public void clickAbout(View view) {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(R.string.alert_learn_more)
-				.setIcon(R.drawable.ic_dialog_info)
-				.setMessage(R.string.alert_learn_more_msg)
-				.setPositiveButton(R.string.alert_ok, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						Uri uri = Uri.parse("http://missionhub.com?mobile=0");
-						startActivity(new Intent(Intent.ACTION_VIEW, uri));
-					}
-				})
-				.setNegativeButton(R.string.alert_cancel, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						dialog.cancel();
-					}
-				});
-		AlertDialog alert = builder.create();
-		alert.show();
-	}
-
-	public void clickContact(View view) {
-		Intent i = new Intent(this, ContactsActivity.class);
-		startActivity(i);
-	}
-	
-	public void clickLogout(View view) {
-		User.token = null;
-		User.isLoggedIn = false;
-		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-		SharedPreferences.Editor editor = settings.edit();
-		editor.remove("token");
-		editor.commit();
-		refreshView();
-	}
-	
-	public void clickProfile(View view) {
-		
-	}	
-	
-	public void refreshView() {
-		if (User.isLoggedIn) {
-			loggedOut.setVisibility(View.GONE);
-			loggedIn.setVisibility(View.VISIBLE);
-			logoutBar.setVisibility(View.VISIBLE);
-			txtLogoutbarName.setText("My Name");
-		} else {
-			loggedIn.setVisibility(View.GONE);
-			loggedOut.setVisibility(View.VISIBLE);
-			logoutBar.setVisibility(View.GONE);
-		}
-	}
-	
-	public String getStoredToken() {
-		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-		return settings.getString("token", null);
-	}
-	
 	
 	public void testingApi() {
 		User.token = "43941a348dbb0b6c6e88763338baa5bedc08ddaa3c139106c700b8a45e1e8205";
