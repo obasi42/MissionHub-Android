@@ -20,7 +20,7 @@ public class Api {
 		String url = getAbsoluteUrl("/people/") + String.valueOf(id) + ".json";
 		Log.i(TAG, "getPeople URL: " + url);
 		RequestParams params = new RequestParams();
-		params.put("access_token", "43941a348dbb0b6c6e88763338baa5bedc08ddaa3c139106c700b8a45e1e8205");
+		params.put("access_token", LoginActivity.token);
 		get(url, params, responseHandler);
 		return true;
 	}
@@ -29,7 +29,7 @@ public class Api {
 		if (ids.size() > 0) {
 			String url = getAbsoluteUrl("/people/") + buildIds(ids) + ".json";
 			RequestParams params = new RequestParams();
-			params.put("access_token", "43941a348dbb0b6c6e88763338baa5bedc08ddaa3c139106c700b8a45e1e8205");
+			params.put("access_token", LoginActivity.token);
 			get(url, params, responseHandler);
 			return true;
 		}
@@ -41,7 +41,7 @@ public class Api {
 			String url = getAbsoluteUrl("/people/") + id + ".json";
 			
 			RequestParams params = new RequestParams();
-			params.put("access_token", "43941a348dbb0b6c6e88763338baa5bedc08ddaa3c139106c700b8a45e1e8205");
+			params.put("access_token", LoginActivity.token);
 			get(url, params, responseHandler);
 			return true;
 		}
@@ -58,7 +58,7 @@ public class Api {
 
 		
 		RequestParams params = new RequestParams();
-		params.put("access_token", "43941a348dbb0b6c6e88763338baa5bedc08ddaa3c139106c700b8a45e1e8205");
+		params.put("access_token", LoginActivity.token);
 		params = sortFilterAssign(options,params);
 		Log.i(TAG, params.toString());
 		
@@ -70,7 +70,7 @@ public class Api {
 		String url = getAbsoluteUrl("/contacts/") + String.valueOf(id) + ".json";
 		
 		RequestParams params = new RequestParams();
-		params.put("access_token", "43941a348dbb0b6c6e88763338baa5bedc08ddaa3c139106c700b8a45e1e8205");
+		params.put("access_token", LoginActivity.token);
 		
 		get(url, params, responseHandler);
 		return true;
@@ -81,7 +81,7 @@ public class Api {
 			String url = getAbsoluteUrl("/contacts/") + buildIds(ids) + ".json";
 			
 			RequestParams params = new RequestParams();
-			params.put("access_token", "43941a348dbb0b6c6e88763338baa5bedc08ddaa3c139106c700b8a45e1e8205");
+			params.put("access_token", LoginActivity.token);
 			
 			get(url, params, responseHandler);
 			return true;
@@ -93,7 +93,7 @@ public class Api {
 		String url = getAbsoluteUrl("/followup_comments/") + String.valueOf(id) + ".json";
 		
 		RequestParams params = new RequestParams();
-		params.put("access_token", "43941a348dbb0b6c6e88763338baa5bedc08ddaa3c139106c700b8a45e1e8205");
+		params.put("access_token", LoginActivity.token);
 		
 		get(url, params, responseHandler);
 		return true;
@@ -133,7 +133,7 @@ public class Api {
 		}
 
 		RequestParams params = new RequestParams();
-		params.put("access_token", "43941a348dbb0b6c6e88763338baa5bedc08ddaa3c139106c700b8a45e1e8205");
+		params.put("access_token", LoginActivity.token);
 		
 		post(url, params, responseHandler);
 		
@@ -143,7 +143,7 @@ public class Api {
 	public static boolean createContactAssignment(int id, int assign_to, AsyncHttpResponseHandler responseHandler) {
 		String url = getAbsoluteUrl("/contact_assignments.json");
 		RequestParams params = new RequestParams();
-		params.put("access_token", "43941a348dbb0b6c6e88763338baa5bedc08ddaa3c139106c700b8a45e1e8205");
+		params.put("access_token", LoginActivity.token);
 		params.put("assign_to", String.valueOf(assign_to));
 		params.put("ids", String.valueOf(id));
 		params.put("org_id", ORGID);
@@ -156,7 +156,7 @@ public class Api {
 	public static boolean deleteContactAssignment(int id, int assign_to, AsyncHttpResponseHandler responseHandler) {
 		String url = getAbsoluteUrl("/contact_assignments/") + String.valueOf(id) + ".json";
 		RequestParams params = new RequestParams();
-		params.put("access_token", "43941a348dbb0b6c6e88763338baa5bedc08ddaa3c139106c700b8a45e1e8205");
+		params.put("access_token", LoginActivity.token);
 		params.put("org_id", ORGID);
 		params.put("_method", "delete");
 		
@@ -166,7 +166,7 @@ public class Api {
 	
 	public static boolean deleteComment(int id, AsyncHttpResponseHandler responseHandler) {
 		RequestParams params = new RequestParams();
-		params.put("access_token", "43941a348dbb0b6c6e88763338baa5bedc08ddaa3c139106c700b8a45e1e8205");
+		params.put("access_token", LoginActivity.token);
 		params.put("org_id", ORGID);
 		params.put("_method", "delete");
 		
