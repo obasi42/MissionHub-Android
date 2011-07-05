@@ -88,8 +88,8 @@ public class MissionHubActivity extends Activity {
 			refreshView();
 		}
 		
-		Intent i = new Intent(this, ContactsActivity.class);
-		startActivity(i);
+		//Intent i = new Intent(this, ContactsActivity.class);
+		//startActivity(i);
 	}
 	
 	@Override
