@@ -1,13 +1,8 @@
 package com.missionhub;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
-
-import com.loopj.android.http.JsonHttpResponseHandler;
-import com.missionhub.api.Api;
-import com.missionhub.api.User;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -23,6 +18,14 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.google.gson.Gson;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.missionhub.api.Api;
+import com.missionhub.api.GContact;
+import com.missionhub.api.GPerson;
+import com.missionhub.api.User;
 
 public class MissionHubActivity extends Activity {
 	
@@ -44,6 +47,7 @@ public class MissionHubActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+		testingApi();
 		
 		loggedOut = (LinearLayout) findViewById(R.id.loggedout);
 		loggedIn = (LinearLayout) findViewById(R.id.loggedin);
@@ -53,17 +57,22 @@ public class MissionHubActivity extends Activity {
 		User.token = getStoredToken();
 		User.isLoggedIn = false;
 		if (User.token != null && !User.token.equalsIgnoreCase("")) {
-			JsonHttpResponseHandler responseHandler = new JsonHttpResponseHandler() {
+			AsyncHttpResponseHandler responseHandler = new AsyncHttpResponseHandler() {
 				@Override
 				public void onStart() {
 					mProgressDialog = ProgressDialog.show(MissionHubActivity.this, "", MissionHubActivity.this.getString(R.string.alert_logging_in), true);
 				}
 				
 				@Override
-				public void onSuccess(JSONObject object) {
+				public void onSuccess(String response) {
 					
 					Log.i(TAG2, "SUCCESS!");
-					Log.i(TAG2, object.toString());
+					Gson gson = new Gson();
+					try{
+						GPerson[] peeps = gson.fromJson(response, GPerson[].class);
+					} catch(Exception e) {
+						Log.i(TAG2, "CRAP", e);
+					}
 					
 				}
 				
@@ -122,9 +131,11 @@ public class MissionHubActivity extends Activity {
 	}
 
 	public void testingApi() {
+		User.token = "c11350a517db90d254a264600b2c7f4c84a7925ca160f9320b2e32f4265e46af";
+		User.orgID = "5380";
+
 		
-		User.token = "43941a348dbb0b6c6e88763338baa5bedc08ddaa3c139106c700b8a45e1e8205";
-		JsonHttpResponseHandler responseHandler = new JsonHttpResponseHandler() {
+		AsyncHttpResponseHandler responseHandler2 = new AsyncHttpResponseHandler() {
 
 			@Override
 			public void onStart() {
@@ -132,10 +143,23 @@ public class MissionHubActivity extends Activity {
 			}
 			
 			@Override
-			public void onSuccess(JSONArray object) {
-
+			public void onSuccess(String response) {
 				Log.i(TAG2, "SUCCESS!");
-				Log.i(TAG2, object.toString());
+				Log.i(TAG2, response);
+				Gson gson = new Gson();
+				try{
+//					GPerson[] peeps = gson.fromJson(response, GPerson[].class);
+//					Log.i(TAG2, peeps[0].getName());
+					
+					GContact[] contacts = gson.fromJson(response, GContact[].class);
+					Log.i(TAG2, contacts[0].getPerson().getName());
+					Log.i(TAG2, contacts[0].getPerson().getPicture());
+					Log.i(TAG2, contacts[0].getPerson().getStatus());
+					
+				} catch(Exception e) {
+					Log.i(TAG2, "CRAP", e);
+				}
+
 				
 			}
 			
@@ -151,34 +175,7 @@ public class MissionHubActivity extends Activity {
 			}
 		};
 		
-		JsonHttpResponseHandler responseHandler2 = new JsonHttpResponseHandler() {
-
-			@Override
-			public void onStart() {
-				Log.i(TAG2, "Starting");
-			}
-			
-			@Override
-			public void onSuccess(JSONArray object) {
-
-				Log.i(TAG2, "SUCCESS!");
-				Log.i(TAG2, object.toString());
-				
-			}
-			
-			@Override
-			public void onFailure(Throwable e) {
-				Log.i(TAG2, e.toString());
-				Log.i(TAG2, "stuff");
-			}
-			
-			@Override
-			public void onFinish() {
-				Log.i(TAG2, "I'm finished!");
-			}
-		};
-		
-//		Api.getPeople(1282204, responseHandler);
+//		Api.getPeople(1282204, responseHandler2);
 //		Api.getPeople("me", responseHandler);
 //		
 //		ArrayList<Integer> ids = new ArrayList<Integer>();
@@ -186,22 +183,33 @@ public class MissionHubActivity extends Activity {
 //		ids.add(244771);
 //		Api.getPeople(ids, responseHandler);
 //		
-//		HashMap<String,String> options = new HashMap<String,String>();
-//		options.put("limit","15");
-//		options.put("start", "0");
-//		options.put("assigned_to_id", "none");
-//		options.put("sort", "time");
-//		options.put("direction", "ASC");
-//		
-//		Api.getContactsList(options, responseHandler);
+		HashMap<String,String> options = new HashMap<String,String>();
+		options.put("limit","15");
+		options.put("start", "0");
+		options.put("assigned_to_id", "none");
+		options.put("sort", "time");
+		options.put("direction", "ASC");
+		Api.getContactsList(options, responseHandler2);
+		
 //		Api.getContacts(1282204, responseHandler);
 		
 		
-		ArrayList<String> rejoicables = new ArrayList<String>();
-		rejoicables.add("gospel_presentation");
+//		ArrayList<String> rejoicables = new ArrayList<String>();
+//		rejoicables.add("gospel_presentation");
+//		
+//		Api.postFollowupComment(1282204, 244771, "completed", "Hi from the Android API", responseHandler, rejoicables);
+//	
+//		Api.createContactAssignment(244771, 1282204, responseHandler);
 		
-		Api.postFollowupComment(1282204, 244771, "completed", "Hi from the Android API", responseHandler, rejoicables);
+//		Api.deleteContactAssignment(244771, responseHandler2);
+		
+//		Api.deleteComment(194, responseHandler);
+		
+//		Api.getFollowupComments(93487, responseHandler2);	
+		
+		//User user = mapper.readValue(new File("user.json"), User.class);
 	}
+	
 	
 	public void refreshView() {
 		if (User.isLoggedIn) {
