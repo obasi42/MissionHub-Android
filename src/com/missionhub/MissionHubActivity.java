@@ -23,7 +23,9 @@ import com.missionhub.api.Api;
 import com.missionhub.api.GContact;
 import com.missionhub.api.GError;
 import com.missionhub.api.GPerson;
+import com.missionhub.api.MHError;
 import com.missionhub.api.User;
+import com.missionhub.ui.DisplayError;
 
 public class MissionHubActivity extends Activity {
 	
@@ -51,6 +53,13 @@ public class MissionHubActivity extends Activity {
 		logoutBar = (RelativeLayout) findViewById(R.id.logoutbar);
 		txtLogoutbarName = (TextView) findViewById(R.id.txt_logoutbar_name);
 		
+		
+		checkToken();
+		//Intent i = new Intent(this, ContactsActivity.class);
+		//startActivity(i);
+	}
+	
+	private void checkToken() {
 		User.token = getStoredToken();
 		User.isLoggedIn = false;
 		if (User.token != null && !User.token.equalsIgnoreCase("")) {
@@ -67,8 +76,7 @@ public class MissionHubActivity extends Activity {
 					Gson gson = new Gson();
 					try{
 						GError error = gson.fromJson(response, GError.class);
-						Log.e(TAG, error.getError().getMessage() + ":" + error.getError().getCode());
-						// TODO: DISPLAY ERROR;
+						onFailure(new MHError(error));
 					} catch (Exception out){
 						try {
 							GPerson[] people = gson.fromJson(response, GPerson[].class);
@@ -87,6 +95,15 @@ public class MissionHubActivity extends Activity {
 				@Override
 				public void onFailure(Throwable e) {
 					Log.e(TAG, "Auto Login Failed", e);
+					AlertDialog ad = DisplayError.display(MissionHubActivity.this, e);
+					ad.setButton(ad.getContext().getString(R.string.alert_retry), new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int id) {
+							dialog.dismiss();
+							checkToken();
+						}
+					});
+					ad.show();
 				}
 				
 				@Override
@@ -94,14 +111,11 @@ public class MissionHubActivity extends Activity {
 					mProgressDialog.dismiss();
 				}
 			};
-			User.orgID = "56";
+			User.orgID = "123123";
 			Api.getPeople("me", responseHandler);
 		} else {
 			refreshView();
 		}
-		
-		//Intent i = new Intent(this, ContactsActivity.class);
-		//startActivity(i);
 	}
 	
 	@Override
