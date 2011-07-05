@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="horizontal"
+	android:layout_height="wrap_content" 
+	android:gravity="left|center"
+	android:padding="3dp" android:background="@color/white" android:layout_width="fill_parent">
+	
+	<ImageView
+        android:id="@+id/contacts_list_contact_image"
+        android:layout_marginRight="7dp"
+        android:src="@drawable/default_contact" android:layout_width="50dp" android:layout_height="50dp"/>
+    <LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="wrap_content">
+        <TextView android:layout_height="wrap_content" android:layout_width="fill_parent" android:textSize="18dp" android:textColor="@color/black" android:id="@+id/contacts_list_contact_name" android:text="@string/contacts_my_completed" android:ellipsize="end"></TextView>
+        <TextView android:layout_height="wrap_content" android:textColor="@color/black" android:layout_width="fill_parent" android:textSize="13dp" android:id="@+id/contacts_list_contact_status" android:text="@string/contacts_unassigned"></TextView>
+    </LinearLayout>
+</LinearLayout>

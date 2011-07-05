@@ -6,6 +6,11 @@
     <string name="main_login">Login</string>
     <string name="main_contacts">Contacts</string>
     
+    <string name="contacts_my_contacts">My Contacts</string>
+    <string name="contacts_my_completed">My Completed Contacts</string>
+    <string name="contacts_unassigned">Unassigned Contacts</string>
+    <string name="contacts_search_hint">Search...</string>
+    
     <string name="alert_ok">OK</string>
     <string name="alert_cancel">Cancel</string>
     <string name="alert_learn_more">Learn More</string>

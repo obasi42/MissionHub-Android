@@ -40,7 +40,6 @@ public class MissionHubActivity extends Activity {
 	
 	public static final String PREFS_NAME = "MissionHubPrivate";
 	
-	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -89,6 +88,9 @@ public class MissionHubActivity extends Activity {
 		} else {
 			refreshView();
 		}
+		
+		Intent i = new Intent(this, ContactsActivity.class);
+		startActivity(i);
 	}
 	
 	@Override
@@ -131,7 +133,8 @@ public class MissionHubActivity extends Activity {
 	}
 
 	public void clickContact(View view) {
-
+		Intent i = new Intent(this, ContactsActivity.class);
+		startActivity(i);
 	}
 	
 	public void clickLogout(View view) {
