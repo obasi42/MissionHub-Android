@@ -21,6 +21,7 @@ import com.google.gson.Gson;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.missionhub.api.Api;
 import com.missionhub.api.GContact;
+import com.missionhub.api.GError;
 import com.missionhub.api.GPerson;
 import com.missionhub.api.User;
 
@@ -63,19 +64,29 @@ public class MissionHubActivity extends Activity {
 				@Override
 				public void onSuccess(String response) {
 					
-					Log.i(TAG2, "SUCCESS!");
+					Log.i(TAG, response);
 					Gson gson = new Gson();
 					try{
-						GPerson[] peeps = gson.fromJson(response, GPerson[].class);
-					} catch(Exception e) {
-						Log.i(TAG2, "CRAP", e);
+						GError error = gson.fromJson(response, GError.class);
+						Log.e(TAG, error.getMesage() + ":" + error.getCode());
+						// TODO: DISPLAY ERROR;
+					} catch (Exception e){
+						try {
+							GPerson[] people = gson.fromJson(response, GPerson[].class);
+							if (people.length > 0) {
+								//User.contact = contacts[0];
+								User.isLoggedIn = true;
+								refreshView();
+							}
+						} catch(Exception e1) {
+							onFailure(e1);
+						}
 					}
 				}
 				
 				@Override
 				public void onFailure(Throwable e) {
-					Log.i(TAG2, e.toString());
-					Log.i(TAG2, "stuff");
+					Log.e(TAG, "Auto Login Failed", e);
 				}
 				
 				@Override
@@ -83,13 +94,14 @@ public class MissionHubActivity extends Activity {
 					mProgressDialog.dismiss();
 				}
 			};
+			User.orgID = "5380";
 			Api.getPeople("me", responseHandler);
 		} else {
 			refreshView();
 		}
 		
-		Intent i = new Intent(this, ContactsActivity.class);
-		startActivity(i);
+		//Intent i = new Intent(this, ContactsActivity.class);
+		//startActivity(i);
 	}
 	
 	@Override
@@ -152,7 +164,7 @@ public class MissionHubActivity extends Activity {
 
 	public void testingApi() {
 		User.token = "c11350a517db90d254a264600b2c7f4c84a7925ca160f9320b2e32f4265e46af";
-		User.orgID = "5380";
+		//User.orgID = "5380";
 
 		
 		AsyncHttpResponseHandler responseHandler2 = new AsyncHttpResponseHandler() {
