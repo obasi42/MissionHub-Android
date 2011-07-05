@@ -170,8 +170,27 @@ public class MissionHubActivity extends Activity {
 	
 	public void clickProfile(View view) {
 		
+	}	
+	
+	public void refreshView() {
+		if (User.isLoggedIn) {
+			loggedOut.setVisibility(View.GONE);
+			loggedIn.setVisibility(View.VISIBLE);
+			logoutBar.setVisibility(View.VISIBLE);
+			txtLogoutbarName.setText("My Name");
+		} else {
+			loggedIn.setVisibility(View.GONE);
+			loggedOut.setVisibility(View.VISIBLE);
+			logoutBar.setVisibility(View.GONE);
+		}
 	}
-
+	
+	public String getStoredToken() {
+		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+		return settings.getString("token", null);
+	}
+	
+	
 	public void testingApi() {
 		User.token = "43941a348dbb0b6c6e88763338baa5bedc08ddaa3c139106c700b8a45e1e8205";
 		User.orgID = "56";
@@ -262,24 +281,5 @@ public class MissionHubActivity extends Activity {
 //		Api.getFollowupComments(93487, responseHandler2);	
 		
 		//User user = mapper.readValue(new File("user.json"), User.class);
-	}
-	
-	
-	public void refreshView() {
-		if (User.isLoggedIn) {
-			loggedOut.setVisibility(View.GONE);
-			loggedIn.setVisibility(View.VISIBLE);
-			logoutBar.setVisibility(View.VISIBLE);
-			txtLogoutbarName.setText("My Name");
-		} else {
-			loggedIn.setVisibility(View.GONE);
-			loggedOut.setVisibility(View.VISIBLE);
-			logoutBar.setVisibility(View.GONE);
-		}
-	}
-	
-	public String getStoredToken() {
-		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-		return settings.getString("token", null);
 	}
 }
