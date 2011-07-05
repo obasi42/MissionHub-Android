@@ -12,7 +12,7 @@
     <string name="contacts_search_hint">Search...</string>
     
     <string name="alert_error">Error</string>
-    <string name="alert_error_msg">An unknown error has occurred. Please try again.</string>
+    <string name="alert_error_msg">An unknown error has occured. Please try again or contact support.</string>
     <string name="alert_ok">OK</string>
     <string name="alert_cancel">Cancel</string>
     <string name="alert_retry">Retry</string>
@@ -23,4 +23,9 @@
     <string name="alert_logging_in">Logging in. Please wait...</string>
     
     <string name="toast_no_browser">Could not find a web browser</string>
+    
+    <string name="error_no_network">No Network</string>
+    <string name="error_no_network_msg">The MissionHub server could not be contacted. Please make sure you are connect to the internet and try again.</string>
+	<string name="error_unexpected_response">Unexpected Response</string>
+	<string name="error_unexpected_response_msg">The MissionHub server returned unexpected data. Please try again later.</string>
 </resources>

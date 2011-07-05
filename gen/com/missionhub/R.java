@@ -95,6 +95,10 @@ public final class R {
         public static final int contacts_my_contacts=0x7f060005;
         public static final int contacts_search_hint=0x7f060008;
         public static final int contacts_unassigned=0x7f060007;
+        public static final int error_no_network=0x7f060014;
+        public static final int error_no_network_msg=0x7f060015;
+        public static final int error_unexpected_response=0x7f060016;
+        public static final int error_unexpected_response_msg=0x7f060017;
         public static final int main_about=0x7f060002;
         public static final int main_contacts=0x7f060004;
         public static final int main_login=0x7f060003;

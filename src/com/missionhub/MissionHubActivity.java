@@ -41,7 +41,6 @@ public class MissionHubActivity extends Activity {
 	
 	public static final String PREFS_NAME = "MissionHubPrivate";
 	
-	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -53,26 +52,26 @@ public class MissionHubActivity extends Activity {
 		logoutBar = (RelativeLayout) findViewById(R.id.logoutbar);
 		txtLogoutbarName = (TextView) findViewById(R.id.txt_logoutbar_name);
 		
-		
-		checkToken();
-		//Intent i = new Intent(this, ContactsActivity.class);
-		//startActivity(i);
+		if (!checkToken()) {
+			refreshView();
+		}
 	}
 	
-	private void checkToken() {
+	/**
+	 * Check Stored Access Token
+	 * @return true if has stored token
+	 */
+	private boolean checkToken() {
 		User.token = getStoredToken();
 		User.isLoggedIn = false;
 		if (User.token != null && !User.token.equalsIgnoreCase("")) {
 			AsyncHttpResponseHandler responseHandler = new AsyncHttpResponseHandler() {
-				
 				@Override
 				public void onStart() {
 					mProgressDialog = ProgressDialog.show(MissionHubActivity.this, "", MissionHubActivity.this.getString(R.string.alert_logging_in), true);
 				}
-				
 				@Override
 				public void onSuccess(String response) {
-					Log.i(TAG, response);
 					Gson gson = new Gson();
 					try{
 						GError error = gson.fromJson(response, GError.class);
@@ -91,13 +90,11 @@ public class MissionHubActivity extends Activity {
 						}
 					}
 				}
-				
 				@Override
 				public void onFailure(Throwable e) {
 					Log.e(TAG, "Auto Login Failed", e);
 					AlertDialog ad = DisplayError.display(MissionHubActivity.this, e);
 					ad.setButton(ad.getContext().getString(R.string.alert_retry), new DialogInterface.OnClickListener() {
-						@Override
 						public void onClick(DialogInterface dialog, int id) {
 							dialog.dismiss();
 							checkToken();
@@ -105,17 +102,15 @@ public class MissionHubActivity extends Activity {
 					});
 					ad.show();
 				}
-				
 				@Override
 				public void onFinish() {
 					mProgressDialog.dismiss();
 				}
 			};
-			User.orgID = "123123";
 			Api.getPeople("me", responseHandler);
-		} else {
-			refreshView();
+			return true;
 		}
+		return false;
 	}
 	
 	@Override
@@ -177,7 +172,7 @@ public class MissionHubActivity extends Activity {
 	}
 
 	public void testingApi() {
-		User.token = "c11350a517db90d254a264600b2c7f4c84a7925ca160f9320b2e32f4265e46af";
+		//User.token = "c11350a517db90d254a264600b2c7f4c84a7925ca160f9320b2e32f4265e46af";
 		//User.orgID = "5380";
 
 		
