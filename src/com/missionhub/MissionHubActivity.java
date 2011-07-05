@@ -8,6 +8,8 @@ import org.json.JSONObject;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.missionhub.api.Api;
 import com.missionhub.api.User;
+import com.missionhub.api.Person;
+import com.missionhub.api.Contact;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -60,11 +62,16 @@ public class MissionHubActivity extends Activity {
 				}
 				
 				@Override
-				public void onSuccess(JSONObject object) {
-					
-					Log.i(TAG2, "SUCCESS!");
-					Log.i(TAG2, object.toString());
-					
+				public void onSuccess(JSONArray array) {
+					try {
+						JSONObject person = (JSONObject) array.get(0);
+						User.contact = new Contact(new Person(person, Person.TYPE_COMPLETE));
+						User.isLoggedIn = true;
+						refreshView();
+					} catch (Exception e) {
+						onFailure(e.getCause());
+						return;
+					}
 				}
 				
 				@Override
@@ -82,6 +89,12 @@ public class MissionHubActivity extends Activity {
 		} else {
 			refreshView();
 		}
+	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		refreshView();
 	}
 
 	public final int LOGIN_WINDOW_ACTIVITY = 0;
@@ -119,6 +132,20 @@ public class MissionHubActivity extends Activity {
 
 	public void clickContact(View view) {
 
+	}
+	
+	public void clickLogout(View view) {
+		User.token = null;
+		User.isLoggedIn = false;
+		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+		SharedPreferences.Editor editor = settings.edit();
+		editor.remove("token");
+		editor.commit();
+		refreshView();
+	}
+	
+	public void clickProfile(View view) {
+		
 	}
 
 	public void testingApi() {

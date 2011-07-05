@@ -165,9 +165,10 @@ public class LoginActivity extends Activity {
 					SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 					SharedPreferences.Editor editor = settings.edit();
 					editor.putString("token", User.token);
+					editor.commit();
 					User.isLoggedIn = true;
 				} catch (Exception e) {
-					onFailure(new Throwable());
+					onFailure(e.getCause());
 					return;
 				}
 				Log.i(TAG, "Logged In With Token: " + User.token);
