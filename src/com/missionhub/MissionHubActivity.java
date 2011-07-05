@@ -10,6 +10,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
+import android.view.animation.AnimationUtils;
+import android.widget.LinearLayout;
 
 public class MissionHubActivity extends Activity {
 	
@@ -17,11 +21,20 @@ public class MissionHubActivity extends Activity {
 	final Handler mHandler = new Handler();
 	private ProgressDialog mProgressDialog;
 	
+	private LinearLayout loggedOut;
+	private LinearLayout loggedIn;
+	
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+		
+		loggedOut = (LinearLayout) findViewById(R.id.loggedout);
+		loggedIn = (LinearLayout) findViewById(R.id.loggedin);
+		
+		refreshView();
 	}
 
 	public final int LOGIN_WINDOW_ACTIVITY = 0;
@@ -33,6 +46,47 @@ public class MissionHubActivity extends Activity {
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == LOGIN_WINDOW_ACTIVITY && resultCode == RESULT_OK) {
 			Log.i(TAG, data.getStringExtra("token"));
+			refreshView();
+		}
+	}
+	
+	public void refreshView() {
+		if (LoginActivity.token != null && LoginActivity.isLoggedIn) {
+			Animation slideOut = AnimationUtils.loadAnimation(this, R.anim.slide_in_bottom);
+			slideOut.setAnimationListener(new AnimationListener() {
+				@Override
+				public void onAnimationEnd(Animation animation) {
+					loggedOut.setVisibility(View.GONE);
+					Animation slideIn = AnimationUtils.loadAnimation(MissionHubActivity.this, R.anim.slide_in_bottom);
+					loggedIn.startAnimation(slideIn);
+				}
+				@Override
+				public void onAnimationRepeat(Animation animation) {}
+
+				@Override
+				public void onAnimationStart(Animation animation) {
+					loggedIn.setVisibility(View.VISIBLE);
+				}
+			});
+			loggedOut.startAnimation(slideOut);
+		} else {
+			Animation slideOut = AnimationUtils.loadAnimation(this, R.anim.slide_in_bottom);
+			slideOut.setAnimationListener(new AnimationListener() {
+				@Override
+				public void onAnimationEnd(Animation animation) {
+					loggedIn.setVisibility(View.GONE);
+					Animation slideIn = AnimationUtils.loadAnimation(MissionHubActivity.this, R.anim.slide_in_bottom);
+					loggedOut.startAnimation(slideIn);
+				}
+				@Override
+				public void onAnimationRepeat(Animation animation) {}
+
+				@Override
+				public void onAnimationStart(Animation animation) {
+					loggedOut.setVisibility(View.VISIBLE);
+				}
+			});
+			loggedIn.startAnimation(slideOut);
 		}
 	}
 

@@ -15,7 +15,7 @@
 	<ImageView android:layout_height="100dp" android:src="@drawable/mh_logo" android:id="@+id/img_logo" android:layout_width="fill_parent" android:layout_marginTop="60dp"></ImageView>
 	<LinearLayout android:layout_height="wrap_content"
 		android:layout_width="fill_parent"
-		android:layout_alignParentBottom="true" android:orientation="vertical" android:id="@+id/loggedout">
+		android:layout_alignParentBottom="true" android:orientation="vertical" android:id="@+id/loggedout" android:visibility="gone">
 		<Button style="@style/mh_button" android:layout_width="fill_parent" android:id="@+id/btn_loggedout_about" android:layout_height="106dp" android:text="@string/main_about" android:onClick="clickAbout"></Button>
 		<Button style="@style/mh_button" android:layout_width="fill_parent" android:id="@+id/btn_loggedout_login" android:layout_height="106dp" android:text="@string/main_login" android:onClick="clickLogin"></Button>
 	</LinearLayout>
