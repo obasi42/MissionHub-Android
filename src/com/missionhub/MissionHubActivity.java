@@ -98,7 +98,6 @@ public class MissionHubActivity extends Activity {
 					Log.e(TAG, "Auto Login Failed", e);
 					AlertDialog ad = DisplayError.display(MissionHubActivity.this, e);
 					ad.setButton(ad.getContext().getString(R.string.alert_retry), new DialogInterface.OnClickListener() {
-						@Override
 						public void onClick(DialogInterface dialog, int id) {
 							dialog.dismiss();
 							checkToken();
@@ -113,7 +112,7 @@ public class MissionHubActivity extends Activity {
 				}
 			};
 			User.orgID = "123123";
-			Api.getPeople("me", responseHandler);
+			//Api.getPeople("me", responseHandler);
 		} else {
 			refreshView();
 		}
@@ -178,8 +177,8 @@ public class MissionHubActivity extends Activity {
 	}
 
 	public void testingApi() {
-		User.token = "c11350a517db90d254a264600b2c7f4c84a7925ca160f9320b2e32f4265e46af";
-		//User.orgID = "5380";
+		User.token = "43941a348dbb0b6c6e88763338baa5bedc08ddaa3c139106c700b8a45e1e8205";
+		User.orgID = "56";
 
 		
 		AsyncHttpResponseHandler responseHandler2 = new AsyncHttpResponseHandler() {
@@ -205,6 +204,7 @@ public class MissionHubActivity extends Activity {
 					
 					try {
 						Log.i(TAG2, peeps[0].getLocation().getName());
+						Log.i(TAG2, peeps[0].getAssignment().getAssigned_to_person()[0].getName());
 					} catch(Exception e) {
 						Log.i(TAG2, "ARGGG", e);
 					}
@@ -234,7 +234,6 @@ public class MissionHubActivity extends Activity {
 				Log.i(TAG2, "I'm finished!");
 			}
 		};
-		
 		Api.getPeople(1282204, responseHandler2);
 //		Api.getPeople("me", responseHandler);
 //		
