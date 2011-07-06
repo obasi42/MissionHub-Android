@@ -32,17 +32,19 @@ public final class R {
         public static final int ic_menu_refresh=0x7f020005;
         public static final int icon=0x7f020006;
         public static final int mh_background=0x7f020007;
-        public static final int mh_button=0x7f020008;
-        public static final int mh_icon_profile=0x7f020009;
-        public static final int mh_logo=0x7f02000a;
-        public static final int mh_logoutbar=0x7f02000b;
-        public static final int mh_navbar=0x7f02000c;
-        public static final int mh_searchband=0x7f02000d;
-        public static final int mh_tab=0x7f02000e;
-        public static final int rounded_edittext=0x7f02000f;
-        public static final int rounded_tab=0x7f020010;
+        public static final int mh_background_black=0x7f020008;
+        public static final int mh_button=0x7f020009;
+        public static final int mh_icon_profile=0x7f02000a;
+        public static final int mh_logo=0x7f02000b;
+        public static final int mh_logoutbar=0x7f02000c;
+        public static final int mh_navbar=0x7f02000d;
+        public static final int mh_searchband=0x7f02000e;
+        public static final int mh_tab=0x7f02000f;
+        public static final int rounded_edittext=0x7f020010;
+        public static final int rounded_tab=0x7f020011;
     }
     public static final class id {
+        public static final int EditText1=0x7f090020;
         public static final int btn_contacts=0x7f09001e;
         public static final int btn_contacts_completed=0x7f09000c;
         public static final int btn_contacts_my=0x7f09000b;
@@ -59,17 +61,27 @@ public final class R {
         public static final int contacts_list_contact_name=0x7f090002;
         public static final int contacts_list_contact_status=0x7f090003;
         public static final int contacts_progress=0x7f09000f;
-        public static final int contacts_refresh=0x7f09001f;
+        public static final int contacts_refresh=0x7f09002a;
         public static final int contacts_search=0x7f090008;
         public static final int contacts_search_container=0x7f090007;
         public static final int contacts_selector=0x7f09000a;
         public static final int contacts_top_bar=0x7f090005;
+        public static final int imageView1=0x7f090024;
         public static final int img_logo=0x7f090019;
+        public static final int linearLayout1=0x7f090023;
+        public static final int linearLayout2=0x7f090025;
+        public static final int linearLayout3=0x7f090027;
         public static final int loggedin=0x7f09001d;
         public static final int loggedout=0x7f09001a;
         public static final int login=0x7f090011;
         public static final int logoutbar=0x7f090015;
         public static final int main=0x7f090014;
+        public static final int profile_container=0x7f090022;
+        public static final int relativeLayout1=0x7f09001f;
+        public static final int spinner1=0x7f090029;
+        public static final int textView2=0x7f090021;
+        public static final int textView3=0x7f090026;
+        public static final int textView5=0x7f090028;
         public static final int txt_contacts_no_data=0x7f090010;
         public static final int txt_contacts_title=0x7f090006;
         public static final int txt_logoutbar_logout=0x7f090016;
@@ -126,9 +138,13 @@ public final class R {
         public static final int main_contacts=0x7f060004;
         public static final int main_login=0x7f060003;
         public static final int main_logout=0x7f060001;
+        public static final int profile_change_current_organization=0x7f060028;
+        public static final int profile_click_to_close=0x7f060029;
+        public static final int profile_header=0x7f060027;
         public static final int toast_no_browser=0x7f06001c;
     }
     public static final class style {
+        public static final int logoutText=0x7f070001;
         public static final int mh_button=0x7f070000;
     }
 }

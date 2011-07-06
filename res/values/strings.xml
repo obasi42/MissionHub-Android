@@ -44,4 +44,8 @@
 	<string name="guide_contacts_unassigned_msg">This view shows all contacts that have been collected but not assigned. All designated leaders can access this page and can self-assign contacts. If you tap ‘Assign to me’, this contact will move to ‘My Contacts’.</string>
 	<string name="guide_contact">Contact Information</string>
 	<string name="guide_contact_msg">You can learn about a contact and record your interactions with that person on this page. If you mark a contact as ‘Completed’, it will move to ‘My Completed’. Tap the rejoicing icon to add  Rejoicables to your interaction.</string>
+
+	<string name="profile_header">Profile</string>
+	<string name="profile_change_current_organization">Change Current Organization:</string>
+	<string name="profile_click_to_close">Click to Close</string>
 </resources>

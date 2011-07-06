@@ -42,7 +42,7 @@ public class MissionHubActivity extends Activity {
 	private TextView txtLogoutbarName;
 	
 	public final int LOGIN_WINDOW_ACTIVITY = 0;
-	
+	public final int PROFILE_ACTIVITY = 1;
 	public static final String PREFS_NAME = "MissionHubPrivate";
 	
 	@Override
@@ -66,6 +66,10 @@ public class MissionHubActivity extends Activity {
 		if (requestCode == LOGIN_WINDOW_ACTIVITY && resultCode == RESULT_OK) {
 			Log.i(TAG, data.getStringExtra("token"));
 			refreshView();
+		}
+		
+		if(requestCode == PROFILE_ACTIVITY && resultCode == RESULT_OK && data.hasExtra("logout")) {
+			logout();
 		}
 	}
 	
@@ -106,6 +110,10 @@ public class MissionHubActivity extends Activity {
 	}
 	
 	public void clickLogout(View view) {
+		logout();
+	}
+	
+	public void logout() {
 		User.token = null;
 		User.isLoggedIn = false;
 		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
@@ -117,7 +125,7 @@ public class MissionHubActivity extends Activity {
 	
 	public void clickProfile(View view) {
 		Intent i = new Intent(this, ProfileActivity.class);
-		startActivity(i);
+		startActivityForResult(i, PROFILE_ACTIVITY);
 	}	
 	
 	/**
@@ -141,7 +149,7 @@ public class MissionHubActivity extends Activity {
 	 * @return stored access token
 	 */
 	public String getStoredToken() {
-		return "a7421d97fe9d790085f62512b2ca205737fa5f7adf9a9c4e97be56ddb3c751a3";
+		return "c1d65450bcb7c26efcedcd41497cae4b66e2194388c8c124914499b2094ebbed";
 		//SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 		//return settings.getString("token", null);
 	}
@@ -203,8 +211,8 @@ public class MissionHubActivity extends Activity {
 	}
 	
 	public void testingApi() {
-		User.token = "43941a348dbb0b6c6e88763338baa5bedc08ddaa3c139106c700b8a45e1e8205";
-		User.orgID = "1825";
+		User.token = "c1d65450bcb7c26efcedcd41497cae4b66e2194388c8c124914499b2094ebbed";
+		User.orgID = "56";
 		
 		AsyncHttpResponseHandler responseHandler2 = new AsyncHttpResponseHandler() {
 
