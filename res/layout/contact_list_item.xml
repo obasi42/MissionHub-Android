@@ -3,7 +3,7 @@
 	android:orientation="horizontal"
 	android:layout_height="wrap_content" 
 	android:gravity="left|center"
-	android:padding="3dp" android:background="@color/white" android:layout_width="fill_parent">
+	android:padding="3dp" android:layout_width="fill_parent">
 	
 	<ImageView
         android:id="@+id/contacts_list_contact_image"
