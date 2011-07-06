@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="fill_parent" android:id="@+id/contact_header" android:padding="8dp" android:background="@drawable/mh_contact_top" android:layout_height="166dp">
+        <ImageView android:src="@drawable/facebook_question" android:layout_width="110dp" android:layout_height="150dp" android:layout_gravity="center" android:layout_marginRight="10dp" android:id="@+id/contact_picture"></ImageView>
+        <LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_gravity="center" android:id="@+id/contact_nameview">
+            <TextView android:text="TextView" android:textAppearance="?android:attr/textAppearanceLarge" android:layout_height="wrap_content" android:layout_width="fill_parent" android:id="@+id/contact_name" android:layout_marginBottom="10dp" android:maxLines="2" android:ellipsize="end"></TextView>
+            <LinearLayout android:layout_height="wrap_content" android:layout_width="fill_parent" android:id="@+id/contact_buttons">
+                <Button android:background="@drawable/phone" android:layout_width="47dp" android:layout_height="38dp" android:layout_marginRight="18dp" android:id="@+id/contact_phone"></Button>
+                <Button android:background="@drawable/chat" android:layout_width="47dp" android:layout_height="38dp" android:layout_marginRight="18dp" android:id="@+id/contact_sms"></Button>
+                <Button android:background="@drawable/envelope" android:layout_width="47dp" android:layout_height="38dp" android:id="@+id/contact_email"></Button>
+            </LinearLayout>
+            <Button android:layout_marginTop="10dp" android:background="@drawable/assign_button" android:layout_width="177dp" android:layout_height="30dp" android:text="@string/contact_assign_to_me" android:textColor="@color/white" android:textSize="13dp" android:textStyle="bold" android:id="@+id/contact_assign"></Button>
+        </LinearLayout>
+    </LinearLayout>

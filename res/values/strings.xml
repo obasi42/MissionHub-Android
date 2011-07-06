@@ -18,6 +18,17 @@
     <string name="contacts_no_data_unassigned">No Unassigned Contacts</string>
     <string name="contacts_menu_refresh">Refresh</string>
     
+    <string name="contact_contact">Contact</string>
+    <string name="contact_more">More Contact Info</string>
+    <string name="contact_survey">Contact Surveys</string>
+    <string name="contact_assign_to_me">Assign To Me</string>
+    <string name="contact_unassign">Unassign</string>
+    <string name="contact_comment_hint">Add comment here...</string>
+    <string name="contact_comment_save">Save</string>
+    <string name="contact_tab_contact">Contact</string>
+    <string name="contact_tab_more">More Info</string>
+    <string name="contact_tab_survey">Surveys</string>
+    
     <string name="alert_error">Error</string>
     <string name="alert_error_msg">An unknown error has occurred. Please try again or contact support.</string>
     <string name="alert_ok">OK</string>
