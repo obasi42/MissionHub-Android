@@ -12,6 +12,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.widget.ImageView;
 
 // FROM: http://codehenge.net/blog/2011/06/android-development-tutorial-asynchronous-lazy-loading-and-caching-of-listview-images/
@@ -43,28 +44,30 @@ public class ImageManager {
 	}
 	   
 	public void displayImage(String url, Activity activity, ImageView imageView) {
-		if(imageMap.containsKey(url))
+		if(imageMap.containsKey(url)) {
 			imageView.setImageBitmap(imageMap.get(url));
-		else {
+		} else {
 			queueImage(url, activity, imageView);
-			imageView.setImageResource(R.drawable.icon);
+			imageView.setImageResource(R.drawable.default_contact);
 		}
 	}
 
 	private void queueImage(String url, Activity activity, ImageView imageView) {
 		// This ImageView might have been used for other images, so we clear 
 		// the queue of old tasks before starting.
-		imageQueue.Clean(imageView);
-		ImageRef p=new ImageRef(url, imageView);
+		if (url != null) {
+			imageQueue.Clean(imageView);
+			ImageRef p=new ImageRef(url, imageView);
 
-		synchronized(imageQueue.imageRefs) {
-			imageQueue.imageRefs.push(p);
-			imageQueue.imageRefs.notifyAll();
+			synchronized(imageQueue.imageRefs) {
+				imageQueue.imageRefs.push(p);
+				imageQueue.imageRefs.notifyAll();
+			}
+
+			// Start thread if it's not started yet
+			if(imageLoaderThread.getState() == Thread.State.NEW)
+				imageLoaderThread.start();
 		}
-
-		// Start thread if it's not started yet
-		if(imageLoaderThread.getState() == Thread.State.NEW)
-			imageLoaderThread.start();
 	}
 
 	private Bitmap getBitmap(String url) {
@@ -81,9 +84,10 @@ public class ImageManager {
 			// save bitmap to cache for later
 			writeFile(bitmap, f);
 			
+			Log.i("BITMAP", f.getAbsolutePath());
+			
 			return bitmap;
 		} catch (Exception ex) {
-			ex.printStackTrace();
 			return null;
 		}
 	}
@@ -94,9 +98,7 @@ public class ImageManager {
 		try {
 			out = new FileOutputStream(f);
 			bmp.compress(Bitmap.CompressFormat.PNG, 80, out);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		} catch (Exception e) {}
 		finally { 
 			try { if (out != null ) out.close(); }
 			catch(Exception ex) {} 
@@ -189,7 +191,7 @@ public class ImageManager {
 			if(bitmap != null)
 				imageView.setImageBitmap(bitmap);
 			else
-				imageView.setImageResource(R.drawable.icon);
+				imageView.setImageResource(R.drawable.default_contact);
 		}
 	}
 }
