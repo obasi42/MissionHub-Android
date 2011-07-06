@@ -43,26 +43,28 @@ public final class R {
         public static final int icon_s_convo=0x7f020010;
         public static final int icon_s_convo_white=0x7f020011;
         public static final int mh_background=0x7f020012;
-        public static final int mh_button=0x7f020013;
-        public static final int mh_contact_rejoicables=0x7f020014;
-        public static final int mh_contact_top=0x7f020015;
-        public static final int mh_icon_profile=0x7f020016;
-        public static final int mh_logo=0x7f020017;
-        public static final int mh_logoutbar=0x7f020018;
-        public static final int mh_navbar=0x7f020019;
-        public static final int mh_searchband=0x7f02001a;
-        public static final int mh_tab=0x7f02001b;
-        public static final int phone=0x7f02001c;
-        public static final int post_button=0x7f02001d;
-        public static final int rejoicable_g_present=0x7f02001e;
-        public static final int rejoicable_icon=0x7f02001f;
-        public static final int rejoicable_r_christ=0x7f020020;
-        public static final int rejoicable_s_convo=0x7f020021;
-        public static final int rounded_edittext=0x7f020022;
-        public static final int rounded_tab=0x7f020023;
-        public static final int status_button=0x7f020024;
+        public static final int mh_background_black=0x7f020013;
+        public static final int mh_button=0x7f020014;
+        public static final int mh_contact_rejoicables=0x7f020015;
+        public static final int mh_contact_top=0x7f020016;
+        public static final int mh_icon_profile=0x7f020017;
+        public static final int mh_logo=0x7f020018;
+        public static final int mh_logoutbar=0x7f020019;
+        public static final int mh_navbar=0x7f02001a;
+        public static final int mh_searchband=0x7f02001b;
+        public static final int mh_tab=0x7f02001c;
+        public static final int phone=0x7f02001d;
+        public static final int post_button=0x7f02001e;
+        public static final int rejoicable_g_present=0x7f02001f;
+        public static final int rejoicable_icon=0x7f020020;
+        public static final int rejoicable_r_christ=0x7f020021;
+        public static final int rejoicable_s_convo=0x7f020022;
+        public static final int rounded_edittext=0x7f020023;
+        public static final int rounded_tab=0x7f020024;
+        public static final int status_button=0x7f020025;
     }
     public static final class id {
+        public static final int EditText1=0x7f090035;
         public static final int btn_contacts=0x7f090033;
         public static final int btn_contacts_completed=0x7f090021;
         public static final int btn_contacts_my=0x7f090020;
@@ -99,17 +101,27 @@ public final class R {
         public static final int contacts_list_contact_name=0x7f090017;
         public static final int contacts_list_contact_status=0x7f090018;
         public static final int contacts_progress=0x7f090024;
-        public static final int contacts_refresh=0x7f090034;
+        public static final int contacts_refresh=0x7f09003f;
         public static final int contacts_search=0x7f09001d;
         public static final int contacts_search_container=0x7f09001c;
         public static final int contacts_selector=0x7f09001f;
         public static final int contacts_top_bar=0x7f09001a;
+        public static final int imageView1=0x7f090039;
         public static final int img_logo=0x7f09002e;
+        public static final int linearLayout1=0x7f090038;
+        public static final int linearLayout2=0x7f09003a;
+        public static final int linearLayout3=0x7f09003c;
         public static final int loggedin=0x7f090032;
         public static final int loggedout=0x7f09002f;
         public static final int login=0x7f090026;
         public static final int logoutbar=0x7f09002a;
         public static final int main=0x7f090029;
+        public static final int profile_container=0x7f090037;
+        public static final int relativeLayout1=0x7f090034;
+        public static final int spinner1=0x7f09003e;
+        public static final int textView2=0x7f090036;
+        public static final int textView3=0x7f09003b;
+        public static final int textView5=0x7f09003d;
         public static final int txt_contact_title=0x7f090002;
         public static final int txt_contacts_no_data=0x7f090025;
         public static final int txt_contacts_title=0x7f09001b;
@@ -179,9 +191,13 @@ public final class R {
         public static final int main_contacts=0x7f060004;
         public static final int main_login=0x7f060003;
         public static final int main_logout=0x7f060001;
+        public static final int profile_change_current_organization=0x7f060032;
+        public static final int profile_click_to_close=0x7f060033;
+        public static final int profile_header=0x7f060031;
         public static final int toast_no_browser=0x7f060026;
     }
     public static final class style {
+        public static final int logoutText=0x7f070001;
         public static final int mh_button=0x7f070000;
     }
 }
