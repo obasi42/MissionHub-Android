@@ -16,6 +16,7 @@
     <string name="contacts_no_data_my_contacts">No Assigned Contacts</string>
     <string name="contacts_no_data_my_completed">No Completed Assigned Contacts</string>
     <string name="contacts_no_data_unassigned">No Unassigned Contacts</string>
+    <string name="contacts_menu_refresh">Refresh</string>
     
     <string name="alert_error">Error</string>
     <string name="alert_error_msg">An unknown error has occurred. Please try again or contact support.</string>

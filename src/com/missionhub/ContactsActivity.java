@@ -24,9 +24,15 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -59,6 +65,7 @@ public class ContactsActivity extends Activity {
 		adapter = new ContactItemAdapter(this, R.layout.contact_list_item, data);
 		contactsList.setAdapter(adapter);
 		contactsList.setOnScrollListener(new ContactsScrollListener());
+		contactsList.setOnItemClickListener(new ContactsOnItemClickListener());
 		
 		progress = (ProgressBar) findViewById(R.id.contacts_progress);
 		txtNoData = (TextView) findViewById(R.id.txt_contacts_no_data);
@@ -75,6 +82,26 @@ public class ContactsActivity extends Activity {
 		}
 		
 		setTab(TAB_MY, true);
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.contacts, menu);
+	    return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    // Handle item selection
+	    switch (item.getItemId()) {
+	    case R.id.contacts_refresh:
+	    	resetListView(false);
+			getMore();
+	        return true;
+	    default:
+	        return super.onOptionsItemSelected(item);
+	    }
 	}
 	
 	public void clickMyContacts(View v) {
@@ -115,7 +142,7 @@ public class ContactsActivity extends Activity {
 				break;
 			}
 			this.tab = tab;
-			resetListView();
+			resetListView(true);
 			getMore();
 			showGuide();
 		}
@@ -131,10 +158,12 @@ public class ContactsActivity extends Activity {
 	private boolean loading = false;
 	private HashMap<String, String> options = new HashMap<String, String>();
 	
-	private void resetListView() {
+	private void resetListView(boolean notify) {
 		txtNoData.setVisibility(View.GONE);
 		data.clear();
-		adapter.notifyDataSetChanged();
+		if (notify) {
+			adapter.notifyDataSetChanged();
+		}
 		start = 0;
 		atEnd = false;
 		loading = false;
@@ -212,11 +241,11 @@ public class ContactsActivity extends Activity {
 		public void afterTextChanged(Editable s) {
 			if (s.length() > 2) {
 				options.put("term", s.toString());
-				resetListView();
+				resetListView(true);
 				getMore();
 			} else if (s.length() == 0){
 				options.remove("term");
-				resetListView();
+				resetListView(true);
 				getMore();
 			}
 		}
@@ -235,5 +264,13 @@ public class ContactsActivity extends Activity {
 		}
 		@Override
 		public void onScrollStateChanged(AbsListView view, int scrollState) {}
+	}
+	
+	private class ContactsOnItemClickListener implements OnItemClickListener {
+		@Override
+		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+			// TODO Auto-generated method stub
+			
+		}
 	}
 }
