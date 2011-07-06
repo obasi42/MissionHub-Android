@@ -8,6 +8,7 @@ import com.missionhub.api.GPerson;
 
 import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,7 +53,7 @@ public class ContactItemAdapter extends ArrayAdapter<GContact> {
 
 		final GContact contact = contacts.get(position);
 		final GPerson person = contact.getPerson();
-		if (contact != null) {
+		if (person != null) {
 			holder.name.setText(person.getName());
 			holder.status.setText(person.getStatus());
 			holder.image.setTag(person.getPicture());

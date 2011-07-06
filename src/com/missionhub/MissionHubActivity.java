@@ -116,7 +116,8 @@ public class MissionHubActivity extends Activity {
 	}
 	
 	public void clickProfile(View view) {
-		
+		Intent i = new Intent(this, ProfileActivity.class);
+		startActivity(i);
 	}	
 	
 	/**
@@ -140,8 +141,9 @@ public class MissionHubActivity extends Activity {
 	 * @return stored access token
 	 */
 	public String getStoredToken() {
-		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-		return settings.getString("token", null);
+		return "a7421d97fe9d790085f62512b2ca205737fa5f7adf9a9c4e97be56ddb3c751a3";
+		//SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+		//return settings.getString("token", null);
 	}
 	
 	/**

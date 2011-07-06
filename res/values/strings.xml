@@ -28,6 +28,8 @@
     <string name="alert_learn_more_msg">Clicking OK will take you to www.missionhub.com to learn more.</string>
     <string name="alert_loading">Loading. Please wait...</string>
     <string name="alert_logging_in">Logging in. Please wait...</string>
+    <string name="alert_hide">Hide</string>
+    <string name="alert_dont_show">Don\'t Show Again</string>
     
     <string name="toast_no_browser">Could not find a web browser</string>
     

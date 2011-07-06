@@ -82,6 +82,7 @@ public final class R {
         public static final int contacts=0x7f030002;
         public static final int login=0x7f030003;
         public static final int main=0x7f030004;
+        public static final int profile=0x7f030005;
     }
     public static final class menu {
         public static final int contacts=0x7f080000;
@@ -89,8 +90,10 @@ public final class R {
     public static final class string {
         public static final int alert_cancel=0x7f060013;
         public static final int alert_close=0x7f060015;
+        public static final int alert_dont_show=0x7f06001b;
         public static final int alert_error=0x7f060010;
         public static final int alert_error_msg=0x7f060011;
+        public static final int alert_hide=0x7f06001a;
         public static final int alert_learn_more=0x7f060016;
         public static final int alert_learn_more_msg=0x7f060017;
         public static final int alert_loading=0x7f060018;
@@ -109,21 +112,21 @@ public final class R {
         public static final int contacts_tab_my_contacts=0x7f060008;
         public static final int contacts_tab_unassigned=0x7f06000a;
         public static final int contacts_unassigned=0x7f060007;
-        public static final int error_no_network=0x7f06001b;
-        public static final int error_no_network_msg=0x7f06001c;
-        public static final int error_unexpected_response=0x7f06001d;
-        public static final int error_unexpected_response_msg=0x7f06001e;
-        public static final int guide_contact=0x7f060023;
-        public static final int guide_contact_msg=0x7f060024;
-        public static final int guide_contacts=0x7f06001f;
-        public static final int guide_contacts_msg=0x7f060020;
-        public static final int guide_contacts_unassigned=0x7f060021;
-        public static final int guide_contacts_unassigned_msg=0x7f060022;
+        public static final int error_no_network=0x7f06001d;
+        public static final int error_no_network_msg=0x7f06001e;
+        public static final int error_unexpected_response=0x7f06001f;
+        public static final int error_unexpected_response_msg=0x7f060020;
+        public static final int guide_contact=0x7f060025;
+        public static final int guide_contact_msg=0x7f060026;
+        public static final int guide_contacts=0x7f060021;
+        public static final int guide_contacts_msg=0x7f060022;
+        public static final int guide_contacts_unassigned=0x7f060023;
+        public static final int guide_contacts_unassigned_msg=0x7f060024;
         public static final int main_about=0x7f060002;
         public static final int main_contacts=0x7f060004;
         public static final int main_login=0x7f060003;
         public static final int main_logout=0x7f060001;
-        public static final int toast_no_browser=0x7f06001a;
+        public static final int toast_no_browser=0x7f06001c;
     }
     public static final class style {
         public static final int mh_button=0x7f070000;
