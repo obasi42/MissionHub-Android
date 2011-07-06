@@ -116,7 +116,8 @@ public class MissionHubActivity extends Activity {
 	}
 	
 	public void clickProfile(View view) {
-		
+		Intent i = new Intent(this, ProfileActivity.class);
+		startActivity(i);
 	}	
 	
 	/**

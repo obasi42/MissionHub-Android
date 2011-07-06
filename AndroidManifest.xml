@@ -16,5 +16,6 @@
 		<activity android:theme="@android:style/Theme.Translucent.NoTitleBar" android:name=".LoginActivity" android:screenOrientation="portrait"></activity>
 		<activity android:theme="@android:style/Theme.NoTitleBar" android:name=".ContactsActivity" android:screenOrientation="portrait" android:windowSoftInputMode="stateHidden|adjustPan"></activity>
 		<activity android:theme="@android:style/Theme.NoTitleBar" android:name=".ContactActivity" android:screenOrientation="portrait" android:windowSoftInputMode="stateHidden|adjustPan"></activity>
+		<activity android:theme="@android:style/Theme.NoTitleBar" android:name=".ProfileActivity" android:screenOrientation="portrait" android:windowSoftInputMode="stateHidden|adjustPan"></activity>
 	</application>
 </manifest>
