@@ -15,6 +15,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class ProfileActivity extends Activity {
@@ -38,6 +39,8 @@ public class ProfileActivity extends Activity {
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, spinnerNames);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // The drop down vieww
 
+		TextView name = (TextView) findViewById(R.id.textView3);
+		name.setText(User.contact.getPerson().getName()); 
 
 		try {
 		    spinner.setAdapter(adapter);
