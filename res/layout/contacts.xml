@@ -9,7 +9,7 @@
         android:layout_width="fill_parent"
         android:orientation="vertical"
         android:layout_marginTop="40dp" android:gravity="center" android:layout_height="34dp" android:background="@drawable/mh_searchband">
-        <EditText android:layout_width="fill_parent" android:hint="@string/contacts_search_hint" android:layout_marginTop="1dp" android:layout_height="30dp" android:id="@+id/contacts_search" android:textSize="16dp" android:layout_alignParentLeft="true" android:paddingLeft="36dp"></EditText>
+        <EditText android:layout_width="fill_parent" android:hint="@string/contacts_search_hint" android:layout_marginTop="1dp" android:layout_height="30dp" android:id="@+id/contacts_search" android:textSize="16dp" android:layout_alignParentLeft="true" android:paddingLeft="36dp" android:background="@drawable/rounded_edittext"></EditText>
         <ImageView android:src="@drawable/ic_btn_search" android:id="@+id/contact_search_icon" android:layout_centerVertical="true" android:layout_marginLeft="8dp" android:layout_width="22dp" android:layout_height="22dp"></ImageView>
     </RelativeLayout>
     <LinearLayout android:layout_alignParentBottom="true" android:layout_width="fill_parent" android:id="@+id/contacts_selector" android:background="@color/black" android:layout_height="32dp">
