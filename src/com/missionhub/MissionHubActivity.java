@@ -56,12 +56,7 @@ public class MissionHubActivity extends Activity {
 		logoutBar = (RelativeLayout) findViewById(R.id.logoutbar);
 		txtLogoutbarName = (TextView) findViewById(R.id.txt_logoutbar_name);
 		
-		if (Config.debug) {
-			User.token = getStoredToken();
-			User.orgID = "56";
-			User.isLoggedIn = true;
-			refreshView();
-		} else if (!checkToken()) {
+		if (!checkToken()) {
 			refreshView();
 		}
 	}

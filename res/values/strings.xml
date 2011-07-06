@@ -9,10 +9,17 @@
     <string name="contacts_my_contacts">My Contacts</string>
     <string name="contacts_my_completed">My Completed Contacts</string>
     <string name="contacts_unassigned">Unassigned Contacts</string>
+    <string name="contacts_tab_my_contacts">My Contacts</string>
+    <string name="contacts_tab_my_completed">My Completed</string>
+    <string name="contacts_tab_unassigned">Unassigned</string>  
     <string name="contacts_search_hint">Search...</string>
+    <string name="contacts_no_data_my_contacts">No Assigned Contacts</string>
+    <string name="contacts_no_data_my_completed">No Completed Assigned Contacts</string>
+    <string name="contacts_no_data_unassigned">No Unassigned Contacts</string>
+    <string name="contacts_menu_refresh">Refresh</string>
     
     <string name="alert_error">Error</string>
-    <string name="alert_error_msg">An unknown error has occured. Please try again or contact support.</string>
+    <string name="alert_error_msg">An unknown error has occurred. Please try again or contact support.</string>
     <string name="alert_ok">OK</string>
     <string name="alert_cancel">Cancel</string>
     <string name="alert_retry">Retry</string>
@@ -28,4 +35,11 @@
     <string name="error_no_network_msg">The MissionHub server could not be contacted. Please make sure you are connect to the internet and try again.</string>
 	<string name="error_unexpected_response">Unexpected Response</string>
 	<string name="error_unexpected_response_msg">The MissionHub server returned unexpected data. Please try again later.</string>
+	
+	<string name="guide_contacts">My Contacts</string>
+	<string name="guide_contacts_msg">This view shows all contacts that have been assigned to you for follow-up. If the list is empty, you need your leader to assign contacts to you or go to ‘Unassigned’ in the lower right corner and assign contacts to yourself.</string>
+	<string name="guide_contacts_unassigned">Unassigned Contacts</string>
+	<string name="guide_contacts_unassigned_msg">This view shows all contacts that have been collected but not assigned. All designated leaders can access this page and can self-assign contacts. If you tap ‘Assign to me’, this contact will move to ‘My Contacts’.</string>
+	<string name="guide_contact">Contact Information</string>
+	<string name="guide_contact_msg">You can learn about a contact and record your interactions with that person on this page. If you mark a contact as ‘Completed’, it will move to ‘My Completed’. Tap the rejoicing icon to add  Rejoicables to your interaction.</string>
 </resources>
