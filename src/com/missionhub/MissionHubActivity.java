@@ -21,6 +21,7 @@ import com.google.gson.Gson;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.missionhub.api.Api;
 import com.missionhub.api.GContact;
+import com.missionhub.api.GContactAll;
 import com.missionhub.api.GError;
 import com.missionhub.api.GIdNameProvider;
 import com.missionhub.api.GPerson;
@@ -193,7 +194,7 @@ public class MissionHubActivity extends Activity {
 	
 	public void testingApi() {
 		User.token = "43941a348dbb0b6c6e88763338baa5bedc08ddaa3c139106c700b8a45e1e8205";
-		User.orgID = "56";
+		User.orgID = "1825";
 		
 		AsyncHttpResponseHandler responseHandler2 = new AsyncHttpResponseHandler() {
 
@@ -207,32 +208,42 @@ public class MissionHubActivity extends Activity {
 				Log.i(TAG2, "SUCCESS!");
 				Log.i(TAG2, response);
 				Gson gson = new Gson();
-				try{
-					GPerson[] peeps = gson.fromJson(response, GPerson[].class);
-					Log.i(TAG2, peeps[0].getName());
-					
-//					GContact[] contacts = gson.fromJson(response, GContact[].class);
-//					Log.i(TAG2, contacts[0].getPerson().getName());
-//					Log.i(TAG2, contacts[0].getPerson().getPicture());
-//					Log.i(TAG2, contacts[0].getPerson().getStatus());
-					
-					try {
-						Log.i(TAG2, peeps[0].getLocation().getName());
-						Log.i(TAG2, peeps[0].getAssignment().getAssigned_to_person()[0].getName());
-					} catch(Exception e) {
-						Log.i(TAG2, "ARGGG", e);
-					}
-					try {
-						Log.i(TAG2, peeps[0].getInterests()[0].getName());
-					}
-					catch(Exception e) {
-						Log.i(TAG2, "ARGGG2", e);
-					}
-
-					
-				} catch(Exception e) {
-					Log.i(TAG2, "CRAP", e);
+				try {
+					GContactAll contact = gson.fromJson(response, GContactAll.class);
+					Log.i(TAG2, contact.getKeywords()[0].getName());
+					Log.i(TAG2, String.valueOf(contact.getKeywords()[0].getQuestions().length));
+					Log.i(TAG2, contact.getQuestions()[0].getLabel());
+					Log.i(TAG2, contact.getPeople()[0].getPerson().getName());
+					Log.i(TAG2, contact.getPeople()[0].getForm()[0].getA());
+				} catch (Exception e) {
+					Log.i(TAG2, "CRAP: ", e);
 				}
+
+				
+//				try{
+//					GPerson[] peeps = gson.fromJson(response, GPerson[].class);
+//					Log.i(TAG2, peeps[0].getName());
+//					
+////					GContact[] contacts = gson.fromJson(response, GContact[].class);
+////					Log.i(TAG2, contacts[0].getPerson().getName());
+////					Log.i(TAG2, contacts[0].getPerson().getPicture());
+////					Log.i(TAG2, contacts[0].getPerson().getStatus());
+//					
+////					try {
+////						Log.i(TAG2, peeps[0].getLocation().getName());
+////						Log.i(TAG2, peeps[0].getAssignment().getAssigned_to_person()[0].getName());
+////						Log.i(TAG2, peeps[0].getOrganizational_memebership()[0].getName());
+////						Log.i(TAG2, peeps[0].getOrganizational_roles()[0].getOrg_id());
+////						Log.i(TAG2, peeps[0].getEducation()[1].getConcentration()[0].getName());
+////						
+////					} catch(Exception e) {
+////						Log.i(TAG2, "ARGGG", e);
+////					}
+//
+//					
+//				} catch(Exception e) {
+//					Log.i(TAG2, "CRAP", e);
+//				}
 
 				
 			}
@@ -248,7 +259,7 @@ public class MissionHubActivity extends Activity {
 				Log.i(TAG2, "I'm finished!");
 			}
 		};
-		Api.getPeople(1282204, responseHandler2);
+		//Api.getPeople(1282204, responseHandler2);
 //		Api.getPeople("me", responseHandler);
 //		
 //		ArrayList<Integer> ids = new ArrayList<Integer>();
@@ -264,7 +275,7 @@ public class MissionHubActivity extends Activity {
 		options.put("direction", "ASC");
 //		Api.getContactsList(options, responseHandler2);
 		
-//		Api.getContacts(1282204, responseHandler2);
+		Api.getContacts(1282204, responseHandler2);
 		
 		
 //		ArrayList<String> rejoicables = new ArrayList<String>();

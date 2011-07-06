@@ -1,7 +1,7 @@
 package com.missionhub.api;
 
 public class GPerson {	
-	
+
 	private String first_name;
 	private String last_name;
 	private String name;
@@ -19,6 +19,9 @@ public class GPerson {
 	private GIdNameProvider location;
 	private GIdNameProvider[] interests;
 	private GAssign assignment;
+	private GOrgGeneric[] organizational_roles;
+	private GOrgGeneric[] organization_membership;
+	private GEducation[] education;
 	
 	public String getFirst_name() { return first_name; }
 	public String getLast_name() { return last_name; }
@@ -37,6 +40,9 @@ public class GPerson {
 	public GIdNameProvider getLocation() { return location; }
 	public GIdNameProvider[] getInterests() { return interests; }
 	public GAssign getAssignment() { return assignment; }
+	public GOrgGeneric[] getOrganizational_roles() { return organizational_roles; }
+	public GOrgGeneric[] getOrganizational_memebership() { return organization_membership; }
+	public GEducation[] getEducation() { return education; }
 	
 	public void setFirst_name(String s) { first_name = s; }
 	public void setLast_name(String s) { last_name = s; }	
@@ -55,4 +61,7 @@ public class GPerson {
 	public void setLocation(GIdNameProvider x) { location = x; }
 	public void setInterests(GIdNameProvider[] i) { interests = i; }
 	public void setAssignment(GAssign a) { assignment = a; }
+	public void setOrganizational_roles(GOrgGeneric[] g) { organizational_roles = g; }
+	public void setOrganization_membership(GOrgGeneric[] g) { organization_membership = g; }
+	public void setEducation(GEducation[] g) { education = g; }
 }
