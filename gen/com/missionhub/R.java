@@ -42,14 +42,14 @@ public final class R {
         public static final int rounded_tab=0x7f02000f;
     }
     public static final class id {
-        public static final int btn_contacts=0x7f08001c;
+        public static final int btn_contacts=0x7f08001e;
         public static final int btn_contacts_completed=0x7f08000c;
         public static final int btn_contacts_my=0x7f08000b;
         public static final int btn_contacts_unassigned=0x7f08000d;
-        public static final int btn_loggedout_about=0x7f080019;
-        public static final int btn_loggedout_login=0x7f08001a;
-        public static final int btn_logout_close=0x7f080011;
-        public static final int btn_logoutbar_profile=0x7f080015;
+        public static final int btn_loggedout_about=0x7f08001b;
+        public static final int btn_loggedout_login=0x7f08001c;
+        public static final int btn_logout_close=0x7f080013;
+        public static final int btn_logoutbar_profile=0x7f080017;
         public static final int contact=0x7f080000;
         public static final int contact_search_icon=0x7f080009;
         public static final int contacts=0x7f080004;
@@ -57,20 +57,22 @@ public final class R {
         public static final int contacts_list_contact_image=0x7f080001;
         public static final int contacts_list_contact_name=0x7f080002;
         public static final int contacts_list_contact_status=0x7f080003;
+        public static final int contacts_progress=0x7f08000f;
         public static final int contacts_search=0x7f080008;
         public static final int contacts_search_container=0x7f080007;
         public static final int contacts_selector=0x7f08000a;
         public static final int contacts_top_bar=0x7f080005;
-        public static final int img_logo=0x7f080017;
-        public static final int loggedin=0x7f08001b;
-        public static final int loggedout=0x7f080018;
-        public static final int login=0x7f08000f;
-        public static final int logoutbar=0x7f080013;
-        public static final int main=0x7f080012;
+        public static final int img_logo=0x7f080019;
+        public static final int loggedin=0x7f08001d;
+        public static final int loggedout=0x7f08001a;
+        public static final int login=0x7f080011;
+        public static final int logoutbar=0x7f080015;
+        public static final int main=0x7f080014;
+        public static final int txt_contacts_no_data=0x7f080010;
         public static final int txt_contacts_title=0x7f080006;
-        public static final int txt_logoutbar_logout=0x7f080014;
-        public static final int txt_logoutbar_name=0x7f080016;
-        public static final int webview_login=0x7f080010;
+        public static final int txt_logoutbar_logout=0x7f080016;
+        public static final int txt_logoutbar_name=0x7f080018;
+        public static final int webview_login=0x7f080012;
     }
     public static final class layout {
         public static final int contact=0x7f030000;
@@ -80,30 +82,42 @@ public final class R {
         public static final int main=0x7f030004;
     }
     public static final class string {
-        public static final int alert_cancel=0x7f06000c;
-        public static final int alert_close=0x7f06000e;
-        public static final int alert_error=0x7f060009;
-        public static final int alert_error_msg=0x7f06000a;
-        public static final int alert_learn_more=0x7f06000f;
-        public static final int alert_learn_more_msg=0x7f060010;
-        public static final int alert_loading=0x7f060011;
-        public static final int alert_logging_in=0x7f060012;
-        public static final int alert_ok=0x7f06000b;
-        public static final int alert_retry=0x7f06000d;
+        public static final int alert_cancel=0x7f060012;
+        public static final int alert_close=0x7f060014;
+        public static final int alert_error=0x7f06000f;
+        public static final int alert_error_msg=0x7f060010;
+        public static final int alert_learn_more=0x7f060015;
+        public static final int alert_learn_more_msg=0x7f060016;
+        public static final int alert_loading=0x7f060017;
+        public static final int alert_logging_in=0x7f060018;
+        public static final int alert_ok=0x7f060011;
+        public static final int alert_retry=0x7f060013;
         public static final int app_name=0x7f060000;
         public static final int contacts_my_completed=0x7f060006;
         public static final int contacts_my_contacts=0x7f060005;
-        public static final int contacts_search_hint=0x7f060008;
+        public static final int contacts_no_data_my_completed=0x7f06000d;
+        public static final int contacts_no_data_my_contacts=0x7f06000c;
+        public static final int contacts_no_data_unassigned=0x7f06000e;
+        public static final int contacts_search_hint=0x7f06000b;
+        public static final int contacts_tab_my_completed=0x7f060009;
+        public static final int contacts_tab_my_contacts=0x7f060008;
+        public static final int contacts_tab_unassigned=0x7f06000a;
         public static final int contacts_unassigned=0x7f060007;
-        public static final int error_no_network=0x7f060014;
-        public static final int error_no_network_msg=0x7f060015;
-        public static final int error_unexpected_response=0x7f060016;
-        public static final int error_unexpected_response_msg=0x7f060017;
+        public static final int error_no_network=0x7f06001a;
+        public static final int error_no_network_msg=0x7f06001b;
+        public static final int error_unexpected_response=0x7f06001c;
+        public static final int error_unexpected_response_msg=0x7f06001d;
+        public static final int guide_contact=0x7f060022;
+        public static final int guide_contact_msg=0x7f060023;
+        public static final int guide_contacts=0x7f06001e;
+        public static final int guide_contacts_msg=0x7f06001f;
+        public static final int guide_contacts_unassigned=0x7f060020;
+        public static final int guide_contacts_unassigned_msg=0x7f060021;
         public static final int main_about=0x7f060002;
         public static final int main_contacts=0x7f060004;
         public static final int main_login=0x7f060003;
         public static final int main_logout=0x7f060001;
-        public static final int toast_no_browser=0x7f060013;
+        public static final int toast_no_browser=0x7f060019;
     }
     public static final class style {
         public static final int mh_button=0x7f070000;

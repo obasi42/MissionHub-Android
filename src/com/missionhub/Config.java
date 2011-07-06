@@ -1,9 +1,6 @@
 package com.missionhub;
 
 public class Config {
-
-	/* Debugging Mode */
-	public static final boolean debug = true;
 	
 	public static final String baseUrl = "https://www.missionhub.com";
 	public static final String cookieHost = "www.missionhub.com";

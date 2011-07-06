@@ -2,20 +2,22 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="fill_parent" android:layout_height="fill_parent" android:background="@drawable/mh_background" android:id="@+id/contacts">
     <RelativeLayout android:layout_alignParentTop="true" android:id="@+id/contacts_top_bar" android:layout_height="40dp" android:layout_width="fill_parent" android:background="@drawable/mh_navbar">
-        <TextView android:layout_alignParentLeft="true" android:layout_width="fill_parent" android:layout_height="fill_parent" android:gravity="center" android:id="@+id/txt_contacts_title" android:textSize="18dp" android:textStyle="bold" android:textColor="@color/white" android:text="@string/contacts_my_contacts"></TextView>
+        <TextView android:layout_alignParentLeft="true" android:layout_width="fill_parent" android:layout_height="fill_parent" android:gravity="center" android:id="@+id/txt_contacts_title" android:textSize="18dp" android:textStyle="bold" android:textColor="@color/white" android:text="@string/contacts_my_contacts" android:layout_marginRight="40dp" android:layout_marginLeft="40dp"></TextView>
     </RelativeLayout>
     <RelativeLayout
         android:id="@+id/contacts_search_container"
         android:layout_width="fill_parent"
         android:orientation="vertical"
         android:layout_marginTop="40dp" android:gravity="center" android:layout_height="34dp" android:background="@drawable/mh_searchband">
-        <EditText android:layout_width="fill_parent" android:hint="@string/contacts_search_hint" android:layout_marginTop="1dp" android:layout_height="30dp" android:id="@+id/contacts_search" android:textSize="16dp" android:layout_alignParentLeft="true" android:paddingLeft="36dp" android:background="@drawable/rounded_edittext"></EditText>
+        <EditText android:layout_width="fill_parent" android:hint="@string/contacts_search_hint" android:layout_marginTop="1dp" android:layout_height="30dp" android:id="@+id/contacts_search" android:textSize="16dp" android:layout_alignParentLeft="true" android:paddingLeft="36dp"></EditText>
         <ImageView android:src="@drawable/ic_btn_search" android:id="@+id/contact_search_icon" android:layout_centerVertical="true" android:layout_marginLeft="8dp" android:layout_width="22dp" android:layout_height="22dp"></ImageView>
     </RelativeLayout>
     <LinearLayout android:layout_alignParentBottom="true" android:layout_width="fill_parent" android:id="@+id/contacts_selector" android:background="@color/black" android:layout_height="32dp">
-        <Button android:id="@+id/btn_contacts_my" android:text="Button" android:layout_width="wrap_content" android:layout_weight="1" android:layout_height="fill_parent" android:textColor="@color/white" android:background="@drawable/rounded_tab"></Button>
-        <Button android:id="@+id/btn_contacts_completed" android:text="Button" android:layout_width="wrap_content" android:layout_weight="1" android:layout_height="fill_parent" android:textColor="@color/white" android:background="@drawable/rounded_tab"></Button>
-        <Button android:id="@+id/btn_contacts_unassigned" android:text="Button" android:layout_width="wrap_content" android:layout_weight="1" android:layout_height="fill_parent" android:textColor="@color/white" android:background="@drawable/rounded_tab"></Button>
+        <Button android:id="@+id/btn_contacts_my" android:layout_width="wrap_content" android:layout_height="fill_parent" android:textColor="@color/white" android:background="@drawable/rounded_tab" android:text="@string/contacts_tab_my_contacts" android:textSize="14dp" android:layout_weight="1" android:onClick="clickMyContacts"></Button>
+        <Button android:id="@+id/btn_contacts_completed" android:layout_width="wrap_content" android:layout_height="fill_parent" android:textColor="@color/white" android:background="@drawable/rounded_tab" android:text="@string/contacts_tab_my_completed" android:textSize="14dp" android:layout_weight="1" android:onClick="clickMyCompleted"></Button>
+        <Button android:id="@+id/btn_contacts_unassigned" android:layout_width="wrap_content" android:layout_height="fill_parent" android:textColor="@color/white" android:background="@drawable/rounded_tab" android:text="@string/contacts_tab_unassigned" android:textSize="14dp" android:layout_weight="1" android:onClick="clickUnassigned"></Button>
     </LinearLayout>
     <ListView android:layout_width="fill_parent" android:layout_alignParentLeft="true" android:layout_marginTop="74dp" android:layout_height="fill_parent" android:layout_marginBottom="32dp" android:background="@color/white" android:id="@+id/contacts_list"></ListView>
+    <ProgressBar android:layout_alignParentRight="true" android:layout_width="30dp" android:layout_height="30dp" android:layout_margin="5dp" android:id="@+id/contacts_progress" android:visibility="gone"></ProgressBar>
+    <TextView android:textAppearance="?android:attr/textAppearanceMedium" android:layout_height="wrap_content" android:layout_alignParentLeft="true" android:layout_width="fill_parent" android:textColor="@color/black" android:gravity="center" android:layout_marginTop="85dp" android:text="@string/contacts_no_data_my_contacts" android:visibility="gone" android:id="@+id/txt_contacts_no_data"></TextView>
 </RelativeLayout>
