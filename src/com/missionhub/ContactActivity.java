@@ -1,13 +1,26 @@
 package com.missionhub;
 
+import java.util.ArrayList;
+
 import com.google.gson.Gson;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.missionhub.api.Api;
+import com.missionhub.api.GAssign;
 import com.missionhub.api.GContact;
 import com.missionhub.api.GContactAll;
+import com.missionhub.api.GError;
+import com.missionhub.api.GIdNameProvider;
 import com.missionhub.api.GPerson;
+import com.missionhub.api.MHError;
+import com.missionhub.api.User;
+import com.missionhub.ui.DisplayError;
 import com.missionhub.ui.Guide;
 import com.missionhub.ui.ImageManager;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,6 +31,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -37,6 +51,7 @@ public class ContactActivity extends Activity {
 	private ListView contactListView;
 	private LinearLayout header;
 	private ImageManager imageManager;
+	private ProgressBar progress;
 
 	private LinearLayout contactHeader;
 	private ImageView contactPicture;
@@ -72,6 +87,7 @@ public class ContactActivity extends Activity {
 		setContentView(R.layout.contact);
 		txtTitle = (TextView) findViewById(R.id.contact_title);
 		contactListView = (ListView) findViewById(R.id.contact_listview);
+		progress = (ProgressBar) findViewById(R.id.contact_progress);
 
 		contactHeader = (LinearLayout) View.inflate(this, R.layout.contact_header, null);
 		contactPicture = (ImageView) contactHeader.findViewById(R.id.contact_picture);
@@ -103,6 +119,21 @@ public class ContactActivity extends Activity {
 		Guide.display(this, Guide.CONTACT);
 	}
 	
+	private ArrayList<String> processes = new ArrayList<String>();
+	
+	private void showProgress(String process) {
+		processes.add(process);
+		this.progress.setVisibility(View.VISIBLE);
+	}
+	
+	private void hideProgress(String process) {
+		processes.remove(process);
+		if (processes.size() <= 0) {
+			this.progress.setVisibility(View.GONE);
+		}
+	}
+	
+	
 	public void updateHeader() {
 		final GPerson person = contact.getPerson();
 		if (person == null) return;
@@ -115,29 +146,106 @@ public class ContactActivity extends Activity {
 				defaultImage = R.drawable.facebook_female;
 			}
 		}
-		
 		if (person.getPicture() != null && !currentContactPicture.equals(person.getPicture())) {
 			currentContactPicture = person.getPicture();
 			contactPicture.setTag(person.getPicture() + "?type=large");
 			imageManager.displayImage(person.getPicture() + "?type=large", ContactActivity.this, contactPicture, defaultImage);
 		}
-		
 		if (person.getName() != null) {
 			contactName.setText(person.getName());
+		}
+		if (person.getPhone_number() != null) {
+			contactPhone.setVisibility(View.VISIBLE);
+			contactSMS.setVisibility(View.VISIBLE);
+		} else {
+			contactPhone.setVisibility(View.GONE);
+			contactSMS.setVisibility(View.GONE);
+		}
+		if (person.getEmail_address() != null) {
+			contactEmail.setVisibility(View.VISIBLE);
+		} else {
+			contactEmail.setVisibility(View.GONE);
+		}
+		
+		String assignedTo = null;
+		if (person.getAssignment() != null) {
+			GAssign assign = person.getAssignment();
+			if (assign.getPerson_assigned_to() != null) {
+				GIdNameProvider[] gids = assign.getPerson_assigned_to();
+				for (GIdNameProvider gid : gids) {
+					if (User.contact.getPerson().getId() == Integer.parseInt(gid.getId())) {
+						assignedTo = "_me_";
+						break;
+					} else {
+						assignedTo = gid.getName();
+					}
+				}
+			}
+		}
+		if (assignedTo == null) {
+			contactAssign.setText(R.string.contact_assign_to_me);
+			contactAssign.setEnabled(true);
+		} else if (assignedTo.equals("_me_")) {
+			contactAssign.setText(R.string.contact_unassign);
+			contactAssign.setEnabled(true);
+		} else {
+			contactAssign.setText(R.string.contact_assign_locked);
+			contactAssign.setEnabled(false);
 		}
 	}
 
 	public void update(boolean force) {
-		
+		updatePerson(force);
+		updateComments(force);
 	}
 
 	public void updatePerson(boolean force) {
-		
+		Api.getContacts(contact.getPerson().getId(), contactResponseHandler);
 	}
 
 	public void updateComments(boolean force) {
 		
 	}
+	
+	private AsyncHttpResponseHandler contactResponseHandler = new AsyncHttpResponseHandler() {
+		@Override
+		public void onStart() {
+			showProgress("contact");
+		}
+		@Override
+		public void onSuccess(String response) {
+			Gson gson = new Gson();
+			try{
+				GError error = gson.fromJson(response, GError.class);
+				onFailure(new MHError(error));
+			} catch (Exception out){
+				try {
+					GContactAll contactAll = gson.fromJson(response, GContactAll.class);
+					ContactActivity.this.contactMeta = contactAll;
+					ContactActivity.this.contact = contactAll.getPeople()[0];
+					ContactActivity.this.updateHeader();
+				} catch(Exception e) {
+					onFailure(e);
+				}
+			}
+		}
+		@Override
+		public void onFailure(Throwable e) {
+			Log.e(TAG, "Contact Fetch Failed", e);
+			AlertDialog ad = DisplayError.display(ContactActivity.this, e);
+			ad.setButton(ad.getContext().getString(R.string.alert_retry), new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					dialog.dismiss();
+					updatePerson(true);
+				}
+			});
+			ad.show();
+		}
+		@Override
+		public void onFinish() {
+			hideProgress("contact");
+		}
+	};
 
 	public void clickAssign(View v) {
 		
