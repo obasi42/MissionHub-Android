@@ -251,7 +251,6 @@ public class ContactsActivity extends Activity {
 	}
 
 	private class ContactsSearchWatcher implements TextWatcher {
-		@Override
 		public void afterTextChanged(Editable s) {
 			if (s.length() > 2) {
 				options.put("term", s.toString());
@@ -264,11 +263,9 @@ public class ContactsActivity extends Activity {
 			}
 		}
 
-		@Override
 		public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 		}
 
-		@Override
 		public void onTextChanged(CharSequence s, int start, int before, int count) {
 		}
 	}
@@ -277,7 +274,6 @@ public class ContactsActivity extends Activity {
 
 		int curState = OnScrollListener.SCROLL_STATE_IDLE;
 
-		@Override
 		public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 			if (totalItemCount - firstVisibleItem < 2.5 * visibleItemCount) {
 				if (curState != OnScrollListener.SCROLL_STATE_IDLE) {
@@ -286,14 +282,12 @@ public class ContactsActivity extends Activity {
 			}
 		}
 
-		@Override
 		public void onScrollStateChanged(AbsListView view, int scrollState) {
 			curState = scrollState;
 		}
 	}
 
 	private class ContactsOnItemClickListener implements OnItemClickListener {
-		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 			// TODO Auto-generated method stub
 
