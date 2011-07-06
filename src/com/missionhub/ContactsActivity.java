@@ -17,6 +17,7 @@ import com.missionhub.ui.Guide;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -34,6 +35,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class ContactsActivity extends Activity {
 
@@ -143,12 +145,7 @@ public class ContactsActivity extends Activity {
 			this.tab = tab;
 			resetListView(true);
 			getMore();
-			showGuide();
 		}
-	}
-
-	public void showGuide() {
-		// TODO:
 	}
 
 	private int start = 0;
@@ -271,26 +268,24 @@ public class ContactsActivity extends Activity {
 	}
 
 	private class ContactsScrollListener implements OnScrollListener {
-
-		int curState = OnScrollListener.SCROLL_STATE_IDLE;
-
 		public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 			if (totalItemCount - firstVisibleItem < 2.5 * visibleItemCount) {
-				if (curState != OnScrollListener.SCROLL_STATE_IDLE) {
-					getMore();
-				}
+				getMore();
 			}
 		}
 
 		public void onScrollStateChanged(AbsListView view, int scrollState) {
-			curState = scrollState;
 		}
 	}
 
 	private class ContactsOnItemClickListener implements OnItemClickListener {
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-			// TODO Auto-generated method stub
-
+			GContact contact = (GContact) parent.getAdapter().getItem(position);
+			Intent i = new Intent(getApplicationContext(), ContactActivity.class);
+			Gson gson = new Gson();
+			String contactJSON = gson.toJson(contact);
+			i.putExtra("contactJSON", contactJSON);
+			startActivity(i);
 		}
 	}
 }
