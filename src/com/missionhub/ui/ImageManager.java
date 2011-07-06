@@ -26,6 +26,8 @@ public class ImageManager {
 	private ImageQueue imageQueue = new ImageQueue();
 	private Thread imageLoaderThread = new Thread(new ImageQueueManager());
 	
+	private int defaultImageResource = R.drawable.default_contact;
+	
 	public ImageManager(Context context) {
 		// Make background thread low priority, to avoid affecting UI performance
 		imageLoaderThread.setPriority(Thread.NORM_PRIORITY-1);
@@ -48,11 +50,21 @@ public class ImageManager {
 			imageView.setImageBitmap(imageMap.get(url));
 		} else {
 			queueImage(url, activity, imageView);
-			imageView.setImageResource(R.drawable.default_contact);
+			imageView.setImageResource(defaultImageResource);
 		}
+	}
+	
+	public void displayImage(String url, Activity activity, ImageView imageView, int defaultResource) {
+		defaultImageResource = defaultResource;
+		displayImage(url, activity, imageView);
 	}
 
 	private void queueImage(String url, Activity activity, ImageView imageView) {
+		
+		if (url != null) {
+			Log.i("URL", url);
+		}
+		
 		// This ImageView might have been used for other images, so we clear 
 		// the queue of old tasks before starting.
 		if (url != null) {
@@ -191,7 +203,7 @@ public class ImageManager {
 			if(bitmap != null)
 				imageView.setImageBitmap(bitmap);
 			else
-				imageView.setImageResource(R.drawable.default_contact);
+				imageView.setImageResource(defaultImageResource);
 		}
 	}
 }

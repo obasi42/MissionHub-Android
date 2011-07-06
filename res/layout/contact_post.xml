@@ -5,7 +5,7 @@
             </EditText>
             <RelativeLayout android:layout_height="30dp" android:layout_width="fill_parent">
                 <Spinner android:layout_width="fill_parent" android:layout_height="wrap_content" android:background="@drawable/status_button" android:layout_marginLeft="45dp" android:id="@+id/contact_status" android:layout_marginRight="68dp"></Spinner>
-                <Button android:layout_width="37dp" android:background="@drawable/rejoicable_icon" android:layout_height="30dp" android:id="@+id/contact_rejoicable"></Button>
-                <Button android:textStyle="bold" android:layout_width="60dp" android:textSize="16dp" android:background="@drawable/post_button" android:text="@string/contact_comment_save" android:layout_height="30dp" android:textColor="@color/white" android:layout_alignParentRight="true" android:id="@+id/contact_save"></Button>
+                <Button android:layout_width="37dp" android:background="@drawable/rejoicable_icon" android:layout_height="30dp" android:id="@+id/contact_rejoicable" android:onClick="clickRejoicables"></Button>
+                <Button android:textStyle="bold" android:layout_width="60dp" android:textSize="16dp" android:background="@drawable/post_button" android:text="@string/contact_comment_save" android:layout_height="30dp" android:textColor="@color/white" android:layout_alignParentRight="true" android:id="@+id/contact_save" android:onClick="clickSave"></Button>
             </RelativeLayout>
         </LinearLayout>
