@@ -49,7 +49,7 @@ public class MissionHubActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		testingApi();
+		//testingApi();
 		
 		loggedOut = (LinearLayout) findViewById(R.id.loggedout);
 		loggedIn = (LinearLayout) findViewById(R.id.loggedin);
