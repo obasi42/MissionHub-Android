@@ -23,7 +23,7 @@ import com.missionhub.api.Api;
 import com.missionhub.api.GContact;
 import com.missionhub.api.GContactAll;
 import com.missionhub.api.GError;
-import com.missionhub.api.GIdNameProvider;
+import com.missionhub.api.GFCTop;
 import com.missionhub.api.GPerson;
 import com.missionhub.api.MHError;
 import com.missionhub.api.User;
@@ -49,7 +49,7 @@ public class MissionHubActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		//testingApi();
+		testingApi();
 		
 		loggedOut = (LinearLayout) findViewById(R.id.loggedout);
 		loggedIn = (LinearLayout) findViewById(R.id.loggedin);
@@ -221,13 +221,26 @@ public class MissionHubActivity extends Activity {
 				Log.i(TAG2, "SUCCESS!");
 				Log.i(TAG2, response);
 				Gson gson = new Gson();
+				
+				
+//				try {
+//					GFCTop[] fcs = gson.fromJson(response, GFCTop[].class);
+//					Log.i(TAG2, fcs[0].getFollowup_comment().getRejoicables()[0].getWhat());
+//					Log.i(TAG2, fcs[0].getFollowup_comment().getComment().getStatus());
+//				} catch(Exception e) {
+//					Log.i(TAG2, "CRAP", e);
+//				}
+				
 				try {
 					GContactAll contact = gson.fromJson(response, GContactAll.class);
-					Log.i(TAG2, contact.getKeywords()[0].getName());
-					Log.i(TAG2, String.valueOf(contact.getKeywords()[0].getQuestions().length));
-					Log.i(TAG2, contact.getQuestions()[0].getLabel());
+//					Log.i(TAG2, contact.getKeywords()[0].getName());
+//					Log.i(TAG2, String.valueOf(contact.getKeywords()[0].getQuestions().length));
+//					Log.i(TAG2, contact.getQuestions()[0].getLabel());
 					Log.i(TAG2, contact.getPeople()[0].getPerson().getName());
-					Log.i(TAG2, contact.getPeople()[0].getForm()[0].getA());
+//					Log.i(TAG2, contact.getPeople()[0].getForm()[0].getA());
+					Log.i(TAG2, "Coming up next... valid roles");
+					User.calculateRoles(contact.getPeople()[0].getPerson());
+					Log.i(TAG2, String.valueOf(User.primaryOrgId));
 				} catch (Exception e) {
 					Log.i(TAG2, "CRAP: ", e);
 				}
@@ -301,9 +314,6 @@ public class MissionHubActivity extends Activity {
 //		Api.deleteContactAssignment(244771, responseHandler2);
 		
 //		Api.deleteComment(194, responseHandler);
-		
-//		Api.getFollowupComments(93487, responseHandler2);	
-		
-		//User user = mapper.readValue(new File("user.json"), User.class);
+//		Api.getFollowupComments(1282204, responseHandler2);	
 	}
 }
