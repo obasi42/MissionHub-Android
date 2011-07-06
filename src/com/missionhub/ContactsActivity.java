@@ -20,9 +20,14 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -41,6 +46,7 @@ public class ContactsActivity extends Activity {
 	private ProgressBar progress;
 	private TextView txtNoData;
 	private TextView txtTitle;
+	private EditText search; 
 	
 	private ArrayList<GContact> data = new ArrayList<GContact>();
 	
@@ -52,10 +58,14 @@ public class ContactsActivity extends Activity {
 		contactsList = (ListView) findViewById(R.id.contacts_list);
 		adapter = new ContactItemAdapter(this, R.layout.contact_list_item, data);
 		contactsList.setAdapter(adapter);
+		contactsList.setOnScrollListener(new ContactsScrollListener());
 		
 		progress = (ProgressBar) findViewById(R.id.contacts_progress);
 		txtNoData = (TextView) findViewById(R.id.txt_contacts_no_data);
 		txtTitle = (TextView) findViewById(R.id.txt_contacts_title);
+		search = (EditText) findViewById(R.id.contacts_search);
+		
+		search.addTextChangedListener(new ContactsSearchWatcher());
 		
 		// Large Screens
 		DisplayMetrics metrics = new DisplayMetrics();
@@ -195,5 +205,35 @@ public class ContactsActivity extends Activity {
 		};
 		
 		Api.getContactsList(options, responseHandler);
+	}
+	
+	private class ContactsSearchWatcher implements TextWatcher {
+		@Override
+		public void afterTextChanged(Editable s) {
+			if (s.length() > 2) {
+				options.put("term", s.toString());
+				resetListView();
+				getMore();
+			} else if (s.length() == 0){
+				options.remove("term");
+				resetListView();
+				getMore();
+			}
+		}
+		@Override
+		public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+		@Override
+		public void onTextChanged(CharSequence s, int start, int before, int count) {}
+	}
+	
+	private class ContactsScrollListener implements OnScrollListener {
+		@Override
+		public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+			if (totalItemCount - firstVisibleItem < 2.5*visibleItemCount) {
+				getMore();
+			}
+		}
+		@Override
+		public void onScrollStateChanged(AbsListView view, int scrollState) {}
 	}
 }
