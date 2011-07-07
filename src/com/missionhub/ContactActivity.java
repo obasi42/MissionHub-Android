@@ -1,6 +1,7 @@
 package com.missionhub;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.google.gson.Gson;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -16,11 +17,13 @@ import com.missionhub.api.GPerson;
 import com.missionhub.api.MHError;
 import com.missionhub.api.User;
 import com.missionhub.ui.CommentItemAdapter;
+import com.missionhub.ui.ContactInfoItemAdapter;
 import com.missionhub.ui.DisplayError;
 import com.missionhub.ui.Guide;
 import com.missionhub.ui.ImageManager;
 import com.missionhub.ui.Rejoicable;
 import com.missionhub.ui.RejoicableAdapter;
+import com.missionhub.ui.SimpleListItem;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -98,6 +101,9 @@ public class ContactActivity extends Activity {
 	
 	private CommentItemAdapter commentAdapter;
 	private ArrayList<GFollowupComment> comments = new ArrayList<GFollowupComment>();
+	
+	private ContactInfoItemAdapter infoAdapter;
+	private ArrayList<SimpleListItem> info = new ArrayList<SimpleListItem>();
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -168,6 +174,7 @@ public class ContactActivity extends Activity {
 		contactStatus.setAdapter(adapter);
 
 		commentAdapter = new CommentItemAdapter(this, R.layout.comment_list_item, comments, statusListTag, statusListRes);
+		infoAdapter = new ContactInfoItemAdapter(this, R.layout.contact_info_item, info);
 		
 		header = new LinearLayout(this);
 		header.setOrientation(LinearLayout.VERTICAL);
@@ -334,6 +341,24 @@ public class ContactActivity extends Activity {
 		}
 	}
 
+	public void updateMoreInfo() {
+		if (contactMeta == null || contact == null) return;
+		final GPerson person = contact.getPerson();
+		if (person == null) return;
+		
+		info.clear();
+		
+		if (person.getFb_id() != null) {
+			HashMap<String, String> data = new HashMap<String, String>();
+			data.put("link", "http://facebook.com/profile.php?id=" + person.getFb_id());
+			info.add(new SimpleListItem(getString(R.string.info_facebook_header), getString(R.string.info_facebook_link), data));
+		}
+		
+		info.add(new SimpleListItem("Hello", "Hello"));
+		
+		infoAdapter.notifyDataSetChanged();
+	}
+	
 	public void update(boolean force) {
 		updatePerson(force);
 		updateComments(force);
@@ -367,6 +392,7 @@ public class ContactActivity extends Activity {
 					ContactActivity.this.contactMeta = contactAll;
 					ContactActivity.this.contact = contactAll.getPeople()[0];
 					ContactActivity.this.updateHeader();
+					ContactActivity.this.updateMoreInfo();
 				} catch (Exception e) {
 					onFailure(e);
 				}
@@ -584,14 +610,21 @@ public class ContactActivity extends Activity {
 		}
 		
 		if (canSave) {
-			Api.postFollowupComment(contact.getPerson().getId(), User.contact.getPerson().getId(), statusListTag.get(statusPos), comment, saveHandler, rejoicables);
+			String status = statusListTag.get(statusPos);
+			Api.postFollowupComment(contact.getPerson().getId(), User.contact.getPerson().getId(), status, comment, new SaveResponseHandler(status), rejoicables);
 		} else {
 			Toast.makeText(this, R.string.contact_cant_save, Toast.LENGTH_LONG).show();
 		}
 	}
 	
-	private AsyncHttpResponseHandler saveHandler = new AsyncHttpResponseHandler() {
+	private class SaveResponseHandler extends AsyncHttpResponseHandler {
 
+		private String status;
+		
+		public SaveResponseHandler(String status) {
+			this.status = status;
+		}
+		
 		@Override
 		public void onStart() {
 			showProgress("save");
@@ -610,6 +643,7 @@ public class ContactActivity extends Activity {
 				if (rejoicableListView != null) {
 					rejoicableListView.clearChoices();
 				}
+				contact.getPerson().setStatus(status);
 				updateComments(true);
 			}
 		}
@@ -733,6 +767,7 @@ public class ContactActivity extends Activity {
 				txtTitle.setText(R.string.contact_contact);
 				break;
 			case TAB_MORE_INFO:
+				contactListView.setAdapter(infoAdapter);
 				contactListView.setOnItemLongClickListener(null);
 				header.removeView(contactPost);
 				txtTitle.setText(R.string.contact_more);

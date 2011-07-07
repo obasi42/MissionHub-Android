@@ -37,6 +37,9 @@
     <string name="contact_menu_refresh">Refresh</string>
     <string name="contact_cant_save">You must provide a message, change contact status, or add a rejoicable before saving!</string>
     
+    <string name="info_facebook_header">Facebook</string>
+    <string name="info_facebook_link">Tap here to open Facebook profile in browser</string>
+    
     <string name="comment_actions">Comment Actions</string>
     <string name="comment_delete">Delete</string>
     
