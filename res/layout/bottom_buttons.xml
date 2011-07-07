@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <RelativeLayout android:id="@+id/relativeLayout1" android:layout_width="fill_parent" android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android">
+        <LinearLayout android:id="@+id/linearLayout1" android:layout_width="320dp" android:layout_height="34dp">
+            <Button android:background="@drawable/bottom_bar_left" android:layout_height="wrap_content" android:layout_width="106.7dp" android:id="@+id/bottom_button_left" android:text="@string/contacts_tab_my_completed" android:textColor="@color/white"></Button>
+            <Button android:background="@drawable/bottom_bar_center" android:layout_height="wrap_content" android:layout_width="106.6dp" android:id="@+id/bottom_button_center" android:text="@string/contacts_tab_my_completed" android:textColor="@color/white"></Button>
+            <Button android:background="@drawable/bottom_bar_right" android:layout_height="wrap_content" android:layout_width="106.6dp" android:id="@+id/bottom_button_right" android:text="@string/contacts_tab_unassigned" android:textColor="@color/white"></Button>
+        </LinearLayout>
+    </RelativeLayout>
