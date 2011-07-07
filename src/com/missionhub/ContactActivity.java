@@ -9,10 +9,13 @@ import com.missionhub.api.GAssign;
 import com.missionhub.api.GContact;
 import com.missionhub.api.GContactAll;
 import com.missionhub.api.GError;
+import com.missionhub.api.GFCTop;
+import com.missionhub.api.GFollowupComment;
 import com.missionhub.api.GIdNameProvider;
 import com.missionhub.api.GPerson;
 import com.missionhub.api.MHError;
 import com.missionhub.api.User;
+import com.missionhub.ui.CommentItemAdapter;
 import com.missionhub.ui.DisplayError;
 import com.missionhub.ui.Guide;
 import com.missionhub.ui.ImageManager;
@@ -83,6 +86,9 @@ public class ContactActivity extends Activity {
 	private final int DIALOG_REJOICABLES = 0;
 
 	private ArrayList<String> statusList = new ArrayList<String>();
+	
+	private CommentItemAdapter commentAdapter;
+	private ArrayList<GFollowupComment> comments = new ArrayList<GFollowupComment>();
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -104,6 +110,8 @@ public class ContactActivity extends Activity {
 		txtTitle = (TextView) findViewById(R.id.contact_title);
 		contactListView = (ListView) findViewById(R.id.contact_listview);
 		progress = (ProgressBar) findViewById(R.id.contact_progress);
+		
+		commentAdapter = new CommentItemAdapter(this, R.layout.comment_list_item, comments);
 
 		contactHeader = (LinearLayout) View.inflate(this, R.layout.contact_header, null);
 		contactPicture = (ImageView) contactHeader.findViewById(R.id.contact_picture);
@@ -133,7 +141,7 @@ public class ContactActivity extends Activity {
 		header.addView(contactHeader);
 
 		contactListView.addHeaderView(header);
-		String[] mStrings = { "one", "two", "three", "four", "five", "six", "seven" };
+		String[] mStrings = {};
 		contactListView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mStrings));
 
 		imageManager = new ImageManager(getApplicationContext());
@@ -244,11 +252,13 @@ public class ContactActivity extends Activity {
 	}
 
 	public void updatePerson(boolean force) {
+		if (!processes.contains("contact") || force)
 		Api.getContacts(contact.getPerson().getId(), contactResponseHandler);
 	}
 
 	public void updateComments(boolean force) {
-
+		if (!processes.contains("comment") || force)
+		Api.getFollowupComments(contact.getPerson().getId(), commentResponseHandler);	
 	}
 
 	private AsyncHttpResponseHandler contactResponseHandler = new AsyncHttpResponseHandler() {
@@ -293,9 +303,61 @@ public class ContactActivity extends Activity {
 			hideProgress("contact");
 		}
 	};
+	
+	private AsyncHttpResponseHandler commentResponseHandler = new AsyncHttpResponseHandler() {
+		@Override
+		public void onStart() {
+			showProgress("comment");
+		}
+
+		@Override
+		public void onSuccess(String response) {
+			Gson gson = new Gson();
+			try {
+				GError error = gson.fromJson(response, GError.class);
+				onFailure(new MHError(error));
+			} catch (Exception out) {
+				try {
+					GFCTop[] fcs = gson.fromJson(response, GFCTop[].class);
+					ContactActivity.this.processFollowupComments(fcs);
+				} catch (Exception e) {
+					onFailure(e);
+				}
+			}
+		}
+
+		@Override
+		public void onFailure(Throwable e) {
+			Log.e(TAG, "Comment Fetch Failed", e);
+			AlertDialog ad = DisplayError.display(ContactActivity.this, e);
+			ad.setButton(ad.getContext().getString(R.string.alert_retry), new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					dialog.dismiss();
+					updateComments(true);
+				}
+			});
+			ad.show();
+		}
+
+		@Override
+		public void onFinish() {
+			hideProgress("comment");
+		}
+	};
 
 	public void clickAssign(View v) {
 		clickAssign();
+	}
+
+	protected void processFollowupComments(GFCTop[] fcs) {
+		comments.clear();
+		for (GFCTop gfc : fcs) {
+			comments.add(gfc.getFollowup_comment());
+		}
+		if (tab == TAB_CONTACT) {
+			contactListView.setAdapter(commentAdapter);
+			commentAdapter.notifyDataSetChanged();
+		}
 	}
 
 	public void clickAssign() {

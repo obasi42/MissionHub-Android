@@ -10,6 +10,7 @@ import com.missionhub.api.GContact;
 import com.missionhub.api.GError;
 import com.missionhub.api.MHError;
 import com.missionhub.api.User;
+import com.missionhub.ui.CommentItemAdapter;
 import com.missionhub.ui.ContactItemAdapter;
 import com.missionhub.ui.DisplayError;
 import com.missionhub.ui.Guide;
