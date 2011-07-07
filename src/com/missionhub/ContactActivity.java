@@ -124,7 +124,7 @@ public class ContactActivity extends Activity {
 		statusList.add(getString(R.string.status_contacted));
 		statusList.add(getString(R.string.status_completed));
 		statusList.add(getString(R.string.status_do_not_contact));
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, statusList);
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.contact_spinner_text, statusList);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		contactStatus.setAdapter(adapter);
 
