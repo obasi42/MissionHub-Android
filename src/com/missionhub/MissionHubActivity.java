@@ -177,9 +177,10 @@ public class MissionHubActivity extends Activity {
 						try {
 							GPerson[] people = gson.fromJson(response, GPerson[].class);
 							if (people.length > 0) {
+								GContact contact = new GContact();
+								contact.setPerson(people[0]);
+								User.setContact(contact);
 								User.setOrgID("56"); // TODO Remove Me
-								User.setContact(new GContact());
-								User.getContact().setPerson(people[0]);
 								User.setLoggedIn(true);
 								refreshView();
 							}

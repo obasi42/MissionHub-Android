@@ -43,6 +43,7 @@ public class User {
 	}
 	
 	public static synchronized void setContact(GContact g) {
+		if (g == null || g.getPerson() == null) return;
 		contact = g;
 		calculateRoles(contact.getPerson());
 		orgID = String.valueOf(primaryOrgID); 
