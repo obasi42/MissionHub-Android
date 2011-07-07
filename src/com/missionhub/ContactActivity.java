@@ -20,9 +20,12 @@ import com.missionhub.ui.ImageManager;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -34,6 +37,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class ContactActivity extends Activity {
 
@@ -154,7 +158,7 @@ public class ContactActivity extends Activity {
 		if (person.getName() != null) {
 			contactName.setText(person.getName());
 		}
-		if (person.getPhone_number() != null) {
+		if (person.getPhone_number() != null && hasPhoneAbility()) {
 			contactPhone.setVisibility(View.VISIBLE);
 			contactSMS.setVisibility(View.VISIBLE);
 		} else {
@@ -256,15 +260,35 @@ public class ContactActivity extends Activity {
 	}
 
 	public void clickPhone(View v) {
-		
+		try {
+		    Intent intent = new Intent(Intent.ACTION_CALL);
+		    intent.setData(Uri.parse("tel:"+contact.getPerson().getPhone_number()));
+		    startActivity(intent);
+		} catch (Exception e) {
+			Toast.makeText(this, R.string.contact_cant_call, Toast.LENGTH_LONG).show();
+		}
 	}
 
 	public void clickSMS(View v) {
-		
+		try {
+			Intent intent = new Intent(Intent.ACTION_VIEW);
+			intent.putExtra("address", contact.getPerson().getPhone_number());
+			intent.setType("vnd.android-dir/mms-sms"); 
+			startActivity(intent);
+		} catch (Exception e) {
+			Toast.makeText(this, R.string.contact_cant_sms, Toast.LENGTH_LONG).show();
+		}
 	}
 
 	public void clickEmail(View v) {
-		
+		try {
+			final Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
+			emailIntent.setType("plain/text");
+			emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{contact.getPerson().getEmail_address()});
+			startActivity(Intent.createChooser(emailIntent, getString(R.string.contact_send_email)));
+		} catch (Exception e) {
+			Toast.makeText(this, R.string.contact_cant_email, Toast.LENGTH_LONG).show();
+		}
 	}
 
 	public void clickSave(View v) {
@@ -305,5 +329,13 @@ public class ContactActivity extends Activity {
 			}
 			this.tab = tab;
 		}
+	}
+	
+	private boolean hasPhoneAbility() {
+	   TelephonyManager telephonyManager = (TelephonyManager) getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
+	   if(telephonyManager.getPhoneType() == TelephonyManager.PHONE_TYPE_NONE)
+	       return false;
+
+	   return true;
 	}
 }
