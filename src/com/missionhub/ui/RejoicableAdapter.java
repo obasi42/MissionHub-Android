@@ -34,6 +34,7 @@ public class RejoicableAdapter extends ArrayAdapter<Rejoicable> {
 		if (rejoicable != null) {
 			v.setTag(rejoicable.name);
 			((CheckedTextView) v).setCheckMarkDrawable(rejoicable.drawable);
+			((CheckedTextView) v).setText(rejoicable.name);
 		}
 		return v;
 	}

@@ -5,4 +5,5 @@
 	<color name="transparent">#00000000</color>
 	<color name="opaque_background">#99000000</color>
 	<color name="webview_background">#f0f0f0</color>
+	<color name="light_gray">#CCC</color>
 </resources>

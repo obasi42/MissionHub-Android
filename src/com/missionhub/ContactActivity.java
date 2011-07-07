@@ -50,7 +50,7 @@ public class ContactActivity extends Activity {
 	public static final int TAB_MORE_INFO = 1;
 	public static final int TAB_SURVEYS = 2;
 	private int tab = TAB_CONTACT;
-	
+
 	private GContactAll contactMeta;
 	private GContact contact;
 
@@ -74,14 +74,14 @@ public class ContactActivity extends Activity {
 	private Button contactRejoicable;
 	private Button contactSave;
 	private Spinner contactStatus;
-	
+
 	private final int ASSIGNMENT_NONE = 0;
 	private final int ASSIGNMENT_ME = 1;
 	private final int ASSIGNMENT_OTHER = 2;
 	private int assignmentStatus = ASSIGNMENT_NONE;
-	
+
 	private final int DIALOG_REJOICABLES = 0;
-	
+
 	private ArrayList<String> statusList = new ArrayList<String>();
 
 	@Override
@@ -117,7 +117,7 @@ public class ContactActivity extends Activity {
 		contactComment = (EditText) contactPost.findViewById(R.id.contact_comment);
 		contactRejoicable = (Button) contactPost.findViewById(R.id.contact_rejoicable);
 		contactSave = (Button) contactPost.findViewById(R.id.contact_save);
-		
+
 		contactStatus = (Spinner) contactPost.findViewById(R.id.contact_status);
 		statusList.add(getString(R.string.status_uncontacted));
 		statusList.add(getString(R.string.status_attempted_contact));
@@ -127,7 +127,7 @@ public class ContactActivity extends Activity {
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, statusList);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		contactStatus.setAdapter(adapter);
-		
+
 		header = new LinearLayout(this);
 		header.setOrientation(LinearLayout.VERTICAL);
 		header.addView(contactHeader);
@@ -135,71 +135,62 @@ public class ContactActivity extends Activity {
 		contactListView.addHeaderView(header);
 		String[] mStrings = { "one", "two", "three", "four", "five", "six", "seven" };
 		contactListView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mStrings));
-		
+
 		imageManager = new ImageManager(getApplicationContext());
 		updateHeader();
-		
+
 		setTab(TAB_CONTACT, true);
 		update(true);
 		Guide.display(this, Guide.CONTACT);
 	}
-	
+
 	@Override
 	protected Dialog onCreateDialog(int id) {
-	    switch(id) {
-	    case DIALOG_REJOICABLES:
-	    	ArrayList<Rejoicable> rejoicables = new ArrayList<Rejoicable>();
-	    	rejoicables.add(new Rejoicable(R.string.rejoice_spiritual_conversation, R.drawable.rejoicable_s_convo, "spiritual_conversation"));
-	    	rejoicables.add(new Rejoicable(R.string.rejoice_prayed_to_receive, R.drawable.rejoicable_r_christ, "prayed_to_receive"));
-	    	rejoicables.add(new Rejoicable(R.string.rejoice_gospel_presentation, R.drawable.rejoicable_g_present, "gospel_presentation"));
-	    	
-	    	AlertDialog dialog = new AlertDialog.Builder(this)
-            .setIcon(R.drawable.rejoicable_icon)
-            .setTitle(R.string.contact_assign_locked)
-            .setAdapter(new RejoicableAdapter(this, android.R.layout.simple_spinner_dropdown_item, rejoicables), new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
-					// TODO Auto-generated method stub
-					
-				}
-            })
-            .setPositiveButton(R.string.alert_ok, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
+		switch (id) {
+		case DIALOG_REJOICABLES:
+			ArrayList<Rejoicable> rejoicables = new ArrayList<Rejoicable>();
+			rejoicables.add(new Rejoicable(R.string.rejoice_spiritual_conversation, R.drawable.rejoicable_s_convo, "spiritual_conversation"));
+			rejoicables.add(new Rejoicable(R.string.rejoice_prayed_to_receive, R.drawable.rejoicable_r_christ, "prayed_to_receive"));
+			rejoicables.add(new Rejoicable(R.string.rejoice_gospel_presentation, R.drawable.rejoicable_g_present, "gospel_presentation"));
 
-                    /* User clicked Yes so do some stuff */
-                }
-            })
-            .setNegativeButton(R.string.alert_cancel, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
+			AlertDialog dialog = new AlertDialog.Builder(this).setIcon(R.drawable.rejoicable_icon).setTitle(R.string.contact_rejoicables)
+					.setAdapter(new RejoicableAdapter(this, android.R.layout.simple_spinner_dropdown_item, rejoicables), null)
+					.setPositiveButton(R.string.alert_ok, new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int whichButton) {
 
-                    /* User clicked No so do some stuff */
-                }
-            })
-           .create();
-	    	dialog.getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-	    	return dialog;
-	    }
-	    return null;
+							/* User clicked Yes so do some stuff */
+						}
+					}).setNegativeButton(R.string.alert_cancel, new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int whichButton) {
+
+							/* User clicked No so do some stuff */
+						}
+					}).create();
+			dialog.getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+			return dialog;
+		}
+		return null;
 	}
 
 	private ArrayList<String> processes = new ArrayList<String>();
-	
+
 	private void showProgress(String process) {
 		processes.add(process);
 		this.progress.setVisibility(View.VISIBLE);
 	}
-	
+
 	private void hideProgress(String process) {
 		processes.remove(process);
 		if (processes.size() <= 0) {
 			this.progress.setVisibility(View.GONE);
 		}
 	}
-	
-	
+
 	public void updateHeader() {
 		final GPerson person = contact.getPerson();
-		if (person == null) return;
-		
+		if (person == null)
+			return;
+
 		int defaultImage = R.drawable.facebook_question;
 		if (person.getGender() != null) {
 			if (person.getGender().equalsIgnoreCase("male")) {
@@ -228,7 +219,7 @@ public class ContactActivity extends Activity {
 		} else {
 			contactEmail.setVisibility(View.GONE);
 		}
-		
+
 		assignmentStatus = ASSIGNMENT_NONE;
 		if (person.getAssignment() != null) {
 			GAssign assign = person.getAssignment();
@@ -266,31 +257,33 @@ public class ContactActivity extends Activity {
 	}
 
 	public void updateComments(boolean force) {
-		
+
 	}
-	
+
 	private AsyncHttpResponseHandler contactResponseHandler = new AsyncHttpResponseHandler() {
 		@Override
 		public void onStart() {
 			showProgress("contact");
 		}
+
 		@Override
 		public void onSuccess(String response) {
 			Gson gson = new Gson();
-			try{
+			try {
 				GError error = gson.fromJson(response, GError.class);
 				onFailure(new MHError(error));
-			} catch (Exception out){
+			} catch (Exception out) {
 				try {
 					GContactAll contactAll = gson.fromJson(response, GContactAll.class);
 					ContactActivity.this.contactMeta = contactAll;
 					ContactActivity.this.contact = contactAll.getPeople()[0];
 					ContactActivity.this.updateHeader();
-				} catch(Exception e) {
+				} catch (Exception e) {
 					onFailure(e);
 				}
 			}
 		}
+
 		@Override
 		public void onFailure(Throwable e) {
 			Log.e(TAG, "Contact Fetch Failed", e);
@@ -303,6 +296,7 @@ public class ContactActivity extends Activity {
 			});
 			ad.show();
 		}
+
 		@Override
 		public void onFinish() {
 			hideProgress("contact");
@@ -312,39 +306,41 @@ public class ContactActivity extends Activity {
 	public void clickAssign(View v) {
 		clickAssign();
 	}
-	
+
 	public void clickAssign() {
 		if (assignmentStatus == ASSIGNMENT_NONE) {
-			Api.createContactAssignment(contact.getPerson().getId(), User.contact.getPerson().getId(), new AssignmentHandler(AssignmentHandler.TYPE_ASSIGN));
+			Api.createContactAssignment(contact.getPerson().getId(), User.contact.getPerson().getId(), new AssignmentHandler(
+					AssignmentHandler.TYPE_ASSIGN));
 		} else if (assignmentStatus == ASSIGNMENT_ME) {
 			Api.deleteContactAssignment(contact.getPerson().getId(), new AssignmentHandler(AssignmentHandler.TYPE_UNASSIGN));
 		}
 	}
-	
+
 	private class AssignmentHandler extends AsyncHttpResponseHandler {
-		
+
 		public static final int TYPE_ASSIGN = 0;
 		public static final int TYPE_UNASSIGN = 1;
-		
+
 		private int type = TYPE_ASSIGN;
-		
+
 		AssignmentHandler(int type) {
 			super();
 			this.type = type;
 		}
-		
+
 		@Override
 		public void onStart() {
 			showProgress("assign");
 			contactAssign.setEnabled(false);
 		}
+
 		@Override
 		public void onSuccess(String response) {
 			Gson gson = new Gson();
-			try{
+			try {
 				GError error = gson.fromJson(response, GError.class);
 				onFailure(new MHError(error));
-			} catch (Exception out){
+			} catch (Exception out) {
 				Log.i(TAG, "ASSIGNMENT SUCCESS");
 				if (type == TYPE_ASSIGN) {
 					contactAssign.setText(R.string.contact_unassign);
@@ -353,10 +349,11 @@ public class ContactActivity extends Activity {
 					contactAssign.setText(R.string.contact_assign_to_me);
 					assignmentStatus = ASSIGNMENT_NONE;
 				}
-				
-				//TODO: on success
+
+				// TODO: on success
 			}
 		}
+
 		@Override
 		public void onFailure(Throwable e) {
 			Log.e(TAG, "Assignment Failed", e);
@@ -369,6 +366,7 @@ public class ContactActivity extends Activity {
 			});
 			ad.show();
 		}
+
 		@Override
 		public void onFinish() {
 			hideProgress("assign");
@@ -376,16 +374,15 @@ public class ContactActivity extends Activity {
 		}
 	};
 
-
 	public void clickPicture(View v) {
-		
+
 	}
 
 	public void clickPhone(View v) {
 		try {
-		    Intent intent = new Intent(Intent.ACTION_CALL);
-		    intent.setData(Uri.parse("tel:"+contact.getPerson().getPhone_number()));
-		    startActivity(intent);
+			Intent intent = new Intent(Intent.ACTION_CALL);
+			intent.setData(Uri.parse("tel:" + contact.getPerson().getPhone_number()));
+			startActivity(intent);
 		} catch (Exception e) {
 			Toast.makeText(this, R.string.contact_cant_call, Toast.LENGTH_LONG).show();
 		}
@@ -395,7 +392,7 @@ public class ContactActivity extends Activity {
 		try {
 			Intent intent = new Intent(Intent.ACTION_VIEW);
 			intent.putExtra("address", contact.getPerson().getPhone_number());
-			intent.setType("vnd.android-dir/mms-sms"); 
+			intent.setType("vnd.android-dir/mms-sms");
 			startActivity(intent);
 		} catch (Exception e) {
 			Toast.makeText(this, R.string.contact_cant_sms, Toast.LENGTH_LONG).show();
@@ -406,7 +403,7 @@ public class ContactActivity extends Activity {
 		try {
 			final Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
 			emailIntent.setType("plain/text");
-			emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{contact.getPerson().getEmail_address()});
+			emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[] { contact.getPerson().getEmail_address() });
 			startActivity(Intent.createChooser(emailIntent, getString(R.string.contact_send_email)));
 		} catch (Exception e) {
 			Toast.makeText(this, R.string.contact_cant_email, Toast.LENGTH_LONG).show();
@@ -414,7 +411,7 @@ public class ContactActivity extends Activity {
 	}
 
 	public void clickSave(View v) {
-		
+
 	}
 
 	public void clickRejoicables(View v) {
@@ -452,12 +449,12 @@ public class ContactActivity extends Activity {
 			this.tab = tab;
 		}
 	}
-	
-	private boolean hasPhoneAbility() {
-	   TelephonyManager telephonyManager = (TelephonyManager) getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
-	   if(telephonyManager.getPhoneType() == TelephonyManager.PHONE_TYPE_NONE)
-	       return false;
 
-	   return true;
+	private boolean hasPhoneAbility() {
+		TelephonyManager telephonyManager = (TelephonyManager) getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
+		if (telephonyManager.getPhoneType() == TelephonyManager.PHONE_TYPE_NONE)
+			return false;
+
+		return true;
 	}
 }
