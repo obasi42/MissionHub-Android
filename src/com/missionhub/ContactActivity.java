@@ -316,7 +316,7 @@ public class ContactActivity extends Activity {
 			if (assign.getPerson_assigned_to() != null) {
 				GIdNameProvider[] gids = assign.getPerson_assigned_to();
 				for (GIdNameProvider gid : gids) {
-					if (User.contact.getPerson().getId() == Integer.parseInt(gid.getId())) {
+					if (User.getContact().getPerson().getId() == Integer.parseInt(gid.getId())) {
 						assignmentStatus = ASSIGNMENT_ME;
 						break;
 					} else {
@@ -476,7 +476,7 @@ public class ContactActivity extends Activity {
 
 	public void clickAssign() {
 		if (assignmentStatus == ASSIGNMENT_NONE) {
-			Api.createContactAssignment(contact.getPerson().getId(), User.contact.getPerson().getId(), new AssignmentHandler(AssignmentHandler.TYPE_ASSIGN));
+			Api.createContactAssignment(contact.getPerson().getId(), User.getContact().getPerson().getId(), new AssignmentHandler(AssignmentHandler.TYPE_ASSIGN));
 		} else if (assignmentStatus == ASSIGNMENT_ME) {
 			Api.deleteContactAssignment(contact.getPerson().getId(), new AssignmentHandler(AssignmentHandler.TYPE_UNASSIGN));
 		}
@@ -611,7 +611,7 @@ public class ContactActivity extends Activity {
 		
 		if (canSave) {
 			String status = statusListTag.get(statusPos);
-			Api.postFollowupComment(contact.getPerson().getId(), User.contact.getPerson().getId(), status, comment, new SaveResponseHandler(status), rejoicables);
+			Api.postFollowupComment(contact.getPerson().getId(), User.getContact().getPerson().getId(), statusListTag.get(statusPos), comment, new SaveResponseHandler(status), rejoicables);
 		} else {
 			Toast.makeText(this, R.string.contact_cant_save, Toast.LENGTH_LONG).show();
 		}

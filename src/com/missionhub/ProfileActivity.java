@@ -40,7 +40,7 @@ public class ProfileActivity extends Activity {
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // The drop down vieww
 
 		TextView name = (TextView) findViewById(R.id.textView3);
-		name.setText(User.contact.getPerson().getName()); 
+		name.setText(User.getContact().getPerson().getName()); 
 
 		try {
 		    spinner.setAdapter(adapter);
@@ -61,13 +61,13 @@ public class ProfileActivity extends Activity {
 
 	    public void onItemSelected(AdapterView<?> parent,
 	        View view, int pos, long id) {
-	    	if (!spinnerOrgIds.get(pos).equalsIgnoreCase(User.orgID)) {
+	    	if (!spinnerOrgIds.get(pos).equalsIgnoreCase(User.getOrgID())) {
 	  	      Toast.makeText(parent.getContext(), "Your current organization is now " +
 	  		          parent.getItemAtPosition(pos).toString(), Toast.LENGTH_LONG).show();
 	    	}
 	    	currentSpinnerOrgID = spinnerOrgIds.get(pos);
 	    	currentSpinnerName = spinnerNames.get(pos);
-	    	User.orgID = currentSpinnerOrgID;
+	    	User.setOrgID(currentSpinnerOrgID);
 	    	Log.i("ARG", String.valueOf(pos));
 	    }
 
@@ -84,18 +84,18 @@ public class ProfileActivity extends Activity {
 	}
 	
 	private void createSpinnerArrays() {
-		User.orgID = "56";
-		Iterator<Integer> it = User.validRoles.keySet().iterator();
+		User.setOrgID("56");
+		Iterator<Integer> it = User.getValidRoles().keySet().iterator();
 		int count = 0; 
 		while (it.hasNext()) {
 			Log.i("ARG", "HIIII");
 			int key = it.next();
-			HashMap<String, String> role = User.validRoles.get(key);
+			HashMap<String, String> role = User.getValidRoles().get(key);
 			Log.i("ARG", role.get("name") + " " + String.valueOf(count));
 			
 			spinnerOrgIds.add(role.get("org_id"));
 			spinnerNames.add(role.get("name"));
-			if (role.get("org_id").equalsIgnoreCase(User.orgID)) {
+			if (role.get("org_id").equalsIgnoreCase(User.getOrgID())) {
 				Log.i("ARG", "EQUALITY!!");
 				currentSpinnerOrgID = role.get("org_id");
 				currentSpinnerName = role.get("name");

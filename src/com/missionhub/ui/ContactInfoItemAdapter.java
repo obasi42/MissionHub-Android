@@ -21,6 +21,7 @@ public class ContactInfoItemAdapter  extends ArrayAdapter<SimpleListItem>{
 		this.items = items;
 		activity = a;
 	}
+	
 
 	public static class ViewHolder{
 		public TextView header;

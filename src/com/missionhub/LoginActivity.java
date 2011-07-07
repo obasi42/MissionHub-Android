@@ -87,7 +87,7 @@ public class LoginActivity extends Activity {
 
 	private void returnWithToken() {
 		Intent i = new Intent();
-		i.putExtra("token", User.token);
+		i.putExtra("token", User.getToken());
 		this.setResult(RESULT_OK, i);
 		finish();
 	}
@@ -161,17 +161,17 @@ public class LoginActivity extends Activity {
 			@Override
 			public void onSuccess(JSONObject response) {
 				try {
-					User.token = response.getString("access_token");
+					User.setToken(response.getString("access_token"));
 					SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 					SharedPreferences.Editor editor = settings.edit();
-					editor.putString("token", User.token);
+					editor.putString("token", User.getToken());
 					editor.commit();
-					User.isLoggedIn = true;
+					User.setLoggedIn(true);
 				} catch (Exception e) {
 					onFailure(e.getCause());
 					return;
 				}
-				Log.i(TAG, "Logged In With Token: " + User.token);
+				Log.i(TAG, "Logged In With Token: " + User.getToken());
 				returnWithToken();
 			}
 
