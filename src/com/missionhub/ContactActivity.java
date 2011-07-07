@@ -32,8 +32,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.util.Log;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -81,7 +79,6 @@ public class ContactActivity extends Activity {
 
 	private LinearLayout contactPost;
 	private EditText contactComment;
-	private Button contactRejoicable;
 	private Button contactSave;
 	private Spinner contactStatus;
 	private ListView rejoicableListView;
@@ -106,12 +103,22 @@ public class ContactActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		Gson gson = new Gson();
 		Intent i = getIntent();
-		if (i != null) {
+		if (i != null && i.hasExtra("contactJSON")) {
 			try {
-				Gson gson = new Gson();
 				contact = gson.fromJson(i.getStringExtra("contactJSON"), GContact.class);
-			} catch (Exception e) {
+			} catch (Exception e) {}
+		} else {
+			if (savedInstanceState != null) {
+				try {
+					if (savedInstanceState.containsKey("contactMetaJSON")) {
+						contactMeta = gson.fromJson(savedInstanceState.getString("contactMetaJSON"), GContactAll.class);
+					}
+					if (savedInstanceState.containsKey("contactJSON")) {
+						contact = gson.fromJson(savedInstanceState.getString("contactJSON"), GContact.class);
+					}
+				} catch (Exception e) {}
 			}
 		}
 		if (contact == null) {
@@ -133,7 +140,6 @@ public class ContactActivity extends Activity {
 
 		contactPost = (LinearLayout) View.inflate(this, R.layout.contact_post, null);
 		contactComment = (EditText) contactPost.findViewById(R.id.contact_comment);
-		contactRejoicable = (Button) contactPost.findViewById(R.id.contact_rejoicable);
 		contactSave = (Button) contactPost.findViewById(R.id.contact_save);
 		
 		validRejoicables = new ArrayList<Rejoicable>();
@@ -172,10 +178,8 @@ public class ContactActivity extends Activity {
 		contactListView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mStrings));
 
 		imageManager = new ImageManager(getApplicationContext());
-		updateHeader();
 
 		setTab(TAB_CONTACT, true);
-		update(true);
 		Guide.display(this, Guide.CONTACT);
 	}
 
@@ -213,6 +217,39 @@ public class ContactActivity extends Activity {
 			return super.onOptionsItemSelected(item);
 		}
 	}
+	
+	@Override
+	public void onSaveInstanceState(Bundle b) {
+		try {
+			Gson gson = new Gson();
+			if (contactMeta != null) {
+				b.putString("contactMetaJSON", gson.toJson(contactMeta));
+			}
+			if (contact != null) {
+				b.putString("contactJSON", gson.toJson(contact));
+			}
+		} catch (Exception e) {};
+	}
+	
+	@Override
+	public void onRestoreInstanceState(Bundle b) {
+		try {
+			Gson gson = new Gson();
+			if (b.containsKey("contactMetaJSON")) {
+				contactMeta = gson.fromJson(b.getString("contactMetaJSON"), GContactAll.class);
+			}
+			if (b.containsKey("contactJSON")) {
+				contact = gson.fromJson(b.getString("contactJSON"), GContact.class);
+			}
+		} catch (Exception e) {}
+	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		update(true);
+		updateHeader();
+	}
 
 	private ArrayList<String> processes = new ArrayList<String>();
 
@@ -233,9 +270,9 @@ public class ContactActivity extends Activity {
 	}
 
 	public void updateHeader() {
+		if (contact == null) return;
 		final GPerson person = contact.getPerson();
-		if (person == null)
-			return;
+		if (person == null) return;
 
 		int defaultImage = R.drawable.facebook_question;
 		if (person.getGender() != null) {
@@ -671,6 +708,7 @@ public class ContactActivity extends Activity {
 			
 			final CharSequence[] items = { getString(R.string.comment_delete) };
 			AlertDialog.Builder builder = new AlertDialog.Builder(ContactActivity.this);
+			builder.setIcon(R.drawable.ic_menu_start_conversation);
 			builder.setTitle(R.string.comment_actions);
 			builder.setItems(items, new DialogInterface.OnClickListener() {
 			    public void onClick(DialogInterface dialog, int item) {
