@@ -154,18 +154,9 @@ public class ContactActivity extends Activity {
 			rejoicables.add(new Rejoicable(R.string.rejoice_gospel_presentation, R.drawable.rejoicable_g_present, "gospel_presentation"));
 
 			AlertDialog dialog = new AlertDialog.Builder(this).setIcon(R.drawable.rejoicable_icon).setTitle(R.string.contact_rejoicables)
-					.setAdapter(new RejoicableAdapter(this, android.R.layout.simple_spinner_dropdown_item, rejoicables), null)
-					.setPositiveButton(R.string.alert_ok, new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int whichButton) {
-
-							/* User clicked Yes so do some stuff */
-						}
-					}).setNegativeButton(R.string.alert_cancel, new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int whichButton) {
-
-							/* User clicked No so do some stuff */
-						}
-					}).create();
+				.setAdapter(new RejoicableAdapter(this, android.R.layout.simple_spinner_dropdown_item, rejoicables), null)
+				.setNeutralButton(R.string.alert_ok, null)
+				.create();
 			dialog.getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 			return dialog;
 		}
@@ -309,8 +300,7 @@ public class ContactActivity extends Activity {
 
 	public void clickAssign() {
 		if (assignmentStatus == ASSIGNMENT_NONE) {
-			Api.createContactAssignment(contact.getPerson().getId(), User.contact.getPerson().getId(), new AssignmentHandler(
-					AssignmentHandler.TYPE_ASSIGN));
+			Api.createContactAssignment(contact.getPerson().getId(), User.contact.getPerson().getId(), new AssignmentHandler(AssignmentHandler.TYPE_ASSIGN));
 		} else if (assignmentStatus == ASSIGNMENT_ME) {
 			Api.deleteContactAssignment(contact.getPerson().getId(), new AssignmentHandler(AssignmentHandler.TYPE_UNASSIGN));
 		}

@@ -6,4 +6,6 @@
 	<color name="opaque_background">#99000000</color>
 	<color name="webview_background">#f0f0f0</color>
 	<color name="light_gray">#CCC</color>
+	<color name="comment_status">#666</color>
+	<color name="comment_time">#666</color>
 </resources>
