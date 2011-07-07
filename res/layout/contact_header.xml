@@ -8,6 +8,6 @@
                 <Button android:background="@drawable/chat" android:layout_width="47dp" android:layout_height="38dp" android:layout_marginRight="18dp" android:id="@+id/contact_sms" android:onClick="clickSMS" android:visibility="gone"></Button>
                 <Button android:background="@drawable/envelope" android:layout_width="47dp" android:layout_height="38dp" android:id="@+id/contact_email" android:onClick="clickEmail" android:visibility="gone"></Button>
             </LinearLayout>
-            <Button android:layout_marginTop="10dp" android:background="@drawable/assign_button" android:layout_width="177dp" android:layout_height="30dp" android:textColor="@color/white" android:textSize="13dp" android:textStyle="bold" android:id="@+id/contact_assign" android:onClick="clickAssign" android:text="@string/contact_assign_to_me" android:enabled="false"></Button>
+            <Button android:layout_marginTop="10dp" android:background="@drawable/medium_button" android:layout_width="177dp" android:layout_height="30dp" android:textColor="@color/white" android:textSize="13dp" android:textStyle="bold" android:id="@+id/contact_assign" android:onClick="clickAssign" android:text="@string/contact_assign_to_me" android:enabled="false"></Button>
         </LinearLayout>
     </LinearLayout>
