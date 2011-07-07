@@ -25,7 +25,6 @@ import com.missionhub.ui.RejoicableAdapter;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -33,6 +32,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -62,6 +64,7 @@ public class ContactActivity extends Activity {
 	private LinearLayout header;
 	private ImageManager imageManager;
 	private ProgressBar progress;
+	private MenuItem refreshMenuItem;
 
 	private LinearLayout contactHeader;
 	private ImageView contactPicture;
@@ -170,17 +173,41 @@ public class ContactActivity extends Activity {
 		}
 		return null;
 	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.contact, menu);
+		refreshMenuItem = menu.findItem(R.id.contact_menu_refresh);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle item selection
+		switch (item.getItemId()) {
+		case R.id.contact_menu_refresh:
+			update(true);
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+	}
 
 	private ArrayList<String> processes = new ArrayList<String>();
 
 	private void showProgress(String process) {
 		processes.add(process);
+		if (refreshMenuItem != null) 
+			refreshMenuItem.setEnabled(false);
 		this.progress.setVisibility(View.VISIBLE);
 	}
 
 	private void hideProgress(String process) {
 		processes.remove(process);
 		if (processes.size() <= 0) {
+			if (refreshMenuItem != null) 
+				refreshMenuItem.setEnabled(true);
 			this.progress.setVisibility(View.GONE);
 		}
 	}
@@ -463,7 +490,7 @@ public class ContactActivity extends Activity {
 	}
 
 	public void clickSave(View v) {
-
+		if (processes.contains("save")) return;
 	}
 
 	public void clickRejoicables(View v) {

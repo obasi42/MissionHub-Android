@@ -34,6 +34,7 @@
     <string name="contact_cant_email">Could not send email.</string>
     <string name="contact_send_email">Send Email...</string>
     <string name="contact_rejoicables">Attach Rejoicables</string>
+    <string name="contact_menu_refresh">Refresh</string>
     
     <string name="status_uncontacted">Uncontacted</string>
     <string name="status_attempted_contact">Attempted Contact</string>

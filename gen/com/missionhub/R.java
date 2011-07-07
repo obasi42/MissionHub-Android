@@ -106,6 +106,7 @@ public final class R {
         public static final int contact_fields=0x7f09001f;
         public static final int contact_header=0x7f090013;
         public static final int contact_listview=0x7f090011;
+        public static final int contact_menu_refresh=0x7f090045;
         public static final int contact_name=0x7f090016;
         public static final int contact_nameview=0x7f090015;
         public static final int contact_phone=0x7f090018;
@@ -125,7 +126,7 @@ public final class R {
         public static final int contacts_list_contact_name=0x7f09001d;
         public static final int contacts_list_contact_status=0x7f09001e;
         public static final int contacts_progress=0x7f09002c;
-        public static final int contacts_refresh=0x7f090045;
+        public static final int contacts_refresh=0x7f090046;
         public static final int contacts_search=0x7f090029;
         public static final int contacts_search_container=0x7f090028;
         public static final int contacts_top_bar=0x7f090026;
@@ -167,21 +168,22 @@ public final class R {
         public static final int rejoiceable_item=0x7f03000b;
     }
     public static final class menu {
-        public static final int contacts=0x7f080000;
+        public static final int contact=0x7f080000;
+        public static final int contacts=0x7f080001;
     }
     public static final class string {
-        public static final int alert_cancel=0x7f06002b;
-        public static final int alert_close=0x7f06002d;
-        public static final int alert_dont_show=0x7f060033;
-        public static final int alert_error=0x7f060028;
-        public static final int alert_error_msg=0x7f060029;
-        public static final int alert_hide=0x7f060032;
-        public static final int alert_learn_more=0x7f06002e;
-        public static final int alert_learn_more_msg=0x7f06002f;
-        public static final int alert_loading=0x7f060030;
-        public static final int alert_logging_in=0x7f060031;
-        public static final int alert_ok=0x7f06002a;
-        public static final int alert_retry=0x7f06002c;
+        public static final int alert_cancel=0x7f06002c;
+        public static final int alert_close=0x7f06002e;
+        public static final int alert_dont_show=0x7f060034;
+        public static final int alert_error=0x7f060029;
+        public static final int alert_error_msg=0x7f06002a;
+        public static final int alert_hide=0x7f060033;
+        public static final int alert_learn_more=0x7f06002f;
+        public static final int alert_learn_more_msg=0x7f060030;
+        public static final int alert_loading=0x7f060031;
+        public static final int alert_logging_in=0x7f060032;
+        public static final int alert_ok=0x7f06002b;
+        public static final int alert_retry=0x7f06002d;
         public static final int app_name=0x7f060000;
         public static final int contact_assign_locked=0x7f060015;
         public static final int contact_assign_to_me=0x7f060013;
@@ -191,6 +193,7 @@ public final class R {
         public static final int contact_comment_hint=0x7f060016;
         public static final int contact_comment_save=0x7f060017;
         public static final int contact_contact=0x7f060010;
+        public static final int contact_menu_refresh=0x7f060020;
         public static final int contact_more=0x7f060011;
         public static final int contact_rejoicables=0x7f06001f;
         public static final int contact_send_email=0x7f06001e;
@@ -210,32 +213,32 @@ public final class R {
         public static final int contacts_tab_my_contacts=0x7f060008;
         public static final int contacts_tab_unassigned=0x7f06000a;
         public static final int contacts_unassigned=0x7f060007;
-        public static final int error_no_network=0x7f060035;
-        public static final int error_no_network_msg=0x7f060036;
-        public static final int error_unexpected_response=0x7f060037;
-        public static final int error_unexpected_response_msg=0x7f060038;
-        public static final int guide_contact=0x7f06003d;
-        public static final int guide_contact_msg=0x7f06003e;
-        public static final int guide_contacts=0x7f060039;
-        public static final int guide_contacts_msg=0x7f06003a;
-        public static final int guide_contacts_unassigned=0x7f06003b;
-        public static final int guide_contacts_unassigned_msg=0x7f06003c;
+        public static final int error_no_network=0x7f060036;
+        public static final int error_no_network_msg=0x7f060037;
+        public static final int error_unexpected_response=0x7f060038;
+        public static final int error_unexpected_response_msg=0x7f060039;
+        public static final int guide_contact=0x7f06003e;
+        public static final int guide_contact_msg=0x7f06003f;
+        public static final int guide_contacts=0x7f06003a;
+        public static final int guide_contacts_msg=0x7f06003b;
+        public static final int guide_contacts_unassigned=0x7f06003c;
+        public static final int guide_contacts_unassigned_msg=0x7f06003d;
         public static final int main_about=0x7f060002;
         public static final int main_contacts=0x7f060004;
         public static final int main_login=0x7f060003;
         public static final int main_logout=0x7f060001;
-        public static final int profile_change_current_organization=0x7f060040;
-        public static final int profile_click_to_close=0x7f060041;
-        public static final int profile_header=0x7f06003f;
-        public static final int rejoice_gospel_presentation=0x7f060027;
-        public static final int rejoice_prayed_to_receive=0x7f060026;
-        public static final int rejoice_spiritual_conversation=0x7f060025;
-        public static final int status_attempted_contact=0x7f060021;
-        public static final int status_completed=0x7f060023;
-        public static final int status_contacted=0x7f060022;
-        public static final int status_do_not_contact=0x7f060024;
-        public static final int status_uncontacted=0x7f060020;
-        public static final int toast_no_browser=0x7f060034;
+        public static final int profile_change_current_organization=0x7f060041;
+        public static final int profile_click_to_close=0x7f060042;
+        public static final int profile_header=0x7f060040;
+        public static final int rejoice_gospel_presentation=0x7f060028;
+        public static final int rejoice_prayed_to_receive=0x7f060027;
+        public static final int rejoice_spiritual_conversation=0x7f060026;
+        public static final int status_attempted_contact=0x7f060022;
+        public static final int status_completed=0x7f060024;
+        public static final int status_contacted=0x7f060023;
+        public static final int status_do_not_contact=0x7f060025;
+        public static final int status_uncontacted=0x7f060021;
+        public static final int toast_no_browser=0x7f060035;
     }
     public static final class style {
         public static final int Theme_App=0x7f070002;
