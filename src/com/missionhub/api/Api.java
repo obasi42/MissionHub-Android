@@ -18,8 +18,8 @@ public class Api {
 		String url = getAbsoluteUrl("/people/") + String.valueOf(id) + ".json";
 		Log.i(TAG, "getPeople URL: " + url);
 		RequestParams params = new RequestParams();
-		params.put("org_id", User.orgID);
-		params.put("access_token", User.token);
+		params.put("org_id", User.getOrgID());
+		params.put("access_token", User.getToken());
 		get(url, params, responseHandler);
 		return true;
 	}
@@ -28,8 +28,8 @@ public class Api {
 		if (ids.size() > 0) {
 			String url = getAbsoluteUrl("/people/") + buildIds(ids) + ".json";
 			RequestParams params = new RequestParams();
-			params.put("access_token", User.token);
-			params.put("org_id", User.orgID);
+			params.put("access_token", User.getToken());
+			params.put("org_id", User.getOrgID());
 			get(url, params, responseHandler);
 			return true;
 		}
@@ -41,8 +41,8 @@ public class Api {
 			String url = getAbsoluteUrl("/people/") + id + ".json";
 			
 			RequestParams params = new RequestParams();
-			params.put("access_token", User.token);
-			params.put("org_id", User.orgID);
+			params.put("access_token", User.getToken());
+			params.put("org_id", User.getOrgID());
 			get(url, params, responseHandler);
 			return true;
 		}
@@ -59,8 +59,8 @@ public class Api {
 
 		
 		RequestParams params = new RequestParams();
-		params.put("access_token", User.token);
-		params.put("org_id", User.orgID);
+		params.put("access_token", User.getToken());
+		params.put("org_id", User.getOrgID());
 		params = sortFilterAssign(options,params);
 		Log.i(TAG, params.toString());
 		
@@ -72,8 +72,8 @@ public class Api {
 		String url = getAbsoluteUrl("/contacts/") + String.valueOf(id) + ".json";
 		
 		RequestParams params = new RequestParams();
-		params.put("access_token", User.token);
-		params.put("org_id", User.orgID);
+		params.put("access_token", User.getToken());
+		params.put("org_id", User.getOrgID());
 		
 		get(url, params, responseHandler);
 		return true;
@@ -84,8 +84,8 @@ public class Api {
 			String url = getAbsoluteUrl("/contacts/") + buildIds(ids) + ".json";
 			
 			RequestParams params = new RequestParams();
-			params.put("access_token", User.token);
-			params.put("org_id", User.orgID);
+			params.put("access_token", User.getToken());
+			params.put("org_id", User.getOrgID());
 			
 			get(url, params, responseHandler);
 			return true;
@@ -97,8 +97,8 @@ public class Api {
 		String url = getAbsoluteUrl("/followup_comments/") + String.valueOf(id) + ".json";
 		
 		RequestParams params = new RequestParams();
-		params.put("access_token", User.token);
-		params.put("org_id", User.orgID);
+		params.put("access_token", User.getToken());
+		params.put("org_id", User.getOrgID());
 		
 		get(url, params, responseHandler);
 		return true;
@@ -108,7 +108,7 @@ public class Api {
 		String url = getAbsoluteUrl("/followup_comments.json");
 		JSONObject jsonComment = new JSONObject();
 		try {
-			jsonComment.put("organization_id", User.orgID);
+			jsonComment.put("organization_id", User.getOrgID());
 			jsonComment.put("contact_id", contact_id);
 			jsonComment.put("commenter_id", commenter_id);
 			jsonComment.put("comment", comment);
@@ -138,8 +138,8 @@ public class Api {
 		}
 
 		RequestParams params = new RequestParams();
-		params.put("access_token", User.token);
-		params.put("org_id", User.orgID);
+		params.put("access_token", User.getToken());
+		params.put("org_id", User.getOrgID());
 		params.put("json", json.toString());
 		
 		post(url, params, responseHandler);
@@ -150,11 +150,11 @@ public class Api {
 	public static boolean createContactAssignment(int id, int assign_to, AsyncHttpResponseHandler responseHandler) {
 		String url = getAbsoluteUrl("/contact_assignments.json");
 		RequestParams params = new RequestParams();
-		params.put("access_token", User.token);
+		params.put("access_token", User.getToken());
 		params.put("assign_to", String.valueOf(assign_to));
 		params.put("ids", String.valueOf(id));
-		params.put("org_id", User.orgID);
-		params.put("organization_id", User.orgID);
+		params.put("org_id", User.getOrgID());
+		params.put("organization_id", User.getOrgID());
 		
 		post(url, params, responseHandler);	
 		return true;
@@ -163,8 +163,8 @@ public class Api {
 	public static boolean deleteContactAssignment(int id, AsyncHttpResponseHandler responseHandler) {
 		String url = getAbsoluteUrl("/contact_assignments/") + String.valueOf(id) + ".json";
 		RequestParams params = new RequestParams();
-		params.put("access_token", User.token);
-		params.put("org_id", User.orgID);
+		params.put("access_token", User.getToken());
+		params.put("org_id", User.getOrgID());
 		params.put("_method", "delete");
 		params.put("id", String.valueOf(id));
 		
@@ -174,8 +174,8 @@ public class Api {
 	
 	public static boolean deleteComment(int id, AsyncHttpResponseHandler responseHandler) {
 		RequestParams params = new RequestParams();
-		params.put("access_token", User.token);
-		params.put("org_id", User.orgID);
+		params.put("access_token", User.getToken());
+		params.put("org_id", User.getOrgID());
 		params.put("_method", "delete");
 		
 		String url = getAbsoluteUrl("/followup_comments/") + String.valueOf(id) + ".json";

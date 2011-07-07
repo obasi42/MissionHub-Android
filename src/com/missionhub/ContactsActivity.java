@@ -124,7 +124,7 @@ public class ContactsActivity extends Activity {
 				txtNoData.setText(R.string.contacts_no_data_my_contacts);
 				options.put("filters", "status");
 				options.put("values", "not_finished");
-				options.put("assigned_to_id", String.valueOf(User.contact.getPerson().getId()));
+				options.put("assigned_to_id", String.valueOf(User.getContact().getPerson().getId()));
 				Guide.display(this, Guide.CONTACTS_MY_CONTACTS);
 				break;
 			case TAB_COMPLETED:
@@ -132,7 +132,7 @@ public class ContactsActivity extends Activity {
 				txtNoData.setText(R.string.contacts_no_data_my_completed);
 				options.put("filters", "status");
 				options.put("values", "finished");
-				options.put("assigned_to_id", String.valueOf(User.contact.getPerson().getId()));
+				options.put("assigned_to_id", String.valueOf(User.getContact().getPerson().getId()));
 				break;
 			case TAB_UNASSIGNED:
 				txtTitle.setText(R.string.contacts_unassigned);

@@ -114,8 +114,8 @@ public class MissionHubActivity extends Activity {
 	}
 	
 	public void logout() {
-		User.token = null;
-		User.isLoggedIn = false;
+		User.setToken(null);
+		User.setLoggedIn(false);
 		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 		SharedPreferences.Editor editor = settings.edit();
 		editor.remove("token");
@@ -132,11 +132,11 @@ public class MissionHubActivity extends Activity {
 	 * Refreshes the main view based on user's logged in status
 	 */
 	public void refreshView() {
-		if (User.isLoggedIn) {
+		if (User.isLoggedIn()) {
 			loggedOut.setVisibility(View.GONE);
 			loggedIn.setVisibility(View.VISIBLE);
 			logoutBar.setVisibility(View.VISIBLE);
-			txtLogoutbarName.setText("My Name");
+			txtLogoutbarName.setText(User.getContact().getPerson().getName());
 		} else {
 			loggedIn.setVisibility(View.GONE);
 			loggedOut.setVisibility(View.VISIBLE);
@@ -159,9 +159,9 @@ public class MissionHubActivity extends Activity {
 	 * @return true if has stored token
 	 */
 	private boolean checkToken() {
-		User.token = getStoredToken();
-		User.isLoggedIn = false;
-		if (User.token != null && !User.token.equalsIgnoreCase("")) {
+		User.setToken(getStoredToken());
+		User.setLoggedIn(false);
+		if (User.getToken() != null && !User.getToken().equalsIgnoreCase("")) {
 			AsyncHttpResponseHandler responseHandler = new AsyncHttpResponseHandler() {
 				@Override
 				public void onStart() {
@@ -177,10 +177,10 @@ public class MissionHubActivity extends Activity {
 						try {
 							GPerson[] people = gson.fromJson(response, GPerson[].class);
 							if (people.length > 0) {
-								User.orgID = "56"; // TODO Remove Me
-								User.contact = new GContact();
-								User.contact.setPerson(people[0]);
-								User.isLoggedIn = true;
+								User.setOrgID("56"); // TODO Remove Me
+								User.setContact(new GContact());
+								User.getContact().setPerson(people[0]);
+								User.setLoggedIn(true);
 								refreshView();
 							}
 						} catch(Exception e) {
@@ -212,8 +212,8 @@ public class MissionHubActivity extends Activity {
 	}
 	
 	public void testingApi() {
-		User.token = "c1d65450bcb7c26efcedcd41497cae4b66e2194388c8c124914499b2094ebbed";
-		User.orgID = "56";
+		User.setToken("c1d65450bcb7c26efcedcd41497cae4b66e2194388c8c124914499b2094ebbed");
+		User.setOrgID("56");
 		
 		AsyncHttpResponseHandler responseHandler2 = new AsyncHttpResponseHandler() {
 
@@ -246,7 +246,7 @@ public class MissionHubActivity extends Activity {
 //					Log.i(TAG2, contact.getPeople()[0].getForm()[0].getA());
 					Log.i(TAG2, "Coming up next... valid roles");
 					User.calculateRoles(contact.getPeople()[0].getPerson());
-					Log.i(TAG2, String.valueOf(User.primaryOrgId));
+					Log.i(TAG2, String.valueOf(User.getPrimaryOrgID()));
 				} catch (Exception e) {
 					Log.i(TAG2, "CRAP: ", e);
 				}
