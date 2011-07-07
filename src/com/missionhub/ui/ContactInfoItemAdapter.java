@@ -36,8 +36,8 @@ public class ContactInfoItemAdapter  extends ArrayAdapter<SimpleListItem>{
 			LayoutInflater vi = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			v = vi.inflate(R.layout.contact_info_item, null);
 			holder = new ViewHolder();
-			holder.header = (TextView) v.findViewById(R.id.contacts_list_contact_name);
-			holder.info = (TextView) v.findViewById(R.id.contacts_list_contact_status);
+			holder.header = (TextView) v.findViewById(R.id.contact_info_header);
+			holder.info = (TextView) v.findViewById(R.id.contact_info_info);
 			v.setTag(holder);
 		}
 		else

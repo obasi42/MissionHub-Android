@@ -354,7 +354,7 @@ public class ContactActivity extends Activity {
 			info.add(new SimpleListItem(getString(R.string.info_facebook_header), getString(R.string.info_facebook_link), data));
 		}
 		
-		info.add(new SimpleListItem("Hello", "Hello"));
+		//TODO Add More Info
 		
 		infoAdapter.notifyDataSetChanged();
 	}
