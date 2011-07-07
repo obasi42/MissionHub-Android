@@ -21,10 +21,14 @@ public class CommentItemAdapter extends ArrayAdapter<GFollowupComment> {
 	private ArrayList<GFollowupComment> comments;
 	private Activity activity;
 	public ImageManager imageManager;
+	private ArrayList<String> statusListTag;
+	private ArrayList<Integer> statusListRes;
 
-	public CommentItemAdapter(Activity a, int textViewResourceId, ArrayList<GFollowupComment> comments) {
+	public CommentItemAdapter(Activity a, int textViewResourceId, ArrayList<GFollowupComment> comments, ArrayList<String> statusListTag, ArrayList<Integer> statusListRes) {
 		super(a, textViewResourceId, comments);
 		this.comments = comments;
+		this.statusListRes = statusListRes;
+		this.statusListTag = statusListTag;
 		activity = a;
 		
 		imageManager = new ImageManager(activity.getApplicationContext());
@@ -75,7 +79,7 @@ public class CommentItemAdapter extends ArrayAdapter<GFollowupComment> {
 				holder.picture.setTag(commenter.getPicture()+"?type=square");
 				imageManager.displayImage(commenter.getPicture()+"?type=square", activity, holder.picture, R.drawable.default_contact);
 				holder.name.setText(commenter.getName());
-				holder.status.setText(comment.getStatus());
+				holder.status.setText(statusListRes.get(statusListTag.indexOf(comment.getStatus())));
 				if (comment.getComment() == null || comment.getComment().equals("")) {
 					holder.comment.setText("");
 				} else {

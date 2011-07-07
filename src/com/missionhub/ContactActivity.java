@@ -32,10 +32,14 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -80,6 +84,9 @@ public class ContactActivity extends Activity {
 	private Button contactRejoicable;
 	private Button contactSave;
 	private Spinner contactStatus;
+	private ListView rejoicableListView;
+	
+	ArrayList<Rejoicable> validRejoicables;
 
 	private final int ASSIGNMENT_NONE = 0;
 	private final int ASSIGNMENT_ME = 1;
@@ -89,6 +96,8 @@ public class ContactActivity extends Activity {
 	private final int DIALOG_REJOICABLES = 0;
 
 	private ArrayList<String> statusList = new ArrayList<String>();
+	private ArrayList<String> statusListTag = new ArrayList<String>();
+	private ArrayList<Integer> statusListRes = new ArrayList<Integer>();
 	
 	private CommentItemAdapter commentAdapter;
 	private ArrayList<GFollowupComment> comments = new ArrayList<GFollowupComment>();
@@ -113,8 +122,6 @@ public class ContactActivity extends Activity {
 		txtTitle = (TextView) findViewById(R.id.contact_title);
 		contactListView = (ListView) findViewById(R.id.contact_listview);
 		progress = (ProgressBar) findViewById(R.id.contact_progress);
-		
-		commentAdapter = new CommentItemAdapter(this, R.layout.comment_list_item, comments);
 
 		contactHeader = (LinearLayout) View.inflate(this, R.layout.contact_header, null);
 		contactPicture = (ImageView) contactHeader.findViewById(R.id.contact_picture);
@@ -128,17 +135,34 @@ public class ContactActivity extends Activity {
 		contactComment = (EditText) contactPost.findViewById(R.id.contact_comment);
 		contactRejoicable = (Button) contactPost.findViewById(R.id.contact_rejoicable);
 		contactSave = (Button) contactPost.findViewById(R.id.contact_save);
+		
+		validRejoicables = new ArrayList<Rejoicable>();
+		validRejoicables.add(new Rejoicable(R.string.rejoice_spiritual_conversation, R.drawable.rejoicable_s_convo, "spiritual_conversation"));
+		validRejoicables.add(new Rejoicable(R.string.rejoice_prayed_to_receive, R.drawable.rejoicable_r_christ, "prayed_to_receive"));
+		validRejoicables.add(new Rejoicable(R.string.rejoice_gospel_presentation, R.drawable.rejoicable_g_present, "gospel_presentation"));
 
 		contactStatus = (Spinner) contactPost.findViewById(R.id.contact_status);
 		statusList.add(getString(R.string.status_uncontacted));
+		statusListRes.add(R.string.status_uncontacted);
+		statusListTag.add("uncontacted");
 		statusList.add(getString(R.string.status_attempted_contact));
+		statusListRes.add(R.string.status_attempted_contact);
+		statusListTag.add("attempted_contact");
 		statusList.add(getString(R.string.status_contacted));
+		statusListRes.add(R.string.status_contacted);
+		statusListTag.add("contacted");
 		statusList.add(getString(R.string.status_completed));
+		statusListRes.add(R.string.status_completed);
+		statusListTag.add("completed");
 		statusList.add(getString(R.string.status_do_not_contact));
+		statusListRes.add(R.string.status_do_not_contact);
+		statusListTag.add("do_not_contact");
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.contact_spinner_text, statusList);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		contactStatus.setAdapter(adapter);
 
+		commentAdapter = new CommentItemAdapter(this, R.layout.comment_list_item, comments, statusListTag, statusListRes);
+		
 		header = new LinearLayout(this);
 		header.setOrientation(LinearLayout.VERTICAL);
 		header.addView(contactHeader);
@@ -159,16 +183,12 @@ public class ContactActivity extends Activity {
 	protected Dialog onCreateDialog(int id) {
 		switch (id) {
 		case DIALOG_REJOICABLES:
-			ArrayList<Rejoicable> rejoicables = new ArrayList<Rejoicable>();
-			rejoicables.add(new Rejoicable(R.string.rejoice_spiritual_conversation, R.drawable.rejoicable_s_convo, "spiritual_conversation"));
-			rejoicables.add(new Rejoicable(R.string.rejoice_prayed_to_receive, R.drawable.rejoicable_r_christ, "prayed_to_receive"));
-			rejoicables.add(new Rejoicable(R.string.rejoice_gospel_presentation, R.drawable.rejoicable_g_present, "gospel_presentation"));
-
 			AlertDialog dialog = new AlertDialog.Builder(this).setIcon(R.drawable.rejoicable_icon).setTitle(R.string.contact_rejoicables)
-				.setAdapter(new RejoicableAdapter(this, android.R.layout.simple_spinner_dropdown_item, rejoicables), null)
+				.setAdapter(new RejoicableAdapter(this, android.R.layout.simple_spinner_dropdown_item, validRejoicables), null)
 				.setNeutralButton(R.string.alert_ok, null)
 				.create();
-			dialog.getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+			rejoicableListView = dialog.getListView();
+			rejoicableListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 			return dialog;
 		}
 		return null;
@@ -271,6 +291,10 @@ public class ContactActivity extends Activity {
 			contactAssign.setText(R.string.contact_assign_locked);
 			contactAssign.setEnabled(false);
 		}
+		
+		if (person.getStatus() != null) {
+			contactStatus.setSelection(statusListTag.indexOf(person.getStatus()));
+		}
 	}
 
 	public void update(boolean force) {
@@ -279,12 +303,12 @@ public class ContactActivity extends Activity {
 	}
 
 	public void updatePerson(boolean force) {
-		if (!processes.contains("contact") || force)
+		if (processes.contains("contact") && !force) return;
 		Api.getContacts(contact.getPerson().getId(), contactResponseHandler);
 	}
 
 	public void updateComments(boolean force) {
-		if (!processes.contains("comment") || force)
+		if (processes.contains("comment") && !force) return;
 		Api.getFollowupComments(contact.getPerson().getId(), commentResponseHandler);	
 	}
 
@@ -488,10 +512,90 @@ public class ContactActivity extends Activity {
 			Toast.makeText(this, R.string.contact_cant_email, Toast.LENGTH_LONG).show();
 		}
 	}
-
+	
 	public void clickSave(View v) {
-		if (processes.contains("save")) return;
+		clickSave(false);
 	}
+
+	public void clickSave(boolean force) {
+		if (processes.contains("save") && !force) return;
+		
+		boolean canSave = false;
+		
+		String comment = "";
+		if (contactComment.getText() != null) {
+			comment = contactComment.getText().toString();
+		}
+		if (!comment.equals("")) canSave = true;
+		
+		ArrayList<String> rejoicables = new ArrayList<String>();
+		if (rejoicableListView != null) {
+			long[] checkedRejoicables = rejoicableListView.getCheckItemIds();
+			for (long pos : checkedRejoicables) {
+				rejoicables.add(validRejoicables.get((int) pos).tag);
+			}
+		}
+		if (rejoicables.size() > 0) {
+			canSave = true;
+		}
+		
+		int statusPos = contactStatus.getSelectedItemPosition();
+		if (statusPos > -1) {
+			if (!contact.getPerson().getStatus().equals(statusListTag.get(statusPos))) {
+				canSave = true;
+			}
+		}
+		
+		if (canSave) {
+			Api.postFollowupComment(contact.getPerson().getId(), User.contact.getPerson().getId(), statusListTag.get(statusPos), comment, saveHandler, rejoicables);
+		} else {
+			Toast.makeText(this, R.string.contact_cant_save, Toast.LENGTH_LONG).show();
+		}
+	}
+	
+	private AsyncHttpResponseHandler saveHandler = new AsyncHttpResponseHandler() {
+
+		@Override
+		public void onStart() {
+			showProgress("save");
+			contactSave.setEnabled(false);
+		}
+
+		@Override
+		public void onSuccess(String response) {
+			Gson gson = new Gson();
+			try {
+				GError error = gson.fromJson(response, GError.class);
+				onFailure(new MHError(error));
+			} catch (Exception out) {
+				Log.i(TAG, "SAVE SUCCESS");
+				contactComment.setText("");
+				if (rejoicableListView != null) {
+					rejoicableListView.clearChoices();
+				}
+				updateComments(true);
+			}
+		}
+
+		@Override
+		public void onFailure(Throwable e) {
+			Log.e(TAG, "Assignment Failed", e);
+			AlertDialog ad = DisplayError.display(ContactActivity.this, e);
+			ad.setButton(ad.getContext().getString(R.string.alert_retry), new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					dialog.dismiss();
+					clickSave(false);
+				}
+			});
+			ad.show();
+		}
+
+		@Override
+		public void onFinish() {
+			hideProgress("save");
+			contactSave.setEnabled(true);
+		}
+	};
 
 	public void clickRejoicables(View v) {
 		showDialog(DIALOG_REJOICABLES);
@@ -508,19 +612,95 @@ public class ContactActivity extends Activity {
 	public void clickSurveys(View v) {
 		setTab(TAB_SURVEYS, false);
 	}
+	
+	public void deleteComment(int id, boolean force) {
+		if (processes.contains("delete_comment") && !force) return;
+		Api.deleteComment(id, new DeleteCommentHandler(id));
+	}
+	
+	private class DeleteCommentHandler extends AsyncHttpResponseHandler {
+
+		private int commentid;
+		
+		public DeleteCommentHandler(int commentid) {
+			this.commentid = commentid;
+		}
+		
+		@Override
+		public void onStart() {
+			showProgress("delete_comment");
+		}
+
+		@Override
+		public void onSuccess(String response) {
+			Gson gson = new Gson();
+			try {
+				GError error = gson.fromJson(response, GError.class);
+				onFailure(new MHError(error));
+			} catch (Exception out) {
+				Log.i(TAG, "DELETE SUCCESS");
+				updateComments(true);
+			}
+		}
+
+		@Override
+		public void onFailure(Throwable e) {
+			Log.e(TAG, "Delete Failed", e);
+			AlertDialog ad = DisplayError.display(ContactActivity.this, e);
+			ad.setButton(ad.getContext().getString(R.string.alert_retry), new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					dialog.dismiss();
+					deleteComment(commentid, false);
+				}
+			});
+			ad.show();
+		}
+
+		@Override
+		public void onFinish() {
+			hideProgress("delete_comment");
+		}
+	};
+	
+	private OnItemLongClickListener commentLongClickListner = new OnItemLongClickListener() {
+		public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+			final GFollowupComment comment = (GFollowupComment) parent.getAdapter().getItem(position);
+			if (comment == null) return false;
+			
+			Log.i(TAG, comment.getComment().getComment());
+			
+			final CharSequence[] items = { getString(R.string.comment_delete) };
+			AlertDialog.Builder builder = new AlertDialog.Builder(ContactActivity.this);
+			builder.setTitle(R.string.comment_actions);
+			builder.setItems(items, new DialogInterface.OnClickListener() {
+			    public void onClick(DialogInterface dialog, int item) {
+			    	if (item == 0) {
+			    		deleteComment(comment.getComment().getId(), false);
+			    	}
+			    }
+			});
+			AlertDialog alert = builder.create();
+			alert.show();
+			return false;
+		}
+	};
 
 	private void setTab(int tab, boolean force) {
 		if (this.tab != tab || force) {
 			switch (tab) {
 			case TAB_CONTACT:
+				contactListView.setAdapter(commentAdapter);
+				contactListView.setOnItemLongClickListener(commentLongClickListner);
 				header.addView(contactPost);
 				txtTitle.setText(R.string.contact_contact);
 				break;
 			case TAB_MORE_INFO:
+				contactListView.setOnItemLongClickListener(null);
 				header.removeView(contactPost);
 				txtTitle.setText(R.string.contact_more);
 				break;
 			case TAB_SURVEYS:
+				contactListView.setOnItemLongClickListener(null);
 				header.removeView(contactPost);
 				txtTitle.setText(R.string.contact_survey);
 				break;
