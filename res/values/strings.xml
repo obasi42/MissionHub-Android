@@ -34,6 +34,16 @@
     <string name="contact_cant_email">Could not send email.</string>
     <string name="contact_send_email">Send Email...</string>
     
+    <string name="status_uncontacted">Uncontacted</string>
+    <string name="status_attempted_contact">Attempted Contact</string>
+    <string name="status_contacted">Contacted</string>
+    <string name="status_completed">Completed</string>
+    <string name="status_do_not_contact">Do Not Contact</string>
+    
+    <string name="rejoice_spiritual_conversation">Spiritual Conversation</string>
+    <string name="rejoice_prayed_to_receive">Prayed To Receive Christ</string>
+    <string name="rejoice_gospel_presentation">Gospel Presentation</string>
+    
     <string name="alert_error">Error</string>
     <string name="alert_error_msg">An unknown error has occurred. Please try again or contact support.</string>
     <string name="alert_ok">OK</string>

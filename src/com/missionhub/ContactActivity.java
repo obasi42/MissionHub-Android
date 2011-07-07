@@ -16,9 +16,12 @@ import com.missionhub.api.User;
 import com.missionhub.ui.DisplayError;
 import com.missionhub.ui.Guide;
 import com.missionhub.ui.ImageManager;
+import com.missionhub.ui.Rejoicable;
+import com.missionhub.ui.RejoicableAdapter;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -71,6 +74,15 @@ public class ContactActivity extends Activity {
 	private Button contactRejoicable;
 	private Button contactSave;
 	private Spinner contactStatus;
+	
+	private final int ASSIGNMENT_NONE = 0;
+	private final int ASSIGNMENT_ME = 1;
+	private final int ASSIGNMENT_OTHER = 2;
+	private int assignmentStatus = ASSIGNMENT_NONE;
+	
+	private final int DIALOG_REJOICABLES = 0;
+	
+	private ArrayList<String> statusList = new ArrayList<String>();
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -105,8 +117,17 @@ public class ContactActivity extends Activity {
 		contactComment = (EditText) contactPost.findViewById(R.id.contact_comment);
 		contactRejoicable = (Button) contactPost.findViewById(R.id.contact_rejoicable);
 		contactSave = (Button) contactPost.findViewById(R.id.contact_save);
+		
 		contactStatus = (Spinner) contactPost.findViewById(R.id.contact_status);
-
+		statusList.add(getString(R.string.status_uncontacted));
+		statusList.add(getString(R.string.status_attempted_contact));
+		statusList.add(getString(R.string.status_contacted));
+		statusList.add(getString(R.string.status_completed));
+		statusList.add(getString(R.string.status_do_not_contact));
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, statusList);
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		contactStatus.setAdapter(adapter);
+		
 		header = new LinearLayout(this);
 		header.setOrientation(LinearLayout.VERTICAL);
 		header.addView(contactHeader);
@@ -123,6 +144,43 @@ public class ContactActivity extends Activity {
 		Guide.display(this, Guide.CONTACT);
 	}
 	
+	@Override
+	protected Dialog onCreateDialog(int id) {
+	    switch(id) {
+	    case DIALOG_REJOICABLES:
+	    	ArrayList<Rejoicable> rejoicables = new ArrayList<Rejoicable>();
+	    	rejoicables.add(new Rejoicable(R.string.rejoice_spiritual_conversation, R.drawable.rejoicable_s_convo, "spiritual_conversation"));
+	    	rejoicables.add(new Rejoicable(R.string.rejoice_prayed_to_receive, R.drawable.rejoicable_r_christ, "prayed_to_receive"));
+	    	rejoicables.add(new Rejoicable(R.string.rejoice_gospel_presentation, R.drawable.rejoicable_g_present, "gospel_presentation"));
+	    	
+	    	AlertDialog dialog = new AlertDialog.Builder(this)
+            .setIcon(R.drawable.rejoicable_icon)
+            .setTitle(R.string.contact_assign_locked)
+            .setAdapter(new RejoicableAdapter(this, android.R.layout.simple_spinner_dropdown_item, rejoicables), new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					// TODO Auto-generated method stub
+					
+				}
+            })
+            .setPositiveButton(R.string.alert_ok, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+
+                    /* User clicked Yes so do some stuff */
+                }
+            })
+            .setNegativeButton(R.string.alert_cancel, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+
+                    /* User clicked No so do some stuff */
+                }
+            })
+           .create();
+	    	dialog.getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+	    	return dialog;
+	    }
+	    return null;
+	}
+
 	private ArrayList<String> processes = new ArrayList<String>();
 	
 	private void showProgress(String process) {
@@ -171,28 +229,28 @@ public class ContactActivity extends Activity {
 			contactEmail.setVisibility(View.GONE);
 		}
 		
-		String assignedTo = null;
+		assignmentStatus = ASSIGNMENT_NONE;
 		if (person.getAssignment() != null) {
 			GAssign assign = person.getAssignment();
 			if (assign.getPerson_assigned_to() != null) {
 				GIdNameProvider[] gids = assign.getPerson_assigned_to();
 				for (GIdNameProvider gid : gids) {
 					if (User.contact.getPerson().getId() == Integer.parseInt(gid.getId())) {
-						assignedTo = "_me_";
+						assignmentStatus = ASSIGNMENT_ME;
 						break;
 					} else {
-						assignedTo = gid.getName();
+						assignmentStatus = ASSIGNMENT_OTHER;
 					}
 				}
 			}
 		}
-		if (assignedTo == null) {
+		if (assignmentStatus == ASSIGNMENT_NONE) {
 			contactAssign.setText(R.string.contact_assign_to_me);
 			contactAssign.setEnabled(true);
-		} else if (assignedTo.equals("_me_")) {
+		} else if (assignmentStatus == ASSIGNMENT_ME) {
 			contactAssign.setText(R.string.contact_unassign);
 			contactAssign.setEnabled(true);
-		} else {
+		} else if (assignmentStatus == ASSIGNMENT_OTHER) {
 			contactAssign.setText(R.string.contact_assign_locked);
 			contactAssign.setEnabled(false);
 		}
@@ -252,8 +310,72 @@ public class ContactActivity extends Activity {
 	};
 
 	public void clickAssign(View v) {
-		
+		clickAssign();
 	}
+	
+	public void clickAssign() {
+		if (assignmentStatus == ASSIGNMENT_NONE) {
+			Api.createContactAssignment(contact.getPerson().getId(), User.contact.getPerson().getId(), new AssignmentHandler(AssignmentHandler.TYPE_ASSIGN));
+		} else if (assignmentStatus == ASSIGNMENT_ME) {
+			Api.deleteContactAssignment(contact.getPerson().getId(), new AssignmentHandler(AssignmentHandler.TYPE_UNASSIGN));
+		}
+	}
+	
+	private class AssignmentHandler extends AsyncHttpResponseHandler {
+		
+		public static final int TYPE_ASSIGN = 0;
+		public static final int TYPE_UNASSIGN = 1;
+		
+		private int type = TYPE_ASSIGN;
+		
+		AssignmentHandler(int type) {
+			super();
+			this.type = type;
+		}
+		
+		@Override
+		public void onStart() {
+			showProgress("assign");
+			contactAssign.setEnabled(false);
+		}
+		@Override
+		public void onSuccess(String response) {
+			Gson gson = new Gson();
+			try{
+				GError error = gson.fromJson(response, GError.class);
+				onFailure(new MHError(error));
+			} catch (Exception out){
+				Log.i(TAG, "ASSIGNMENT SUCCESS");
+				if (type == TYPE_ASSIGN) {
+					contactAssign.setText(R.string.contact_unassign);
+					assignmentStatus = ASSIGNMENT_ME;
+				} else if (type == TYPE_UNASSIGN) {
+					contactAssign.setText(R.string.contact_assign_to_me);
+					assignmentStatus = ASSIGNMENT_NONE;
+				}
+				
+				//TODO: on success
+			}
+		}
+		@Override
+		public void onFailure(Throwable e) {
+			Log.e(TAG, "Assignment Failed", e);
+			AlertDialog ad = DisplayError.display(ContactActivity.this, e);
+			ad.setButton(ad.getContext().getString(R.string.alert_retry), new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					dialog.dismiss();
+					clickAssign();
+				}
+			});
+			ad.show();
+		}
+		@Override
+		public void onFinish() {
+			hideProgress("assign");
+			contactAssign.setEnabled(true);
+		}
+	};
+
 
 	public void clickPicture(View v) {
 		
@@ -296,7 +418,7 @@ public class ContactActivity extends Activity {
 	}
 
 	public void clickRejoicables(View v) {
-		
+		showDialog(DIALOG_REJOICABLES);
 	}
 
 	public void clickContact(View v) {
