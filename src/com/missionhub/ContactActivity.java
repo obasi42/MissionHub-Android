@@ -392,7 +392,7 @@ public class ContactActivity extends Activity {
 					ContactActivity.this.contactMeta = contactAll;
 					ContactActivity.this.contact = contactAll.getPeople()[0];
 					ContactActivity.this.updateHeader();
-					ContactActivity.this.updateMoreInfo();
+					//ContactActivity.this.updateMoreInfo();
 				} catch (Exception e) {
 					onFailure(e);
 				}
