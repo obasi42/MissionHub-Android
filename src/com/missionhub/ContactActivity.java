@@ -141,7 +141,7 @@ public class ContactActivity extends Activity {
 						contact = gson.fromJson(savedInstanceState.getString("contactJSON"), GContact.class);
 					}
 				} catch (Exception e) { Log.i(TAG, "Expand from instance failed", e); }
-				User.setFromBundle(savedInstanceState);
+				User.setFromBundle(savedInstanceState, this);
 			}
 		}
 		if (contact == null) {
@@ -272,7 +272,7 @@ public class ContactActivity extends Activity {
 				contact = gson.fromJson(b.getString("contactJSON"), GContact.class);
 			}
 		} catch (Exception e) {Log.i(TAG, "restore state failed", e); }
-		User.setFromBundle(b);
+		User.setFromBundle(b, this);
 	}
 	
 	@Override

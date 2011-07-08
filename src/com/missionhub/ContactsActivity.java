@@ -63,7 +63,7 @@ public class ContactsActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.contacts);
 		
-		User.setFromBundle(savedInstanceState);
+		User.setFromBundle(savedInstanceState, this);
 
 		contactsList = (ListView) findViewById(R.id.contacts_list);
 		adapter = new ContactItemAdapter(this, R.layout.contact_list_item, data);
@@ -119,7 +119,7 @@ public class ContactsActivity extends Activity {
 	
 	@Override
 	public void onRestoreInstanceState(Bundle b) {
-		User.setFromBundle(b);
+		User.setFromBundle(b, this);
 	}
 
 	public void clickMyContacts(View v) {
