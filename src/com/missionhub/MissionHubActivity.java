@@ -129,6 +129,7 @@ public class MissionHubActivity extends Activity {
 		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 		SharedPreferences.Editor editor = settings.edit();
 		editor.remove("token");
+		editor.remove("orgID");
 		editor.commit();
 		refreshView();
 	}
