@@ -748,7 +748,7 @@ public class ContactActivity extends Activity {
 		        	   try {
 		        		   Intent intent = new Intent(Intent.ACTION_VIEW);
 		        		   intent.setClassName("com.facebook.katana", "com.facebook.katana.ProfileTabHostActivity");
-		        		   intent.putExtra("extra_user_id", Integer.parseInt(new_uid));
+		        		   intent.putExtra("extra_user_id", Long.parseLong(new_uid));
 		        		   startActivity(intent);
 		        	   } catch(Exception e) {
 		        		   try {
