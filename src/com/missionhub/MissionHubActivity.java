@@ -128,8 +128,7 @@ public class MissionHubActivity extends Activity {
 	}
 	
 	public void logout() {
-		User.setToken(null);
-		User.setLoggedIn(false);
+		User.logout();
 		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 		SharedPreferences.Editor editor = settings.edit();
 		editor.remove("token");

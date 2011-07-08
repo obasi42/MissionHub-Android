@@ -136,7 +136,7 @@ public class User {
 	
 	public static synchronized void calculateRoles(GPerson person) {
 		GOrgGeneric[] org_roles = person.getOrganizational_roles();
-		
+		validRoles.clear();
 		for( int i=0; i < org_roles.length; i++ ) {
 			HashMap<String, String> map = new HashMap<String,String>();
 			if (org_roles[i].getRole().equalsIgnoreCase("leader") || org_roles[i].getRole().equalsIgnoreCase("admin")) {
@@ -173,5 +173,15 @@ public class User {
 	public static synchronized String getOrgIDPreference(Activity a) {
 		SharedPreferences settings = a.getSharedPreferences(PREFS_NAME, 0);
 		return settings.getString("orgID", getOrgID());
+	}
+
+	public static void logout() {
+		token = null;
+		loggedIn = false;
+		orgID = null;
+		contact = null;
+		validRoles.clear();
+		primaryOrgID = null;
+		currentRole = null;
 	}
 }
