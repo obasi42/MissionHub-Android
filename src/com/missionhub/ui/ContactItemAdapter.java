@@ -2,6 +2,7 @@ package com.missionhub.ui;
 
 import java.util.ArrayList;
 
+import com.missionhub.Helper;
 import com.missionhub.R;
 import com.missionhub.api.GContact;
 import com.missionhub.api.GPerson;
@@ -54,7 +55,7 @@ public class ContactItemAdapter extends ArrayAdapter<GContact> {
 		final GPerson person = contact.getPerson();
 		if (person != null) {
 			holder.name.setText(person.getName());
-			holder.status.setText(person.getStatus());
+			holder.status.setText(Helper.getStatusResourceId(person.getStatus()));
 			holder.image.setTag(person.getPicture());
 			imageManager.displayImage(person.getPicture(), activity, holder.image, R.drawable.default_contact);
 		}

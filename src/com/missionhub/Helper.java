@@ -1,11 +1,14 @@
 package com.missionhub;
 
 import java.util.Date;
+import java.util.HashMap;
 
 import android.util.Log;
 
 public class Helper {
 	public static final String TAG = "HELPER";
+	public static HashMap<String, Integer> statusMap = new HashMap<String, Integer>();
+	
 	
 	public static Date getDateFromUTCString(String s) {
 		java.text.DateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
@@ -52,4 +55,16 @@ public class Helper {
 	    return fNum;
 	}
 	
+	public static synchronized int getStatusResourceId(String s) {
+		buildStatusMap();
+		return statusMap.get(s);
+	}
+	
+	public static synchronized void buildStatusMap() {
+		statusMap.put("attempted_contact", R.string.status_attempted_contact);
+		statusMap.put("uncontacted", R.string.status_uncontacted);
+		statusMap.put("do_not_contact", R.string.status_do_not_contact);
+		statusMap.put("contacted", R.string.status_contacted);
+		statusMap.put("completed", R.string.status_completed);
+	}
 }
