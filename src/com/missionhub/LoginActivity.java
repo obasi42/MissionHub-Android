@@ -1,13 +1,18 @@
 package com.missionhub;
 
-import org.json.JSONObject;
-
+import com.google.gson.Gson;
 import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+import com.missionhub.api.GContact;
+import com.missionhub.api.GError;
+import com.missionhub.api.GLoginDone;
+import com.missionhub.api.MHError;
 import com.missionhub.api.User;
+import com.missionhub.ui.DisplayError;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
@@ -109,8 +114,29 @@ public class LoginActivity extends Activity {
 			if (mProgressDialog.isShowing()) {
 				mProgressDialog.hide();
 			}
-			Log.e(TAG, description);
-			// TODO Throw Error
+			mWebView.setVisibility(View.GONE);
+			mCloseBtn.setVisibility(View.GONE);
+			AlertDialog ad = DisplayError.display(LoginActivity.this, errorCode, description, failingUrl);
+			ad.setButton(ad.getContext().getString(R.string.alert_retry), new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					dialog.dismiss();
+					mWebView.setVisibility(View.VISIBLE);
+					mCloseBtn.setVisibility(View.VISIBLE);
+					mWebView.reload();
+				}
+			});
+			ad.setButton(AlertDialog.BUTTON_NEUTRAL, getString(R.string.alert_close), new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					dialog.dismiss();
+					finish();
+				}
+			});
+			ad.setOnCancelListener(new OnCancelListener(){
+				public void onCancel(DialogInterface dialog) {
+					finish();
+				}
+			});
+			ad.show();
 		}
 
 		@Override
@@ -141,7 +167,11 @@ public class LoginActivity extends Activity {
 		}
 	}
 
+	private boolean gettingToken = false;
+	
 	private void getTokenFromCode(String code) {
+		if (gettingToken) return;
+		
 		AsyncHttpClient client = new AsyncHttpClient();
 
 		RequestParams params = new RequestParams();
@@ -152,36 +182,59 @@ public class LoginActivity extends Activity {
 		params.put("scope", Config.oauthScope);
 		params.put("redirect_uri", Config.oauthUrl + "/done.json");
 
-		client.post(Config.oauthUrl + "/access_token", params, new JsonHttpResponseHandler() {
+		client.post(Config.oauthUrl + "/access_token", params, new AsyncHttpResponseHandler() {
 			@Override
 			public void onStart() {
 				mProgressDialog.show();
+				gettingToken = true;
 			}
 
 			@Override
-			public void onSuccess(JSONObject response) {
-				try {
-					User.setToken(response.getString("access_token"));
-					SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-					SharedPreferences.Editor editor = settings.edit();
-					editor.putString("token", User.getToken());
-					editor.commit();
-					User.setLoggedIn(true);
-				} catch (Exception e) {
-					onFailure(e.getCause());
-					return;
-				}
-				Log.i(TAG, "Logged In With Token: " + User.getToken());
-				returnWithToken();
+			public void onSuccess(String response) {
+				Gson gson = new Gson();
+				try{
+					GError error = gson.fromJson(response, GError.class);
+					onFailure(new MHError(error));
+				} catch (Exception out){
+					try {
+						GLoginDone loginDone = gson.fromJson(response, GLoginDone.class);
+						User.setToken(loginDone.getAccess_token());
+						GContact contact = new GContact();
+						contact.setPerson(loginDone.getPerson());
+						User.setContact(contact);
+						User.setLoggedIn(true);
+						SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+						SharedPreferences.Editor editor = settings.edit();
+						editor.putString("token", User.getToken());
+						editor.commit();
+						returnWithToken();
+					} catch(Exception e) {
+						onFailure(e);
+					}
+				}	
 			}
-
+			
 			@Override
 			public void onFailure(Throwable e) {
-				Log.i(TAG, "GET TOKEN FAIL: " + e.toString());
+				Log.e(TAG, "Login Failed", e);
+				AlertDialog ad = DisplayError.display(LoginActivity.this, e);
+				ad.setButton(AlertDialog.BUTTON_NEUTRAL, getString(R.string.alert_close), new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.dismiss();
+						finish();
+					}
+				});
+				ad.setOnCancelListener(new OnCancelListener(){
+					public void onCancel(DialogInterface dialog) {
+						finish();
+					}
+				});
+				ad.show();
 			}
 
 			@Override
 			public void onFinish() {
+				gettingToken = false;
 				mProgressDialog.hide();
 			}
 		});

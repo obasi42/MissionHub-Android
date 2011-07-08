@@ -5,6 +5,7 @@ import com.missionhub.R;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.webkit.WebViewClient;
 
 public class DisplayError { 
 	
@@ -31,5 +32,13 @@ public class DisplayError {
 					}
 				});
 		return builder.create();
+	}
+
+	public static AlertDialog display(Context ctx, int errorCode, String description, String failingUrl) {
+		if (errorCode == WebViewClient.ERROR_CONNECT) {
+			return display(ctx, new java.net.ConnectException());
+		} else {
+			return display(ctx, new Exception(description));
+		}
 	}
 }
