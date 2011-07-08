@@ -70,7 +70,7 @@ public class User {
 	
 	public static synchronized String getOrgID() {
 		if (orgID == null) {
-			return primaryOrgID;
+			return getPrimaryOrgID();
 		}
 		return orgID;
 	}
