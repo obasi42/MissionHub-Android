@@ -42,9 +42,6 @@ public class ProfileActivity extends Activity {
 		contactPicture = (ImageView) findViewById(R.id.profile_person_image);
 
 		createSpinnerArrays();
-		Log.i("ARG", String.valueOf(spinnerOrgIds.size()));
-		Log.i("ARG", String.valueOf(spinnerNames.size()));
-		Log.i("ARG", String.valueOf(currentSpinnerIndex));
 		spinner = (Spinner) findViewById(R.id.spinner1);
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, spinnerNames);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // The drop down vieww
@@ -52,11 +49,7 @@ public class ProfileActivity extends Activity {
 		TextView name = (TextView) findViewById(R.id.textView3);
 		name.setText(person.getName()); 
 
-		try {
-		    spinner.setAdapter(adapter);
-		} catch (Exception e) {
-			Log.i("ARG", "ARGGGG", e);
-		}
+		spinner.setAdapter(adapter);
 		
 		imageManager = new ImageManager(getApplicationContext());
 		int defaultImage = R.drawable.facebook_question;
@@ -92,8 +85,7 @@ public class ProfileActivity extends Activity {
 	    	}
 	    	currentSpinnerOrgID = spinnerOrgIds.get(pos);
 	    	currentSpinnerName = spinnerNames.get(pos);
-	    	User.setOrgID(currentSpinnerOrgID);
-	    	Log.i("ARG", String.valueOf(pos));
+	    	User.setOrgIDPreference(currentSpinnerOrgID, ProfileActivity.this);
 	    }
 
 	    public void onNothingSelected(AdapterView parent) {
@@ -109,11 +101,9 @@ public class ProfileActivity extends Activity {
 	}
 	
 	private void createSpinnerArrays() {
-		User.setOrgID("56");
 		Iterator<Integer> it = User.getValidRoles().keySet().iterator();
 		int count = 0; 
 		while (it.hasNext()) {
-			Log.i("ARG", "HIIII");
 			int key = it.next();
 			HashMap<String, String> role = User.getValidRoles().get(key);
 			Log.i("ARG", role.get("name") + " " + String.valueOf(count));
@@ -121,7 +111,6 @@ public class ProfileActivity extends Activity {
 			spinnerOrgIds.add(role.get("org_id"));
 			spinnerNames.add(role.get("name"));
 			if (role.get("org_id").equalsIgnoreCase(User.getOrgID())) {
-				Log.i("ARG", "EQUALITY!!");
 				currentSpinnerOrgID = role.get("org_id");
 				currentSpinnerName = role.get("name");
 				currentSpinnerIndex = count;
