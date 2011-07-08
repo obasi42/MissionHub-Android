@@ -23,7 +23,6 @@ import com.missionhub.api.Api;
 import com.missionhub.api.GContact;
 import com.missionhub.api.GContactAll;
 import com.missionhub.api.GError;
-import com.missionhub.api.GFCTop;
 import com.missionhub.api.GPerson;
 import com.missionhub.api.MHError;
 import com.missionhub.api.User;
@@ -51,6 +50,8 @@ public class MissionHubActivity extends Activity {
 		setContentView(R.layout.main);
 		//testingApi();
 		
+		User.setFromBundle(savedInstanceState);
+		
 		loggedOut = (LinearLayout) findViewById(R.id.loggedout);
 		loggedIn = (LinearLayout) findViewById(R.id.loggedin);
 		logoutBar = (RelativeLayout) findViewById(R.id.logoutbar);
@@ -59,6 +60,16 @@ public class MissionHubActivity extends Activity {
 		if (!checkToken()) {
 			refreshView();
 		}
+	}
+	
+	@Override
+	public void onSaveInstanceState(Bundle b) {
+		b.putAll(User.getAsBundle());
+	}
+	
+	@Override
+	public void onRestoreInstanceState(Bundle b) {
+		User.setFromBundle(b);
 	}
 	
 	@Override

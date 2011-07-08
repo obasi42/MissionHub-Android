@@ -47,11 +47,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
-import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -138,7 +136,8 @@ public class ContactActivity extends Activity {
 					if (savedInstanceState.containsKey("contactJSON")) {
 						contact = gson.fromJson(savedInstanceState.getString("contactJSON"), GContact.class);
 					}
-				} catch (Exception e) {}
+				} catch (Exception e) { Log.i(TAG, "Expand from instance failed", e); }
+				User.setFromBundle(savedInstanceState);
 			}
 		}
 		if (contact == null) {
@@ -250,7 +249,8 @@ public class ContactActivity extends Activity {
 			if (contact != null) {
 				b.putString("contactJSON", gson.toJson(contact));
 			}
-		} catch (Exception e) {};
+		} catch (Exception e) {Log.i(TAG, "save state failed", e); };
+		b.putAll(User.getAsBundle());
 	}
 	
 	@Override
@@ -263,7 +263,8 @@ public class ContactActivity extends Activity {
 			if (b.containsKey("contactJSON")) {
 				contact = gson.fromJson(b.getString("contactJSON"), GContact.class);
 			}
-		} catch (Exception e) {}
+		} catch (Exception e) {Log.i(TAG, "restore state failed", e); }
+		User.setFromBundle(b);
 	}
 	
 	@Override
