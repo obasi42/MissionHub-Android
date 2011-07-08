@@ -1,6 +1,7 @@
 package com.missionhub.api;
 
 import java.util.HashMap;
+import java.util.Iterator;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
@@ -148,6 +149,13 @@ public class User {
 					primaryOrgID = String.valueOf(org_roles[i].getOrg_id());
 				}
 				validRoles.put(org_roles[i].getOrg_id(), map);
+			}
+		}
+		if (!validRoles.isEmpty() && primaryOrgID == null) {
+			Iterator<Integer> itr = validRoles.keySet().iterator();
+			while (itr.hasNext()) {
+				primaryOrgID = String.valueOf(itr.next());
+				break;
 			}
 		}
 	}
