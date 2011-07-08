@@ -62,6 +62,8 @@ public class ContactsActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.contacts);
+		
+		User.setFromBundle(savedInstanceState);
 
 		contactsList = (ListView) findViewById(R.id.contacts_list);
 		adapter = new ContactItemAdapter(this, R.layout.contact_list_item, data);
@@ -108,6 +110,16 @@ public class ContactsActivity extends Activity {
 		default:
 			return super.onOptionsItemSelected(item);
 		}
+	}
+	
+	@Override
+	public void onSaveInstanceState(Bundle b) {
+		b.putAll(User.getAsBundle());
+	}
+	
+	@Override
+	public void onRestoreInstanceState(Bundle b) {
+		User.setFromBundle(b);
 	}
 
 	public void clickMyContacts(View v) {
