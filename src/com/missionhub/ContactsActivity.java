@@ -2,6 +2,8 @@ package com.missionhub;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import com.google.gson.Gson;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -19,6 +21,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
@@ -289,12 +292,15 @@ public class ContactsActivity extends Activity {
 		Api.getContactsList(options, responseHandler);
 	}
 
+	private Handler searchHandler = new Handler();
+	private String searchText = "";
+	
 	private class ContactsSearchWatcher implements TextWatcher {
 		public void afterTextChanged(Editable s) {
-			if (s.length() > 2) {
-				options.put("term", s.toString());
-				resetListView(true);
-				getMore();
+			searchText = s.toString();
+			searchHandler.removeCallbacks(doSearch);
+			if (searchText.length() > 0) {
+				searchHandler.postDelayed(doSearch, 350);
 			} else if (s.length() == 0) {
 				options.remove("term");
 				resetListView(true);
@@ -308,6 +314,14 @@ public class ContactsActivity extends Activity {
 		public void onTextChanged(CharSequence s, int start, int before, int count) {
 		}
 	}
+
+	private Runnable doSearch = new Runnable() {
+		public void run() {
+			options.put("term", searchText);
+			resetListView(true);
+			getMore();
+		}
+	};
 
 	private class ContactsScrollListener implements OnScrollListener {
 		public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
