@@ -1,7 +1,10 @@
 package com.missionhub;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.TimeZone;
 
 import com.google.gson.Gson;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -9,6 +12,7 @@ import com.missionhub.api.Api;
 import com.missionhub.api.GAssign;
 import com.missionhub.api.GContact;
 import com.missionhub.api.GContactAll;
+import com.missionhub.api.GEducation;
 import com.missionhub.api.GError;
 import com.missionhub.api.GFCTop;
 import com.missionhub.api.GFollowupComment;
@@ -40,6 +44,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -350,11 +355,80 @@ public class ContactActivity extends Activity {
 		
 		if (person.getFb_id() != null) {
 			HashMap<String, String> data = new HashMap<String, String>();
-			data.put("link", "http://facebook.com/profile.php?id=" + person.getFb_id());
-			info.add(new SimpleListItem(getString(R.string.info_facebook_header), getString(R.string.info_facebook_link), data));
+			data.put("facebook_id", person.getFb_id());
+			info.add(new SimpleListItem(getString(R.string.contact_info_facebook_header), getString(R.string.contact_info_facebook_link), data));
 		}
 		
-		//TODO Add More Info
+		if(person.getAssignment().getAssigned_to_person().length > 0) {
+			info.add(new SimpleListItem(getString(R.string.contact_info_assigned_to), person.getAssignment().getAssigned_to_person()[0].getName()));
+		}
+		
+		if(person.getFirst_contact_date() != null) {
+			Date date = Helper.getDateFromUTCString(person.getFirst_contact_date());
+			SimpleDateFormat formatter = new SimpleDateFormat("MMMMM d, yyyy hh:mm aaa");
+			formatter.setTimeZone(TimeZone.getDefault());
+			String formattedDate = formatter.format(date);
+			info.add(new SimpleListItem(getString(R.string.contact_info_first_contact_date), formattedDate));
+		}
+		
+		if(person.getPhone_number() != null) {
+			HashMap<String, String> data = new HashMap<String, String>();
+			data.put("phone", person.getPhone_number());
+			String prettyPhoneNumber = Helper.formatPhoneNumber(person.getPhone_number());
+			info.add(new SimpleListItem(getString(R.string.contact_info_phone_number), prettyPhoneNumber, data));
+		}
+		
+		if(person.getEmail_address() !=null) {
+			HashMap<String, String> data = new HashMap<String, String>();
+			data.put("email", person.getEmail_address());
+			info.add(new SimpleListItem(getString(R.string.contact_info_email_address), person.getEmail_address(), data));
+		}
+		
+		if(person.getBirthday() != null) {
+			info.add(new SimpleListItem(getString(R.string.contact_info_birthday), person.getBirthday()));
+		}
+		
+		if(person.getInterests().length > 0) {
+			String interests = "";
+			for( int i=0; i < person.getInterests().length; i++) {
+				GIdNameProvider interest = person.getInterests()[i];
+				interests += interest.getName();
+				if((i+1) < person.getInterests().length) {
+					interests += ", ";
+				}
+			}
+			
+			info.add(new SimpleListItem(getString(R.string.contact_info_interests), interests));
+		}
+		
+		if(person.getEducation().length > 0) {
+			for(int k=0; k < person.getEducation().length; k++) {
+				GEducation education = person.getEducation()[k];
+				String title = null;
+				String value = "";
+				if(education.getType() == null) {
+					title = getString(R.string.contact_info_education);
+				} else {
+					title = education.getType();
+				}
+				
+				if(education.getSchool().getName() != null) {
+					value += education.getSchool().getName();
+				}
+				
+				if(education.getYear() != null && education.getYear().getName() != null) {
+					if (value.length() > 0) {
+						value += " " + getString(R.string.contact_info_class_of) + " ";
+					}
+					value += education.getYear().getName();
+				}
+			info.add(new SimpleListItem(title, value));	
+			}
+		}
+		
+		if(person.getLocation().getName() != null) {
+			info.add(new SimpleListItem(getString(R.string.contact_info_location), person.getLocation().getName()));
+		}
 		
 		infoAdapter.notifyDataSetChanged();
 	}
@@ -541,39 +615,110 @@ public class ContactActivity extends Activity {
 	};
 
 	public void clickPicture(View v) {
-
+		openFacebookProfile(contact.getPerson().getFb_id());
 	}
 
 	public void clickPhone(View v) {
+		makePhoneCall(contact.getPerson().getPhone_number());
+	}
+
+	public void clickSMS(View v) {
+		sendSMS(contact.getPerson().getPhone_number());
+	}
+
+	public void clickEmail(View v) {
+		sendEmail(contact.getPerson().getEmail_address());
+	}
+	
+	public void makePhoneCall(String phoneNumber) {
 		try {
 			Intent intent = new Intent(Intent.ACTION_CALL);
-			intent.setData(Uri.parse("tel:" + contact.getPerson().getPhone_number()));
+			intent.setData(Uri.parse("tel:" + phoneNumber));
 			startActivity(intent);
 		} catch (Exception e) {
 			Toast.makeText(this, R.string.contact_cant_call, Toast.LENGTH_LONG).show();
 		}
 	}
-
-	public void clickSMS(View v) {
+	
+	public void sendSMS(String phoneNumber) {
 		try {
 			Intent intent = new Intent(Intent.ACTION_VIEW);
-			intent.putExtra("address", contact.getPerson().getPhone_number());
+			intent.putExtra("address", phoneNumber);
 			intent.setType("vnd.android-dir/mms-sms");
 			startActivity(intent);
 		} catch (Exception e) {
 			Toast.makeText(this, R.string.contact_cant_sms, Toast.LENGTH_LONG).show();
 		}
 	}
-
-	public void clickEmail(View v) {
+	
+	public void sendEmail(String emailAddress) {
 		try {
 			final Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
 			emailIntent.setType("plain/text");
-			emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[] { contact.getPerson().getEmail_address() });
+			emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[] { emailAddress });
 			startActivity(Intent.createChooser(emailIntent, getString(R.string.contact_send_email)));
 		} catch (Exception e) {
 			Toast.makeText(this, R.string.contact_cant_email, Toast.LENGTH_LONG).show();
 		}
+	}
+	
+	public void openURL(String url) {
+		final String new_url = url;
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage(R.string.contact_open_url)
+		       .setCancelable(true)
+		       .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+		           public void onClick(DialogInterface dialog, int id) {
+		        	   try {
+		       			Intent i = new Intent(Intent.ACTION_VIEW);
+		       			i.setData(Uri.parse(new_url));
+		       			startActivity(i);
+		       		} catch(Exception e) {
+		       			Toast.makeText(ContactActivity.this, R.string.contact_cant_open_profile, Toast.LENGTH_LONG).show();
+		       		}
+		        	   dialog.dismiss();
+		           }
+		       })
+		       .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+		           public void onClick(DialogInterface dialog, int id) {
+		                dialog.cancel();
+		           }
+		       });
+		AlertDialog alert = builder.create();
+		alert.show();
+	}
+	
+	public void openFacebookProfile(String uid) {
+		final String new_uid = uid;
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage(R.string.contact_open_profile)
+		       .setCancelable(true)
+		       .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+		           public void onClick(DialogInterface dialog, int id) {
+		        	   try {
+		        		   Intent intent = new Intent(Intent.ACTION_VIEW);
+		        		   intent.setClassName("com.facebook.katana", "com.facebook.katana.ProfileTabHostActivity");
+		        		   intent.putExtra("extra_user_id", Integer.parseInt(new_uid));
+		        		   startActivity(intent);
+		        	   } catch(Exception e) {
+		        		   try {
+				       			Intent i = new Intent(Intent.ACTION_VIEW);
+				       			i.setData(Uri.parse("http://www.facebook.com/profile.php?id=" + new_uid));
+				       			startActivity(i);
+				       		} catch(Exception f) {
+				       			Toast.makeText(ContactActivity.this, R.string.contact_cant_open_profile, Toast.LENGTH_LONG).show();
+				       		}
+		        	   }
+		        	   dialog.dismiss();
+		           }
+		       })
+		       .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+		           public void onClick(DialogInterface dialog, int id) {
+		                dialog.cancel();
+		           }
+		       });
+		AlertDialog alert = builder.create();
+		alert.show();
 	}
 	
 	public void clickSave(View v) {
@@ -756,6 +901,35 @@ public class ContactActivity extends Activity {
 			return false;
 		}
 	};
+	
+	
+	private OnItemClickListener infoClickListener = new OnItemClickListener() {
+		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+			final SimpleListItem item = (SimpleListItem) parent.getAdapter().getItem(position);
+			//if (comment == null) return false;
+			
+			Log.i(TAG, item.header + " " + item.info);
+			if (item.data.containsKey("phone")) {
+				makePhoneCall(item.data.get("phone"));
+			}
+			
+			if (item.data.containsKey("sms")) {
+				sendSMS(item.data.get("sms"));
+			}
+			
+			if (item.data.containsKey("email")) {
+				sendEmail(item.data.get("email"));
+			}
+			
+			if (item.data.containsKey("facebook_id")) {
+				openFacebookProfile(item.data.get("facebook_id"));
+			}
+			
+			if(item.data.containsKey("url")) {
+				openURL(item.data.get("url"));
+			}
+		}
+	};
 
 	private void setTab(int tab, boolean force) {
 		if (this.tab != tab || force) {
@@ -764,16 +938,19 @@ public class ContactActivity extends Activity {
 				contactListView.setAdapter(commentAdapter);
 				contactListView.setOnItemLongClickListener(commentLongClickListner);
 				header.addView(contactPost);
+				contactListView.setOnItemClickListener(null);
 				txtTitle.setText(R.string.contact_contact);
 				break;
 			case TAB_MORE_INFO:
 				contactListView.setAdapter(infoAdapter);
 				contactListView.setOnItemLongClickListener(null);
+				contactListView.setOnItemClickListener(infoClickListener);
 				header.removeView(contactPost);
 				txtTitle.setText(R.string.contact_more);
 				break;
 			case TAB_SURVEYS:
 				contactListView.setOnItemLongClickListener(null);
+				contactListView.setOnItemClickListener(null);
 				header.removeView(contactPost);
 				txtTitle.setText(R.string.contact_survey);
 				break;

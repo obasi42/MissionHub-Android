@@ -32,13 +32,26 @@
     <string name="contact_cant_call">Could not place call.</string>
     <string name="contact_cant_sms">Could not send SMS message.</string>
     <string name="contact_cant_email">Could not send email.</string>
+    <string name="contact_cant_open_profile">Could not open Facebook profile.</string>
+    <string name="contact_open_profile_in_app">Open Facebook profile?</string>
     <string name="contact_send_email">Send Email...</string>
     <string name="contact_rejoicables">Attach Rejoicables</string>
     <string name="contact_menu_refresh">Refresh</string>
     <string name="contact_cant_save">You must provide a message, change contact status, or add a rejoicable before saving!</string>
+    <string name="contact_open_profile">Open Facebook profile?</string>
+    <string name="contact_open_url">Open link in browser?</string>
     
-    <string name="info_facebook_header">Facebook</string>
-    <string name="info_facebook_link">Tap here to open Facebook profile in browser</string>
+    <string name="contact_info_facebook_header">Facebook</string>
+    <string name="contact_info_facebook_link">Tap here to open Facebook profile</string>
+    <string name="contact_info_interests">Interests</string>
+    <string name="contact_info_education">Education</string>
+    <string name="contact_info_class_of">Class of</string>
+    <string name="contact_info_location">Location</string>
+    <string name="contact_info_assigned_to">Assigned to</string>
+    <string name="contact_info_first_contact_date">First Contact Date</string>
+    <string name="contact_info_phone_number">Phone Number</string>
+    <string name="contact_info_email_address">E-mail Address</string>
+    <string name="contact_info_birthday">Birthday</string>
     
     <string name="comment_actions">Comment Actions</string>
     <string name="comment_delete">Delete</string>
@@ -83,4 +96,7 @@
 	<string name="profile_header">Profile</string>
 	<string name="profile_change_current_organization">Change Current Organization:</string>
 	<string name="profile_click_to_close">Click to Close</string>
+	
+	<string name="yes">Yes</string>
+	<string name="no">No</string>
 </resources>

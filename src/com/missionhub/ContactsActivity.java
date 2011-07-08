@@ -10,7 +10,6 @@ import com.missionhub.api.GContact;
 import com.missionhub.api.GError;
 import com.missionhub.api.MHError;
 import com.missionhub.api.User;
-import com.missionhub.ui.CommentItemAdapter;
 import com.missionhub.ui.ContactItemAdapter;
 import com.missionhub.ui.DisplayError;
 import com.missionhub.ui.Guide;
@@ -36,7 +35,6 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class ContactsActivity extends Activity {
 

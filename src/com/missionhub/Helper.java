@@ -21,4 +21,35 @@ public class Helper {
 		return date;
 	}
 	
+	public static String formatPhoneNumber(String phoneNumber)
+	{
+	    String fNum = null;
+	    phoneNumber.replaceAll("[^0-9]", "");
+	 
+	    if(11 == phoneNumber.length())
+	    {
+	        fNum = "+" + phoneNumber.substring(0, 1);
+	        fNum += " (" + phoneNumber.substring(1, 4) + ")";
+	        fNum += " " + phoneNumber.substring(4, 7);
+	        fNum += "-" + phoneNumber.substring(7, 11);
+	    }
+	    else if(10 == phoneNumber.length())
+	    {
+	        fNum = "(" + phoneNumber.substring(0, 3) + ")";
+	        fNum += " " + phoneNumber.substring(3, 6);
+	        fNum += "-" + phoneNumber.substring(6, 10);
+	    }
+	    else if(7 == phoneNumber.length())
+	    {
+	        fNum = phoneNumber.substring(0, 3);
+	        fNum += "-" + phoneNumber.substring(4, 7);
+	    }
+	    else
+	    {
+	        return "Invalid Phone Number.";
+	    }
+	 
+	    return fNum;
+	}
+	
 }
