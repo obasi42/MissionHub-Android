@@ -2,6 +2,8 @@ package com.missionhub.api;
 
 import java.util.HashMap;
 
+import android.app.Activity;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 public class User {
@@ -13,6 +15,7 @@ public class User {
 	private static HashMap<Integer,HashMap<String, String>> validRoles = new HashMap<Integer, HashMap<String, String>>();
 	private static int primaryOrgID;
 	private static String currentRole;
+	public static final String PREFS_NAME = "MissionHubPrivate";
 	
 	public static synchronized String getOrgID() {
 		return orgID;
@@ -66,7 +69,7 @@ public class User {
 	}
 	
 	
-	public static void calculateRoles(GPerson person) {
+	public static synchronized void calculateRoles(GPerson person) {
 		GOrgGeneric[] org_roles = person.getOrganizational_roles();
 		
 		for( int i=0; i < org_roles.length-1; i++ ) {
@@ -86,10 +89,21 @@ public class User {
 		}
 	}
 	
-	public static void calculateCurrentRole() {
+	public static synchronized void calculateCurrentRole() {
 		GOrgGeneric[] org_roles = contact.getPerson().getOrganizational_roles();
 		//TODO: make it such that the current role will be set off the orgID preference, if not set then set it off the primaryOrgID
-		
-		
+	}
+	
+	public static synchronized void setOrgIDPreference(String s, Activity a) {
+		SharedPreferences settings = a.getSharedPreferences(PREFS_NAME, 0);
+		SharedPreferences.Editor editor = settings.edit();
+		editor.putString("orgID", s);
+		editor.commit();
+		setOrgID(s);
+	}
+	
+	public static synchronized String getOrgIDPreference(String s, Activity a) {
+		SharedPreferences settings = a.getSharedPreferences(PREFS_NAME, 0);
+		return settings.getString("orgID", getOrgID());
 	}
 }

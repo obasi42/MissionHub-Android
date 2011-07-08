@@ -180,7 +180,7 @@ public class MissionHubActivity extends Activity {
 								GContact contact = new GContact();
 								contact.setPerson(people[0]);
 								User.setContact(contact);
-								User.setOrgID("56"); // TODO Remove Me
+								User.setOrgID(User.getOrgIDPreference("orgID", MissionHubActivity.this));
 								User.setLoggedIn(true);
 								refreshView();
 							}
