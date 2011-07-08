@@ -12,11 +12,11 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-public class ContactInfoItemAdapter  extends ArrayAdapter<SimpleListItem>{
+public class SimpleListItemAdapter  extends ArrayAdapter<SimpleListItem>{
 	private ArrayList<SimpleListItem> items;
 	private Activity activity;
 
-	public ContactInfoItemAdapter(Activity a, int textViewResourceId, ArrayList<SimpleListItem> items) {
+	public SimpleListItemAdapter(Activity a, int textViewResourceId, ArrayList<SimpleListItem> items) {
 		super(a, textViewResourceId, items);
 		this.items = items;
 		activity = a;
@@ -34,7 +34,7 @@ public class ContactInfoItemAdapter  extends ArrayAdapter<SimpleListItem>{
 		ViewHolder holder;
 		if (v == null) {		
 			LayoutInflater vi = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			v = vi.inflate(R.layout.contact_info_item, null);
+			v = vi.inflate(R.layout.simple_list_item, null);
 			holder = new ViewHolder();
 			holder.header = (TextView) v.findViewById(R.id.contact_info_header);
 			holder.info = (TextView) v.findViewById(R.id.contact_info_info);
@@ -46,7 +46,14 @@ public class ContactInfoItemAdapter  extends ArrayAdapter<SimpleListItem>{
 		final SimpleListItem item = items.get(position);
 		if (item != null) {
 			holder.header.setText(item.header);
-			holder.info.setText(item.info);
+			String info = item.info;
+			if (info == null || info.equals("")) {
+				if (item.data != null && item.data.containsKey("default")) {
+					info = item.data.get("default");
+					holder.info.setTextColor(R.color.medium_gray);
+				}
+			}
+			holder.info.setText(info);
 		}
 		return v;
 	}
