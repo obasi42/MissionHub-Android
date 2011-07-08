@@ -48,7 +48,6 @@ public class MissionHubActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		//testingApi();
 		
 		User.setFromBundle(savedInstanceState, this);
 		
@@ -221,117 +220,5 @@ public class MissionHubActivity extends Activity {
 			return true;
 		}
 		return false;
-	}
-	
-	public void testingApi() {
-		User.setToken("c1d65450bcb7c26efcedcd41497cae4b66e2194388c8c124914499b2094ebbed");
-		User.setOrgID("56");
-		
-		AsyncHttpResponseHandler responseHandler2 = new AsyncHttpResponseHandler() {
-
-			@Override
-			public void onStart() {
-				Log.i(TAG2, "Starting");
-			}
-			
-			@Override
-			public void onSuccess(String response) {
-				Log.i(TAG2, "SUCCESS!");
-				Log.i(TAG2, response);
-				Gson gson = new Gson();
-				
-				
-//				try {
-//					GFCTop[] fcs = gson.fromJson(response, GFCTop[].class);
-//					Log.i(TAG2, fcs[0].getFollowup_comment().getRejoicables()[0].getWhat());
-//					Log.i(TAG2, fcs[0].getFollowup_comment().getComment().getStatus());
-//				} catch(Exception e) {
-//					Log.i(TAG2, "CRAP", e);
-//				}
-				
-				try {
-					GContactAll contact = gson.fromJson(response, GContactAll.class);
-//					Log.i(TAG2, contact.getKeywords()[0].getName());
-//					Log.i(TAG2, String.valueOf(contact.getKeywords()[0].getQuestions().length));
-//					Log.i(TAG2, contact.getQuestions()[0].getLabel());
-					Log.i(TAG2, contact.getPeople()[0].getPerson().getName());
-//					Log.i(TAG2, contact.getPeople()[0].getForm()[0].getA());
-					Log.i(TAG2, "Coming up next... valid roles");
-					User.calculateRoles(contact.getPeople()[0].getPerson());
-					Log.i(TAG2, String.valueOf(User.getPrimaryOrgID()));
-				} catch (Exception e) {
-					Log.i(TAG2, "CRAP: ", e);
-				}
-
-				
-//				try{
-//					GPerson[] peeps = gson.fromJson(response, GPerson[].class);
-//					Log.i(TAG2, peeps[0].getName());
-//					
-////					GContact[] contacts = gson.fromJson(response, GContact[].class);
-////					Log.i(TAG2, contacts[0].getPerson().getName());
-////					Log.i(TAG2, contacts[0].getPerson().getPicture());
-////					Log.i(TAG2, contacts[0].getPerson().getStatus());
-//					
-////					try {
-////						Log.i(TAG2, peeps[0].getLocation().getName());
-////						Log.i(TAG2, peeps[0].getAssignment().getAssigned_to_person()[0].getName());
-////						Log.i(TAG2, peeps[0].getOrganizational_memebership()[0].getName());
-////						Log.i(TAG2, peeps[0].getOrganizational_roles()[0].getOrg_id());
-////						Log.i(TAG2, peeps[0].getEducation()[1].getConcentration()[0].getName());
-////						
-////					} catch(Exception e) {
-////						Log.i(TAG2, "ARGGG", e);
-////					}
-//
-//					
-//				} catch(Exception e) {
-//					Log.i(TAG2, "CRAP", e);
-//				}
-
-				
-			}
-			
-			@Override
-			public void onFailure(Throwable e) {
-				Log.i(TAG2, e.toString());
-				Log.i(TAG2, "stuff");
-			}
-			
-			@Override
-			public void onFinish() {
-				Log.i(TAG2, "I'm finished!");
-			}
-		};
-		//Api.getPeople(1282204, responseHandler2);
-//		Api.getPeople("me", responseHandler);
-//		
-//		ArrayList<Integer> ids = new ArrayList<Integer>();
-//		ids.add(1282204);
-//		ids.add(244771);
-//		Api.getPeople(ids, responseHandler);
-//		
-		HashMap<String,String> options = new HashMap<String,String>();
-		options.put("limit","15");
-		options.put("start", "0");
-		options.put("assigned_to_id", "none");
-		options.put("sort", "time");
-		options.put("direction", "ASC");
-//		Api.getContactsList(options, responseHandler2);
-		
-		Api.getContacts(1282204, responseHandler2);
-		
-		
-//		ArrayList<String> rejoicables = new ArrayList<String>();
-//		rejoicables.add("gospel_presentation");
-//		
-//		Api.postFollowupComment(1282204, 244771, "completed", "Hi from the Android API", responseHandler, rejoicables);
-//	
-//		Api.createContactAssignment(244771, 1282204, responseHandler);
-		
-//		Api.deleteContactAssignment(244771, responseHandler2);
-		
-//		Api.deleteComment(194, responseHandler);
-//		Api.getFollowupComments(1282204, responseHandler2);	
 	}
 }
