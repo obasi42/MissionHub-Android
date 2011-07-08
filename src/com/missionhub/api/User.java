@@ -51,7 +51,7 @@ public class User {
 		return b;
 	}
 	
-	public static synchronized void setFromBundle(Bundle b) {
+	public static synchronized void setFromBundle(Bundle b, Activity a) {
 		if (b == null || contact != null) return;
 		
 		Log.i(TAG, "Restoring User From Bundle");
@@ -69,6 +69,8 @@ public class User {
 		try {
 			setCurrentRole(b.getString("_currentRole"));
 		} catch (Exception e) {Log.e(TAG, "currentRole restore failed", e); };
+		
+		setOrgID(getOrgIDPreference(a));
 	}
 	
 	public static synchronized String getOrgID() {
@@ -79,7 +81,9 @@ public class User {
 	}
 	
 	public static synchronized void setOrgID(String org) {
-		orgID = org;
+		if (validRoles.containsKey(org)) {
+			orgID = org;
+		}
 		calculateCurrentRole();
 	}
 	
@@ -114,6 +118,9 @@ public class User {
 	}
 	
 	public static synchronized String getCurrentRole() {
+		if (currentRole == null) {
+			return "none";
+		}
 		return currentRole;
 	}
 	
@@ -162,7 +169,7 @@ public class User {
 		setOrgID(s);
 	}
 	
-	public static synchronized String getOrgIDPreference(String s, Activity a) {
+	public static synchronized String getOrgIDPreference(Activity a) {
 		SharedPreferences settings = a.getSharedPreferences(PREFS_NAME, 0);
 		return settings.getString("orgID", getOrgID());
 	}

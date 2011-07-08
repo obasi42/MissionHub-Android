@@ -50,7 +50,7 @@ public class MissionHubActivity extends Activity {
 		setContentView(R.layout.main);
 		//testingApi();
 		
-		User.setFromBundle(savedInstanceState);
+		User.setFromBundle(savedInstanceState, this);
 		
 		loggedOut = (LinearLayout) findViewById(R.id.loggedout);
 		loggedIn = (LinearLayout) findViewById(R.id.loggedin);
@@ -69,7 +69,7 @@ public class MissionHubActivity extends Activity {
 	
 	@Override
 	public void onRestoreInstanceState(Bundle b) {
-		User.setFromBundle(b);
+		User.setFromBundle(b, this);
 	}
 	
 	@Override
@@ -191,7 +191,7 @@ public class MissionHubActivity extends Activity {
 								GContact contact = new GContact();
 								contact.setPerson(people[0]);
 								User.setContact(contact);
-								User.setOrgID(User.getOrgIDPreference("orgID", MissionHubActivity.this));
+								User.setOrgID(User.getOrgIDPreference(MissionHubActivity.this));
 								User.setLoggedIn(true);
 								refreshView();
 							}
