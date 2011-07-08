@@ -14,7 +14,7 @@ public class User {
 	private static String orgID;
 	private static GContact contact;
 	private static HashMap<Integer,HashMap<String, String>> validRoles = new HashMap<Integer, HashMap<String, String>>();
-	private static int primaryOrgID;
+	private static String primaryOrgID;
 	private static String currentRole;
 	
 	private static String TAG = User.class.getName();
@@ -69,11 +69,15 @@ public class User {
 	}
 	
 	public static synchronized String getOrgID() {
+		if (orgID == null) {
+			return primaryOrgID;
+		}
 		return orgID;
 	}
 	
 	public static synchronized void setOrgID(String org) {
 		orgID = org;
+		calculateCurrentRole();
 	}
 	
 	public static synchronized String getToken() {
@@ -103,7 +107,7 @@ public class User {
 		orgID = String.valueOf(primaryOrgID); 
 	}
 	
-	public static synchronized int getPrimaryOrgID() {
+	public static synchronized String getPrimaryOrgID() {
 		return primaryOrgID;
 	}
 	
@@ -120,7 +124,7 @@ public class User {
 	}
 	
 	
-	public static void calculateRoles(GPerson person) {
+	public static synchronized void calculateRoles(GPerson person) {
 		GOrgGeneric[] org_roles = person.getOrganizational_roles();
 		
 		for( int i=0; i < org_roles.length-1; i++ ) {
@@ -131,15 +135,19 @@ public class User {
 				map.put("primary", org_roles[i].getPrimary());
 				map.put("name", org_roles[i].getName());
 				if (org_roles[i].getPrimary().equalsIgnoreCase("true")) {
-					primaryOrgID = org_roles[i].getOrg_id();
+					primaryOrgID = String.valueOf(org_roles[i].getOrg_id());
 				}
 				validRoles.put(org_roles[i].getOrg_id(), map);
 			}
 		}
 	}
 	
-	public static void calculateCurrentRole() {
+	public static synchronized void calculateCurrentRole() {
 		GOrgGeneric[] org_roles = contact.getPerson().getOrganizational_roles();
-		//TODO: make it such that the current role will be set off the orgID preference, if not set then set it off the primaryOrgID
+		for(GOrgGeneric o : org_roles) {
+			if (o.getOrg_id() == Integer.parseInt(getOrgID())) {
+				setCurrentRole(o.getRole());
+			}
+		}
 	}
 }
