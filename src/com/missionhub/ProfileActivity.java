@@ -10,7 +10,6 @@ import com.missionhub.ui.ImageManager;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -27,7 +26,6 @@ public class ProfileActivity extends Activity {
 	private LinkedList<String> spinnerNames = new LinkedList<String>();
 	private int currentSpinnerIndex;
 	private String currentSpinnerOrgID;
-	private String currentSpinnerName;
 	private Spinner spinner;
 	private String currentContactPicture = "";
 	private ImageView contactPicture;
@@ -84,11 +82,10 @@ public class ProfileActivity extends Activity {
 	  		          parent.getItemAtPosition(pos).toString(), Toast.LENGTH_LONG).show();
 	    	}
 	    	currentSpinnerOrgID = spinnerOrgIds.get(pos);
-	    	currentSpinnerName = spinnerNames.get(pos);
 	    	User.setOrgIDPreference(currentSpinnerOrgID, ProfileActivity.this);
 	    }
 
-	    public void onNothingSelected(AdapterView parent) {
+	    public void onNothingSelected(AdapterView<?> parent) {
 	      // Do nothing.
 	    }
 	}
@@ -112,7 +109,6 @@ public class ProfileActivity extends Activity {
 			spinnerNames.add(role.get("name"));
 			if (role.get("org_id").equalsIgnoreCase(User.getOrgID())) {
 				currentSpinnerOrgID = role.get("org_id");
-				currentSpinnerName = role.get("name");
 				currentSpinnerIndex = count;
 			}
 			count++;

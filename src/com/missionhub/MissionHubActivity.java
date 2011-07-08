@@ -1,7 +1,5 @@
 package com.missionhub;
 
-import java.util.HashMap;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -21,7 +19,6 @@ import com.google.gson.Gson;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.missionhub.api.Api;
 import com.missionhub.api.GContact;
-import com.missionhub.api.GContactAll;
 import com.missionhub.api.GError;
 import com.missionhub.api.GPerson;
 import com.missionhub.api.MHError;
@@ -31,7 +28,7 @@ import com.missionhub.ui.DisplayError;
 public class MissionHubActivity extends Activity {
 	
 	public static final String TAG = "MissionHubActivity";
-	public static final String TAG2 = "API";
+	
 	final Handler mHandler = new Handler();
 	private ProgressDialog mProgressDialog;
 	
@@ -159,9 +156,8 @@ public class MissionHubActivity extends Activity {
 	 * @return stored access token
 	 */
 	public String getStoredToken() {
-		return "c1d65450bcb7c26efcedcd41497cae4b66e2194388c8c124914499b2094ebbed";
-		//SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-		//return settings.getString("token", null);
+		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+		return settings.getString("token", null);
 	}
 	
 	/**
