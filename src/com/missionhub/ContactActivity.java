@@ -640,7 +640,6 @@ public class ContactActivity extends Activity {
 				GError error = gson.fromJson(response, GError.class);
 				onFailure(new MHError(error));
 			} catch (Exception out) {
-				Log.i(TAG, "ASSIGNMENT SUCCESS");
 				if (type == TYPE_ASSIGN) {
 					contactAssign.setText(R.string.contact_unassign);
 					assignmentStatus = ASSIGNMENT_ME;
@@ -648,8 +647,6 @@ public class ContactActivity extends Activity {
 					contactAssign.setText(R.string.contact_assign_to_me);
 					assignmentStatus = ASSIGNMENT_NONE;
 				}
-
-				// TODO: on success
 			}
 		}
 
@@ -842,7 +839,6 @@ public class ContactActivity extends Activity {
 				GError error = gson.fromJson(response, GError.class);
 				onFailure(new MHError(error));
 			} catch (Exception out) {
-				Log.i(TAG, "SAVE SUCCESS");
 				contactComment.setText("");
 				if (rejoicableListView != null) {
 					rejoicableListView.clearChoices();
@@ -854,7 +850,7 @@ public class ContactActivity extends Activity {
 
 		@Override
 		public void onFailure(Throwable e) {
-			Log.e(TAG, "Assignment Failed", e);
+			Log.e(TAG, "Save Failed", e);
 			AlertDialog ad = DisplayError.display(ContactActivity.this, e);
 			ad.setButton(ad.getContext().getString(R.string.alert_retry), new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int id) {
@@ -913,7 +909,6 @@ public class ContactActivity extends Activity {
 				GError error = gson.fromJson(response, GError.class);
 				onFailure(new MHError(error));
 			} catch (Exception out) {
-				Log.i(TAG, "DELETE SUCCESS");
 				updateComments(true);
 			}
 		}
@@ -942,8 +937,6 @@ public class ContactActivity extends Activity {
 			final GFollowupComment comment = (GFollowupComment) parent.getAdapter().getItem(position);
 			if (comment == null) return false;
 			
-			Log.i(TAG, comment.getComment().getComment());
-			
 			final CharSequence[] items = { getString(R.string.comment_delete) };
 			AlertDialog.Builder builder = new AlertDialog.Builder(ContactActivity.this);
 			builder.setIcon(R.drawable.ic_menu_start_conversation);
@@ -965,14 +958,13 @@ public class ContactActivity extends Activity {
 	private OnItemClickListener infoClickListener = new OnItemClickListener() {
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 			final SimpleListItem item = (SimpleListItem) parent.getAdapter().getItem(position);
-			//if (comment == null) return false;
+			if (item == null || item.data == null) return;
 			
-			Log.i(TAG, item.header + " " + item.info);
-			if (item.data.containsKey("phone")) {
+			if (item.data.containsKey("phone") && hasPhoneAbility()) {
 				makePhoneCall(item.data.get("phone"));
 			}
 			
-			if (item.data.containsKey("sms")) {
+			if (item.data.containsKey("sms") && hasPhoneAbility()) {
 				sendSMS(item.data.get("sms"));
 			}
 			

@@ -71,10 +71,8 @@ public class MissionHubActivity extends Activity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == LOGIN_WINDOW_ACTIVITY && resultCode == RESULT_OK) {
-			Log.i(TAG, data.getStringExtra("token"));
 			refreshView();
 		}
-		
 		if(requestCode == PROFILE_ACTIVITY && resultCode == RESULT_OK && data.hasExtra("logout")) {
 			logout();
 		}

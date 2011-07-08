@@ -13,15 +13,14 @@ public class Helper {
 	public static Date getDateFromUTCString(String s) {
 		java.text.DateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
 		df.setTimeZone(java.util.TimeZone.getTimeZone("Zulu"));
-		java.util.Date date = null;
 		s = s.replace("UTC", "");
 		
 		try {
-			date = df.parse(s);
+			return df.parse(s);
 		} catch (Exception e) {
-			Log.i(TAG, "date parse exception", e);
+			Log.w(TAG, "date parse exception", e);
 		}
-		return date;
+		return new Date();
 	}
 	
 	public static String formatPhoneNumber(String phoneNumber)

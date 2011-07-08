@@ -160,7 +160,6 @@ public class LoginActivity extends Activity {
 				return;
 			}
 
-			Log.e(TAG, "WebView Loaded: " + url);
 			if (mProgressDialog.isShowing()) {
 				mProgressDialog.hide();
 			}

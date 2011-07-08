@@ -81,7 +81,7 @@ public class User {
 	}
 	
 	public static synchronized void setOrgID(String org) {
-		if (validRoles.containsKey(org)) {
+		if (validRoles.containsKey(Integer.parseInt(org))) {
 			orgID = org;
 		}
 		calculateCurrentRole();

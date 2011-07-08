@@ -11,7 +11,6 @@ import com.missionhub.ui.ImageManager;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -103,8 +102,6 @@ public class ProfileActivity extends Activity {
 		while (it.hasNext()) {
 			int key = it.next();
 			HashMap<String, String> role = User.getValidRoles().get(key);
-			Log.i("ARG", role.get("name") + " " + String.valueOf(count));
-			
 			spinnerOrgIds.add(role.get("org_id"));
 			spinnerNames.add(role.get("name"));
 			if (role.get("org_id").equalsIgnoreCase(User.getOrgID())) {
