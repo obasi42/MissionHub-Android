@@ -87,7 +87,6 @@ public class SeparatedListAdapter extends BaseAdapter {
 		return (getItemViewType(position) != TYPE_SECTION_HEADER);
 	}
 
-	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		int sectionnum = 0;
 		for (Object section : this.sections.keySet()) {
@@ -107,7 +106,6 @@ public class SeparatedListAdapter extends BaseAdapter {
 		return null;
 	}
 
-	@Override
 	public long getItemId(int position) {
 		return position;
 	}
