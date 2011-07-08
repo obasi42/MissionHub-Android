@@ -648,6 +648,7 @@ public class ContactActivity extends Activity {
 					contactAssign.setText(R.string.contact_assign_to_me);
 					assignmentStatus = ASSIGNMENT_NONE;
 				}
+				updatePerson(false);
 			}
 		}
 
@@ -874,14 +875,23 @@ public class ContactActivity extends Activity {
 	}
 
 	public void clickContact(View v) {
+		bottom_button_center.setChecked(false);
+		bottom_button_right.setChecked(false);
+		bottom_button_left.setChecked(true);
 		setTab(TAB_CONTACT, false);
 	}
 
 	public void clickMoreInfo(View v) {
+		bottom_button_left.setChecked(false);
+		bottom_button_right.setChecked(false);
+		bottom_button_center.setChecked(true);
 		setTab(TAB_MORE_INFO, false);
 	}
 
 	public void clickSurveys(View v) {
+		bottom_button_left.setChecked(false);
+		bottom_button_center.setChecked(false);
+		bottom_button_right.setChecked(true);
 		setTab(TAB_SURVEYS, false);
 	}
 	
@@ -987,10 +997,6 @@ public class ContactActivity extends Activity {
 		if (this.tab != tab || force) {
 			switch (tab) {
 			case TAB_CONTACT:
-				bottom_button_center.setChecked(false);
-				bottom_button_right.setChecked(false);
-				bottom_button_left.setChecked(true);
-				
 				header.addView(contactPost);
 				contactListView.setOnItemClickListener(null);
 				txtTitle.setText(R.string.contact_contact);
@@ -998,10 +1004,6 @@ public class ContactActivity extends Activity {
 				contactListView.setOnItemLongClickListener(commentLongClickListener);
 				break;
 			case TAB_MORE_INFO:
-				bottom_button_left.setChecked(false);
-				bottom_button_right.setChecked(false);
-				bottom_button_center.setChecked(true);
-				
 				header.removeView(contactPost);
 				txtTitle.setText(R.string.contact_more);
 				contactListView.setAdapter(infoAdapter);
@@ -1009,10 +1011,6 @@ public class ContactActivity extends Activity {
 				contactListView.setOnItemClickListener(infoClickListener);
 				break;
 			case TAB_SURVEYS:
-				bottom_button_left.setChecked(false);
-				bottom_button_center.setChecked(false);
-				bottom_button_right.setChecked(true);
-				
 				header.removeView(contactPost);
 				txtTitle.setText(R.string.contact_survey);
 				contactListView.setAdapter(keywordAdapter);

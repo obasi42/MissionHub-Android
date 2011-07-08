@@ -137,14 +137,23 @@ public class ContactsActivity extends Activity {
 	}
 
 	public void clickMyContacts(View v) {
+		bottom_button_center.setChecked(false);
+		bottom_button_right.setChecked(false);
+		bottom_button_left.setChecked(true);
 		setTab(TAB_MY, false);
 	}
 
 	public void clickMyCompleted(View v) {
+		bottom_button_left.setChecked(false);
+		bottom_button_right.setChecked(false);
+		bottom_button_center.setChecked(true);
 		setTab(TAB_COMPLETED, false);
 	}
 
 	public void clickUnassigned(View v) {
+		bottom_button_left.setChecked(false);
+		bottom_button_center.setChecked(false);
+		bottom_button_right.setChecked(true);
 		setTab(TAB_UNASSIGNED, false);
 	}
 
@@ -152,10 +161,6 @@ public class ContactsActivity extends Activity {
 		if (this.tab != tab || force) {
 			switch (tab) {
 			case TAB_MY:
-				bottom_button_center.setChecked(false);
-				bottom_button_right.setChecked(false);
-				bottom_button_left.setChecked(true);
-				
 				txtTitle.setText(R.string.contacts_my_contacts);
 				txtNoData.setText(R.string.contacts_no_data_my_contacts);
 				options.put("filters", "status");
@@ -164,10 +169,6 @@ public class ContactsActivity extends Activity {
 				Guide.display(this, Guide.CONTACTS_MY_CONTACTS);
 				break;
 			case TAB_COMPLETED:
-				bottom_button_left.setChecked(false);
-				bottom_button_right.setChecked(false);
-				bottom_button_center.setChecked(true);
-				
 				txtTitle.setText(R.string.contacts_my_completed);
 				txtNoData.setText(R.string.contacts_no_data_my_completed);
 				options.put("filters", "status");
@@ -175,10 +176,6 @@ public class ContactsActivity extends Activity {
 				options.put("assigned_to_id", String.valueOf(User.getContact().getPerson().getId()));
 				break;
 			case TAB_UNASSIGNED:
-				bottom_button_left.setChecked(false);
-				bottom_button_center.setChecked(false);
-				bottom_button_right.setChecked(true);
-				
 				txtTitle.setText(R.string.contacts_unassigned);
 				txtNoData.setText(R.string.contacts_no_data_unassigned);
 				options.remove("filters");
@@ -213,7 +210,7 @@ public class ContactsActivity extends Activity {
 	}
 
 	private void getMore() {
-		if (loading || atEnd)
+		if (loading || atEnd || processes.contains("loading_"+tab))
 			return;
 
 		options.put("limit", String.valueOf(limit));
@@ -227,7 +224,7 @@ public class ContactsActivity extends Activity {
 			@Override
 			public void onStart() {
 				loading = true;
-				showProgress("loading_"+tab);
+				showProgress("loading_"+forTab);
 			}
 
 			@Override
@@ -285,7 +282,7 @@ public class ContactsActivity extends Activity {
 			@Override
 			public void onFinish() {
 				loading = false;
-				hideProgress("loading_"+tab);
+				hideProgress("loading_"+forTab);
 			}
 		};
 
