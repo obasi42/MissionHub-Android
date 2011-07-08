@@ -44,7 +44,14 @@ public class ProfileActivity extends Activity {
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // The drop down vieww
 
 		TextView name = (TextView) findViewById(R.id.textView3);
-		name.setText(person.getName()); 
+		name.setText(person.getName());
+		
+		TextView version = (TextView) findViewById(R.id.profile_version);
+		try {
+			version.setText(getString(R.string.profile_version) + " " + getPackageManager().getPackageInfo(getPackageName(), 0).versionName);
+		} catch (Exception e) {
+			version.setText("");
+		}
 
 		spinner.setAdapter(adapter);
 		
@@ -62,7 +69,7 @@ public class ProfileActivity extends Activity {
 			contactPicture.setTag(person.getPicture() + "?type=large");
 			imageManager.displayImage(person.getPicture() + "?type=large", ProfileActivity.this, contactPicture, defaultImage);
 		}
-
+		clicks = 0;
 	}
 	
 	@Override
@@ -109,6 +116,17 @@ public class ProfileActivity extends Activity {
 				currentSpinnerIndex = count;
 			}
 			count++;
+		}
+	}
+	
+	private int clicks = 0;
+	public void clickVersion(View v) {
+		clicks++;
+		if (clicks == 20) {
+			clicks = 0;
+			Intent i = new Intent(this.getApplicationContext(), MHEgg.class);
+			startActivity(i);
+			finish();
 		}
 	}
 }	

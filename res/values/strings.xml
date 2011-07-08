@@ -98,6 +98,10 @@
 	<string name="profile_header">Profile</string>
 	<string name="profile_change_current_organization">Change Current Organization:</string>
 	<string name="profile_click_to_close">Click to Close</string>
+	<string name="profile_version">Version</string>
+	
+	<string name="egg_title">Rejoicables 4TW</string>
+	<string name="egg_title_todd">For You Todd...</string>
 	
 	<string name="yes">Yes</string>
 	<string name="no">No</string>
