@@ -60,7 +60,8 @@ public class MissionHubActivity extends Activity {
 	
 	@Override
 	public void onSaveInstanceState(Bundle b) {
-		b.putAll(User.getAsBundle());
+		if (User.isLoggedIn())
+			b.putAll(User.getAsBundle());
 	}
 	
 	@Override
