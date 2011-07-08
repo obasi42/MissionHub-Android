@@ -204,7 +204,7 @@ public class LoginActivity extends Activity {
 						User.setLoggedIn(true);
 						SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 						SharedPreferences.Editor editor = settings.edit();
-						editor.putString("token", User.getToken());
+						editor.putString("token", loginDone.getAccess_token());
 						editor.commit();
 						returnWithToken();
 					} catch(Exception e) {
