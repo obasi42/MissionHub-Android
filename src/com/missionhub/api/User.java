@@ -137,7 +137,7 @@ public class User {
 	public static synchronized void calculateRoles(GPerson person) {
 		GOrgGeneric[] org_roles = person.getOrganizational_roles();
 		
-		for( int i=0; i < org_roles.length-1; i++ ) {
+		for( int i=0; i < org_roles.length; i++ ) {
 			HashMap<String, String> map = new HashMap<String,String>();
 			if (org_roles[i].getRole().equalsIgnoreCase("leader") || org_roles[i].getRole().equalsIgnoreCase("admin")) {
 				map.put("role", org_roles[i].getRole());
