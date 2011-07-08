@@ -35,6 +35,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 public class ContactsActivity extends Activity {
 
@@ -51,6 +52,9 @@ public class ContactsActivity extends Activity {
 	private TextView txtNoData;
 	private TextView txtTitle;
 	private EditText search;
+	private ToggleButton bottom_button_left;
+	private ToggleButton bottom_button_center;
+	private ToggleButton bottom_button_right;
 
 	private ArrayList<GContact> data = new ArrayList<GContact>();
 
@@ -70,6 +74,10 @@ public class ContactsActivity extends Activity {
 		txtTitle = (TextView) findViewById(R.id.txt_contacts_title);
 		search = (EditText) findViewById(R.id.contacts_search);
 
+		bottom_button_left = (ToggleButton) findViewById(R.id.bottom_button_left);
+		bottom_button_center = (ToggleButton) findViewById(R.id.bottom_button_center);
+		bottom_button_right = (ToggleButton) findViewById(R.id.bottom_button_right);
+		
 		search.addTextChangedListener(new ContactsSearchWatcher());
 
 		// Large Screens
@@ -118,6 +126,10 @@ public class ContactsActivity extends Activity {
 		if (this.tab != tab || force) {
 			switch (tab) {
 			case TAB_MY:
+				bottom_button_center.setChecked(false);
+				bottom_button_right.setChecked(false);
+				bottom_button_left.setChecked(true);
+				
 				txtTitle.setText(R.string.contacts_my_contacts);
 				txtNoData.setText(R.string.contacts_no_data_my_contacts);
 				options.put("filters", "status");
@@ -126,6 +138,10 @@ public class ContactsActivity extends Activity {
 				Guide.display(this, Guide.CONTACTS_MY_CONTACTS);
 				break;
 			case TAB_COMPLETED:
+				bottom_button_left.setChecked(false);
+				bottom_button_right.setChecked(false);
+				bottom_button_center.setChecked(true);
+				
 				txtTitle.setText(R.string.contacts_my_completed);
 				txtNoData.setText(R.string.contacts_no_data_my_completed);
 				options.put("filters", "status");
@@ -133,6 +149,10 @@ public class ContactsActivity extends Activity {
 				options.put("assigned_to_id", String.valueOf(User.getContact().getPerson().getId()));
 				break;
 			case TAB_UNASSIGNED:
+				bottom_button_left.setChecked(false);
+				bottom_button_center.setChecked(false);
+				bottom_button_right.setChecked(true);
+				
 				txtTitle.setText(R.string.contacts_unassigned);
 				txtNoData.setText(R.string.contacts_no_data_unassigned);
 				options.remove("filters");

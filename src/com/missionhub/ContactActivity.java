@@ -62,6 +62,7 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 public class ContactActivity extends Activity {
 
@@ -96,6 +97,9 @@ public class ContactActivity extends Activity {
 	private Button contactSave;
 	private Spinner contactStatus;
 	private ListView rejoicableListView;
+	private ToggleButton bottom_button_left;
+	private ToggleButton bottom_button_center;
+	private ToggleButton bottom_button_right;
 	
 	ArrayList<Rejoicable> validRejoicables;
 
@@ -149,6 +153,10 @@ public class ContactActivity extends Activity {
 		txtTitle = (TextView) findViewById(R.id.contact_title);
 		contactListView = (ListView) findViewById(R.id.contact_listview);
 		progress = (ProgressBar) findViewById(R.id.contact_progress);
+		
+		bottom_button_left = (ToggleButton) findViewById(R.id.bottom_button_left);
+		bottom_button_center = (ToggleButton) findViewById(R.id.bottom_button_center);
+		bottom_button_right = (ToggleButton) findViewById(R.id.bottom_button_right);
 
 		contactHeader = (LinearLayout) View.inflate(this, R.layout.contact_header, null);
 		contactPicture = (ImageView) contactHeader.findViewById(R.id.contact_picture);
@@ -928,7 +936,7 @@ public class ContactActivity extends Activity {
 		}
 	};
 	
-	private OnItemLongClickListener commentLongClickListner = new OnItemLongClickListener() {
+	private OnItemLongClickListener commentLongClickListener = new OnItemLongClickListener() {
 		public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 			final GFollowupComment comment = (GFollowupComment) parent.getAdapter().getItem(position);
 			if (comment == null) return false;
@@ -985,13 +993,21 @@ public class ContactActivity extends Activity {
 		if (this.tab != tab || force) {
 			switch (tab) {
 			case TAB_CONTACT:
+				bottom_button_center.setChecked(false);
+				bottom_button_right.setChecked(false);
+				bottom_button_left.setChecked(true);
+				
 				header.addView(contactPost);
 				contactListView.setOnItemClickListener(null);
 				txtTitle.setText(R.string.contact_contact);
 				contactListView.setAdapter(commentAdapter);
-				contactListView.setOnItemLongClickListener(commentLongClickListner);
+				contactListView.setOnItemLongClickListener(commentLongClickListener);
 				break;
 			case TAB_MORE_INFO:
+				bottom_button_left.setChecked(false);
+				bottom_button_right.setChecked(false);
+				bottom_button_center.setChecked(true);
+				
 				header.removeView(contactPost);
 				txtTitle.setText(R.string.contact_more);
 				contactListView.setAdapter(infoAdapter);
@@ -999,6 +1015,10 @@ public class ContactActivity extends Activity {
 				contactListView.setOnItemClickListener(infoClickListener);
 				break;
 			case TAB_SURVEYS:
+				bottom_button_left.setChecked(false);
+				bottom_button_center.setChecked(false);
+				bottom_button_right.setChecked(true);
+				
 				header.removeView(contactPost);
 				txtTitle.setText(R.string.contact_survey);
 				contactListView.setAdapter(keywordAdapter);
