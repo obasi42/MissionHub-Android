@@ -104,7 +104,6 @@ public class User {
 		if (g == null || g.getPerson() == null) return;
 		contact = g;
 		calculateRoles(contact.getPerson());
-		orgID = String.valueOf(primaryOrgID); 
 	}
 	
 	public static synchronized String getPrimaryOrgID() {
