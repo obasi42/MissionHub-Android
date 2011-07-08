@@ -519,6 +519,7 @@ public class ContactActivity extends Activity {
 				GError error = gson.fromJson(response, GError.class);
 				onFailure(new MHError(error));
 			} catch (Exception out) {
+				Log.i(TAG, response);
 				try {
 					GContactAll contactAll = gson.fromJson(response, GContactAll.class);
 					ContactActivity.this.contactMeta = contactAll;
@@ -804,7 +805,7 @@ public class ContactActivity extends Activity {
 		}
 		
 		int statusPos = contactStatus.getSelectedItemPosition();
-		if (statusPos > -1) {
+		if (statusPos > -1 && contact.getPerson().getStatus() != null) {
 			if (!contact.getPerson().getStatus().equals(statusListTag.get(statusPos))) {
 				canSave = true;
 			}
