@@ -121,6 +121,20 @@ public class ContactsActivity extends Activity {
 	public void onRestoreInstanceState(Bundle b) {
 		User.setFromBundle(b, this);
 	}
+	
+	private ArrayList<String> processes = new ArrayList<String>();
+
+	private void showProgress(String process) {
+		processes.add(process);
+		this.progress.setVisibility(View.VISIBLE);
+	}
+
+	private void hideProgress(String process) {
+		processes.remove(process);
+		if (processes.size() <= 0) {
+			this.progress.setVisibility(View.GONE);
+		}
+	}
 
 	public void clickMyContacts(View v) {
 		setTab(TAB_MY, false);
@@ -213,7 +227,7 @@ public class ContactsActivity extends Activity {
 			@Override
 			public void onStart() {
 				loading = true;
-				progress.setVisibility(View.VISIBLE);
+				showProgress("loading_"+tab);
 			}
 
 			@Override
@@ -271,7 +285,7 @@ public class ContactsActivity extends Activity {
 			@Override
 			public void onFinish() {
 				loading = false;
-				progress.setVisibility(View.GONE);
+				hideProgress("loading_"+tab);
 			}
 		};
 
