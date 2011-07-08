@@ -113,6 +113,7 @@ public class ContactActivity extends Activity {
 	private ArrayList<Integer> statusListRes = new ArrayList<Integer>();
 	
 	private CommentItemAdapter commentAdapter;
+	private ArrayAdapter<String> noCommentAdapter;
 	private ArrayList<GFollowupComment> comments = new ArrayList<GFollowupComment>();
 	
 	private SimpleListItemAdapter infoAdapter;
@@ -195,6 +196,9 @@ public class ContactActivity extends Activity {
 		contactStatus.setAdapter(adapter);
 
 		commentAdapter = new CommentItemAdapter(this, R.layout.comment_list_item, comments, statusListTag, statusListRes);
+		ArrayList<String> noComment = new ArrayList<String>();
+		noComment.add(getString(R.string.contact_no_comments));
+		noCommentAdapter =  new ArrayAdapter<String>(this, R.layout.no_comment_list_item, noComment);
 		infoAdapter = new SimpleListItemAdapter(this, R.layout.simple_list_item, info);
 		keywordAdapter = new SeparatedListAdapter(this);
 		
@@ -378,8 +382,8 @@ public class ContactActivity extends Activity {
 			info.add(new SimpleListItem(getString(R.string.contact_info_facebook_header), getString(R.string.contact_info_facebook_link), data));
 		}
 		
-		if(person.getAssignment().getAssigned_to_person().length > 0) {
-			info.add(new SimpleListItem(getString(R.string.contact_info_assigned_to), person.getAssignment().getAssigned_to_person()[0].getName()));
+		if(person.getAssignment().getPerson_assigned_to().length > 0) {
+			info.add(new SimpleListItem(getString(R.string.contact_info_assigned_to), person.getAssignment().getPerson_assigned_to()[0].getName()));
 		}
 		
 		if(person.getFirst_contact_date() != null) {
@@ -596,14 +600,18 @@ public class ContactActivity extends Activity {
 	public void clickAssign(View v) {
 		clickAssign();
 	}
-
+	
 	protected void processFollowupComments(GFCTop[] fcs) {
 		comments.clear();
 		for (GFCTop gfc : fcs) {
 			comments.add(gfc.getFollowup_comment());
 		}
 		if (tab == TAB_CONTACT) {
-			contactListView.setAdapter(commentAdapter);
+			if (comments.isEmpty()) {
+				contactListView.setAdapter(noCommentAdapter);
+			} else {
+				contactListView.setAdapter(commentAdapter);
+			}
 			commentAdapter.notifyDataSetChanged();
 		}
 	}
@@ -1000,7 +1008,11 @@ public class ContactActivity extends Activity {
 				header.addView(contactPost);
 				contactListView.setOnItemClickListener(null);
 				txtTitle.setText(R.string.contact_contact);
-				contactListView.setAdapter(commentAdapter);
+				if (comments.isEmpty()) {
+					contactListView.setAdapter(noCommentAdapter);
+				} else {
+					contactListView.setAdapter(commentAdapter);
+				}
 				contactListView.setOnItemLongClickListener(commentLongClickListener);
 				break;
 			case TAB_MORE_INFO:

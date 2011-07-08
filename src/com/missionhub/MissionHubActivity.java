@@ -10,8 +10,14 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout.LayoutParams;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -32,6 +38,7 @@ public class MissionHubActivity extends Activity {
 	final Handler mHandler = new Handler();
 	private ProgressDialog mProgressDialog;
 	
+	private ImageView logo;
 	private LinearLayout loggedOut;
 	private LinearLayout loggedIn;
 	private RelativeLayout logoutBar;
@@ -48,6 +55,7 @@ public class MissionHubActivity extends Activity {
 		
 		User.setFromBundle(savedInstanceState, this);
 		
+		logo = (ImageView) findViewById(R.id.img_logo);
 		loggedOut = (LinearLayout) findViewById(R.id.loggedout);
 		loggedIn = (LinearLayout) findViewById(R.id.loggedin);
 		logoutBar = (RelativeLayout) findViewById(R.id.logoutbar);
@@ -139,11 +147,22 @@ public class MissionHubActivity extends Activity {
 	 */
 	public void refreshView() {
 		if (User.isLoggedIn()) {
+			Animation a = AnimationUtils.loadAnimation(this, R.anim.logo_down);
+			a.setFillBefore(true);
+			a.setFillEnabled(true);
+			a.setFillAfter(true);
+			logo.startAnimation(a);
+			
 			loggedOut.setVisibility(View.GONE);
 			loggedIn.setVisibility(View.VISIBLE);
 			logoutBar.setVisibility(View.VISIBLE);
 			txtLogoutbarName.setText(User.getContact().getPerson().getName());
 		} else {
+			Animation a = AnimationUtils.loadAnimation(this, R.anim.logo_up);
+			a.setFillEnabled(true);
+			a.setFillBefore(true);
+			a.setFillAfter(true);
+			logo.startAnimation(a);
 			loggedIn.setVisibility(View.GONE);
 			loggedOut.setVisibility(View.VISIBLE);
 			logoutBar.setVisibility(View.GONE);

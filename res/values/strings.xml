@@ -42,6 +42,7 @@
     <string name="contact_open_url">Open link in browser?</string>
     <string name="contact_survey_no_answer">not answered</string>
     <string name="contact_survey_keyword">Keyword</string>
+    <string name="contact_no_comments">No Previous Comments</string>
     
     <string name="contact_info_facebook_header">Facebook</string>
     <string name="contact_info_facebook_link">Tap here to open Facebook profile</string>

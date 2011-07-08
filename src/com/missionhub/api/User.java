@@ -81,7 +81,7 @@ public class User {
 	}
 	
 	public static synchronized void setOrgID(String org) {
-		if (org == "" || org.equals("")) return;
+		if (org == null || org.equals("")) return;
 		if (validRoles.containsKey(Integer.parseInt(org))) {
 			orgID = org;
 		}
