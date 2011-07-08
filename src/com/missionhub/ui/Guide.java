@@ -27,7 +27,7 @@ public class Guide {
 		switch(guideId) {
 			case CONTACTS_MY_CONTACTS:
 				title = ctx.getString(R.string.guide_contacts);
-				message = ctx.getString(R.string.guide_contact_msg);
+				message = ctx.getString(R.string.guide_contacts_msg);
 				break;
 			case CONTACTS_UNASSIGNED:
 				title = ctx.getString(R.string.guide_contacts_unassigned);
