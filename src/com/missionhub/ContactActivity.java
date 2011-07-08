@@ -13,16 +13,20 @@ import com.missionhub.api.GError;
 import com.missionhub.api.GFCTop;
 import com.missionhub.api.GFollowupComment;
 import com.missionhub.api.GIdNameProvider;
+import com.missionhub.api.GKeyword;
 import com.missionhub.api.GPerson;
+import com.missionhub.api.GQA;
+import com.missionhub.api.GQuestion;
 import com.missionhub.api.MHError;
 import com.missionhub.api.User;
 import com.missionhub.ui.CommentItemAdapter;
-import com.missionhub.ui.ContactInfoItemAdapter;
+import com.missionhub.ui.SimpleListItemAdapter;
 import com.missionhub.ui.DisplayError;
 import com.missionhub.ui.Guide;
 import com.missionhub.ui.ImageManager;
 import com.missionhub.ui.Rejoicable;
 import com.missionhub.ui.RejoicableAdapter;
+import com.missionhub.ui.SeparatedListAdapter;
 import com.missionhub.ui.SimpleListItem;
 
 import android.app.Activity;
@@ -39,8 +43,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -102,8 +108,11 @@ public class ContactActivity extends Activity {
 	private CommentItemAdapter commentAdapter;
 	private ArrayList<GFollowupComment> comments = new ArrayList<GFollowupComment>();
 	
-	private ContactInfoItemAdapter infoAdapter;
+	private SimpleListItemAdapter infoAdapter;
 	private ArrayList<SimpleListItem> info = new ArrayList<SimpleListItem>();
+	
+	private SeparatedListAdapter keywordAdapter;
+	
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -174,7 +183,8 @@ public class ContactActivity extends Activity {
 		contactStatus.setAdapter(adapter);
 
 		commentAdapter = new CommentItemAdapter(this, R.layout.comment_list_item, comments, statusListTag, statusListRes);
-		infoAdapter = new ContactInfoItemAdapter(this, R.layout.contact_info_item, info);
+		infoAdapter = new SimpleListItemAdapter(this, R.layout.simple_list_item, info);
+		keywordAdapter = new SeparatedListAdapter(this);
 		
 		header = new LinearLayout(this);
 		header.setOrientation(LinearLayout.VERTICAL);
@@ -257,7 +267,7 @@ public class ContactActivity extends Activity {
 		update(true);
 		updateHeader();
 	}
-
+	
 	private ArrayList<String> processes = new ArrayList<String>();
 
 	private void showProgress(String process) {
@@ -359,6 +369,45 @@ public class ContactActivity extends Activity {
 		infoAdapter.notifyDataSetChanged();
 	}
 	
+	public void updateKeywords() {
+		if (contactMeta == null || contact == null) return;
+		final GPerson person = contact.getPerson();
+		if (person == null) return;
+		
+		keywordAdapter = new SeparatedListAdapter(this);
+		
+		try {
+			final GKeyword[] keywords = contactMeta.getKeywords();
+			HashMap<Integer, GQuestion> questions = new HashMap<Integer, GQuestion>();
+			for (GQuestion q : contactMeta.getQuestions()) {
+				questions.put(q.getId(), q);
+			}
+			HashMap<Integer, GQA> answers = new HashMap<Integer, GQA>();
+			for (GQA qa : contact.getForm()) {
+				answers.put(qa.getQ(), qa);
+			}
+			for (GKeyword keyword : keywords) {
+				try {
+					ArrayList<SimpleListItem> keywordData = new ArrayList<SimpleListItem>();
+					for (int q : keyword.getQuestions()) {
+						final GQuestion quesiton = questions.get(q);
+						final GQA qa = answers.get(q);
+						HashMap<String, String> data = new HashMap<String, String>();
+						data.put("id", String.valueOf(keyword.getKeyword_id()));
+						data.put("default", getString(R.string.contact_survey_no_answer));
+						keywordData.add(new SimpleListItem(quesiton.getLabel(), qa.getA(), data));
+					}
+					SimpleListItemAdapter adapter = new SimpleListItemAdapter(this, R.layout.simple_list_item, keywordData);
+					keywordAdapter.addSection(getString(R.string.contact_survey_keyword) + ": " + keyword.getName(), adapter);
+				} catch (Exception e) {
+				}
+			}
+		} catch (Exception e) {}
+		if (tab == TAB_SURVEYS) {
+			contactListView.setAdapter(keywordAdapter);
+		}
+	}
+	
 	public void update(boolean force) {
 		updatePerson(force);
 		updateComments(force);
@@ -393,6 +442,7 @@ public class ContactActivity extends Activity {
 					ContactActivity.this.contact = contactAll.getPeople()[0];
 					ContactActivity.this.updateHeader();
 					ContactActivity.this.updateMoreInfo();
+					ContactActivity.this.updateKeywords();
 				} catch (Exception e) {
 					onFailure(e);
 				}
@@ -761,21 +811,22 @@ public class ContactActivity extends Activity {
 		if (this.tab != tab || force) {
 			switch (tab) {
 			case TAB_CONTACT:
-				contactListView.setAdapter(commentAdapter);
-				contactListView.setOnItemLongClickListener(commentLongClickListner);
 				header.addView(contactPost);
 				txtTitle.setText(R.string.contact_contact);
+				contactListView.setAdapter(commentAdapter);
+				contactListView.setOnItemLongClickListener(commentLongClickListner);
 				break;
 			case TAB_MORE_INFO:
-				contactListView.setAdapter(infoAdapter);
-				contactListView.setOnItemLongClickListener(null);
 				header.removeView(contactPost);
 				txtTitle.setText(R.string.contact_more);
+				contactListView.setAdapter(infoAdapter);
+				contactListView.setOnItemLongClickListener(null);
 				break;
 			case TAB_SURVEYS:
-				contactListView.setOnItemLongClickListener(null);
 				header.removeView(contactPost);
 				txtTitle.setText(R.string.contact_survey);
+				contactListView.setAdapter(keywordAdapter);
+				contactListView.setOnItemLongClickListener(null);
 				break;
 			}
 			this.tab = tab;

@@ -36,6 +36,8 @@
     <string name="contact_rejoicables">Attach Rejoicables</string>
     <string name="contact_menu_refresh">Refresh</string>
     <string name="contact_cant_save">You must provide a message, change contact status, or add a rejoicable before saving!</string>
+    <string name="contact_survey_no_answer">not answered</string>
+    <string name="contact_survey_keyword">Keyword</string>
     
     <string name="info_facebook_header">Facebook</string>
     <string name="info_facebook_link">Tap here to open Facebook profile in browser</string>
