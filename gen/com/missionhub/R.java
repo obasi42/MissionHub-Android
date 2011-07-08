@@ -87,7 +87,7 @@ public final class R {
         public static final int status_button=0x7f020036;
     }
     public static final class id {
-        public static final int EditText1=0x7f09003d;
+        public static final int TextView1=0x7f09003d;
         public static final int bottom_button_center=0x7f090003;
         public static final int bottom_button_left=0x7f090002;
         public static final int bottom_button_right=0x7f090004;
@@ -138,7 +138,6 @@ public final class R {
         public static final int contacts_search=0x7f090029;
         public static final int contacts_search_container=0x7f090028;
         public static final int contacts_top_bar=0x7f090026;
-        public static final int imageView1=0x7f090040;
         public static final int img_logo=0x7f090037;
         public static final int linearLayout1=0x7f090001;
         public static final int linearLayout2=0x7f090041;
@@ -150,6 +149,7 @@ public final class R {
         public static final int logoutbar=0x7f090033;
         public static final int main=0x7f090032;
         public static final int profile_container=0x7f09003f;
+        public static final int profile_person_image=0x7f090040;
         public static final int relativeLayout1=0x7f090000;
         public static final int spinner1=0x7f090045;
         public static final int spinnerText=0x7f090024;

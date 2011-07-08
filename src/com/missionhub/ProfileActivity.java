@@ -3,7 +3,10 @@ package com.missionhub;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+
+import com.missionhub.api.GPerson;
 import com.missionhub.api.User;
+import com.missionhub.ui.ImageManager;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -14,6 +17,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,12 +29,18 @@ public class ProfileActivity extends Activity {
 	private String currentSpinnerOrgID;
 	private String currentSpinnerName;
 	private Spinner spinner;
+	private String currentContactPicture = "";
+	private ImageView contactPicture;
+	private GPerson person;
+	private ImageManager imageManager;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.profile);
-		
+		person = User.getContact().getPerson();
+		contactPicture = (ImageView) findViewById(R.id.profile_person_image);
+
 		createSpinnerArrays();
 		Log.i("ARG", String.valueOf(spinnerOrgIds.size()));
 		Log.i("ARG", String.valueOf(spinnerNames.size()));
@@ -40,12 +50,27 @@ public class ProfileActivity extends Activity {
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // The drop down vieww
 
 		TextView name = (TextView) findViewById(R.id.textView3);
-		name.setText(User.getContact().getPerson().getName()); 
+		name.setText(person.getName()); 
 
 		try {
 		    spinner.setAdapter(adapter);
 		} catch (Exception e) {
 			Log.i("ARG", "ARGGGG", e);
+		}
+		
+		imageManager = new ImageManager(getApplicationContext());
+		int defaultImage = R.drawable.facebook_question;
+		if (person.getGender() != null) {
+			if (person.getGender().equalsIgnoreCase("male")) {
+				defaultImage = R.drawable.facebook_male;
+			} else if (person.getGender().equalsIgnoreCase("female")) {
+				defaultImage = R.drawable.facebook_female;
+			}
+		}
+		if (person.getPicture() != null && !currentContactPicture.equals(person.getPicture())) {
+			currentContactPicture = person.getPicture();
+			contactPicture.setTag(person.getPicture() + "?type=large");
+			imageManager.displayImage(person.getPicture() + "?type=large", ProfileActivity.this, contactPicture, defaultImage);
 		}
 
 	}

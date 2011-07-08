@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="fill_parent" android:layout_height="fill_parent" android:background="@drawable/mh_background_black" android:id="@+id/contacts">
     <RelativeLayout android:layout_alignParentTop="true" android:layout_width="wrap_content" android:id="@+id/relativeLayout1" android:background="@drawable/mh_navbar" android:layout_height="40dp">
-        <EditText android:layout_width="wrap_content" android:id="@+id/EditText1" android:textAppearance="?android:attr/textAppearanceMedium" android:layout_alignParentRight="true" android:layout_height="fill_parent" android:gravity="center_vertical" android:layout_marginRight="5dp" android:text="@string/main_logout" android:textSize="12dp" android:background="@color/transparent" android:onClick="clickLogout" android:textColor="@color/white" android:editable="false"></EditText>
+        <TextView android:layout_width="wrap_content" android:id="@+id/TextView1" android:textAppearance="?android:attr/textAppearanceMedium" android:layout_alignParentRight="true" android:layout_height="fill_parent" android:gravity="center_vertical" android:layout_marginRight="5dp" android:text="@string/main_logout" android:textSize="12dp" android:background="@color/transparent" android:onClick="clickLogout" android:textColor="@color/white" android:editable="false"></TextView>
         <TextView android:id="@+id/textView2" android:textAppearance="?android:attr/textAppearanceLarge" android:layout_width="fill_parent" android:layout_height="fill_parent" android:gravity="center|center_horizontal" android:layout_marginRight="40dp" android:layout_marginLeft="40dp" android:text="@string/profile_header"></TextView>
     </RelativeLayout>
     <LinearLayout
@@ -12,7 +12,7 @@
         android:layout_alignParentLeft="true"
         android:layout_marginTop="40dp" android:paddingLeft="10dp" android:paddingRight="10dp">
         <LinearLayout android:layout_height="wrap_content" android:id="@+id/linearLayout1" android:layout_width="fill_parent" >
-            <ImageView android:src="@drawable/default_contact" android:id="@+id/imageView1" android:layout_width="110dp" android:layout_height="150dp"></ImageView>
+            <ImageView android:src="@drawable/default_contact" android:layout_width="110dp" android:layout_height="150dp" android:id="@+id/profile_person_image"></ImageView>
             <LinearLayout android:orientation="vertical" android:layout_width="wrap_content" android:id="@+id/linearLayout2" android:layout_height="fill_parent" android:gravity="center_vertical">
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/textView3" android:text="TextView" android:textAppearance="?android:attr/textAppearanceLarge" android:lines="2" android:layout_marginLeft="10dp" android:gravity="center|left"></TextView>
             </LinearLayout>
