@@ -138,19 +138,21 @@ public class User {
 	public static synchronized void calculateRoles(GPerson person) {
 		GOrgGeneric[] org_roles = person.getOrganizational_roles();
 		validRoles.clear();
-		for( int i=0; i < org_roles.length; i++ ) {
-			HashMap<String, String> map = new HashMap<String,String>();
-			if (org_roles[i].getRole().equalsIgnoreCase("leader") || org_roles[i].getRole().equalsIgnoreCase("admin")) {
-				map.put("role", org_roles[i].getRole());
-				map.put("org_id", String.valueOf(org_roles[i].getOrg_id()));
-				map.put("primary", org_roles[i].getPrimary());
-				map.put("name", org_roles[i].getName());
-				if (org_roles[i].getPrimary().equalsIgnoreCase("true")) {
-					primaryOrgID = String.valueOf(org_roles[i].getOrg_id());
+		try {
+			for( int i=0; i < org_roles.length; i++ ) {
+				HashMap<String, String> map = new HashMap<String,String>();
+				if (org_roles[i].getRole().equalsIgnoreCase("leader") || org_roles[i].getRole().equalsIgnoreCase("admin")) {
+					map.put("role", org_roles[i].getRole());
+					map.put("org_id", String.valueOf(org_roles[i].getOrg_id()));
+					map.put("primary", org_roles[i].getPrimary());
+					map.put("name", org_roles[i].getName());
+					if (org_roles[i].getPrimary().equalsIgnoreCase("true")) {
+						primaryOrgID = String.valueOf(org_roles[i].getOrg_id());
+					}
+					validRoles.put(org_roles[i].getOrg_id(), map);
 				}
-				validRoles.put(org_roles[i].getOrg_id(), map);
 			}
-		}
+		} catch (Exception e) { Log.e(TAG, "Calculate Roles Failed", e); }
 		if (!validRoles.isEmpty() && primaryOrgID == null) {
 			Iterator<Integer> itr = validRoles.keySet().iterator();
 			while (itr.hasNext()) {
@@ -161,13 +163,14 @@ public class User {
 	}
 	
 	public static synchronized void calculateCurrentRole() {
-		GOrgGeneric[] org_roles = contact.getPerson().getOrganizational_roles();
-		for(GOrgGeneric o : org_roles) {
-			if (o.getOrg_id() == Integer.parseInt(getOrgID())) {
-				setCurrentRole(o.getRole());
+		try {
+			GOrgGeneric[] org_roles = contact.getPerson().getOrganizational_roles();
+			for(GOrgGeneric o : org_roles) {
+				if (o.getOrg_id() == Integer.parseInt(getOrgID())) {
+					setCurrentRole(o.getRole());
+				}
 			}
-		}
-		//TODO: make it such that the current role will be set off the orgID preference, if not set then set it off the primaryOrgID
+		} catch (Exception e) { Log.e(TAG, "Calculate Current Role Failed", e); }
 	}
 	
 	public static synchronized void setOrgIDPreference(String s, Activity a) {
