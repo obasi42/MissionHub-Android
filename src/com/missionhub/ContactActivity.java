@@ -1078,6 +1078,7 @@ public class ContactActivity extends Activity {
 		if (this.tab != tab || force) {
 			switch (tab) {
 			case TAB_CONTACT:
+				bottom_button_left.setChecked(true); // First State
 				header.addView(contactPost);
 				contactListView.setOnItemClickListener(null);
 				txtTitle.setText(R.string.contact_contact);
