@@ -576,7 +576,7 @@ public class ContactActivity extends Activity {
 				}
 			});
 			ad.show();
-			MHError.onFlurryError(e);
+			MHError.onFlurryError(e, "Contact.contactResponseHandler");
 		}
 
 		@Override
@@ -618,7 +618,7 @@ public class ContactActivity extends Activity {
 				}
 			});
 			ad.show();
-			MHError.onFlurryError(e);
+			MHError.onFlurryError(e, "Contact.commentResponseHandler");
 		}
 
 		@Override
@@ -710,7 +710,7 @@ public class ContactActivity extends Activity {
 				}
 			});
 			ad.show();
-			MHError.onFlurryError(e);
+			MHError.onFlurryError(e, "Contact.AssignmentHandler");
 		}
 
 		@Override
@@ -937,7 +937,7 @@ public class ContactActivity extends Activity {
 				}
 			});
 			ad.show();
-			MHError.onFlurryError(e);
+			MHError.onFlurryError(e, "Contact.SaveResponseHandler");
 		}
 
 		@Override
@@ -1015,7 +1015,7 @@ public class ContactActivity extends Activity {
 				}
 			});
 			ad.show();
-			MHError.onFlurryError(e);
+			MHError.onFlurryError(e, "Contact.DeleteCommentHandler");
 		}
 
 		@Override

@@ -319,7 +319,7 @@ public class ContactsActivity extends Activity {
 					}
 				});
 				ad.show();
-				MHError.onFlurryError(e);
+				MHError.onFlurryError(e, "Contacts.getMore");
 			}
 
 			@Override

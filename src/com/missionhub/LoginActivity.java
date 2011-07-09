@@ -251,7 +251,7 @@ public class LoginActivity extends Activity {
 					}
 				});
 				ad.show();
-				MHError.onFlurryError(e);
+				MHError.onFlurryError(e, "Login.getTokenFromCode");
 			}
 
 			@Override

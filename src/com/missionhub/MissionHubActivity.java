@@ -253,7 +253,7 @@ public class MissionHubActivity extends Activity {
 						}
 					});
 					ad.show();
-					MHError.onFlurryError(e);
+					MHError.onFlurryError(e, "Main.checkToken");
 				}
 				@Override
 				public void onFinish() {

@@ -25,15 +25,29 @@ public class MHError extends Exception{
 		return code;
 	}
 	
-	public static void onFlurryError(Throwable e) {
+	public static void onFlurryError(Throwable e, String title) {
 		try {
 			if (e == null) return;
 			
+			String userId = "";
+			try {
+				userId = String.valueOf(User.getContact().getPerson().getId());
+			} catch (Exception e2) {}
+			
+			
 			if (e instanceof MHError) {
-				FlurryAgent.onError(((MHError) e).getCode(), e.getMessage(), e.getClass().getName());
+				if (userId != null && !userId.equals("")) {
+					FlurryAgent.onError(((MHError) e).getCode(), e.getMessage() + " || UserID: " + userId, e.getClass().getName());
+				} else {
+					FlurryAgent.onError(((MHError) e).getCode(), e.getMessage(), e.getClass().getName());
+				}
 			} else {
 				if (e.getMessage() != null) {
-					FlurryAgent.onError("UNKNOWN", e.getMessage(), e.getClass().getName());
+					if (userId != null && !userId.equals("")) {
+						FlurryAgent.onError(title, e.getMessage() + " || UserID: " + userId, e.getClass().getName());
+					} else {
+						FlurryAgent.onError(title, e.getMessage(), e.getClass().getName());
+					}
 				}
 			}
 		} catch (Exception e2) {}
