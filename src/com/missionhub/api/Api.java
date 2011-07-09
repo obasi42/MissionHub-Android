@@ -202,8 +202,6 @@ public class Api {
 		
 		while (iterator.hasNext()) {
 			String key = iterator.next();
-			Log.i("SFA", key);
-			System.out.println("Error " + key + " means " + options.get(key));
 			if (key.equalsIgnoreCase("limit")) {
 				params.put("limit", options.get(key));
 				continue;

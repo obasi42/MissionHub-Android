@@ -289,6 +289,7 @@ public class ContactActivity extends Activity {
 	private ArrayList<String> processes = new ArrayList<String>();
 
 	private void showProgress(String process) {
+		Log.i("PROCESS", "ADD PROCRESS: " + process);
 		processes.add(process);
 		if (refreshMenuItem != null) 
 			refreshMenuItem.setEnabled(false);
@@ -296,6 +297,7 @@ public class ContactActivity extends Activity {
 	}
 
 	private void hideProgress(String process) {
+		Log.i("PROCESS", "REM PROCRESS: " + process);
 		processes.remove(process);
 		if (processes.size() <= 0) {
 			if (refreshMenuItem != null) 
