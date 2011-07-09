@@ -5,6 +5,9 @@ import java.util.Iterator;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
+
+import com.flurry.android.Constants;
+import com.flurry.android.FlurryAgent;
 import com.google.gson.Gson;
 
 import android.os.Bundle;
@@ -194,5 +197,22 @@ public class User {
 		validRoles.clear();
 		primaryOrgID = null;
 		currentRole = null;
+	}
+	
+	public static void setFlurryUser() {
+		try {
+			FlurryAgent.setUserId(String.valueOf(User.getContact().getPerson().getId()));
+		} catch (Exception e) {
+			try {
+				FlurryAgent.setUserId(null);
+			} catch (Exception e2) {}
+		};
+		try {
+			if (User.getContact().getPerson().getGender().equals("male")) {
+				FlurryAgent.setGender(Constants.MALE);
+			} else if (User.getContact().getPerson().getGender().equals("female")) {
+				FlurryAgent.setGender(Constants.FEMALE);
+			}
+		} catch (Exception e) {}
 	}
 }

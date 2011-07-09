@@ -1,5 +1,7 @@
 package com.missionhub.api;
 
+import com.flurry.android.FlurryAgent;
+
 public class MHError extends Exception{
 	private static final long serialVersionUID = 1L;
 	
@@ -21,5 +23,19 @@ public class MHError extends Exception{
 	
 	public String getCode() {
 		return code;
+	}
+	
+	public static void onFlurryError(Throwable e) {
+		try {
+			if (e == null) return;
+			
+			if (e instanceof MHError) {
+				FlurryAgent.onError(((MHError) e).getCode(), e.getMessage(), e.getClass().getName());
+			} else {
+				if (e.getMessage() != null) {
+					FlurryAgent.onError("UNKNOWN", e.getMessage(), e.getClass().getName());
+				}
+			}
+		} catch (Exception e2) {}
 	}
 }

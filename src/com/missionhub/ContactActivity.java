@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.TimeZone;
 
+import com.flurry.android.FlurryAgent;
 import com.google.gson.Gson;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.missionhub.api.Api;
@@ -214,6 +215,14 @@ public class ContactActivity extends Activity {
 
 		setTab(TAB_CONTACT, true);
 		Guide.display(this, Guide.CONTACT);
+		
+		try {
+			User.setFlurryUser();
+			FlurryAgent.onPageView();
+			HashMap<String, String> params = new HashMap<String, String>();
+			params.put("page", "Contact");
+			FlurryAgent.onEvent("PageView", params);
+		} catch (Exception e) {}
 	}
 
 	@Override
@@ -244,6 +253,9 @@ public class ContactActivity extends Activity {
 		// Handle item selection
 		switch (item.getItemId()) {
 		case R.id.contact_menu_refresh:
+			try {
+				FlurryAgent.onEvent("Contact.Refresh");
+			} catch (Exception e) {}
 			update(true);
 			return true;
 		default:
@@ -284,6 +296,20 @@ public class ContactActivity extends Activity {
 		super.onResume();
 		update(true);
 		updateHeader();
+	}
+	
+	@Override
+	public void onStart() {
+	   super.onStart();
+	   User.setFlurryUser();
+	   FlurryAgent.onStartSession(this, Config.flurryKey);
+	}
+	
+	@Override
+	public void onStop() {
+	   super.onStop();
+	   User.setFlurryUser();
+	   FlurryAgent.onEndSession(this);
 	}
 	
 	private ArrayList<String> processes = new ArrayList<String>();
@@ -550,6 +576,7 @@ public class ContactActivity extends Activity {
 				}
 			});
 			ad.show();
+			MHError.onFlurryError(e);
 		}
 
 		@Override
@@ -591,6 +618,7 @@ public class ContactActivity extends Activity {
 				}
 			});
 			ad.show();
+			MHError.onFlurryError(e);
 		}
 
 		@Override
@@ -659,6 +687,15 @@ public class ContactActivity extends Activity {
 					assignmentStatus = ASSIGNMENT_NONE;
 				}
 				updatePerson(false);
+				try {
+					HashMap<String, String> params = new HashMap<String, String>();
+					if (type == ASSIGNMENT_ME) {
+						params.put("assignment", "Me");
+					} else if (type == ASSIGNMENT_NONE) {
+						params.put("assignment", "None");
+					}
+					FlurryAgent.onEvent("Contact.Assign", params);
+				} catch (Exception e) {}
 			}
 		}
 
@@ -673,6 +710,7 @@ public class ContactActivity extends Activity {
 				}
 			});
 			ad.show();
+			MHError.onFlurryError(e);
 		}
 
 		@Override
@@ -703,6 +741,11 @@ public class ContactActivity extends Activity {
 			Intent intent = new Intent(Intent.ACTION_CALL);
 			intent.setData(Uri.parse("tel:" + phoneNumber));
 			startActivity(intent);
+			try {
+				HashMap<String, String> params = new HashMap<String, String>();
+				params.put("method", "Phone");
+				FlurryAgent.onEvent("Contact.MakeContact", params);
+			} catch (Exception e) {}
 		} catch (Exception e) {
 			Toast.makeText(this, R.string.contact_cant_call, Toast.LENGTH_LONG).show();
 		}
@@ -714,6 +757,11 @@ public class ContactActivity extends Activity {
 			intent.putExtra("address", phoneNumber);
 			intent.setType("vnd.android-dir/mms-sms");
 			startActivity(intent);
+			try {
+				HashMap<String, String> params = new HashMap<String, String>();
+				params.put("method", "SMS");
+				FlurryAgent.onEvent("Contact.MakeContact", params);
+			} catch (Exception e) {}
 		} catch (Exception e) {
 			Toast.makeText(this, R.string.contact_cant_sms, Toast.LENGTH_LONG).show();
 		}
@@ -725,6 +773,11 @@ public class ContactActivity extends Activity {
 			emailIntent.setType("plain/text");
 			emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[] { emailAddress });
 			startActivity(Intent.createChooser(emailIntent, getString(R.string.contact_send_email)));
+			try {
+				HashMap<String, String> params = new HashMap<String, String>();
+				params.put("method", "Email");
+				FlurryAgent.onEvent("Contact.MakeContact", params);
+			} catch (Exception e) {}
 		} catch (Exception e) {
 			Toast.makeText(this, R.string.contact_cant_email, Toast.LENGTH_LONG).show();
 		}
@@ -768,11 +821,21 @@ public class ContactActivity extends Activity {
 		        		   intent.setClassName("com.facebook.katana", "com.facebook.katana.ProfileTabHostActivity");
 		        		   intent.putExtra("extra_user_id", Long.parseLong(new_uid));
 		        		   startActivity(intent);
+		        		   try {
+			       				HashMap<String, String> params = new HashMap<String, String>();
+			       				params.put("method", "App");
+			       				FlurryAgent.onEvent("Contact.OpenFacebook", params);
+			       			} catch (Exception e) {}
 		        	   } catch(Exception e) {
 		        		   try {
 				       			Intent i = new Intent(Intent.ACTION_VIEW);
 				       			i.setData(Uri.parse("http://www.facebook.com/profile.php?id=" + new_uid));
 				       			startActivity(i);
+				       			try {
+				       				HashMap<String, String> params = new HashMap<String, String>();
+				       				params.put("method", "Browser");
+				       				FlurryAgent.onEvent("Contact.OpenFacebook", params);
+				       			} catch (Exception e2) {}
 				       		} catch(Exception f) {
 				       			Toast.makeText(ContactActivity.this, R.string.contact_cant_open_profile, Toast.LENGTH_LONG).show();
 				       		}
@@ -857,6 +920,9 @@ public class ContactActivity extends Activity {
 				}
 				contact.getPerson().setStatus(status);
 				updateComments(true);
+				try {
+       				FlurryAgent.onEvent("Contact.Comment.Save");
+       			} catch (Exception e) {}
 			}
 		}
 
@@ -871,6 +937,7 @@ public class ContactActivity extends Activity {
 				}
 			});
 			ad.show();
+			MHError.onFlurryError(e);
 		}
 
 		@Override
@@ -931,6 +998,9 @@ public class ContactActivity extends Activity {
 				onFailure(new MHError(error));
 			} catch (Exception out) {
 				updateComments(true);
+				try {
+					FlurryAgent.onEvent("Contact.Comment.Delete");
+				} catch (Exception e) {}
 			}
 		}
 
@@ -945,6 +1015,7 @@ public class ContactActivity extends Activity {
 				}
 			});
 			ad.show();
+			MHError.onFlurryError(e);
 		}
 
 		@Override
@@ -1016,6 +1087,11 @@ public class ContactActivity extends Activity {
 					contactListView.setAdapter(commentAdapter);
 				}
 				contactListView.setOnItemLongClickListener(commentLongClickListener);
+				try {
+					HashMap<String, String> params = new HashMap<String, String>();
+					params.put("tab", "Contact");
+					FlurryAgent.onEvent("Contact.ChangeTab", params);
+				} catch (Exception e) {}
 				break;
 			case TAB_MORE_INFO:
 				header.removeView(contactPost);
@@ -1023,6 +1099,11 @@ public class ContactActivity extends Activity {
 				contactListView.setAdapter(infoAdapter);
 				contactListView.setOnItemLongClickListener(null);
 				contactListView.setOnItemClickListener(infoClickListener);
+				try {
+					HashMap<String, String> params = new HashMap<String, String>();
+					params.put("tab", "More Info");
+					FlurryAgent.onEvent("Contact.ChangeTab", params);
+				} catch (Exception e) {}
 				break;
 			case TAB_SURVEYS:
 				header.removeView(contactPost);
@@ -1030,6 +1111,11 @@ public class ContactActivity extends Activity {
 				contactListView.setAdapter(keywordAdapter);
 				contactListView.setOnItemLongClickListener(null);
 				contactListView.setOnItemClickListener(null);
+				try {
+					HashMap<String, String> params = new HashMap<String, String>();
+					params.put("tab", "Surveys");
+					FlurryAgent.onEvent("Contact.ChangeTab", params);
+				} catch (Exception e) {}
 				break;
 			}
 			this.tab = tab;

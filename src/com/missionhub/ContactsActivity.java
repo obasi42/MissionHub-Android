@@ -3,6 +3,7 @@ package com.missionhub;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.flurry.android.FlurryAgent;
 import com.google.gson.Gson;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.missionhub.api.Api;
@@ -91,6 +92,13 @@ public class ContactsActivity extends Activity {
 		}
 
 		setTab(TAB_MY, true);
+		User.setFlurryUser();
+		try {
+			FlurryAgent.onPageView();
+			HashMap<String, String> params = new HashMap<String, String>();
+			params.put("page", "Contacts");
+			FlurryAgent.onEvent("PageView", params);
+		} catch (Exception e) {}
 	}
 
 	@Override
@@ -105,6 +113,9 @@ public class ContactsActivity extends Activity {
 		// Handle item selection
 		switch (item.getItemId()) {
 		case R.id.contacts_refresh:
+			try {
+				FlurryAgent.onEvent("Contacts.Refresh");
+			} catch (Exception e) {}
 			resetListView(false);
 			getMore();
 			return true;
@@ -121,6 +132,20 @@ public class ContactsActivity extends Activity {
 	@Override
 	public void onRestoreInstanceState(Bundle b) {
 		User.setFromBundle(b, this);
+	}
+	
+	@Override
+	public void onStart() {
+	   super.onStart();
+	   User.setFlurryUser();
+	   FlurryAgent.onStartSession(this, Config.flurryKey);
+	}
+	
+	@Override
+	public void onStop() {
+	   super.onStop();
+	   User.setFlurryUser();
+	   FlurryAgent.onEndSession(this);
 	}
 	
 	private ArrayList<String> processes = new ArrayList<String>();
@@ -162,12 +187,18 @@ public class ContactsActivity extends Activity {
 		if (this.tab != tab || force) {
 			switch (tab) {
 			case TAB_MY:
+				bottom_button_left.setChecked(true); // First State
 				txtTitle.setText(R.string.contacts_my_contacts);
 				txtNoData.setText(R.string.contacts_no_data_my_contacts);
 				options.put("filters", "status");
 				options.put("values", "not_finished");
 				options.put("assigned_to_id", String.valueOf(User.getContact().getPerson().getId()));
 				Guide.display(this, Guide.CONTACTS_MY_CONTACTS);
+				try {
+					HashMap<String, String> params = new HashMap<String, String>();
+					params.put("tab", "My");
+					FlurryAgent.onEvent("Contacts.ChangeTab", params);
+				} catch (Exception e) {}
 				break;
 			case TAB_COMPLETED:
 				txtTitle.setText(R.string.contacts_my_completed);
@@ -175,6 +206,11 @@ public class ContactsActivity extends Activity {
 				options.put("filters", "status");
 				options.put("values", "finished");
 				options.put("assigned_to_id", String.valueOf(User.getContact().getPerson().getId()));
+				try {
+					HashMap<String, String> params = new HashMap<String, String>();
+					params.put("tab", "My Completed");
+					FlurryAgent.onEvent("Contacts.ChangeTab", params);
+				} catch (Exception e) {}
 				break;
 			case TAB_UNASSIGNED:
 				txtTitle.setText(R.string.contacts_unassigned);
@@ -183,6 +219,11 @@ public class ContactsActivity extends Activity {
 				options.remove("values");
 				options.put("assigned_to_id", "none");
 				Guide.display(this, Guide.CONTACTS_UNASSIGNED);
+				try {
+					HashMap<String, String> params = new HashMap<String, String>();
+					params.put("tab", "Unassigned");
+					FlurryAgent.onEvent("Contacts.ChangeTab", params);
+				} catch (Exception e) {}
 				break;
 			}
 			this.tab = tab;
@@ -278,6 +319,7 @@ public class ContactsActivity extends Activity {
 					}
 				});
 				ad.show();
+				MHError.onFlurryError(e);
 			}
 
 			@Override

@@ -1,5 +1,7 @@
 package com.missionhub;
 
+import java.util.HashMap;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -18,6 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.flurry.android.FlurryAgent;
 import com.google.gson.Gson;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.missionhub.api.Api;
@@ -61,6 +64,13 @@ public class MissionHubActivity extends Activity {
 		if (!checkToken()) {
 			refreshView();
 		}
+		
+		try {
+			FlurryAgent.onPageView();
+			HashMap<String, String> params = new HashMap<String, String>();
+			params.put("page", "Main");
+			FlurryAgent.onEvent("PageView", params);
+		} catch (Exception e) {}
 	}
 	
 	@Override
@@ -89,6 +99,20 @@ public class MissionHubActivity extends Activity {
 		super.onResume();
 		refreshView();
 	}
+	
+	@Override
+	public void onStart() {
+	   super.onStart();
+	   User.setFlurryUser();
+	   FlurryAgent.onStartSession(this, Config.flurryKey);
+	}
+	
+	@Override
+	public void onStop() {
+	   super.onStop();
+	   User.setFlurryUser();
+	   FlurryAgent.onEndSession(this);
+	}
 
 	public void clickAbout(View view) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -97,6 +121,9 @@ public class MissionHubActivity extends Activity {
 				.setMessage(R.string.alert_learn_more_msg)
 				.setPositiveButton(R.string.alert_ok, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
+						try {
+							FlurryAgent.onEvent("Main.AboutLink");
+						} catch (Exception e) {}
 						Uri uri = Uri.parse("http://missionhub.com?mobile=0");
 						startActivity(new Intent(Intent.ACTION_VIEW, uri));
 					}
@@ -131,6 +158,10 @@ public class MissionHubActivity extends Activity {
 		editor.remove("token");
 		editor.remove("orgID");
 		editor.commit();
+		try {
+			FlurryAgent.onEvent("Main.Logout");
+			User.setFlurryUser();
+		} catch (Exception e) {}
 		refreshView();
 	}
 	
@@ -164,6 +195,7 @@ public class MissionHubActivity extends Activity {
 			loggedOut.setVisibility(View.VISIBLE);
 			logoutBar.setVisibility(View.GONE);
 		}
+		User.setFlurryUser();
 	}
 	
 	/**
@@ -221,6 +253,7 @@ public class MissionHubActivity extends Activity {
 						}
 					});
 					ad.show();
+					MHError.onFlurryError(e);
 				}
 				@Override
 				public void onFinish() {

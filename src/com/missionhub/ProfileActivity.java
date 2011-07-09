@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import com.flurry.android.FlurryAgent;
 import com.missionhub.api.GPerson;
 import com.missionhub.api.User;
 import com.missionhub.ui.ImageManager;
@@ -70,13 +71,30 @@ public class ProfileActivity extends Activity {
 			imageManager.displayImage(person.getPicture() + "?type=large", ProfileActivity.this, contactPicture, defaultImage);
 		}
 		clicks = 0;
+		
+		User.setFlurryUser();
+		try {
+			FlurryAgent.onPageView();
+			HashMap<String, String> params = new HashMap<String, String>();
+			params.put("page", "Profile");
+			FlurryAgent.onEvent("PageView", params);
+		} catch (Exception e) {}
 	}
 	
 	@Override
 	public void onStart() {
 		super.onStart();
+		User.setFlurryUser();
+		FlurryAgent.onStartSession(this, Config.flurryKey);
 		spinner.setSelection(currentSpinnerIndex);
 		spinner.setOnItemSelectedListener(new MyOnItemSelectedListener());
+	}
+	
+	@Override
+	public void onStop() {
+	   super.onStop();
+	   User.setFlurryUser();
+	   FlurryAgent.onEndSession(this);
 	}
 	
 	public class MyOnItemSelectedListener implements OnItemSelectedListener {
@@ -84,6 +102,11 @@ public class ProfileActivity extends Activity {
 	    public void onItemSelected(AdapterView<?> parent,
 	        View view, int pos, long id) {
 	    	if (!spinnerOrgIds.get(pos).equalsIgnoreCase(User.getOrgID())) {
+	    		try {
+	    			HashMap<String, String> params = new HashMap<String, String>();
+	    			params.put("orgID", spinnerOrgIds.get(pos));
+	    			FlurryAgent.onEvent("Profile.ChangeOrg", params);
+	    		} catch (Exception e) {}
 	  	      Toast.makeText(parent.getContext(), "Your current organization is now " +
 	  		          parent.getItemAtPosition(pos).toString(), Toast.LENGTH_LONG).show();
 	    	}

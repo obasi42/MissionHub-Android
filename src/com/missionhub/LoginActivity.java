@@ -1,5 +1,8 @@
 package com.missionhub;
 
+import java.util.HashMap;
+
+import com.flurry.android.FlurryAgent;
 import com.google.gson.Gson;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -71,6 +74,13 @@ public class LoginActivity extends Activity {
 		mWebView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
 		mWebView.setWebViewClient(new InternalWebViewClient());
 		mWebView.loadUrl(wvUrl);
+		
+		try {
+			FlurryAgent.onPageView();
+			HashMap<String, String> params = new HashMap<String, String>();
+			params.put("page", "Login");
+			FlurryAgent.onEvent("PageView", params);
+		} catch (Exception e) {}
 	}
 
 	private void clearCookies() {
@@ -88,6 +98,18 @@ public class LoginActivity extends Activity {
 		clearCookies();
 		super.finish();
 		overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+	}
+	
+	@Override
+	public void onStart() {
+	   super.onStart();
+	   FlurryAgent.onStartSession(this, Config.flurryKey);
+	}
+	
+	@Override
+	public void onStop() {
+	   super.onStop();
+	   FlurryAgent.onEndSession(this);
 	}
 
 	private void returnWithToken() {
@@ -229,6 +251,7 @@ public class LoginActivity extends Activity {
 					}
 				});
 				ad.show();
+				MHError.onFlurryError(e);
 			}
 
 			@Override
