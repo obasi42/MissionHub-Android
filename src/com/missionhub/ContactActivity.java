@@ -1030,13 +1030,16 @@ public class ContactActivity extends Activity {
 			if (comment == null) return false;
 			
 			boolean canDelete = false;
-			if (User.getCurrentRole() == "admin") {
+			if (User.getCurrentRole().equals("admin")) {
 				canDelete = true;
-			} else if (User.getCurrentRole() == "leader") {
+			} else if (User.getCurrentRole().equals("leader")) {
 				if (comment.getComment().getCommenter().getId() == User.getContact().getPerson().getId()) {
 					canDelete = true;
 				}
 			}
+			
+			Log.e(TAG, "Role:" + User.getCurrentRole());
+			Log.e(TAG, "Comment: " + comment.getComment().getCommenter().getId() + "   User: " + User.getContact().getPerson().getId());
 			
 			if (canDelete) {
 				final CharSequence[] items = { getString(R.string.comment_delete) };
