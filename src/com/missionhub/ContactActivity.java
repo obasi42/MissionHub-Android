@@ -1055,6 +1055,8 @@ public class ContactActivity extends Activity {
 				});
 				AlertDialog alert = builder.create();
 				alert.show();
+			} else {
+				Toast.makeText(ContactActivity.this, R.string.contact_no_permissions, Toast.LENGTH_SHORT).show();
 			}
 			return false;
 		}
