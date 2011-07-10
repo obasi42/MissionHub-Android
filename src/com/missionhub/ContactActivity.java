@@ -1029,19 +1029,30 @@ public class ContactActivity extends Activity {
 			final GFollowupComment comment = (GFollowupComment) parent.getAdapter().getItem(position);
 			if (comment == null) return false;
 			
-			final CharSequence[] items = { getString(R.string.comment_delete) };
-			AlertDialog.Builder builder = new AlertDialog.Builder(ContactActivity.this);
-			builder.setIcon(R.drawable.ic_menu_start_conversation);
-			builder.setTitle(R.string.comment_actions);
-			builder.setItems(items, new DialogInterface.OnClickListener() {
-			    public void onClick(DialogInterface dialog, int item) {
-			    	if (item == 0) {
-			    		deleteComment(comment.getComment().getId(), false);
-			    	}
-			    }
-			});
-			AlertDialog alert = builder.create();
-			alert.show();
+			boolean canDelete = false;
+			if (User.getCurrentRole() == "admin") {
+				canDelete = true;
+			} else if (User.getCurrentRole() == "leader") {
+				if (comment.getComment().getCommenter().getId() == User.getContact().getPerson().getId()) {
+					canDelete = true;
+				}
+			}
+			
+			if (canDelete) {
+				final CharSequence[] items = { getString(R.string.comment_delete) };
+				AlertDialog.Builder builder = new AlertDialog.Builder(ContactActivity.this);
+				builder.setIcon(R.drawable.ic_menu_start_conversation);
+				builder.setTitle(R.string.comment_actions);
+				builder.setItems(items, new DialogInterface.OnClickListener() {
+				    public void onClick(DialogInterface dialog, int item) {
+				    	if (item == 0) {
+				    		deleteComment(comment.getComment().getId(), false);
+				    	}
+				    }
+				});
+				AlertDialog alert = builder.create();
+				alert.show();
+			}
 			return false;
 		}
 	};
