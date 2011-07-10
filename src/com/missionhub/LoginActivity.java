@@ -204,8 +204,8 @@ public class LoginActivity extends Activity {
 		params.put("scope", Config.oauthScope);
 		params.put("redirect_uri", Config.oauthUrl + "/done.json");
 		params.put("platform", "android");
-		params.put("product", Build.PRODUCT);
-		params.put("release", android.os.Build.VERSION.RELEASE);
+		params.put("platform_product", Build.PRODUCT);
+		params.put("platform_release", android.os.Build.VERSION.RELEASE);
 		try {
 			params.put("app", String.valueOf(getPackageManager().getPackageInfo(getPackageName(), 0).versionCode));
 		} catch (NameNotFoundException e) {}

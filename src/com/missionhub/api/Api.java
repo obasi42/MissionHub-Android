@@ -244,8 +244,8 @@ public class Api {
 	private static void get(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
 		try {
 			params.put("platform", "android");
-			params.put("product", Build.PRODUCT);
-			params.put("release", android.os.Build.VERSION.RELEASE);
+			params.put("platform_product", Build.PRODUCT);
+			params.put("platform_release", android.os.Build.VERSION.RELEASE);
 			params.put("app", User.getAppVersion());
 		} catch (Exception e) {}
 		Log.i(TAG, "Starting get at url:" + url);
