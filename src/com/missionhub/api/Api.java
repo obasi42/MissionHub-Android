@@ -7,6 +7,7 @@ import java.util.Iterator;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import android.os.Build;
 import android.util.Log;
 import com.loopj.android.http.*;
 import com.missionhub.Config;
@@ -241,12 +242,24 @@ public class Api {
 	private static AsyncHttpClient client = new AsyncHttpClient();
 
 	private static void get(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
+		try {
+			params.put("platform", "android");
+			params.put("product", Build.PRODUCT);
+			params.put("release", android.os.Build.VERSION.RELEASE);
+			params.put("app", User.getAppVersion());
+		} catch (Exception e) {}
 		Log.i(TAG, "Starting get at url:" + url);
 		Log.i(TAG, "with params:" + params.toString());
 	    client.get(url, params, responseHandler);
 	}
 	
 	private static void post(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
+		try {
+			params.put("platform", "android");
+			params.put("platform_product", Build.PRODUCT);
+			params.put("platform_release", android.os.Build.VERSION.RELEASE);
+			params.put("app", User.getAppVersion());
+		} catch (Exception e) {}
 		Log.i(TAG, "starting post at url:" + url);
 		Log.i(TAG, "with params:" + params.toString());
       client.post(url, params, responseHandler);

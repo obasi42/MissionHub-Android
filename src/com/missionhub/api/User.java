@@ -15,6 +15,7 @@ import android.util.Log;
 
 public class User {
 	
+	private static String appVersion;
 	private static String token;
 	private static boolean loggedIn = false;
 	private static String orgID;
@@ -39,6 +40,9 @@ public class User {
 		Log.i(TAG, "Saving User To Bundle");
 		
 		try {
+			b.putString("_appVersion", appVersion);
+		} catch (Exception e) {Log.e(TAG, "app version save failed", e); };
+		try {
 			b.putString("_token", token);
 		} catch (Exception e) {Log.e(TAG, "token save failed", e); };
 		try {
@@ -61,6 +65,9 @@ public class User {
 		Log.i(TAG, "Restoring User From Bundle");
 		
 		try {
+			appVersion = b.getString("_appVersion");
+		} catch (Exception e) {Log.e(TAG, "token restore failed", e); };
+		try {
 			setToken(b.getString("_token"));
 		} catch (Exception e) {Log.e(TAG, "token restore failed", e); };
 		try {
@@ -75,6 +82,14 @@ public class User {
 		} catch (Exception e) {Log.e(TAG, "currentRole restore failed", e); };
 		
 		setOrgID(getOrgIDPreference(a));
+	}
+	
+	public static synchronized void setAppVersion(String version) {
+		appVersion = version;
+	}
+	
+	public static synchronized String getAppVersion() {
+		return appVersion;
 	}
 	
 	public static synchronized String getOrgID() {

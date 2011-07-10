@@ -7,7 +7,6 @@ import com.google.gson.Gson;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
-import com.missionhub.api.GContact;
 import com.missionhub.api.GError;
 import com.missionhub.api.GLoginDone;
 import com.missionhub.api.MHError;
@@ -21,8 +20,10 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -202,6 +203,12 @@ public class LoginActivity extends Activity {
 		params.put("grant_type", "authorization_code");
 		params.put("scope", Config.oauthScope);
 		params.put("redirect_uri", Config.oauthUrl + "/done.json");
+		params.put("platform", "android");
+		params.put("product", Build.PRODUCT);
+		params.put("release", android.os.Build.VERSION.RELEASE);
+		try {
+			params.put("app", String.valueOf(getPackageManager().getPackageInfo(getPackageName(), 0).versionCode));
+		} catch (NameNotFoundException e) {}
 
 		client.post(Config.oauthUrl + "/access_token", params, new AsyncHttpResponseHandler() {
 			@Override
@@ -220,10 +227,6 @@ public class LoginActivity extends Activity {
 					try {
 						GLoginDone loginDone = gson.fromJson(response, GLoginDone.class);
 						User.setToken(loginDone.getAccess_token());
-						GContact contact = new GContact();
-						contact.setPerson(loginDone.getPerson());
-						User.setContact(contact);
-						User.setLoggedIn(true);
 						SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 						SharedPreferences.Editor editor = settings.edit();
 						editor.putString("token", loginDone.getAccess_token());

@@ -8,6 +8,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -48,11 +49,15 @@ public class MissionHubActivity extends Activity {
 	public final int PROFILE_ACTIVITY = 1;
 	public static final String PREFS_NAME = "MissionHubPrivate";
 	
+	public static String APP_VERSION;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		
+		try {
+			User.setAppVersion(String.valueOf(getPackageManager().getPackageInfo(getPackageName(), 0).versionCode));
+		} catch (NameNotFoundException e) {}
 		User.setFromBundle(savedInstanceState, this);
 		
 		logo = (ImageView) findViewById(R.id.img_logo);
@@ -87,7 +92,7 @@ public class MissionHubActivity extends Activity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == LOGIN_WINDOW_ACTIVITY && resultCode == RESULT_OK) {
-			refreshView();
+			checkToken();
 		}
 		if(requestCode == PROFILE_ACTIVITY && resultCode == RESULT_OK && data.hasExtra("logout")) {
 			logout();
