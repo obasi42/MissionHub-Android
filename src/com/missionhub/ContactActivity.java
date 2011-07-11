@@ -1038,9 +1038,6 @@ public class ContactActivity extends Activity {
 				}
 			}
 			
-			Log.e(TAG, "Role:" + User.getCurrentRole());
-			Log.e(TAG, "Comment: " + comment.getComment().getCommenter().getId() + "   User: " + User.getContact().getPerson().getId());
-			
 			if (canDelete) {
 				final CharSequence[] items = { getString(R.string.comment_delete) };
 				AlertDialog.Builder builder = new AlertDialog.Builder(ContactActivity.this);

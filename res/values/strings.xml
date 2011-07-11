@@ -5,6 +5,12 @@
     <string name="main_about">About</string>
     <string name="main_login">Login</string>
     <string name="main_contacts">Contacts</string>
+    <string name="main_surveys">Surveys</string>
+    
+    <string name="surveys_title">MHub Survey</string>
+    <string name="surveys_loading">Loading...</string>
+    <string name="surveys_exit">Exit Survey Mode?</string>
+    <string name="surveys_exit_msg">Clicking OK will exit survey mode.</string>
     
     <string name="contacts_my_contacts">My Contacts</string>
     <string name="contacts_my_completed">My Completed Contacts</string>

@@ -21,5 +21,6 @@
 	</LinearLayout>
 	<LinearLayout android:layout_height="wrap_content" android:id="@+id/loggedin" android:layout_width="fill_parent" android:orientation="vertical" android:layout_alignParentBottom="true" android:visibility="gone">
 		<Button style="@style/mh_button" android:layout_width="fill_parent" android:id="@+id/btn_contacts" android:text="@string/main_contacts" android:layout_height="106dp" android:onClick="clickContacts"></Button>
+		<Button style="@style/mh_button" android:layout_width="fill_parent" android:layout_height="106dp" android:id="@+id/btn_surveys" android:text="@string/main_surveys" android:onClick="clickSurveys"></Button>
 	</LinearLayout>
 </RelativeLayout>
