@@ -185,6 +185,20 @@ public class Api {
 		return true;
 	}
 	
+	public static String getSurveysUrl() {
+		String url = Config.baseUrl + "/surveys";
+		RequestParams params = new RequestParams();
+		params.put("org_id", User.getOrgID());
+		params.put("access_token", User.getToken());
+		try {
+			params.put("platform", "android");
+			params.put("platform_product", Build.PRODUCT);
+			params.put("platform_release", android.os.Build.VERSION.RELEASE);
+			params.put("app", User.getAppVersion());
+		} catch (Exception e) {}
+		return url + '?' + params.toString();
+	}
+	
 	private static String buildIds(ArrayList<Integer> ids) {
 		String listOfIds = "";
 		Iterator<Integer> itr = ids.iterator();

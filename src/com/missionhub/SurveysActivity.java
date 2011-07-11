@@ -3,6 +3,7 @@ package com.missionhub;
 import java.util.HashMap;
 
 import com.flurry.android.FlurryAgent;
+import com.missionhub.api.Api;
 import com.missionhub.api.User;
 import com.missionhub.ui.DisplayError;
 
@@ -21,6 +22,8 @@ import android.webkit.WebViewClient;
 
 public class SurveysActivity extends Activity {
 
+	public static final String TAG = SurveysActivity.class.getName();
+	
 	private WebView mWebView;
 
 	@Override
@@ -39,7 +42,7 @@ public class SurveysActivity extends Activity {
 		mWebView.getSettings().setSupportZoom(false);
 		mWebView.setWebViewClient(new InternalWebViewClient());
 		mWebView.setWebChromeClient(new InternalWebViewChrome());
-		mWebView.loadUrl("https://missionhub.com/c/cru");
+		mWebView.loadUrl(Api.getSurveysUrl());
 
 		clearCookies();
 
