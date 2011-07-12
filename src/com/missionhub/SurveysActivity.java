@@ -82,20 +82,11 @@ public class SurveysActivity extends Activity {
 	}
 
 	private class InternalWebViewChrome extends WebChromeClient {
-
-		private String title = SurveysActivity.this.getString(R.string.surveys_title);
-
-		public void onReceivedTitle(WebView view, String title) {
-			this.title = title;
-			if (mWebView.getProgress() == 100)
-				SurveysActivity.this.setTitle(title);
-		}
-
 		public void onProgressChanged(WebView view, int progress) {
 			SurveysActivity.this.setTitle(R.string.surveys_loading);
 			SurveysActivity.this.setProgress(progress * 100);
 			if (progress == 100)
-				SurveysActivity.this.setTitle(title);
+				SurveysActivity.this.setTitle(R.string.surveys_title);
 		}
 	}
 
