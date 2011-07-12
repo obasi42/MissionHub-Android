@@ -432,7 +432,7 @@ public class ContactActivity extends Activity {
 			}
 		}
 		
-		if(person.getAssignment().getPerson_assigned_to().length > 0) {
+		if(person.getAssignment() != null && person.getAssignment().getPerson_assigned_to().length > 0) {
 			info.add(new SimpleListItem(getString(R.string.contact_info_assigned_to), person.getAssignment().getPerson_assigned_to()[0].getName()));
 		}
 		
@@ -485,7 +485,7 @@ public class ContactActivity extends Activity {
 					title = education.getType();
 				}
 				
-				if(education.getSchool().getName() != null) {
+				if(education.getSchool() != null && education.getSchool().getName() != null) {
 					value += education.getSchool().getName();
 				}
 				
@@ -499,7 +499,7 @@ public class ContactActivity extends Activity {
 			}
 		}
 		
-		if(person.getLocation().getName() != null) {
+		if(person.getLocation() != null && person.getLocation().getName() != null) {
 			info.add(new SimpleListItem(getString(R.string.contact_info_location), person.getLocation().getName()));
 		}
 		
