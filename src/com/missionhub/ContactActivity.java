@@ -19,6 +19,7 @@ import com.missionhub.api.GFCTop;
 import com.missionhub.api.GFollowupComment;
 import com.missionhub.api.GIdNameProvider;
 import com.missionhub.api.GKeyword;
+import com.missionhub.api.GOrgGeneric;
 import com.missionhub.api.GPerson;
 import com.missionhub.api.GQA;
 import com.missionhub.api.GQuestion;
@@ -410,6 +411,27 @@ public class ContactActivity extends Activity {
 			info.add(new SimpleListItem(getString(R.string.contact_info_facebook_header), getString(R.string.contact_info_facebook_link), data));
 		}
 		
+		if (User.getCurrentRole().equals("admin")) {
+			HashMap<String, String> data = new HashMap<String, String>();
+			String contactRole = "contact";
+			for (GOrgGeneric role : person.getOrganizational_roles()) {
+				if (role.getOrg_id() == Integer.parseInt(User.getOrgID())) {
+					contactRole = role.getRole();
+					break;
+				}
+			}
+			data.put("role", contactRole);
+			data.put("org_id", User.getOrgID());
+			data.put("contact_id", String.valueOf(person.getId()));
+			if (contactRole.equals("contact")) {
+				info.add(new SimpleListItem(getString(R.string.contact_role), getString(R.string.contact_role_promote), data));
+			} else if (contactRole.equals("leader")) {
+				info.add(new SimpleListItem(getString(R.string.contact_role), getString(R.string.contact_role_demote), data));
+			} else if (contactRole.equals("admin")){
+				info.add(new SimpleListItem(getString(R.string.contact_role), getString(R.string.contact_role_admin)));
+			}
+		}
+		
 		if(person.getAssignment().getPerson_assigned_to().length > 0) {
 			info.add(new SimpleListItem(getString(R.string.contact_info_assigned_to), person.getAssignment().getPerson_assigned_to()[0].getName()));
 		}
@@ -786,7 +808,7 @@ public class ContactActivity extends Activity {
 	public void openURL(String url) {
 		final String new_url = url;
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setMessage(R.string.contact_open_url)
+		builder.setTitle(R.string.contact_open_url)
 		       .setCancelable(true)
 		       .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
 		           public void onClick(DialogInterface dialog, int id) {
@@ -812,7 +834,7 @@ public class ContactActivity extends Activity {
 	public void openFacebookProfile(String uid) {
 		final String new_uid = uid;
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setMessage(R.string.contact_open_profile)
+		builder.setTitle(R.string.contact_open_profile)
 		       .setCancelable(true)
 		       .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
 		           public void onClick(DialogInterface dialog, int id) {
@@ -1059,11 +1081,90 @@ public class ContactActivity extends Activity {
 		}
 	};
 	
+	private class ChangeRoleHandler extends AsyncHttpResponseHandler {
+		
+		String role;
+		int contactId;
+		
+		public ChangeRoleHandler(String role, int id) {
+			this.role = role;
+			this.contactId = id;
+		}
+		
+		@Override
+		public void onStart() {
+			showProgress("change_role_" + contactId);
+		}
+
+		@Override
+		public void onSuccess(String response) {
+			Gson gson = new Gson();
+			try {
+				GError error = gson.fromJson(response, GError.class);
+				onFailure(new MHError(error));
+			} catch (Exception out) {
+				updatePerson(true);
+				try {
+					FlurryAgent.onEvent("Contact.ChangeRole");
+				} catch (Exception e) {}
+			}
+		}
+
+		@Override
+		public void onFailure(Throwable e) {
+			Log.e(TAG, "Change Role Failed", e);
+			AlertDialog ad = DisplayError.display(ContactActivity.this, e);
+			ad.setButton(ad.getContext().getString(R.string.alert_retry), new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					dialog.dismiss();
+					Api.changeRole(role, id, new ChangeRoleHandler(role, contactId));
+				}
+			});
+			ad.show();
+			MHError.onFlurryError(e, "Contact.ChangeRoleHandler");
+		}
+
+		@Override
+		public void onFinish() {
+			hideProgress("change_role_" + contactId);
+		}
+	};
 	
 	private OnItemClickListener infoClickListener = new OnItemClickListener() {
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 			final SimpleListItem item = (SimpleListItem) parent.getAdapter().getItem(position);
 			if (item == null || item.data == null) return;
+			
+			if (item.data.containsKey("role")) {
+				final String role = item.data.get("role");
+				final int contactId = Integer.parseInt(item.data.get("contact_id"));
+				
+				AlertDialog.Builder builder = new AlertDialog.Builder(ContactActivity.this).setCancelable(true);
+				if (role.equals("contact")) {
+					builder.setTitle(R.string.contact_promote);
+					builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							Api.changeRole("leader", contactId, new ChangeRoleHandler("leader", contactId));
+							dialog.dismiss();
+						}
+					});
+				} else if (role.equals("leader")) {
+					builder.setTitle(R.string.contact_demote);
+					builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							Api.changeRole("contact", contactId, new ChangeRoleHandler("contact", contactId));
+							dialog.dismiss();
+						}
+					});
+				}
+				builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.cancel();
+					}
+				});
+				AlertDialog alert = builder.create();
+				alert.show();
+			}
 			
 			if (item.data.containsKey("phone") && hasPhoneAbility()) {
 				makePhoneCall(item.data.get("phone"));

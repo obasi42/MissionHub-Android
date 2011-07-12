@@ -148,6 +148,20 @@ public class Api {
 		return true;
 	}
 	
+	public static boolean changeRole(String role, int id, AsyncHttpResponseHandler responseHandler) {
+		String url = getAbsoluteUrl("/roles/" + id + ".json");
+		
+		RequestParams params = new RequestParams();
+		params.put("access_token", User.getToken());
+		params.put("org_id", User.getOrgID());
+		params.put("role", role);
+		params.put("_method", "put");
+		
+		post(url, params, responseHandler);
+		
+		return true;
+	}
+	
 	public static boolean createContactAssignment(int id, int assign_to, AsyncHttpResponseHandler responseHandler) {
 		String url = getAbsoluteUrl("/contact_assignments.json");
 		RequestParams params = new RequestParams();

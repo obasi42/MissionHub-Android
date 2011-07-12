@@ -9,6 +9,7 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.missionhub.api.Api;
 import com.missionhub.api.GContact;
 import com.missionhub.api.GError;
+import com.missionhub.api.GOrgGeneric;
 import com.missionhub.api.MHError;
 import com.missionhub.api.User;
 import com.missionhub.ui.ContactItemAdapter;
@@ -33,6 +34,7 @@ import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -72,6 +74,7 @@ public class ContactsActivity extends Activity {
 		contactsList.setAdapter(adapter);
 		contactsList.setOnScrollListener(new ContactsScrollListener());
 		contactsList.setOnItemClickListener(new ContactsOnItemClickListener());
+		contactsList.setOnItemLongClickListener(new ContactsOnItemLongClickListener());
 
 		progress = (ProgressBar) findViewById(R.id.contacts_progress);
 		txtNoData = (TextView) findViewById(R.id.txt_contacts_no_data);
@@ -373,7 +376,7 @@ public class ContactsActivity extends Activity {
 		public void onScrollStateChanged(AbsListView view, int scrollState) {
 		}
 	}
-
+	
 	private class ContactsOnItemClickListener implements OnItemClickListener {
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 			GContact contact = (GContact) parent.getAdapter().getItem(position);
@@ -383,5 +386,101 @@ public class ContactsActivity extends Activity {
 			i.putExtra("contactJSON", contactJSON);
 			startActivity(i);
 		}
+	}
+	
+	private class ChangeRoleHandler extends AsyncHttpResponseHandler {
+
+		String role;
+		int contactId;
+
+		public ChangeRoleHandler(String role, int id) {
+			this.role = role;
+			this.contactId = id;
+		}
+
+		@Override
+		public void onStart() {
+			showProgress("change_role_" + contactId);
+		}
+
+		@Override
+		public void onSuccess(String response) {
+			Gson gson = new Gson();
+			try {
+				GError error = gson.fromJson(response, GError.class);
+				onFailure(new MHError(error));
+			} catch (Exception out) {
+				try {
+					FlurryAgent.onEvent("Contacts.ChangeRole");
+				} catch (Exception e) {
+				}
+				resetListView(false);
+				getMore();
+			}
+		}
+
+		@Override
+		public void onFailure(Throwable e) {
+			Log.e(TAG, "Change Role Failed", e);
+			AlertDialog ad = DisplayError.display(ContactsActivity.this, e);
+			ad.setButton(ad.getContext().getString(R.string.alert_retry), new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					dialog.dismiss();
+					Api.changeRole(role, id, new ChangeRoleHandler(role, contactId));
+				}
+			});
+			ad.show();
+			MHError.onFlurryError(e, "Contacts.ChangeRoleHandler");
+		}
+
+		@Override
+		public void onFinish() {
+			hideProgress("change_role_" + contactId);
+		}
+	};
+	
+	private class ContactsOnItemLongClickListener implements OnItemLongClickListener {
+
+		@Override
+		public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+			final GContact contact = (GContact) parent.getAdapter().getItem(position);
+			if (contact != null && contact.getPerson() != null && User.getCurrentRole().equals("admin")) {
+				String contactRole = "contact";
+	    		for (GOrgGeneric role : contact.getPerson().getOrganizational_roles()) {
+					if (role.getOrg_id() == Integer.parseInt(User.getOrgID())) {
+						contactRole = role.getRole();
+						break;
+					}
+				}
+	    		
+	    		final ArrayList<CharSequence> items = new ArrayList<CharSequence>();
+				if (contactRole.equals("contact")) {
+					items.add(getString(R.string.contacts_actions_promote));
+				} else if (contactRole.equals("leader")) {
+					items.add(getString(R.string.contacts_actions_demote));
+				}
+				AlertDialog.Builder builder = new AlertDialog.Builder(ContactsActivity.this);
+				builder.setTitle(R.string.contacts_actions);
+				
+				CharSequence itemsArray[] = new CharSequence[items.size()];
+				itemsArray = items.toArray(itemsArray);
+				
+				builder.setItems(itemsArray, new DialogInterface.OnClickListener() {
+				    public void onClick(DialogInterface dialog, int item) {
+				    	if (items.get(item).equals(getString(R.string.contacts_actions_promote))) {
+				    		Api.changeRole("leader", contact.getPerson().getId(), new ChangeRoleHandler("leader", contact.getPerson().getId()));
+				    	} else if (items.get(item).equals(getString(R.string.contacts_actions_demote))) {
+				    		Api.changeRole("contact", contact.getPerson().getId(), new ChangeRoleHandler("contact", contact.getPerson().getId()));
+				    	}
+				    }
+				});
+				AlertDialog alert = builder.create();
+				if (!items.isEmpty()) {
+					alert.show();
+				}
+			}
+			return false;
+		}
+		
 	}
 }

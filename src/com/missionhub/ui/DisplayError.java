@@ -2,6 +2,7 @@ package com.missionhub.ui;
 
 import com.google.gson.JsonParseException;
 import com.missionhub.R;
+import com.missionhub.api.MHError;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -21,12 +22,16 @@ public class DisplayError {
 			if (t instanceof java.net.ConnectException) {
 				title = ctx.getString(R.string.error_no_network);
 				message = ctx.getString(R.string.error_no_network_msg);
-			} else if (message.indexOf("Unable to invoke no-args constructor for class") >= 0) {
+			} else if (t.getMessage() != null && message.indexOf("Unable to invoke no-args constructor for class") >= 0) {
 				title = ctx.getString(R.string.error_unexpected_response);
 				message = ctx.getString(R.string.error_unexpected_response_msg);
 			} else if (t instanceof JsonParseException) {
 				title = ctx.getString(R.string.error_unexpected_response);
 				message = ctx.getString(R.string.error_unexpected_response_msg);
+			} else if (t instanceof MHError) {
+				if (((MHError) t).getTitle() != null) {
+					title = ((MHError) t).getTitle();
+				}
 			}
 		} catch (Exception e) { Log.e("DisplayError", "Error Setup Failed", e); }
 		AlertDialog.Builder builder = new AlertDialog.Builder(ctx);

@@ -23,6 +23,10 @@
     <string name="contacts_no_data_my_completed">No Completed Assigned Contacts</string>
     <string name="contacts_no_data_unassigned">No Unassigned Contacts</string>
     <string name="contacts_menu_refresh">Refresh</string>
+    <string name="contacts_actions">Contact Actions</string>
+    <string name="contacts_make_leader">Promote to Leader</string>
+    <string name="contacts_actions_promote">Promote to Leader</string>
+    <string name="contacts_actions_demote">Demote to Contact</string>
     
     <string name="contact_contact">Contact</string>
     <string name="contact_more">More Contact Info</string>
@@ -61,6 +65,12 @@
     <string name="contact_info_phone_number">Phone Number</string>
     <string name="contact_info_email_address">E-mail Address</string>
     <string name="contact_info_birthday">Birthday</string>
+    <string name="contact_role">Organization Role</string>
+    <string name="contact_role_promote">Contact - Tap here to promote to leader</string>
+    <string name="contact_role_demote">Leader - Tap here to demote to contact</string>
+    <string name="contact_role_admin">Admin</string>
+    <string name="contact_promote">Promote to Leader?</string>
+    <string name="contact_demote">Demote to contact?</string>
     
     <string name="comment_actions">Comment Actions</string>
     <string name="comment_delete">Delete</string>
