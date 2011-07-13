@@ -3,8 +3,6 @@ package com.missionhub.auth;
 import java.util.HashMap;
 import java.util.Set;
 
-import com.flurry.android.Constants;
-import com.flurry.android.FlurryAgent;
 import com.google.common.collect.HashMultimap;
 import com.google.gson.Gson;
 import com.missionhub.api.GContact;
@@ -233,25 +231,5 @@ public class User {
 		} catch (Exception e) {
 			throw new MHException(e.getMessage(), User.class.getName() + ".initRoles", e.getStackTrace());
 		}
-	}
-
-	/**
-	 * Set FlurryAgent data based on contact object
-	 */
-	public static void initFlurryUser() {
-		try {
-			FlurryAgent.setUserId(String.valueOf(User.getContact().getPerson().getId()));
-		} catch (Exception e) {
-			try {
-				FlurryAgent.setUserId(null);
-			} catch (Exception e2) {}
-		}
-		try {
-			if (User.getContact().getPerson().getGender().equals("male")) {
-				FlurryAgent.setGender(Constants.MALE);
-			} else if (User.getContact().getPerson().getGender().equals("female")) {
-				FlurryAgent.setGender(Constants.FEMALE);
-			}
-		} catch (Exception e) {}
 	}
 }

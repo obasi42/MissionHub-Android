@@ -24,8 +24,8 @@ import com.missionhub.api.GPerson;
 import com.missionhub.api.GQA;
 import com.missionhub.api.GQuestion;
 import com.missionhub.auth.User;
-import com.missionhub.config.Config;
 import com.missionhub.error.MHException;
+import com.missionhub.helpers.Flurry;
 import com.missionhub.helpers.Helper;
 import com.missionhub.ui.CommentItemAdapter;
 import com.missionhub.ui.SimpleListItemAdapter;
@@ -219,13 +219,7 @@ public class ContactActivity extends Activity {
 		setTab(TAB_CONTACT, true);
 		Guide.display(this, Guide.CONTACT);
 		
-		try {
-			User.initFlurryUser();
-			FlurryAgent.onPageView();
-			HashMap<String, String> params = new HashMap<String, String>();
-			params.put("page", "Contact");
-			FlurryAgent.onEvent("PageView", params);
-		} catch (Exception e) {}
+		Flurry.pageView("Contact");
 	}
 
 	@Override
@@ -304,15 +298,13 @@ public class ContactActivity extends Activity {
 	@Override
 	public void onStart() {
 	   super.onStart();
-	   User.initFlurryUser();
-	   FlurryAgent.onStartSession(this, Config.flurryKey);
+	   Flurry.startSession(this);
 	}
 	
 	@Override
 	public void onStop() {
 	   super.onStop();
-	   User.initFlurryUser();
-	   FlurryAgent.onEndSession(this);
+	   Flurry.endSession(this);
 	}
 	
 	private ArrayList<String> processes = new ArrayList<String>();

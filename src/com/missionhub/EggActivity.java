@@ -2,9 +2,8 @@ package com.missionhub;
 
 import java.util.HashMap;
 
-import com.flurry.android.FlurryAgent;
 import com.missionhub.auth.User;
-import com.missionhub.config.Config;
+import com.missionhub.helpers.Flurry;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -27,32 +26,24 @@ public class EggActivity extends Activity {
 		title = (TextView) findViewById(R.id.egg_title);
 		iv = (ImageView) findViewById(R.id.egg_picture);
 		
-		User.initFlurryUser();
-		try {
-			FlurryAgent.onPageView();
-			HashMap<String, String> params = new HashMap<String, String>();
-			params.put("page", "Egg");
-			FlurryAgent.onEvent("PageView", params);
-		} catch (Exception e) {}
+		Flurry.pageView("Egg");
 		try {
 			HashMap<String, String> params = new HashMap<String, String>();
 			params.put("userid", String.valueOf(User.getContact().getPerson().getId()));
-			FlurryAgent.onEvent("EggView", params);
+			Flurry.event("EggView", params);
 		} catch (Exception e) {}
 	}
 	
 	@Override
 	public void onStart() {
 	   super.onStart();
-	   User.initFlurryUser();
-	   FlurryAgent.onStartSession(this, Config.flurryKey);
+	   Flurry.startSession(this);
 	}
 	
 	@Override
 	public void onStop() {
 	   super.onStop();
-	   User.initFlurryUser();
-	   FlurryAgent.onEndSession(this);
+	   Flurry.endSession(this);
 	}
 	
 	private int clicks = 0;

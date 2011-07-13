@@ -10,8 +10,8 @@ import com.google.common.collect.HashMultimap;
 import com.missionhub.api.GOrgGeneric;
 import com.missionhub.api.GPerson;
 import com.missionhub.auth.User;
-import com.missionhub.config.Config;
 import com.missionhub.config.Preferences;
+import com.missionhub.helpers.Flurry;
 import com.missionhub.ui.ImageManager;
 
 import android.app.Activity;
@@ -78,20 +78,13 @@ public class ProfileActivity extends Activity {
 		}
 		clicks = 0;
 		
-		User.initFlurryUser();
-		try {
-			FlurryAgent.onPageView();
-			HashMap<String, String> params = new HashMap<String, String>();
-			params.put("page", "Profile");
-			FlurryAgent.onEvent("PageView", params);
-		} catch (Exception e) {}
+		Flurry.pageView("Profile");
 	}
 	
 	@Override
 	public void onStart() {
 		super.onStart();
-		User.initFlurryUser();
-		FlurryAgent.onStartSession(this, Config.flurryKey);
+		Flurry.startSession(this);
 		spinner.setSelection(currentSpinnerIndex);
 		spinner.setOnItemSelectedListener(new MyOnItemSelectedListener());
 	}
@@ -99,8 +92,7 @@ public class ProfileActivity extends Activity {
 	@Override
 	public void onStop() {
 	   super.onStop();
-	   User.initFlurryUser();
-	   FlurryAgent.onEndSession(this);
+	   Flurry.endSession(this);
 	}
 	
 	public class MyOnItemSelectedListener implements OnItemSelectedListener {

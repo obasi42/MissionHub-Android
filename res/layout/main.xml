@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="fill_parent" android:layout_height="fill_parent" android:id="@+id/main" android:background="@drawable/mh_background">
+	android:layout_width="fill_parent" android:layout_height="fill_parent" android:background="@drawable/mh_background">
 	<RelativeLayout android:layout_height="33dp"
 		android:layout_width="fill_parent" android:id="@+id/logoutbar" android:background="@drawable/mh_logoutbar" android:visibility="gone">
 		<TextView android:layout_width="wrap_content"
 			android:layout_height="fill_parent" android:layout_alignParentRight="true"
-			android:gravity="center_vertical" android:id="@+id/txt_logoutbar_logout" android:layout_marginRight="5dp" android:textSize="12dp" android:text="@string/main_logout" android:clickable="true" android:onClick="clickLogout"></TextView>
-		<Button android:layout_marginRight="10dp" android:id="@+id/btn_logoutbar_profile"
+			android:gravity="center_vertical" android:layout_marginRight="5dp" android:textSize="12dp" android:text="@string/main_logout" android:clickable="true" android:onClick="clickLogout"></TextView>
+		<Button android:layout_marginRight="10dp"
 			android:layout_alignParentLeft="true" android:layout_marginLeft="5dp" android:background="@drawable/mh_icon_profile" android:layout_width="29dp" android:layout_height="29dp" android:layout_centerVertical="true" android:clickable="true" android:onClick="clickProfile"></Button>
 		<TextView android:text="TextView" android:layout_width="fill_parent"
 			android:layout_height="fill_parent" android:gravity="center"
-			android:layout_alignParentTop="true" android:id="@+id/txt_logoutbar_name" android:layout_marginLeft="40dp" android:layout_marginRight="40dp" android:textStyle="bold"></TextView>
+			android:layout_alignParentTop="true" android:layout_marginLeft="40dp" android:layout_marginRight="40dp" android:textStyle="bold" android:id="@+id/name"></TextView>
 	</RelativeLayout>
-	<ImageView android:layout_height="100dp" android:src="@drawable/mh_logo" android:id="@+id/img_logo" android:layout_width="fill_parent" android:layout_marginTop="60dp"></ImageView>
+	<ImageView android:layout_height="100dp" android:layout_width="fill_parent" android:layout_marginTop="60dp" android:id="@+id/logo" android:src="@drawable/mh_logo"></ImageView>
 	<LinearLayout android:layout_height="wrap_content"
 		android:layout_width="fill_parent"
 		android:layout_alignParentBottom="true" android:orientation="vertical" android:id="@+id/loggedout" android:visibility="gone">
-		<Button style="@style/mh_button" android:layout_width="fill_parent" android:id="@+id/btn_loggedout_about" android:layout_height="106dp" android:text="@string/main_about" android:onClick="clickAbout"></Button>
-		<Button style="@style/mh_button" android:layout_width="fill_parent" android:id="@+id/btn_loggedout_login" android:layout_height="106dp" android:text="@string/main_login" android:onClick="clickLogin"></Button>
+		<Button style="@style/mh_button" android:layout_width="fill_parent" android:layout_height="106dp" android:text="@string/main_about" android:onClick="clickAbout"></Button>
+		<Button style="@style/mh_button" android:layout_width="fill_parent" android:layout_height="106dp" android:text="@string/main_login" android:onClick="clickLogin"></Button>
 	</LinearLayout>
 	<LinearLayout android:layout_height="wrap_content" android:id="@+id/loggedin" android:layout_width="fill_parent" android:orientation="vertical" android:layout_alignParentBottom="true" android:visibility="gone">
-		<Button style="@style/mh_button" android:layout_width="fill_parent" android:id="@+id/btn_contacts" android:text="@string/main_contacts" android:layout_height="106dp" android:onClick="clickContacts"></Button>
-		<Button style="@style/mh_button" android:layout_width="fill_parent" android:layout_height="106dp" android:id="@+id/btn_surveys" android:text="@string/main_surveys" android:onClick="clickSurveys"></Button>
+		<Button style="@style/mh_button" android:layout_width="fill_parent" android:text="@string/main_contacts" android:layout_height="106dp" android:onClick="clickContacts"></Button>
+		<Button style="@style/mh_button" android:layout_width="fill_parent" android:layout_height="106dp" android:text="@string/main_surveys" android:onClick="clickSurveys"></Button>
 	</LinearLayout>
 </RelativeLayout>
