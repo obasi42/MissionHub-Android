@@ -592,7 +592,7 @@ public class ContactActivity extends Activity {
 				}
 			});
 			ad.show();
-			MHException.onFlurryError(e, "Contact.contactResponseHandler");
+			Flurry.error(e, "Contact.contactResponseHandler");
 		}
 
 		@Override
@@ -634,7 +634,7 @@ public class ContactActivity extends Activity {
 				}
 			});
 			ad.show();
-			MHException.onFlurryError(e, "Contact.commentResponseHandler");
+			Flurry.error(e, "Contact.commentResponseHandler");
 		}
 
 		@Override
@@ -726,7 +726,7 @@ public class ContactActivity extends Activity {
 				}
 			});
 			ad.show();
-			MHException.onFlurryError(e, "Contact.AssignmentHandler");
+			Flurry.error(e, "Contact.AssignmentHandler");
 		}
 
 		@Override
@@ -953,7 +953,7 @@ public class ContactActivity extends Activity {
 				}
 			});
 			ad.show();
-			MHException.onFlurryError(e, "Contact.SaveResponseHandler");
+			Flurry.error(e, "Contact.SaveResponseHandler");
 		}
 
 		@Override
@@ -1031,7 +1031,7 @@ public class ContactActivity extends Activity {
 				}
 			});
 			ad.show();
-			MHException.onFlurryError(e, "Contact.DeleteCommentHandler");
+			Flurry.error(e, "Contact.DeleteCommentHandler");
 		}
 
 		@Override
@@ -1115,7 +1115,7 @@ public class ContactActivity extends Activity {
 				}
 			});
 			ad.show();
-			MHException.onFlurryError(e, "Contact.ChangeRoleHandler");
+			Flurry.error(e, "Contact.ChangeRoleHandler");
 		}
 
 		@Override

@@ -1,7 +1,5 @@
 package com.missionhub;
 
-import java.util.HashMap;
-
 import com.flurry.android.FlurryAgent;
 import com.google.gson.Gson;
 import com.loopj.android.http.AsyncHttpClient;
@@ -13,6 +11,7 @@ import com.missionhub.auth.Auth;
 import com.missionhub.config.Config;
 import com.missionhub.config.Preferences;
 import com.missionhub.error.MHException;
+import com.missionhub.helpers.Flurry;
 import com.missionhub.ui.DisplayError;
 
 import android.app.Activity;
@@ -21,7 +20,6 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -38,20 +36,13 @@ import android.widget.Button;
 
 public class LoginActivity extends Activity {
 
-	public static final String TAG = "LoginActivity";
-
-	public static final String PREFS_NAME = "MissionHubPrivate";
+	public static final String TAG = LoginActivity.class.getName();
 
 	private ProgressDialog mProgressDialog;
 	private WebView mWebView;
 	private Button mCloseBtn;
 	private String wvUrl = Config.oauthUrl + "/authorize?display=touch&simple=true&response_type=code&redirect_uri=" + Config.oauthUrl
 			+ "/done.json&client_id=" + Config.oauthClientId + "&scope=" + Config.oauthScope;
-
-	public String getStoredToken() {
-		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-		return settings.getString("token", null);
-	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -69,38 +60,16 @@ public class LoginActivity extends Activity {
 			}
 		});
 
-		mCloseBtn = (Button) findViewById(R.id.btn_logout_close);
+		mCloseBtn = (Button) findViewById(R.id.close);
 
-		mWebView = (WebView) findViewById(R.id.webview_login);
+		mWebView = (WebView) findViewById(R.id.webview);
 		mWebView.getSettings().setJavaScriptEnabled(true);
 		mWebView.getSettings().setSupportZoom(false);
 		mWebView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
 		mWebView.setWebViewClient(new InternalWebViewClient());
 		mWebView.loadUrl(wvUrl);
 		
-		try {
-			FlurryAgent.onPageView();
-			HashMap<String, String> params = new HashMap<String, String>();
-			params.put("page", "Login");
-			FlurryAgent.onEvent("PageView", params);
-		} catch (Exception e) {}
-	}
-
-	private void clearCookies() {
-		CookieSyncManager csm = CookieSyncManager.createInstance(LoginActivity.this);
-		CookieManager mgr = CookieManager.getInstance();
-		mgr.removeAllCookie();
-		csm.sync();
-		csm.startSync();
-	}
-
-	@Override
-	public void finish() {
-		mWebView.stopLoading();
-		mProgressDialog.dismiss();
-		clearCookies();
-		super.finish();
-		overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+		Flurry.pageView("Login");
 	}
 	
 	@Override
@@ -113,6 +82,27 @@ public class LoginActivity extends Activity {
 	public void onStop() {
 	   super.onStop();
 	   FlurryAgent.onEndSession(this);
+	}
+	
+	@Override
+	public void finish() {
+		mWebView.stopLoading();
+		mProgressDialog.dismiss();
+		clearCookies();
+		super.finish();
+		overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+	}
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if ((keyCode == KeyEvent.KEYCODE_BACK)) {
+			finish();
+		}
+		return super.onKeyDown(keyCode, event);
+	}
+
+	public void clickClose(View view) {
+		finish();
 	}
 
 	private void returnWithToken() {
@@ -253,7 +243,7 @@ public class LoginActivity extends Activity {
 					}
 				});
 				ad.show();
-				MHException.onFlurryError(e, "Login.getTokenFromCode");
+				Flurry.error(e, "Login.getTokenFromCode");
 			}
 
 			@Override
@@ -263,16 +253,12 @@ public class LoginActivity extends Activity {
 			}
 		});
 	}
-
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if ((keyCode == KeyEvent.KEYCODE_BACK)) {
-			finish();
-		}
-		return super.onKeyDown(keyCode, event);
-	}
-
-	public void clickClose(View view) {
-		finish();
+	
+	private void clearCookies() {
+		CookieSyncManager csm = CookieSyncManager.createInstance(LoginActivity.this);
+		CookieManager mgr = CookieManager.getInstance();
+		mgr.removeAllCookie();
+		csm.sync();
+		csm.startSync();
 	}
 }

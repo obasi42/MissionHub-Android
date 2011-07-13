@@ -9,6 +9,7 @@ import com.missionhub.api.GError;
 import com.missionhub.api.GPerson;
 import com.missionhub.config.Preferences;
 import com.missionhub.error.MHException;
+import com.missionhub.helpers.Flurry;
 import com.missionhub.ui.DisplayError;
 
 import android.app.AlertDialog;
@@ -119,7 +120,7 @@ public class Auth {
 						}
 					});
 					ad.show();
-					MHException.onFlurryError(e, "Main.checkToken");
+					Flurry.error(e, "Main.checkToken");
 				}
 				@Override
 				public void onFinish() {
