@@ -2,7 +2,7 @@ package com.missionhub.ui;
 
 import com.google.gson.JsonParseException;
 import com.missionhub.R;
-import com.missionhub.api.MHError;
+import com.missionhub.error.MHException;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -28,9 +28,9 @@ public class DisplayError {
 			} else if (t instanceof JsonParseException) {
 				title = ctx.getString(R.string.error_unexpected_response);
 				message = ctx.getString(R.string.error_unexpected_response_msg);
-			} else if (t instanceof MHError) {
-				if (((MHError) t).getTitle() != null) {
-					title = ((MHError) t).getTitle();
+			} else if (t instanceof MHException) {
+				if (((MHException) t).getTitle() != null) {
+					title = ((MHException) t).getTitle();
 				}
 			}
 		} catch (Exception e) { Log.e("DisplayError", "Error Setup Failed", e); }

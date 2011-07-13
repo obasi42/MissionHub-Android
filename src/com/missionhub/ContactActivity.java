@@ -23,8 +23,10 @@ import com.missionhub.api.GOrgGeneric;
 import com.missionhub.api.GPerson;
 import com.missionhub.api.GQA;
 import com.missionhub.api.GQuestion;
-import com.missionhub.api.MHError;
-import com.missionhub.api.User;
+import com.missionhub.auth.User;
+import com.missionhub.config.Config;
+import com.missionhub.error.MHException;
+import com.missionhub.helpers.Helper;
 import com.missionhub.ui.CommentItemAdapter;
 import com.missionhub.ui.SimpleListItemAdapter;
 import com.missionhub.ui.DisplayError;
@@ -144,7 +146,7 @@ public class ContactActivity extends Activity {
 						contact = gson.fromJson(savedInstanceState.getString("contactJSON"), GContact.class);
 					}
 				} catch (Exception e) { Log.i(TAG, "Expand from instance failed", e); }
-				User.setFromBundle(savedInstanceState, this);
+				Application.restoreApplicationState(savedInstanceState);
 			}
 		}
 		if (contact == null) {
@@ -218,7 +220,7 @@ public class ContactActivity extends Activity {
 		Guide.display(this, Guide.CONTACT);
 		
 		try {
-			User.setFlurryUser();
+			User.initFlurryUser();
 			FlurryAgent.onPageView();
 			HashMap<String, String> params = new HashMap<String, String>();
 			params.put("page", "Contact");
@@ -275,7 +277,7 @@ public class ContactActivity extends Activity {
 				b.putString("contactJSON", gson.toJson(contact));
 			}
 		} catch (Exception e) {Log.i(TAG, "save state failed", e); };
-		b.putAll(User.getAsBundle());
+		b.putAll(Application.saveApplicationState(b));
 	}
 	
 	@Override
@@ -289,7 +291,7 @@ public class ContactActivity extends Activity {
 				contact = gson.fromJson(b.getString("contactJSON"), GContact.class);
 			}
 		} catch (Exception e) {Log.i(TAG, "restore state failed", e); }
-		User.setFromBundle(b, this);
+		Application.restoreApplicationState(b);
 	}
 	
 	@Override
@@ -302,14 +304,14 @@ public class ContactActivity extends Activity {
 	@Override
 	public void onStart() {
 	   super.onStart();
-	   User.setFlurryUser();
+	   User.initFlurryUser();
 	   FlurryAgent.onStartSession(this, Config.flurryKey);
 	}
 	
 	@Override
 	public void onStop() {
 	   super.onStop();
-	   User.setFlurryUser();
+	   User.initFlurryUser();
 	   FlurryAgent.onEndSession(this);
 	}
 	
@@ -411,17 +413,17 @@ public class ContactActivity extends Activity {
 			info.add(new SimpleListItem(getString(R.string.contact_info_facebook_header), getString(R.string.contact_info_facebook_link), data));
 		}
 		
-		if (User.getCurrentRole().equals("admin")) {
+		if (User.hasRole("admin")) {
 			HashMap<String, String> data = new HashMap<String, String>();
 			String contactRole = "contact";
 			for (GOrgGeneric role : person.getOrganizational_roles()) {
-				if (role.getOrg_id() == Integer.parseInt(User.getOrgID())) {
+				if (role.getOrg_id() == User.getOrganizationID()) {
 					contactRole = role.getRole();
 					break;
 				}
 			}
 			data.put("role", contactRole);
-			data.put("org_id", User.getOrgID());
+			data.put("org_id", String.valueOf(User.getOrganizationID()));
 			data.put("contact_id", String.valueOf(person.getId()));
 			if (contactRole.equals("contact")) {
 				info.add(new SimpleListItem(getString(R.string.contact_role), getString(R.string.contact_role_promote), data));
@@ -571,7 +573,7 @@ public class ContactActivity extends Activity {
 			Gson gson = new Gson();
 			try {
 				GError error = gson.fromJson(response, GError.class);
-				onFailure(new MHError(error));
+				onFailure(new MHException(error));
 			} catch (Exception out) {
 				Log.i(TAG, response);
 				try {
@@ -598,7 +600,7 @@ public class ContactActivity extends Activity {
 				}
 			});
 			ad.show();
-			MHError.onFlurryError(e, "Contact.contactResponseHandler");
+			MHException.onFlurryError(e, "Contact.contactResponseHandler");
 		}
 
 		@Override
@@ -618,7 +620,7 @@ public class ContactActivity extends Activity {
 			Gson gson = new Gson();
 			try {
 				GError error = gson.fromJson(response, GError.class);
-				onFailure(new MHError(error));
+				onFailure(new MHException(error));
 			} catch (Exception out) {
 				try {
 					GFCTop[] fcs = gson.fromJson(response, GFCTop[].class);
@@ -640,7 +642,7 @@ public class ContactActivity extends Activity {
 				}
 			});
 			ad.show();
-			MHError.onFlurryError(e, "Contact.commentResponseHandler");
+			MHException.onFlurryError(e, "Contact.commentResponseHandler");
 		}
 
 		@Override
@@ -699,7 +701,7 @@ public class ContactActivity extends Activity {
 			Gson gson = new Gson();
 			try {
 				GError error = gson.fromJson(response, GError.class);
-				onFailure(new MHError(error));
+				onFailure(new MHException(error));
 			} catch (Exception out) {
 				if (type == TYPE_ASSIGN) {
 					contactAssign.setText(R.string.contact_unassign);
@@ -732,7 +734,7 @@ public class ContactActivity extends Activity {
 				}
 			});
 			ad.show();
-			MHError.onFlurryError(e, "Contact.AssignmentHandler");
+			MHException.onFlurryError(e, "Contact.AssignmentHandler");
 		}
 
 		@Override
@@ -934,7 +936,7 @@ public class ContactActivity extends Activity {
 			Gson gson = new Gson();
 			try {
 				GError error = gson.fromJson(response, GError.class);
-				onFailure(new MHError(error));
+				onFailure(new MHException(error));
 			} catch (Exception out) {
 				contactComment.setText("");
 				if (rejoicableListView != null) {
@@ -959,7 +961,7 @@ public class ContactActivity extends Activity {
 				}
 			});
 			ad.show();
-			MHError.onFlurryError(e, "Contact.SaveResponseHandler");
+			MHException.onFlurryError(e, "Contact.SaveResponseHandler");
 		}
 
 		@Override
@@ -1017,7 +1019,7 @@ public class ContactActivity extends Activity {
 			Gson gson = new Gson();
 			try {
 				GError error = gson.fromJson(response, GError.class);
-				onFailure(new MHError(error));
+				onFailure(new MHException(error));
 			} catch (Exception out) {
 				updateComments(true);
 				try {
@@ -1037,7 +1039,7 @@ public class ContactActivity extends Activity {
 				}
 			});
 			ad.show();
-			MHError.onFlurryError(e, "Contact.DeleteCommentHandler");
+			MHException.onFlurryError(e, "Contact.DeleteCommentHandler");
 		}
 
 		@Override
@@ -1052,9 +1054,9 @@ public class ContactActivity extends Activity {
 			if (comment == null) return false;
 			
 			boolean canDelete = false;
-			if (User.getCurrentRole().equals("admin")) {
+			if (User.hasRole("admin")) {
 				canDelete = true;
-			} else if (User.getCurrentRole().equals("leader")) {
+			} else if (User.hasRole("leader")) {
 				if (comment.getComment().getCommenter().getId() == User.getContact().getPerson().getId()) {
 					canDelete = true;
 				}
@@ -1101,7 +1103,7 @@ public class ContactActivity extends Activity {
 			Gson gson = new Gson();
 			try {
 				GError error = gson.fromJson(response, GError.class);
-				onFailure(new MHError(error));
+				onFailure(new MHException(error));
 			} catch (Exception out) {
 				updatePerson(true);
 				try {
@@ -1121,7 +1123,7 @@ public class ContactActivity extends Activity {
 				}
 			});
 			ad.show();
-			MHError.onFlurryError(e, "Contact.ChangeRoleHandler");
+			MHException.onFlurryError(e, "Contact.ChangeRoleHandler");
 		}
 
 		@Override

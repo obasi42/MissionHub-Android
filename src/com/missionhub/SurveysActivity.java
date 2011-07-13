@@ -4,7 +4,8 @@ import java.util.HashMap;
 
 import com.flurry.android.FlurryAgent;
 import com.missionhub.api.Api;
-import com.missionhub.api.User;
+import com.missionhub.auth.User;
+import com.missionhub.config.Config;
 import com.missionhub.ui.DisplayError;
 
 import android.app.Activity;
@@ -46,7 +47,7 @@ public class SurveysActivity extends Activity {
 
 		clearCookies();
 
-		User.setFlurryUser();
+		User.initFlurryUser();
 		try {
 			FlurryAgent.onPageView();
 			HashMap<String, String> params = new HashMap<String, String>();
@@ -135,14 +136,14 @@ public class SurveysActivity extends Activity {
 	@Override
 	public void onStart() {
 		super.onStart();
-		User.setFlurryUser();
+		User.initFlurryUser();
 		FlurryAgent.onStartSession(this, Config.flurryKey);
 	}
 
 	@Override
 	public void onStop() {
 		super.onStop();
-		User.setFlurryUser();
+		User.initFlurryUser();
 		FlurryAgent.onEndSession(this);
 	}
 }

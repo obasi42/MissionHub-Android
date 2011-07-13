@@ -10,7 +10,10 @@ import org.json.JSONObject;
 import android.os.Build;
 import android.util.Log;
 import com.loopj.android.http.*;
-import com.missionhub.Config;
+import com.missionhub.Application;
+import com.missionhub.auth.Auth;
+import com.missionhub.auth.User;
+import com.missionhub.config.Config;
 
 public class Api {
 	public static final String TAG = "API";
@@ -19,8 +22,8 @@ public class Api {
 		String url = getAbsoluteUrl("/people/") + String.valueOf(id) + ".json";
 		Log.i(TAG, "getPeople URL: " + url);
 		RequestParams params = new RequestParams();
-		params.put("org_id", User.getOrgID());
-		params.put("access_token", User.getToken());
+		params.put("org_id", String.valueOf(User.getOrganizationID()));
+		params.put("access_token", Auth.getAccessToken());
 		get(url, params, responseHandler);
 		return true;
 	}
@@ -29,8 +32,8 @@ public class Api {
 		if (ids.size() > 0) {
 			String url = getAbsoluteUrl("/people/") + buildIds(ids) + ".json";
 			RequestParams params = new RequestParams();
-			params.put("access_token", User.getToken());
-			params.put("org_id", User.getOrgID());
+			params.put("access_token", Auth.getAccessToken());
+			params.put("org_id", String.valueOf(User.getOrganizationID()));
 			get(url, params, responseHandler);
 			return true;
 		}
@@ -40,10 +43,8 @@ public class Api {
 	public static boolean getPeople(String id, AsyncHttpResponseHandler responseHandler) {
 		if (id.equalsIgnoreCase("me")) {
 			String url = getAbsoluteUrl("/people/") + id + ".json";
-			
 			RequestParams params = new RequestParams();
-			params.put("access_token", User.getToken());
-			params.put("org_id", User.getOrgID());
+			params.put("access_token", Auth.getAccessToken());
 			get(url, params, responseHandler);
 			return true;
 		}
@@ -60,8 +61,8 @@ public class Api {
 
 		
 		RequestParams params = new RequestParams();
-		params.put("access_token", User.getToken());
-		params.put("org_id", User.getOrgID());
+		params.put("access_token", Auth.getAccessToken());
+		params.put("org_id", String.valueOf(User.getOrganizationID()));
 		params = sortFilterAssign(options,params);
 		Log.i(TAG, params.toString());
 		
@@ -73,8 +74,8 @@ public class Api {
 		String url = getAbsoluteUrl("/contacts/") + String.valueOf(id) + ".json";
 		
 		RequestParams params = new RequestParams();
-		params.put("access_token", User.getToken());
-		params.put("org_id", User.getOrgID());
+		params.put("access_token", Auth.getAccessToken());
+		params.put("org_id", String.valueOf(User.getOrganizationID()));
 		
 		get(url, params, responseHandler);
 		return true;
@@ -85,8 +86,8 @@ public class Api {
 			String url = getAbsoluteUrl("/contacts/") + buildIds(ids) + ".json";
 			
 			RequestParams params = new RequestParams();
-			params.put("access_token", User.getToken());
-			params.put("org_id", User.getOrgID());
+			params.put("access_token", Auth.getAccessToken());
+			params.put("org_id", String.valueOf(User.getOrganizationID()));
 			
 			get(url, params, responseHandler);
 			return true;
@@ -98,8 +99,8 @@ public class Api {
 		String url = getAbsoluteUrl("/followup_comments/") + String.valueOf(id) + ".json";
 		
 		RequestParams params = new RequestParams();
-		params.put("access_token", User.getToken());
-		params.put("org_id", User.getOrgID());
+		params.put("access_token", Auth.getAccessToken());
+		params.put("org_id", String.valueOf(User.getOrganizationID()));
 		
 		get(url, params, responseHandler);
 		return true;
@@ -109,7 +110,7 @@ public class Api {
 		String url = getAbsoluteUrl("/followup_comments.json");
 		JSONObject jsonComment = new JSONObject();
 		try {
-			jsonComment.put("organization_id", User.getOrgID());
+			jsonComment.put("organization_id", User.getOrganizationID());
 			jsonComment.put("contact_id", contact_id);
 			jsonComment.put("commenter_id", commenter_id);
 			jsonComment.put("comment", comment);
@@ -139,8 +140,8 @@ public class Api {
 		}
 
 		RequestParams params = new RequestParams();
-		params.put("access_token", User.getToken());
-		params.put("org_id", User.getOrgID());
+		params.put("access_token", Auth.getAccessToken());
+		params.put("org_id", String.valueOf(User.getOrganizationID()));
 		params.put("json", json.toString());
 		
 		post(url, params, responseHandler);
@@ -152,8 +153,8 @@ public class Api {
 		String url = getAbsoluteUrl("/roles/" + id + ".json");
 		
 		RequestParams params = new RequestParams();
-		params.put("access_token", User.getToken());
-		params.put("org_id", User.getOrgID());
+		params.put("access_token", Auth.getAccessToken());
+		params.put("org_id", String.valueOf(User.getOrganizationID()));
 		params.put("role", role);
 		params.put("_method", "put");
 		
@@ -165,11 +166,11 @@ public class Api {
 	public static boolean createContactAssignment(int id, int assign_to, AsyncHttpResponseHandler responseHandler) {
 		String url = getAbsoluteUrl("/contact_assignments.json");
 		RequestParams params = new RequestParams();
-		params.put("access_token", User.getToken());
+		params.put("access_token", Auth.getAccessToken());
 		params.put("assign_to", String.valueOf(assign_to));
 		params.put("ids", String.valueOf(id));
-		params.put("org_id", User.getOrgID());
-		params.put("organization_id", User.getOrgID());
+		params.put("org_id", String.valueOf(User.getOrganizationID()));
+		params.put("organization_id", String.valueOf(User.getOrganizationID()));
 		
 		post(url, params, responseHandler);	
 		return true;
@@ -178,8 +179,8 @@ public class Api {
 	public static boolean deleteContactAssignment(int id, AsyncHttpResponseHandler responseHandler) {
 		String url = getAbsoluteUrl("/contact_assignments/") + String.valueOf(id) + ".json";
 		RequestParams params = new RequestParams();
-		params.put("access_token", User.getToken());
-		params.put("org_id", User.getOrgID());
+		params.put("access_token", Auth.getAccessToken());
+		params.put("org_id", String.valueOf(User.getOrganizationID()));
 		params.put("_method", "delete");
 		params.put("id", String.valueOf(id));
 		
@@ -189,8 +190,8 @@ public class Api {
 	
 	public static boolean deleteComment(int id, AsyncHttpResponseHandler responseHandler) {
 		RequestParams params = new RequestParams();
-		params.put("access_token", User.getToken());
-		params.put("org_id", User.getOrgID());
+		params.put("access_token", Auth.getAccessToken());
+		params.put("org_id", String.valueOf(User.getOrganizationID()));
 		params.put("_method", "delete");
 		
 		String url = getAbsoluteUrl("/followup_comments/") + String.valueOf(id) + ".json";
@@ -202,13 +203,13 @@ public class Api {
 	public static String getSurveysUrl() {
 		String url = Config.baseUrl + "/surveys";
 		RequestParams params = new RequestParams();
-		params.put("org_id", User.getOrgID());
-		params.put("access_token", User.getToken());
+		params.put("org_id", String.valueOf(User.getOrganizationID()));
+		params.put("access_token", Auth.getAccessToken());
 		try {
 			params.put("platform", "android");
 			params.put("platform_product", Build.PRODUCT);
 			params.put("platform_release", android.os.Build.VERSION.RELEASE);
-			params.put("app", User.getAppVersion());
+			params.put("app", Application.getVersion());
 		} catch (Exception e) {}
 		return url + '?' + params.toString();
 	}
@@ -274,7 +275,7 @@ public class Api {
 			params.put("platform", "android");
 			params.put("platform_product", Build.PRODUCT);
 			params.put("platform_release", android.os.Build.VERSION.RELEASE);
-			params.put("app", User.getAppVersion());
+			params.put("app", Application.getVersion());
 		} catch (Exception e) {}
 		Log.i(TAG, "Starting get at url:" + url);
 		Log.i(TAG, "with params:" + params.toString());
@@ -286,7 +287,7 @@ public class Api {
 			params.put("platform", "android");
 			params.put("platform_product", Build.PRODUCT);
 			params.put("platform_release", android.os.Build.VERSION.RELEASE);
-			params.put("app", User.getAppVersion());
+			params.put("app", Application.getVersion());
 		} catch (Exception e) {}
 		Log.i(TAG, "starting post at url:" + url);
 		Log.i(TAG, "with params:" + params.toString());

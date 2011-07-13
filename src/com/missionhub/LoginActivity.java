@@ -9,8 +9,10 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.missionhub.api.GError;
 import com.missionhub.api.GLoginDone;
-import com.missionhub.api.MHError;
-import com.missionhub.api.User;
+import com.missionhub.auth.Auth;
+import com.missionhub.config.Config;
+import com.missionhub.config.Preferences;
+import com.missionhub.error.MHException;
 import com.missionhub.ui.DisplayError;
 
 import android.app.Activity;
@@ -115,7 +117,7 @@ public class LoginActivity extends Activity {
 
 	private void returnWithToken() {
 		Intent i = new Intent();
-		i.putExtra("token", User.getToken());
+		i.putExtra("token", Auth.getAccessToken());
 		this.setResult(RESULT_OK, i);
 		finish();
 	}
@@ -222,15 +224,12 @@ public class LoginActivity extends Activity {
 				Gson gson = new Gson();
 				try{
 					GError error = gson.fromJson(response, GError.class);
-					onFailure(new MHError(error));
+					onFailure(new MHException(error));
 				} catch (Exception out){
 					try {
 						GLoginDone loginDone = gson.fromJson(response, GLoginDone.class);
-						User.setToken(loginDone.getAccess_token());
-						SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-						SharedPreferences.Editor editor = settings.edit();
-						editor.putString("token", loginDone.getAccess_token());
-						editor.commit();
+						Auth.setAccessToken(loginDone.getAccess_token());
+						Preferences.setAccessToken(LoginActivity.this, loginDone.getAccess_token());
 						returnWithToken();
 					} catch(Exception e) {
 						onFailure(e);
@@ -254,7 +253,7 @@ public class LoginActivity extends Activity {
 					}
 				});
 				ad.show();
-				MHError.onFlurryError(e, "Login.getTokenFromCode");
+				MHException.onFlurryError(e, "Login.getTokenFromCode");
 			}
 
 			@Override

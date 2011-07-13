@@ -1,12 +1,16 @@
-package com.missionhub;
+package com.missionhub.helpers;
 
 import java.util.Date;
 import java.util.HashMap;
 
+import com.missionhub.R;
+
 import android.util.Log;
 
 public class Helper {
+	
 	public static final String TAG = "HELPER";
+	
 	public static final HashMap<String, Integer> statusMap = new HashMap<String, Integer>();
 	static {
 		statusMap.put("attempted_contact", R.string.status_attempted_contact);
@@ -15,7 +19,6 @@ public class Helper {
 		statusMap.put("contacted", R.string.status_contacted);
 		statusMap.put("completed", R.string.status_completed);
 	}
-	
 	
 	public static Date getDateFromUTCString(String s) {
 		java.text.DateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");

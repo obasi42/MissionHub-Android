@@ -1,30 +1,37 @@
-package com.missionhub.api;
+package com.missionhub.error;
 
 import com.flurry.android.FlurryAgent;
+import com.missionhub.api.GError;
+import com.missionhub.auth.User;
 
-public class MHError extends Exception{
+public class MHException extends Exception{
 	private static final long serialVersionUID = 1L;
 	
 	private String code;
 	private String title;
 	
-	public MHError(String title, String message, String code) {
+	public MHException(String title, String message, String code) {
 		super(message);
 		this.setTitle(title);
 		this.code = code;
 	}
 	
-	public MHError(String message, String code) {
+	public MHException(String message, String code) {
 		super(message);
 		this.code = code;
 	}
 	
-	public MHError(GError error) {
+	public MHException(GError error) {
 		super(error.getError().getMessage());
 		this.code = error.getError().getCode();
 		this.setTitle(error.getError().getTitle());
 	}
 	
+	public MHException(String message, String code, StackTraceElement[] stackTrace) {
+		this(message, code);
+		this.setStackTrace(stackTrace);
+	}
+
 	public void setCode(String code) {
 		this.code = code;
 	}
@@ -43,11 +50,11 @@ public class MHError extends Exception{
 			} catch (Exception e2) {}
 			
 			
-			if (e instanceof MHError) {
+			if (e instanceof MHException) {
 				if (userId != null && !userId.equals("")) {
-					FlurryAgent.onError(((MHError) e).getCode(), e.getMessage() + " || UserID: " + userId, e.getClass().getName());
+					FlurryAgent.onError(((MHException) e).getCode(), e.getMessage() + " || UserID: " + userId, e.getClass().getName());
 				} else {
-					FlurryAgent.onError(((MHError) e).getCode(), e.getMessage(), e.getClass().getName());
+					FlurryAgent.onError(((MHException) e).getCode(), e.getMessage(), e.getClass().getName());
 				}
 			} else {
 				if (e.getMessage() != null) {

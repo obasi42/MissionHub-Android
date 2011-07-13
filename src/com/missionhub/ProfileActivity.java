@@ -3,10 +3,15 @@ package com.missionhub;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Set;
 
 import com.flurry.android.FlurryAgent;
+import com.google.common.collect.HashMultimap;
+import com.missionhub.api.GOrgGeneric;
 import com.missionhub.api.GPerson;
-import com.missionhub.api.User;
+import com.missionhub.auth.User;
+import com.missionhub.config.Config;
+import com.missionhub.config.Preferences;
 import com.missionhub.ui.ImageManager;
 
 import android.app.Activity;
@@ -22,6 +27,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class ProfileActivity extends Activity {
+
 	private LinkedList<String> spinnerOrgIds = new LinkedList<String>();
 	private LinkedList<String> spinnerNames = new LinkedList<String>();
 	private int currentSpinnerIndex;
@@ -72,7 +78,7 @@ public class ProfileActivity extends Activity {
 		}
 		clicks = 0;
 		
-		User.setFlurryUser();
+		User.initFlurryUser();
 		try {
 			FlurryAgent.onPageView();
 			HashMap<String, String> params = new HashMap<String, String>();
@@ -84,7 +90,7 @@ public class ProfileActivity extends Activity {
 	@Override
 	public void onStart() {
 		super.onStart();
-		User.setFlurryUser();
+		User.initFlurryUser();
 		FlurryAgent.onStartSession(this, Config.flurryKey);
 		spinner.setSelection(currentSpinnerIndex);
 		spinner.setOnItemSelectedListener(new MyOnItemSelectedListener());
@@ -93,7 +99,7 @@ public class ProfileActivity extends Activity {
 	@Override
 	public void onStop() {
 	   super.onStop();
-	   User.setFlurryUser();
+	   User.initFlurryUser();
 	   FlurryAgent.onEndSession(this);
 	}
 	
@@ -101,7 +107,7 @@ public class ProfileActivity extends Activity {
 
 	    public void onItemSelected(AdapterView<?> parent,
 	        View view, int pos, long id) {
-	    	if (!spinnerOrgIds.get(pos).equalsIgnoreCase(User.getOrgID())) {
+	    	if (!spinnerOrgIds.get(pos).equalsIgnoreCase(String.valueOf(User.getOrganizationID()))) {
 	    		try {
 	    			HashMap<String, String> params = new HashMap<String, String>();
 	    			params.put("orgID", spinnerOrgIds.get(pos));
@@ -111,7 +117,7 @@ public class ProfileActivity extends Activity {
 	  		          parent.getItemAtPosition(pos).toString(), Toast.LENGTH_LONG).show();
 	    	}
 	    	currentSpinnerOrgID = spinnerOrgIds.get(pos);
-	    	User.setOrgIDPreference(currentSpinnerOrgID, ProfileActivity.this);
+	    	Preferences.setOrganizationID(ProfileActivity.this, Integer.parseInt(currentSpinnerOrgID));
 	    }
 
 	    public void onNothingSelected(AdapterView<?> parent) {
@@ -127,18 +133,25 @@ public class ProfileActivity extends Activity {
 	}
 	
 	private void createSpinnerArrays() {
-		Iterator<Integer> it = User.getValidRoles().keySet().iterator();
+		
+		final HashMultimap<Integer, String> roles = User.getRoles();
+		final HashMap<Integer, GOrgGeneric> organizations = User.getOrganizations();
+		
+		Iterator<Integer> it = roles.keySet().iterator();
+
 		int count = 0; 
 		while (it.hasNext()) {
 			int key = it.next();
-			HashMap<String, String> role = User.getValidRoles().get(key);
-			spinnerOrgIds.add(role.get("org_id"));
-			spinnerNames.add(role.get("name"));
-			if (role.get("org_id").equalsIgnoreCase(User.getOrgID())) {
-				currentSpinnerOrgID = role.get("org_id");
-				currentSpinnerIndex = count;
+			Set<String> orgRoles = roles.get(key);
+			if (orgRoles.contains("admin") || orgRoles.contains("leader")) {
+				spinnerOrgIds.add(String.valueOf(key));
+				spinnerNames.add(organizations.get(key).getName());
+				if (key == User.getOrganizationID()) {
+					currentSpinnerOrgID = String.valueOf(key);
+					currentSpinnerIndex = count;
+				}
+				count++;
 			}
-			count++;
 		}
 	}
 	
@@ -147,7 +160,7 @@ public class ProfileActivity extends Activity {
 		clicks++;
 		if (clicks == 20) {
 			clicks = 0;
-			Intent i = new Intent(this.getApplicationContext(), MHEgg.class);
+			Intent i = new Intent(this.getApplicationContext(), EggActivity.class);
 			startActivity(i);
 			finish();
 		}

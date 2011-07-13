@@ -10,8 +10,9 @@ import com.missionhub.api.Api;
 import com.missionhub.api.GContact;
 import com.missionhub.api.GError;
 import com.missionhub.api.GOrgGeneric;
-import com.missionhub.api.MHError;
-import com.missionhub.api.User;
+import com.missionhub.auth.User;
+import com.missionhub.config.Config;
+import com.missionhub.error.MHException;
 import com.missionhub.ui.ContactItemAdapter;
 import com.missionhub.ui.DisplayError;
 import com.missionhub.ui.Guide;
@@ -67,7 +68,7 @@ public class ContactsActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.contacts);
 		
-		User.setFromBundle(savedInstanceState, this);
+		Application.restoreApplicationState(savedInstanceState);
 
 		contactsList = (ListView) findViewById(R.id.contacts_list);
 		adapter = new ContactItemAdapter(this, R.layout.contact_list_item, data);
@@ -95,7 +96,7 @@ public class ContactsActivity extends Activity {
 		}
 
 		setTab(TAB_MY, true);
-		User.setFlurryUser();
+		User.initFlurryUser();
 		try {
 			FlurryAgent.onPageView();
 			HashMap<String, String> params = new HashMap<String, String>();
@@ -129,25 +130,25 @@ public class ContactsActivity extends Activity {
 	
 	@Override
 	public void onSaveInstanceState(Bundle b) {
-		b.putAll(User.getAsBundle());
+		b.putAll(Application.saveApplicationState(b));
 	}
 	
 	@Override
 	public void onRestoreInstanceState(Bundle b) {
-		User.setFromBundle(b, this);
+		Application.restoreApplicationState(b);
 	}
 	
 	@Override
 	public void onStart() {
 	   super.onStart();
-	   User.setFlurryUser();
+	   User.initFlurryUser();
 	   FlurryAgent.onStartSession(this, Config.flurryKey);
 	}
 	
 	@Override
 	public void onStop() {
 	   super.onStop();
-	   User.setFlurryUser();
+	   User.initFlurryUser();
 	   FlurryAgent.onEndSession(this);
 	}
 	
@@ -280,7 +281,7 @@ public class ContactsActivity extends Activity {
 				Gson gson = new Gson();
 				try {
 					GError error = gson.fromJson(response, GError.class);
-					onFailure(new MHError(error));
+					onFailure(new MHException(error));
 				} catch (Exception out) {
 					try {
 						GContact[] contacts = gson.fromJson(response, GContact[].class);
@@ -322,7 +323,7 @@ public class ContactsActivity extends Activity {
 					}
 				});
 				ad.show();
-				MHError.onFlurryError(e, "Contacts.getMore");
+				MHException.onFlurryError(e, "Contacts.getMore");
 			}
 
 			@Override
@@ -408,7 +409,7 @@ public class ContactsActivity extends Activity {
 			Gson gson = new Gson();
 			try {
 				GError error = gson.fromJson(response, GError.class);
-				onFailure(new MHError(error));
+				onFailure(new MHException(error));
 			} catch (Exception out) {
 				try {
 					FlurryAgent.onEvent("Contacts.ChangeRole");
@@ -430,7 +431,7 @@ public class ContactsActivity extends Activity {
 				}
 			});
 			ad.show();
-			MHError.onFlurryError(e, "Contacts.ChangeRoleHandler");
+			MHException.onFlurryError(e, "Contacts.ChangeRoleHandler");
 		}
 
 		@Override
@@ -444,10 +445,10 @@ public class ContactsActivity extends Activity {
 		@Override
 		public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 			final GContact contact = (GContact) parent.getAdapter().getItem(position);
-			if (contact != null && contact.getPerson() != null && User.getCurrentRole().equals("admin")) {
+			if (contact != null && contact.getPerson() != null && User.hasRole("admin")) {
 				String contactRole = "contact";
 	    		for (GOrgGeneric role : contact.getPerson().getOrganizational_roles()) {
-					if (role.getOrg_id() == Integer.parseInt(User.getOrgID())) {
+					if (role.getOrg_id() == User.getOrganizationID()) {
 						contactRole = role.getRole();
 						break;
 					}
