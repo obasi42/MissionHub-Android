@@ -23,6 +23,8 @@ public class EggActivity extends Activity {
 		overridePendingTransition(R.anim.fadein, R.anim.fadeout);
 		setContentView(R.layout.egg);
 		
+		Application.restoreApplicationState(savedInstanceState);
+		
 		title = (TextView) findViewById(R.id.egg_title);
 		iv = (ImageView) findViewById(R.id.egg_picture);
 		
@@ -44,6 +46,16 @@ public class EggActivity extends Activity {
 	public void onStop() {
 	   super.onStop();
 	   Flurry.endSession(this);
+	}
+	
+	@Override
+	public void onSaveInstanceState(Bundle b) {
+		b.putAll(Application.saveApplicationState(b));
+	}
+	
+	@Override
+	public void onRestoreInstanceState(Bundle b) {
+		Application.restoreApplicationState(b);
 	}
 	
 	private int clicks = 0;

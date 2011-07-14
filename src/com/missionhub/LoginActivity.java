@@ -50,6 +50,8 @@ public class LoginActivity extends Activity {
 		overridePendingTransition(R.anim.fadein, R.anim.fadeout);
 		setContentView(R.layout.login);
 
+		Application.restoreApplicationState(savedInstanceState);
+		
 		clearCookies();
 
 		mProgressDialog = ProgressDialog.show(LoginActivity.this, "", LoginActivity.this.getString(R.string.alert_loading), true);
@@ -99,6 +101,16 @@ public class LoginActivity extends Activity {
 			finish();
 		}
 		return super.onKeyDown(keyCode, event);
+	}
+	
+	@Override
+	public void onSaveInstanceState(Bundle b) {
+		b.putAll(Application.saveApplicationState(b));
+	}
+	
+	@Override
+	public void onRestoreInstanceState(Bundle b) {
+		Application.restoreApplicationState(b);
 	}
 
 	public void clickClose(View view) {
