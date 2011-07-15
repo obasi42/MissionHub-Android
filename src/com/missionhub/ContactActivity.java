@@ -399,7 +399,7 @@ public class ContactActivity extends Activity {
 		
 		info.clear();
 		
-		if (person.getFb_id() != null) {
+		if (!nullOrEmpty(person.getFb_id())) {
 			HashMap<String, String> data = new HashMap<String, String>();
 			data.put("facebook_id", person.getFb_id());
 			info.add(new SimpleListItem(getString(R.string.contact_info_facebook_header), getString(R.string.contact_info_facebook_link), data));
@@ -430,7 +430,7 @@ public class ContactActivity extends Activity {
 			info.add(new SimpleListItem(getString(R.string.contact_info_assigned_to), person.getAssignment().getPerson_assigned_to()[0].getName()));
 		}
 		
-		if(person.getFirst_contact_date() != null) {
+		if(!nullOrEmpty(person.getFirst_contact_date())) {
 			Date date = Helper.getDateFromUTCString(person.getFirst_contact_date());
 			SimpleDateFormat formatter = new SimpleDateFormat("MMMMM d, yyyy hh:mm aaa");
 			formatter.setTimeZone(TimeZone.getDefault());
@@ -438,20 +438,20 @@ public class ContactActivity extends Activity {
 			info.add(new SimpleListItem(getString(R.string.contact_info_first_contact_date), formattedDate));
 		}
 		
-		if(person.getPhone_number() != null) {
+		if(!nullOrEmpty(person.getPhone_number())) {
 			HashMap<String, String> data = new HashMap<String, String>();
 			data.put("phone", person.getPhone_number());
 			String prettyPhoneNumber = Helper.formatPhoneNumber(person.getPhone_number());
 			info.add(new SimpleListItem(getString(R.string.contact_info_phone_number), prettyPhoneNumber, data));
 		}
 		
-		if(person.getEmail_address() !=null) {
+		if(!nullOrEmpty(person.getEmail_address())) {
 			HashMap<String, String> data = new HashMap<String, String>();
 			data.put("email", person.getEmail_address());
 			info.add(new SimpleListItem(getString(R.string.contact_info_email_address), person.getEmail_address(), data));
 		}
 		
-		if(person.getBirthday() != null) {
+		if(!nullOrEmpty(person.getBirthday())) {
 			info.add(new SimpleListItem(getString(R.string.contact_info_birthday), person.getBirthday()));
 		}
 		
@@ -493,7 +493,7 @@ public class ContactActivity extends Activity {
 			}
 		}
 		
-		if(person.getLocation() != null && person.getLocation().getName() != null) {
+		if(!nullOrEmpty(person.getLocation()) && !nullOrEmpty(person.getLocation().getName())) {
 			info.add(new SimpleListItem(getString(R.string.contact_info_location), person.getLocation().getName()));
 		}
 		
@@ -737,7 +737,8 @@ public class ContactActivity extends Activity {
 	};
 
 	public void clickPicture(View v) {
-		openFacebookProfile(contact.getPerson().getFb_id());
+		if (contact.getPerson().getFb_id() != null)
+			openFacebookProfile(contact.getPerson().getFb_id());
 	}
 
 	public void clickPhone(View v) {
@@ -1237,5 +1238,16 @@ public class ContactActivity extends Activity {
 			return false;
 
 		return true;
+	}
+	
+	private boolean nullOrEmpty(Object obj) {
+		if (obj instanceof String) {
+			if (obj == null || ((String) obj).length() <= 0)
+				return true;
+		} else {
+			if (obj == null)
+				return true;
+		}
+		return false;
 	}
 }

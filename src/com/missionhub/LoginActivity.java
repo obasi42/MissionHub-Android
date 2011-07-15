@@ -174,7 +174,7 @@ public class LoginActivity extends Activity {
 				CookieSyncManager.createInstance(LoginActivity.this);
 				CookieManager mgr = CookieManager.getInstance();
 				String cookieString = mgr.getCookie(Config.cookieHost);
-				if (cookieString != null && (cookieString.contains("_bonfire_session=") || cookieString.contains("_mh_session=true"))) {
+				if (cookieString != null && (cookieString.contains("_bonfire_session=") || cookieString.contains("_mh_session="))) {
 					mWebView.loadUrl(Config.oauthUrl + "/grant.json?authorization=" + authorization);
 					return;
 				}
