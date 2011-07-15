@@ -754,13 +754,13 @@ public class ContactActivity extends Activity {
 	
 	public void makePhoneCall(String phoneNumber) {
 		try {
-			Intent intent = new Intent(Intent.ACTION_CALL);
+			Intent intent = new Intent(Intent.ACTION_DIAL);
 			intent.setData(Uri.parse("tel:" + phoneNumber));
 			startActivity(intent);
 			try {
 				HashMap<String, String> params = new HashMap<String, String>();
 				params.put("method", "Phone");
-				FlurryAgent.onEvent("Contact.MakeContact", params);
+				Flurry.event("Contact.MakeContact", params);
 			} catch (Exception e) {}
 		} catch (Exception e) {
 			Toast.makeText(this, R.string.contact_cant_call, Toast.LENGTH_LONG).show();
