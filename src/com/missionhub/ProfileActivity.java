@@ -99,7 +99,8 @@ public class ProfileActivity extends Activity {
 
 	    public void onItemSelected(AdapterView<?> parent,
 	        View view, int pos, long id) {
-	    	if (!spinnerOrgIds.get(pos).equalsIgnoreCase(String.valueOf(User.getOrganizationID()))) {
+	    	currentSpinnerOrgID = spinnerOrgIds.get(pos);
+	    	if (!currentSpinnerOrgID.equalsIgnoreCase(String.valueOf(User.getOrganizationID()))) {
 	    		try {
 	    			HashMap<String, String> params = new HashMap<String, String>();
 	    			params.put("orgID", spinnerOrgIds.get(pos));
@@ -107,9 +108,9 @@ public class ProfileActivity extends Activity {
 	    		} catch (Exception e) {}
 	  	      Toast.makeText(parent.getContext(), "Your current organization is now " +
 	  		          parent.getItemAtPosition(pos).toString(), Toast.LENGTH_LONG).show();
+	  	      Preferences.setOrganizationID(ProfileActivity.this, Integer.parseInt(currentSpinnerOrgID));
+	  	      User.setOrganizationID(Integer.parseInt(currentSpinnerOrgID));
 	    	}
-	    	currentSpinnerOrgID = spinnerOrgIds.get(pos);
-	    	Preferences.setOrganizationID(ProfileActivity.this, Integer.parseInt(currentSpinnerOrgID));
 	    }
 
 	    public void onNothingSelected(AdapterView<?> parent) {

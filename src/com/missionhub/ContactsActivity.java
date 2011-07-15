@@ -251,6 +251,9 @@ public class ContactsActivity extends Activity {
 	private void getMore() {
 		if (loading || atEnd || processes.contains("loading_"+tab))
 			return;
+		
+		if (searchTerm != null && !searchTerm.equals("") &&  processes.contains("loading_"+searchTerm))
+			return;
 
 		options.put("limit", String.valueOf(limit));
 		options.put("start", String.valueOf(start));
@@ -259,18 +262,25 @@ public class ContactsActivity extends Activity {
 		AsyncHttpResponseHandler responseHandler = new AsyncHttpResponseHandler() {
 
 			final int forTab = tab;
+			final String forTerm = searchTerm;
 
 			@Override
 			public void onStart() {
 				loading = true;
-				showProgress("loading_"+forTab);
+				if (forTerm != null && !forTerm.equals("")){
+					showProgress("loading_"+forTerm);
+				} else {
+					showProgress("loading_"+forTab);
+				}
 			}
 
 			@Override
 			public void onSuccess(String response) {
-				if (forTab != tab)
+				if (forTerm != null && !forTerm.equals("") && !forTerm.equals(searchTerm)){
 					return;
-
+				} else if (forTab != tab){
+					return;
+				}
 				Gson gson = new Gson();
 				try {
 					GError error = gson.fromJson(response, GError.class);
@@ -322,23 +332,27 @@ public class ContactsActivity extends Activity {
 			@Override
 			public void onFinish() {
 				loading = false;
-				hideProgress("loading_"+forTab);
+				if (forTerm != null && !forTerm.equals("")){
+					hideProgress("loading_"+forTerm);
+				} else {
+					hideProgress("loading_"+forTab);
+				}
 			}
 		};
 
 		Api.getContactsList(options, responseHandler);
 	}
 
+	private String searchTerm = "";
 	private Handler searchHandler = new Handler();
-	private String searchText = "";
 	
 	private class ContactsSearchWatcher implements TextWatcher {
 		public void afterTextChanged(Editable s) {
-			searchText = s.toString();
+			searchTerm = s.toString();
 			searchHandler.removeCallbacks(doSearch);
-			if (searchText.length() > 0) {
+			if (searchTerm.length() > 0) {
 				searchHandler.postDelayed(doSearch, 350);
-			} else if (s.length() == 0) {
+			} else if (searchTerm.length() <= 0) {
 				options.remove("term");
 				resetListView(true);
 				getMore();
@@ -354,7 +368,7 @@ public class ContactsActivity extends Activity {
 
 	private Runnable doSearch = new Runnable() {
 		public void run() {
-			options.put("term", searchText);
+			options.put("term", searchTerm);
 			resetListView(true);
 			getMore();
 		}
