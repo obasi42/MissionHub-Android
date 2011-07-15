@@ -128,7 +128,7 @@ public class User {
 	}
 
 	/**
-	 * Sets the primary organizaiton id
+	 * Sets the primary organization id
 	 * @param id
 	 */
 	public static synchronized void setPrimaryOrganizationID(int id) {

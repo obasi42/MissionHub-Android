@@ -6,6 +6,7 @@ import com.flurry.android.Constants;
 import com.flurry.android.FlurryAgent;
 import com.missionhub.auth.User;
 import com.missionhub.config.Config;
+import com.missionhub.error.MHException;
 
 import android.content.Context;
 
@@ -42,6 +43,34 @@ public class Flurry {
 			initFlurryUser();
 			FlurryAgent.onEvent(event, params);
 		} catch (Exception e) {}
+	}
+	
+	public static void error(Throwable e, String title) {
+		try {
+			if (e == null) return;
+			
+			String userId = "";
+			try {
+				userId = String.valueOf(User.getContact().getPerson().getId());
+			} catch (Exception e2) {}
+			
+			
+			if (e instanceof MHException) {
+				if (userId != null && !userId.equals("")) {
+					FlurryAgent.onError(((MHException) e).getCode(), e.getMessage() + " || UserID: " + userId, e.getClass().getName());
+				} else {
+					FlurryAgent.onError(((MHException) e).getCode(), e.getMessage(), e.getClass().getName());
+				}
+			} else {
+				if (e.getMessage() != null) {
+					if (userId != null && !userId.equals("")) {
+						FlurryAgent.onError(title, e.getMessage() + " || UserID: " + userId, e.getClass().getName());
+					} else {
+						FlurryAgent.onError(title, e.getMessage(), e.getClass().getName());
+					}
+				}
+			}
+		} catch (Exception e2) {}
 	}
 	
 	/**

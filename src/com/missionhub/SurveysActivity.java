@@ -30,6 +30,8 @@ public class SurveysActivity extends Activity {
 		setTitle(R.string.surveys_title);
 		setContentView(R.layout.surveys);
 
+		Application.restoreApplicationState(savedInstanceState);
+		
 		mWebView = (WebView) findViewById(R.id.webview_surveys);
 		mWebView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
 		mWebView.getSettings().setAllowFileAccess(false);
@@ -132,5 +134,15 @@ public class SurveysActivity extends Activity {
 	public void onStop() {
 		super.onStop();
 		Flurry.endSession(this);
+	}
+	
+	@Override
+	public void onSaveInstanceState(Bundle b) {
+		b.putAll(Application.saveApplicationState(b));
+	}
+	
+	@Override
+	public void onRestoreInstanceState(Bundle b) {
+		Application.restoreApplicationState(b);
 	}
 }

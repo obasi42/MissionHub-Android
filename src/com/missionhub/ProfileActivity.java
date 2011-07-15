@@ -48,7 +48,7 @@ public class ProfileActivity extends Activity {
 		createSpinnerArrays();
 		spinner = (Spinner) findViewById(R.id.spinner1);
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, spinnerNames);
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // The drop down vieww
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // The drop down view
 
 		TextView name = (TextView) findViewById(R.id.textView3);
 		name.setText(person.getName());

@@ -316,7 +316,7 @@ public class ContactsActivity extends Activity {
 					}
 				});
 				ad.show();
-				MHException.onFlurryError(e, "Contacts.getMore");
+				Flurry.error(e, "Contacts.getMore");
 			}
 
 			@Override
@@ -424,7 +424,7 @@ public class ContactsActivity extends Activity {
 				}
 			});
 			ad.show();
-			MHException.onFlurryError(e, "Contacts.ChangeRoleHandler");
+			Flurry.error(e, "Contacts.ChangeRoleHandler");
 		}
 
 		@Override
