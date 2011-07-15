@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.TimeZone;
 
-import com.flurry.android.FlurryAgent;
 import com.google.gson.Gson;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.missionhub.api.Api;
@@ -250,9 +249,7 @@ public class ContactActivity extends Activity {
 		// Handle item selection
 		switch (item.getItemId()) {
 		case R.id.contact_menu_refresh:
-			try {
-				FlurryAgent.onEvent("Contact.Refresh");
-			} catch (Exception e) {}
+			Flurry.event("Contact.Refresh");
 			update(true);
 			return true;
 		default:
@@ -710,7 +707,7 @@ public class ContactActivity extends Activity {
 					} else if (type == ASSIGNMENT_NONE) {
 						params.put("assignment", "None");
 					}
-					FlurryAgent.onEvent("Contact.Assign", params);
+					Flurry.event("Contact.Assign", params);
 				} catch (Exception e) {}
 			}
 		}
@@ -777,7 +774,7 @@ public class ContactActivity extends Activity {
 			try {
 				HashMap<String, String> params = new HashMap<String, String>();
 				params.put("method", "SMS");
-				FlurryAgent.onEvent("Contact.MakeContact", params);
+				Flurry.event("Contact.MakeContact", params);
 			} catch (Exception e) {}
 		} catch (Exception e) {
 			Toast.makeText(this, R.string.contact_cant_sms, Toast.LENGTH_LONG).show();
@@ -793,7 +790,7 @@ public class ContactActivity extends Activity {
 			try {
 				HashMap<String, String> params = new HashMap<String, String>();
 				params.put("method", "Email");
-				FlurryAgent.onEvent("Contact.MakeContact", params);
+				Flurry.event("Contact.MakeContact", params);
 			} catch (Exception e) {}
 		} catch (Exception e) {
 			Toast.makeText(this, R.string.contact_cant_email, Toast.LENGTH_LONG).show();
@@ -841,7 +838,7 @@ public class ContactActivity extends Activity {
 		        		   try {
 			       				HashMap<String, String> params = new HashMap<String, String>();
 			       				params.put("method", "App");
-			       				FlurryAgent.onEvent("Contact.OpenFacebook", params);
+			       				Flurry.event("Contact.OpenFacebook", params);
 			       			} catch (Exception e) {}
 		        	   } catch(Exception e) {
 		        		   try {
@@ -851,7 +848,7 @@ public class ContactActivity extends Activity {
 				       			try {
 				       				HashMap<String, String> params = new HashMap<String, String>();
 				       				params.put("method", "Browser");
-				       				FlurryAgent.onEvent("Contact.OpenFacebook", params);
+				       				Flurry.event("Contact.OpenFacebook", params);
 				       			} catch (Exception e2) {}
 				       		} catch(Exception f) {
 				       			Toast.makeText(ContactActivity.this, R.string.contact_cant_open_profile, Toast.LENGTH_LONG).show();
@@ -938,7 +935,7 @@ public class ContactActivity extends Activity {
 				contact.getPerson().setStatus(status);
 				updateComments(true);
 				try {
-       				FlurryAgent.onEvent("Contact.Comment.Save");
+       				Flurry.event("Contact.Comment.Save");
        			} catch (Exception e) {}
 			}
 		}
@@ -1016,7 +1013,7 @@ public class ContactActivity extends Activity {
 			} catch (Exception out) {
 				updateComments(true);
 				try {
-					FlurryAgent.onEvent("Contact.Comment.Delete");
+					Flurry.event("Contact.Comment.Delete");
 				} catch (Exception e) {}
 			}
 		}
@@ -1099,9 +1096,7 @@ public class ContactActivity extends Activity {
 				onFailure(new MHException(error));
 			} catch (Exception out) {
 				updatePerson(true);
-				try {
-					FlurryAgent.onEvent("Contact.ChangeRole");
-				} catch (Exception e) {}
+				Flurry.event("Contact.ChangeRole");
 			}
 		}
 
@@ -1200,7 +1195,7 @@ public class ContactActivity extends Activity {
 				try {
 					HashMap<String, String> params = new HashMap<String, String>();
 					params.put("tab", "Contact");
-					FlurryAgent.onEvent("Contact.ChangeTab", params);
+					Flurry.event("Contact.ChangeTab", params);
 				} catch (Exception e) {}
 				break;
 			case TAB_MORE_INFO:
@@ -1212,7 +1207,7 @@ public class ContactActivity extends Activity {
 				try {
 					HashMap<String, String> params = new HashMap<String, String>();
 					params.put("tab", "More Info");
-					FlurryAgent.onEvent("Contact.ChangeTab", params);
+					Flurry.event("Contact.ChangeTab", params);
 				} catch (Exception e) {}
 				break;
 			case TAB_SURVEYS:
@@ -1224,7 +1219,7 @@ public class ContactActivity extends Activity {
 				try {
 					HashMap<String, String> params = new HashMap<String, String>();
 					params.put("tab", "Surveys");
-					FlurryAgent.onEvent("Contact.ChangeTab", params);
+					Flurry.event("Contact.ChangeTab", params);
 				} catch (Exception e) {}
 				break;
 			}
