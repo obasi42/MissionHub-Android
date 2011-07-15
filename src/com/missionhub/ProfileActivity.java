@@ -41,6 +41,7 @@ public class ProfileActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
 		setContentView(R.layout.profile);
 		person = User.getContact().getPerson();
 		contactPicture = (ImageView) findViewById(R.id.profile_person_image);
@@ -93,6 +94,12 @@ public class ProfileActivity extends Activity {
 	public void onStop() {
 	   super.onStop();
 	   Flurry.endSession(this);
+	}
+	
+	@Override
+	public void finish() {
+		super.finish();
+		overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
 	}
 	
 	public class MyOnItemSelectedListener implements OnItemSelectedListener {
