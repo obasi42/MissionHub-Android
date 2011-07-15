@@ -2,22 +2,14 @@ package com.missionhub.config;
 
 public class Config {
 	
-	public static final String baseUrl = "https://www.missionhub.com";
-	public static final String cookieHost = "www.missionhub.com";
+	public static final String baseUrl = "";
+	public static final String cookieHost = "";
 	public static final String oauthUrl = baseUrl + "/oauth";
 	public static final String apiUrl = baseUrl + "/api/v1";
-	public static final String oauthClientId = "5";
-	public static final String oauthClientSecret = "a47326052ee47060847acc7a8bbdc587f6ba5dac70d2be82b6a1a4761037b3c8";
+	public static final String oauthClientId = "";
+	public static final String oauthClientSecret = "";
 	public static final String oauthScope = "userinfo,contacts,contact_assignment,followup_comments,roles";
-	//public static final String flurryKey = "BWPEYSEM6U823TEWG631"; // Production
-	public static final String flurryKey = "GNH51RVF8SGEMQZX5DQT"; // Development
-	
-//	public static final String baseUrl = "http://hub.ccci.us";
-//	public static final String cookieHost = "hub.ccci.us";
-//	public static final String oauthUrl = baseUrl + "/oauth";
-//	public static final String apiUrl = baseUrl + "/api/v1";
-//	public static final String oauthClientId = "5";
-//	public static final String oauthClientSecret = "a47326052ee47060847acc7a8bbdc587f6ba5dac70d2be82b6a1a4761037b3c8";
-//	public static final String oauthScope = "userinfo,contacts,contact_assignment,followup_comments";
+	//public static final String flurryKey = ""; // Production
+	public static final String flurryKey = ""; // Development
 	
 }
