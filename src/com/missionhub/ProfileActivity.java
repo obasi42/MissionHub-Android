@@ -28,14 +28,14 @@ import android.widget.Toast;
 
 public class ProfileActivity extends Activity {
 
-	private LinkedList<String> spinnerOrgIds = new LinkedList<String>();
+	private GPerson person;
+	private LinkedList<String> spinnerOrgIDs = new LinkedList<String>();
 	private LinkedList<String> spinnerNames = new LinkedList<String>();
 	private int currentSpinnerIndex;
 	private String currentSpinnerOrgID;
 	private Spinner spinner;
-	private String currentContactPicture = "";
-	private ImageView contactPicture;
-	private GPerson person;
+	private ImageView profilePicture;
+	private String currentProfilePicture = "";
 	private ImageManager imageManager;
 	
 	@Override
@@ -43,26 +43,30 @@ public class ProfileActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
 		setContentView(R.layout.profile);
+		
 		person = User.getContact().getPerson();
-		contactPicture = (ImageView) findViewById(R.id.profile_person_image);
 
+		/* Spinner */
 		createSpinnerArrays();
-		spinner = (Spinner) findViewById(R.id.spinner1);
+		spinner = (Spinner) findViewById(R.id.spinner);
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, spinnerNames);
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // The drop down view
-
-		TextView name = (TextView) findViewById(R.id.textView3);
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		spinner.setAdapter(adapter);
+		
+		/* Name */
+		TextView name = (TextView) findViewById(R.id.name);
 		name.setText(person.getName());
 		
-		TextView version = (TextView) findViewById(R.id.profile_version);
+		/* Version */
+		TextView version = (TextView) findViewById(R.id.version);
 		try {
 			version.setText(getString(R.string.profile_version) + " " + getPackageManager().getPackageInfo(getPackageName(), 0).versionName);
 		} catch (Exception e) {
 			version.setText("");
 		}
-
-		spinner.setAdapter(adapter);
 		
+		/* Profile Picture */
+		profilePicture = (ImageView) findViewById(R.id.profile_picture);
 		imageManager = new ImageManager(getApplicationContext());
 		int defaultImage = R.drawable.facebook_question;
 		if (person.getGender() != null) {
@@ -72,11 +76,13 @@ public class ProfileActivity extends Activity {
 				defaultImage = R.drawable.facebook_female;
 			}
 		}
-		if (person.getPicture() != null && !currentContactPicture.equals(person.getPicture())) {
-			currentContactPicture = person.getPicture();
-			contactPicture.setTag(person.getPicture() + "?type=large");
-			imageManager.displayImage(person.getPicture() + "?type=large", ProfileActivity.this, contactPicture, defaultImage);
+		if (person.getPicture() != null && !currentProfilePicture.equals(person.getPicture())) {
+			currentProfilePicture = person.getPicture();
+			profilePicture.setTag(person.getPicture() + "?type=large");
+			imageManager.displayImage(person.getPicture() + "?type=large", ProfileActivity.this, profilePicture, defaultImage);
 		}
+		
+		/* Egg Count */
 		clicks = 0;
 		
 		Flurry.pageView("Profile");
@@ -106,11 +112,11 @@ public class ProfileActivity extends Activity {
 
 	    public void onItemSelected(AdapterView<?> parent,
 	        View view, int pos, long id) {
-	    	currentSpinnerOrgID = spinnerOrgIds.get(pos);
+	    	currentSpinnerOrgID = spinnerOrgIDs.get(pos);
 	    	if (!currentSpinnerOrgID.equalsIgnoreCase(String.valueOf(User.getOrganizationID()))) {
 	    		try {
 	    			HashMap<String, String> params = new HashMap<String, String>();
-	    			params.put("orgID", spinnerOrgIds.get(pos));
+	    			params.put("orgID", spinnerOrgIDs.get(pos));
 	    			FlurryAgent.onEvent("Profile.ChangeOrg", params);
 	    		} catch (Exception e) {}
 	  	      Toast.makeText(parent.getContext(), "Your current organization is now " +
@@ -144,7 +150,7 @@ public class ProfileActivity extends Activity {
 			int key = it.next();
 			Set<String> orgRoles = roles.get(key);
 			if (orgRoles.contains("admin") || orgRoles.contains("leader")) {
-				spinnerOrgIds.add(String.valueOf(key));
+				spinnerOrgIDs.add(String.valueOf(key));
 				spinnerNames.add(organizations.get(key).getName());
 				if (key == User.getOrganizationID()) {
 					currentSpinnerOrgID = String.valueOf(key);
