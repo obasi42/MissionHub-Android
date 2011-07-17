@@ -22,6 +22,7 @@ import android.util.Log;
 
 public class Auth {
 	
+	/* Logging Tag */
 	public static final String TAG = Auth.class.getName();
 	
 	/* OAuth Access Token */
