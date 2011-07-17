@@ -26,6 +26,7 @@ import com.missionhub.auth.User;
 import com.missionhub.error.MHException;
 import com.missionhub.helpers.Flurry;
 import com.missionhub.helpers.Helper;
+import com.missionhub.helpers.U;
 import com.missionhub.ui.CommentItemAdapter;
 import com.missionhub.ui.SimpleListItemAdapter;
 import com.missionhub.ui.DisplayError;
@@ -67,61 +68,75 @@ import android.widget.ToggleButton;
 
 public class ContactActivity extends Activity {
 
+	/* Logging Tag */
 	public static final String TAG = ContactActivity.class.getName();
 
+	/* Tab Constants */
 	public static final int TAB_CONTACT = 0;
 	public static final int TAB_MORE_INFO = 1;
 	public static final int TAB_SURVEYS = 2;
+	
+	/* Current Tab */
 	private int tab = TAB_CONTACT;
 
+	/* Dialog Constants */
+	private final int DIALOG_REJOICABLES = 0;
+	
+	/* The currently displayed contact */
 	private GContactAll contactMeta;
 	private GContact contact;
 
-	private TextView txtTitle;
-	private ListView contactListView;
-	private LinearLayout header;
-	private ImageManager imageManager;
+	/* contact.xml */
+	private TextView title;
+	private ListView listView;
 	private ProgressBar progress;
-	private MenuItem refreshMenuItem;
-
-	private LinearLayout contactHeader;
-	private ImageView contactPicture;
-	private String currentContactPicture = "";
-	private TextView contactName;
-	private Button contactPhone;
-	private Button contactSMS;
-	private Button contactEmail;
-	private Button contactAssign;
-
-	private LinearLayout contactPost;
-	private EditText contactComment;
-	private Button contactSave;
-	private Spinner contactStatus;
-	private ListView rejoicableListView;
 	private ToggleButton bottom_button_left;
 	private ToggleButton bottom_button_center;
 	private ToggleButton bottom_button_right;
+	private LinearLayout header;
+	private MenuItem refreshMenuItem;
+	
+	/* contact_header.xml */
+	private LinearLayout contactHeader;
+	private ImageView profilePicture;
+	private String currentProfilePicture = "";
+	private ImageManager imageManager;
+	private TextView name;
+	private Button phone;
+	private Button sms;
+	private Button email;
+	private Button assign;
+
+	/* contact_post.xml */
+	private LinearLayout post;
+	private EditText comment;
+	private Button save;
+	private Spinner status;
+	private ListView rejoicableListView;
 	
 	ArrayList<Rejoicable> validRejoicables;
 
+	/* Assignment Constants */
 	private final int ASSIGNMENT_NONE = 0;
 	private final int ASSIGNMENT_ME = 1;
 	private final int ASSIGNMENT_OTHER = 2;
 	private int assignmentStatus = ASSIGNMENT_NONE;
 
-	private final int DIALOG_REJOICABLES = 0;
-
+	/* Status Maps */
 	private ArrayList<String> statusList = new ArrayList<String>();
 	private ArrayList<String> statusListTag = new ArrayList<String>();
 	private ArrayList<Integer> statusListRes = new ArrayList<Integer>();
 	
+	/* Followup Comment Adapters */
 	private CommentItemAdapter commentAdapter;
 	private ArrayAdapter<String> noCommentAdapter;
 	private ArrayList<GFollowupComment> comments = new ArrayList<GFollowupComment>();
 	
+	/* Info Tab Adapter */
 	private SimpleListItemAdapter infoAdapter;
 	private ArrayList<SimpleListItem> info = new ArrayList<SimpleListItem>();
 	
+	/* Survey Adapter */
 	private SeparatedListAdapter keywordAdapter;
 	
 
@@ -129,6 +144,7 @@ public class ContactActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		/* Restore contact from savedInstanceState if possible */
 		Gson gson = new Gson();
 		Intent i = getIntent();
 		if (i != null && i.hasExtra("contactJSON")) {
@@ -152,33 +168,30 @@ public class ContactActivity extends Activity {
 			finish();
 		}
 
+		/* contact.xml */
 		setContentView(R.layout.contact);
-		txtTitle = (TextView) findViewById(R.id.contact_title);
-		contactListView = (ListView) findViewById(R.id.contact_listview);
-		progress = (ProgressBar) findViewById(R.id.contact_progress);
-		
+		title = (TextView) findViewById(R.id.title);
+		listView = (ListView) findViewById(R.id.listview);
+		progress = (ProgressBar) findViewById(R.id.progress);
 		bottom_button_left = (ToggleButton) findViewById(R.id.bottom_button_left);
 		bottom_button_center = (ToggleButton) findViewById(R.id.bottom_button_center);
 		bottom_button_right = (ToggleButton) findViewById(R.id.bottom_button_right);
 
+		/* contact_header.xml */
 		contactHeader = (LinearLayout) View.inflate(this, R.layout.contact_header, null);
-		contactPicture = (ImageView) contactHeader.findViewById(R.id.contact_picture);
-		contactName = (TextView) contactHeader.findViewById(R.id.contact_name);
-		contactPhone = (Button) contactHeader.findViewById(R.id.contact_phone);
-		contactSMS = (Button) contactHeader.findViewById(R.id.contact_sms);
-		contactEmail = (Button) contactHeader.findViewById(R.id.contact_email);
-		contactAssign = (Button) contactHeader.findViewById(R.id.contact_assign);
+		profilePicture = (ImageView) contactHeader.findViewById(R.id.contact_picture);
+		imageManager = new ImageManager(getApplicationContext());
+		name = (TextView) contactHeader.findViewById(R.id.contact_name);
+		phone = (Button) contactHeader.findViewById(R.id.contact_phone);
+		sms = (Button) contactHeader.findViewById(R.id.contact_sms);
+		email = (Button) contactHeader.findViewById(R.id.contact_email);
+		assign = (Button) contactHeader.findViewById(R.id.contact_assign);
 
-		contactPost = (LinearLayout) View.inflate(this, R.layout.contact_post, null);
-		contactComment = (EditText) contactPost.findViewById(R.id.contact_comment);
-		contactSave = (Button) contactPost.findViewById(R.id.contact_save);
-		
-		validRejoicables = new ArrayList<Rejoicable>();
-		validRejoicables.add(new Rejoicable(R.string.rejoice_spiritual_conversation, R.drawable.rejoicable_s_convo, "spiritual_conversation"));
-		validRejoicables.add(new Rejoicable(R.string.rejoice_prayed_to_receive, R.drawable.rejoicable_r_christ, "prayed_to_receive"));
-		validRejoicables.add(new Rejoicable(R.string.rejoice_gospel_presentation, R.drawable.rejoicable_g_present, "gospel_presentation"));
-
-		contactStatus = (Spinner) contactPost.findViewById(R.id.contact_status);
+		/* contact_post.xml */
+		post = (LinearLayout) View.inflate(this, R.layout.contact_post, null);
+		comment = (EditText) post.findViewById(R.id.contact_comment);
+		save = (Button) post.findViewById(R.id.contact_save);
+		status = (Spinner) post.findViewById(R.id.contact_status);
 		statusList.add(getString(R.string.status_uncontacted));
 		statusListRes.add(R.string.status_uncontacted);
 		statusListTag.add("uncontacted");
@@ -196,8 +209,13 @@ public class ContactActivity extends Activity {
 		statusListTag.add("do_not_contact");
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.contact_spinner_text, statusList);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		contactStatus.setAdapter(adapter);
+		status.setAdapter(adapter);
+		validRejoicables = new ArrayList<Rejoicable>();
+		validRejoicables.add(new Rejoicable(R.string.rejoice_spiritual_conversation, R.drawable.rejoicable_s_convo, "spiritual_conversation"));
+		validRejoicables.add(new Rejoicable(R.string.rejoice_prayed_to_receive, R.drawable.rejoicable_r_christ, "prayed_to_receive"));
+		validRejoicables.add(new Rejoicable(R.string.rejoice_gospel_presentation, R.drawable.rejoicable_g_present, "gospel_presentation"));
 
+		/* Set-Up Adapters */
 		commentAdapter = new CommentItemAdapter(this, R.layout.comment_list_item, comments, statusListTag, statusListRes);
 		ArrayList<String> noComment = new ArrayList<String>();
 		noComment.add(getString(R.string.contact_no_comments));
@@ -205,17 +223,20 @@ public class ContactActivity extends Activity {
 		infoAdapter = new SimpleListItemAdapter(this, R.layout.simple_list_item, info);
 		keywordAdapter = new SeparatedListAdapter(this);
 		
+		/* Create ListView Header */
 		header = new LinearLayout(this);
 		header.setOrientation(LinearLayout.VERTICAL);
 		header.addView(contactHeader);
-
-		contactListView.addHeaderView(header);
+		
+		/* Set-Up ListView */
+		listView.addHeaderView(header);
 		String[] mStrings = {};
-		contactListView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mStrings));
+		listView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mStrings));
 
-		imageManager = new ImageManager(getApplicationContext());
-
+		/* Set The Default Tab */
 		setTab(TAB_CONTACT, true);
+		
+		/* Display The Guide Pop-Up If Not Hidden */
 		Guide.display(this, Guide.CONTACT);
 		
 		Flurry.pageView("Contact");
@@ -280,7 +301,7 @@ public class ContactActivity extends Activity {
 			}
 			if (b.containsKey("contactJSON")) {
 				contact = gson.fromJson(b.getString("contactJSON"), GContact.class);
-			}
+		 	}
 		} catch (Exception e) {Log.i(TAG, "restore state failed", e); }
 		Application.restoreApplicationState(b);
 	}
@@ -307,7 +328,6 @@ public class ContactActivity extends Activity {
 	private ArrayList<String> processes = new ArrayList<String>();
 
 	private void showProgress(String process) {
-		Log.i("PROCESS", "ADD PROCRESS: " + process);
 		processes.add(process);
 		if (refreshMenuItem != null) 
 			refreshMenuItem.setEnabled(false);
@@ -315,7 +335,6 @@ public class ContactActivity extends Activity {
 	}
 
 	private void hideProgress(String process) {
-		Log.i("PROCESS", "REM PROCRESS: " + process);
 		processes.remove(process);
 		if (processes.size() <= 0) {
 			if (refreshMenuItem != null) 
@@ -337,25 +356,25 @@ public class ContactActivity extends Activity {
 				defaultImage = R.drawable.facebook_female;
 			}
 		}
-		if (person.getPicture() != null && !currentContactPicture.equals(person.getPicture())) {
-			currentContactPicture = person.getPicture();
-			contactPicture.setTag(person.getPicture() + "?type=large");
-			imageManager.displayImage(person.getPicture() + "?type=large", ContactActivity.this, contactPicture, defaultImage);
+		if (person.getPicture() != null && !currentProfilePicture.equals(person.getPicture())) {
+			currentProfilePicture = person.getPicture();
+			profilePicture.setTag(person.getPicture() + "?type=large");
+			imageManager.displayImage(person.getPicture() + "?type=large", ContactActivity.this, profilePicture, defaultImage);
 		}
 		if (person.getName() != null) {
-			contactName.setText(person.getName());
+			name.setText(person.getName());
 		}
 		if (person.getPhone_number() != null && hasPhoneAbility()) {
-			contactPhone.setVisibility(View.VISIBLE);
-			contactSMS.setVisibility(View.VISIBLE);
+			phone.setVisibility(View.VISIBLE);
+			sms.setVisibility(View.VISIBLE);
 		} else {
-			contactPhone.setVisibility(View.GONE);
-			contactSMS.setVisibility(View.GONE);
+			phone.setVisibility(View.GONE);
+			sms.setVisibility(View.GONE);
 		}
 		if (person.getEmail_address() != null) {
-			contactEmail.setVisibility(View.VISIBLE);
+			email.setVisibility(View.VISIBLE);
 		} else {
-			contactEmail.setVisibility(View.GONE);
+			email.setVisibility(View.GONE);
 		}
 
 		assignmentStatus = ASSIGNMENT_NONE;
@@ -374,18 +393,18 @@ public class ContactActivity extends Activity {
 			}
 		}
 		if (assignmentStatus == ASSIGNMENT_NONE) {
-			contactAssign.setText(R.string.contact_assign_to_me);
-			contactAssign.setEnabled(true);
+			assign.setText(R.string.contact_assign_to_me);
+			assign.setEnabled(true);
 		} else if (assignmentStatus == ASSIGNMENT_ME) {
-			contactAssign.setText(R.string.contact_unassign);
-			contactAssign.setEnabled(true);
+			assign.setText(R.string.contact_unassign);
+			assign.setEnabled(true);
 		} else if (assignmentStatus == ASSIGNMENT_OTHER) {
-			contactAssign.setText(R.string.contact_assign_locked);
-			contactAssign.setEnabled(false);
+			assign.setText(R.string.contact_assign_locked);
+			assign.setEnabled(false);
 		}
 		
 		if (person.getStatus() != null) {
-			contactStatus.setSelection(statusListTag.indexOf(person.getStatus()));
+			status.setSelection(statusListTag.indexOf(person.getStatus()));
 		}
 	}
 
@@ -396,7 +415,7 @@ public class ContactActivity extends Activity {
 		
 		info.clear();
 		
-		if (!nullOrEmpty(person.getFb_id())) {
+		if (!U.nullOrEmpty(person.getFb_id())) {
 			HashMap<String, String> data = new HashMap<String, String>();
 			data.put("facebook_id", person.getFb_id());
 			info.add(new SimpleListItem(getString(R.string.contact_info_facebook_header), getString(R.string.contact_info_facebook_link), data));
@@ -427,7 +446,7 @@ public class ContactActivity extends Activity {
 			info.add(new SimpleListItem(getString(R.string.contact_info_assigned_to), person.getAssignment().getPerson_assigned_to()[0].getName()));
 		}
 		
-		if(!nullOrEmpty(person.getFirst_contact_date())) {
+		if(!U.nullOrEmpty(person.getFirst_contact_date())) {
 			Date date = Helper.getDateFromUTCString(person.getFirst_contact_date());
 			SimpleDateFormat formatter = new SimpleDateFormat("MMMMM d, yyyy hh:mm aaa");
 			formatter.setTimeZone(TimeZone.getDefault());
@@ -435,20 +454,20 @@ public class ContactActivity extends Activity {
 			info.add(new SimpleListItem(getString(R.string.contact_info_first_contact_date), formattedDate));
 		}
 		
-		if(!nullOrEmpty(person.getPhone_number())) {
+		if(!U.nullOrEmpty(person.getPhone_number())) {
 			HashMap<String, String> data = new HashMap<String, String>();
 			data.put("phone", person.getPhone_number());
 			String prettyPhoneNumber = Helper.formatPhoneNumber(person.getPhone_number());
 			info.add(new SimpleListItem(getString(R.string.contact_info_phone_number), prettyPhoneNumber, data));
 		}
 		
-		if(!nullOrEmpty(person.getEmail_address())) {
+		if(!U.nullOrEmpty(person.getEmail_address())) {
 			HashMap<String, String> data = new HashMap<String, String>();
 			data.put("email", person.getEmail_address());
 			info.add(new SimpleListItem(getString(R.string.contact_info_email_address), person.getEmail_address(), data));
 		}
 		
-		if(!nullOrEmpty(person.getBirthday())) {
+		if(!U.nullOrEmpty(person.getBirthday())) {
 			info.add(new SimpleListItem(getString(R.string.contact_info_birthday), person.getBirthday()));
 		}
 		
@@ -490,7 +509,7 @@ public class ContactActivity extends Activity {
 			}
 		}
 		
-		if(!nullOrEmpty(person.getLocation()) && !nullOrEmpty(person.getLocation().getName())) {
+		if(!U.nullOrEmpty(person.getLocation()) && !U.nullOrEmpty(person.getLocation().getName())) {
 			info.add(new SimpleListItem(getString(R.string.contact_info_location), person.getLocation().getName()));
 		}
 		
@@ -532,7 +551,7 @@ public class ContactActivity extends Activity {
 			}
 		} catch (Exception e) {}
 		if (tab == TAB_SURVEYS) {
-			contactListView.setAdapter(keywordAdapter);
+			listView.setAdapter(keywordAdapter);
 		}
 	}
 	
@@ -651,9 +670,9 @@ public class ContactActivity extends Activity {
 		}
 		if (tab == TAB_CONTACT) {
 			if (comments.isEmpty()) {
-				contactListView.setAdapter(noCommentAdapter);
+				listView.setAdapter(noCommentAdapter);
 			} else {
-				contactListView.setAdapter(commentAdapter);
+				listView.setAdapter(commentAdapter);
 			}
 			commentAdapter.notifyDataSetChanged();
 		}
@@ -682,7 +701,7 @@ public class ContactActivity extends Activity {
 		@Override
 		public void onStart() {
 			showProgress("assign");
-			contactAssign.setEnabled(false);
+			assign.setEnabled(false);
 		}
 
 		@Override
@@ -693,10 +712,10 @@ public class ContactActivity extends Activity {
 				onFailure(new MHException(error));
 			} catch (Exception out) {
 				if (type == TYPE_ASSIGN) {
-					contactAssign.setText(R.string.contact_unassign);
+					assign.setText(R.string.contact_unassign);
 					assignmentStatus = ASSIGNMENT_ME;
 				} else if (type == TYPE_UNASSIGN) {
-					contactAssign.setText(R.string.contact_assign_to_me);
+					assign.setText(R.string.contact_assign_to_me);
 					assignmentStatus = ASSIGNMENT_NONE;
 				}
 				updatePerson(false);
@@ -729,7 +748,7 @@ public class ContactActivity extends Activity {
 		@Override
 		public void onFinish() {
 			hideProgress("assign");
-			contactAssign.setEnabled(true);
+			assign.setEnabled(true);
 		}
 	};
 
@@ -875,11 +894,11 @@ public class ContactActivity extends Activity {
 		
 		boolean canSave = false;
 		
-		String comment = "";
-		if (contactComment.getText() != null) {
-			comment = contactComment.getText().toString();
+		String commentStr = "";
+		if (comment.getText() != null) {
+			commentStr = comment.getText().toString();
 		}
-		if (!comment.equals("")) canSave = true;
+		if (!commentStr.equals("")) canSave = true;
 		
 		ArrayList<String> rejoicables = new ArrayList<String>();
 		if (rejoicableListView != null) {
@@ -892,7 +911,7 @@ public class ContactActivity extends Activity {
 			canSave = true;
 		}
 		
-		int statusPos = contactStatus.getSelectedItemPosition();
+		int statusPos = status.getSelectedItemPosition();
 		if (statusPos > -1 && contact.getPerson().getStatus() != null) {
 			if (!contact.getPerson().getStatus().equals(statusListTag.get(statusPos))) {
 				canSave = true;
@@ -901,7 +920,7 @@ public class ContactActivity extends Activity {
 		
 		if (canSave) {
 			String status = statusListTag.get(statusPos);
-			Api.postFollowupComment(contact.getPerson().getId(), User.getContact().getPerson().getId(), statusListTag.get(statusPos), comment, new SaveResponseHandler(status), rejoicables);
+			Api.postFollowupComment(contact.getPerson().getId(), User.getContact().getPerson().getId(), statusListTag.get(statusPos), commentStr, new SaveResponseHandler(status), rejoicables);
 		} else {
 			Toast.makeText(this, R.string.contact_cant_save, Toast.LENGTH_LONG).show();
 		}
@@ -918,7 +937,7 @@ public class ContactActivity extends Activity {
 		@Override
 		public void onStart() {
 			showProgress("save");
-			contactSave.setEnabled(false);
+			save.setEnabled(false);
 		}
 
 		@Override
@@ -928,7 +947,7 @@ public class ContactActivity extends Activity {
 				GError error = gson.fromJson(response, GError.class);
 				onFailure(new MHException(error));
 			} catch (Exception out) {
-				contactComment.setText("");
+				comment.setText("");
 				if (rejoicableListView != null) {
 					rejoicableListView.clearChoices();
 				}
@@ -957,7 +976,7 @@ public class ContactActivity extends Activity {
 		@Override
 		public void onFinish() {
 			hideProgress("save");
-			contactSave.setEnabled(true);
+			save.setEnabled(true);
 		}
 	};
 
@@ -1183,15 +1202,15 @@ public class ContactActivity extends Activity {
 			switch (tab) {
 			case TAB_CONTACT:
 				bottom_button_left.setChecked(true); // First State
-				header.addView(contactPost);
-				contactListView.setOnItemClickListener(null);
-				txtTitle.setText(R.string.contact_contact);
+				header.addView(post);
+				listView.setOnItemClickListener(null);
+				title.setText(R.string.contact_contact);
 				if (comments.isEmpty()) {
-					contactListView.setAdapter(noCommentAdapter);
+					listView.setAdapter(noCommentAdapter);
 				} else {
-					contactListView.setAdapter(commentAdapter);
+					listView.setAdapter(commentAdapter);
 				}
-				contactListView.setOnItemLongClickListener(commentLongClickListener);
+				listView.setOnItemLongClickListener(commentLongClickListener);
 				try {
 					HashMap<String, String> params = new HashMap<String, String>();
 					params.put("tab", "Contact");
@@ -1199,11 +1218,11 @@ public class ContactActivity extends Activity {
 				} catch (Exception e) {}
 				break;
 			case TAB_MORE_INFO:
-				header.removeView(contactPost);
-				txtTitle.setText(R.string.contact_more);
-				contactListView.setAdapter(infoAdapter);
-				contactListView.setOnItemLongClickListener(null);
-				contactListView.setOnItemClickListener(infoClickListener);
+				header.removeView(post);
+				title.setText(R.string.contact_more);
+				listView.setAdapter(infoAdapter);
+				listView.setOnItemLongClickListener(null);
+				listView.setOnItemClickListener(infoClickListener);
 				try {
 					HashMap<String, String> params = new HashMap<String, String>();
 					params.put("tab", "More Info");
@@ -1211,11 +1230,11 @@ public class ContactActivity extends Activity {
 				} catch (Exception e) {}
 				break;
 			case TAB_SURVEYS:
-				header.removeView(contactPost);
-				txtTitle.setText(R.string.contact_survey);
-				contactListView.setAdapter(keywordAdapter);
-				contactListView.setOnItemLongClickListener(null);
-				contactListView.setOnItemClickListener(null);
+				header.removeView(post);
+				title.setText(R.string.contact_survey);
+				listView.setAdapter(keywordAdapter);
+				listView.setOnItemLongClickListener(null);
+				listView.setOnItemClickListener(null);
 				try {
 					HashMap<String, String> params = new HashMap<String, String>();
 					params.put("tab", "Surveys");
@@ -1233,16 +1252,5 @@ public class ContactActivity extends Activity {
 			return false;
 
 		return true;
-	}
-	
-	private boolean nullOrEmpty(Object obj) {
-		if (obj instanceof String) {
-			if (obj == null || ((String) obj).length() <= 0)
-				return true;
-		} else {
-			if (obj == null)
-				return true;
-		}
-		return false;
 	}
 }

@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+import com.missionhub.api.Api;
 import com.missionhub.api.GError;
 import com.missionhub.api.GLoginDone;
 import com.missionhub.auth.Auth;
@@ -41,8 +42,6 @@ public class LoginActivity extends Activity {
 	private ProgressDialog mProgressDialog;
 	private WebView mWebView;
 	private Button mCloseBtn;
-	private String wvUrl = Config.oauthUrl + "/authorize?display=touch&simple=true&response_type=code&redirect_uri=" + Config.oauthUrl
-			+ "/done.json&client_id=" + Config.oauthClientId + "&scope=" + Config.oauthScope;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -69,7 +68,7 @@ public class LoginActivity extends Activity {
 		mWebView.getSettings().setSupportZoom(false);
 		mWebView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
 		mWebView.setWebViewClient(new InternalWebViewClient());
-		mWebView.loadUrl(wvUrl);
+		mWebView.loadUrl(Api.getLoginUrl());
 		
 		Flurry.pageView("Login");
 	}
