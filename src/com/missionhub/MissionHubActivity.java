@@ -43,6 +43,7 @@ public class MissionHubActivity extends Activity {
 		mLogoutBar = (RelativeLayout) findViewById(R.id.logoutbar);
 		mLoggedIn = (LinearLayout) findViewById(R.id.loggedin);
 		mLoggedOut = (LinearLayout) findViewById(R.id.loggedout);
+		
 		mName = (TextView) findViewById(R.id.name);
 		
 		Auth.checkToken(this, checkTokenHandler);

@@ -2,6 +2,8 @@ package com.missionhub;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import com.flurry.android.FlurryAgent;
 import com.google.gson.Gson;
@@ -13,6 +15,7 @@ import com.missionhub.api.GOrgGeneric;
 import com.missionhub.auth.User;
 import com.missionhub.error.MHException;
 import com.missionhub.helpers.Flurry;
+import com.missionhub.helpers.U;
 import com.missionhub.ui.ContactItemAdapter;
 import com.missionhub.ui.DisplayError;
 import com.missionhub.ui.Guide;
@@ -21,6 +24,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
@@ -46,6 +50,9 @@ public class ContactsActivity extends Activity {
 
 	public static final String TAG = ContactsActivity.class.getName();
 
+	public final static int RESULT_CONTACTS_FILTER_ACTIVITY = 0;
+	public final static int RESULT_CHANGED = 1000;
+	
 	private final int TAB_MY = 0;
 	private final int TAB_COMPLETED = 1;
 	private final int TAB_UNASSIGNED = 2;
@@ -145,6 +152,17 @@ public class ContactsActivity extends Activity {
 	   Flurry.endSession(this);
 	}
 	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == RESULT_CONTACTS_FILTER_ACTIVITY && resultCode == RESULT_CHANGED) {
+			try {
+				FlurryAgent.onEvent("Contacts.Refresh");
+			} catch (Exception e) {}
+			resetListView(false);
+			getMore();
+		}
+	}
+	
 	private ArrayList<String> processes = new ArrayList<String>();
 
 	private void showProgress(String process) {
@@ -179,6 +197,11 @@ public class ContactsActivity extends Activity {
 		bottom_button_right.setChecked(true);
 		setTab(TAB_UNASSIGNED, false);
 	}
+	
+	public void clickFilter(View v) {
+		Intent i = new Intent(this, ContactsFilterActivity.class);
+		startActivityForResult(i, RESULT_CONTACTS_FILTER_ACTIVITY);
+	}
 
 	private void setTab(int tab, boolean force) {
 		if (this.tab != tab || force) {
@@ -187,8 +210,6 @@ public class ContactsActivity extends Activity {
 				bottom_button_left.setChecked(true); // First State
 				txtTitle.setText(R.string.contacts_my_contacts);
 				txtNoData.setText(R.string.contacts_no_data_my_contacts);
-				options.put("filters", "status");
-				options.put("values", "not_finished");
 				options.put("assigned_to_id", String.valueOf(User.getContact().getPerson().getId()));
 				Guide.display(this, Guide.CONTACTS_MY_CONTACTS);
 				try {
@@ -200,8 +221,6 @@ public class ContactsActivity extends Activity {
 			case TAB_COMPLETED:
 				txtTitle.setText(R.string.contacts_my_completed);
 				txtNoData.setText(R.string.contacts_no_data_my_completed);
-				options.put("filters", "status");
-				options.put("values", "finished");
 				options.put("assigned_to_id", String.valueOf(User.getContact().getPerson().getId()));
 				try {
 					HashMap<String, String> params = new HashMap<String, String>();
@@ -212,8 +231,6 @@ public class ContactsActivity extends Activity {
 			case TAB_UNASSIGNED:
 				txtTitle.setText(R.string.contacts_unassigned);
 				txtNoData.setText(R.string.contacts_no_data_unassigned);
-				options.remove("filters");
-				options.remove("values");
 				options.put("assigned_to_id", "none");
 				Guide.display(this, Guide.CONTACTS_UNASSIGNED);
 				try {
@@ -254,6 +271,8 @@ public class ContactsActivity extends Activity {
 		
 		if (searchTerm != null && !searchTerm.equals("") &&  processes.contains("loading_"+searchTerm))
 			return;
+		
+		setFilters();
 
 		options.put("limit", String.valueOf(limit));
 		options.put("start", String.valueOf(start));
@@ -343,6 +362,63 @@ public class ContactsActivity extends Activity {
 		Api.getContactsList(options, responseHandler);
 	}
 
+	private void setFilters() {
+		HashMap<String, String> filters = new HashMap<String, String>();
+		
+		if (tab == TAB_MY) {
+			filters.put("status", "not_finished");
+		} else if (tab == TAB_COMPLETED) {
+			filters.put("status", "finished");
+		}
+		
+		SharedPreferences sharedPrefs = getBaseContext().getSharedPreferences("contact_filters", 0);
+		Map<String, ?> prefs = sharedPrefs.getAll();
+		
+		Iterator<String> itr = prefs.keySet().iterator();
+		while (itr.hasNext()) {
+			String key = itr.next();
+			Object value = prefs.get(key);
+			
+			if (key.equalsIgnoreCase("gender")) {
+				String gender = value.toString();
+				if (gender.equalsIgnoreCase("male")) {
+					filters.put("gender", "male");
+				}
+				if (gender.equalsIgnoreCase("female")) {
+					filters.put("gender", "female");
+				}
+			}
+		}
+		
+		String filterKeys = "";
+		String filterValues = "";
+		Iterator<String> itr2 = filters.keySet().iterator();
+		while(itr2.hasNext()) {
+			String key = itr2.next();
+			if (U.nullOrEmpty(key)) {
+				continue;
+			}
+			String value = filters.get(key);
+			if (U.nullOrEmpty(value)) {
+				continue;
+			}
+			filterKeys += key;
+			filterValues += value;
+			if (itr2.hasNext()) {
+				filterKeys += ",";
+				filterValues += ",";
+			}
+		}
+		
+		if (filterKeys.length() > 0 && filterValues.length() > 0) {
+			options.put("filters", filterKeys);
+			options.put("values", filterValues);
+		} else {
+			options.remove("filters");
+			options.remove("values");
+		}
+	}
+	
 	private String searchTerm = "";
 	private Handler searchHandler = new Handler();
 	
