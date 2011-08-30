@@ -10,7 +10,6 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.ViewGroup.LayoutParams;
