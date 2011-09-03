@@ -3,6 +3,7 @@ package com.missionhub.api;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map.Entry;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -227,53 +228,55 @@ public class Api {
 	}
 	
 	private static String buildIds(ArrayList<Integer> ids) {
-		String listOfIds = "";
+		StringBuffer idList = new StringBuffer();
 		Iterator<Integer> itr = ids.iterator();
 		while (itr.hasNext()) {
 			String element = String.valueOf(itr.next());
-			listOfIds += element;
+			idList.append(element);
 			if (itr.hasNext()) {
-				listOfIds += ",";
+				idList.append(",");
 			}
 		}
-		return listOfIds;
+		return idList.toString();
 	}
 	
 	private static RequestParams sortFilterAssign(HashMap<String,String> options, RequestParams params) {
-		Iterator<String> iterator = options.keySet().iterator();
+		Iterator<Entry<String, String>> iterator = options.entrySet().iterator();
 		
 		while (iterator.hasNext()) {
-			String key = iterator.next();
+			final Entry<String, String> entry = iterator.next();
+			String key = entry.getKey();
+			String value = entry.getValue();
 			if (key.equalsIgnoreCase("limit")) {
-				params.put("limit", options.get(key));
+				params.put("limit", value);
 				continue;
 			}
 			if (key.equalsIgnoreCase("start")) {
-				params.put("start", options.get(key));
+				params.put("start", value);
 				continue;
 			}
 			if (key.equalsIgnoreCase("assigned_to_id")) {
-				params.put("assigned_to", options.get(key));
+				params.put("assigned_to", value);
 				continue;
 			}
 			if (key.equalsIgnoreCase("sort")) {
-				params.put("sort", options.get(key));
+				params.put("sort", value);
 				continue;
 			}
 			if (key.equalsIgnoreCase("direction")) {
-				params.put("direction", options.get(key));
+				params.put("direction", value);
 				continue;
 			}
 			if (key.equalsIgnoreCase("filters")) {
-				params.put("filters", options.get(key));
+				params.put("filters", value);
 				continue;
 			}
 			if (key.equalsIgnoreCase("values")) {
-				params.put("values", options.get(key));
+				params.put("values", value);
 				continue;
 			}
 			if (key.equalsIgnoreCase("term")) {
-				params.put("term", options.get(key));
+				params.put("term", value);
 				continue;
 			}
 	   }

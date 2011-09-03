@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.flurry.android.FlurryAgent;
 import com.google.gson.Gson;
@@ -387,29 +388,31 @@ public class ContactsActivity extends Activity {
 			}
 		}
 		
-		String filterKeys = "";
-		String filterValues = "";
-		Iterator<String> itr2 = filters.keySet().iterator();
+		StringBuffer filterKeys = new StringBuffer();
+		StringBuffer filterValues = new StringBuffer();
+		
+		Iterator<Entry<String, String>> itr2 = filters.entrySet().iterator();
 		while(itr2.hasNext()) {
-			String key = itr2.next();
+			Entry<String, String> entry = itr2.next();
+			final String key = entry.getKey();
 			if (U.nullOrEmpty(key)) {
 				continue;
 			}
-			String value = filters.get(key);
+			final String value = entry.getValue();
 			if (U.nullOrEmpty(value)) {
 				continue;
 			}
-			filterKeys += key;
-			filterValues += value;
+			filterKeys.append(key);
+			filterValues.append(value);
 			if (itr2.hasNext()) {
-				filterKeys += ",";
-				filterValues += ",";
+				filterKeys.append(",");
+				filterValues.append(",");
 			}
 		}
 		
 		if (filterKeys.length() > 0 && filterValues.length() > 0) {
-			options.put("filters", filterKeys);
-			options.put("values", filterValues);
+			options.put("filters", filterKeys.toString());
+			options.put("values", filterValues.toString());
 		} else {
 			options.remove("filters");
 			options.remove("values");

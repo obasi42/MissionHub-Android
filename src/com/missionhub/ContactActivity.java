@@ -472,16 +472,15 @@ public class ContactActivity extends Activity {
 		}
 		
 		if(person.getInterests().length > 0) {
-			String interests = "";
+			StringBuffer interests = new StringBuffer();
 			for( int i=0; i < person.getInterests().length; i++) {
 				GIdNameProvider interest = person.getInterests()[i];
-				interests += interest.getName();
+				interests.append(interest.getName());
 				if((i+1) < person.getInterests().length) {
-					interests += ", ";
+					interests.append(", ");
 				}
 			}
-			
-			info.add(new SimpleListItem(getString(R.string.contact_info_interests), interests));
+			info.add(new SimpleListItem(getString(R.string.contact_info_interests), interests.toString()));
 		}
 		
 		if(person.getEducation().length > 0) {

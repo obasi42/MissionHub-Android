@@ -36,7 +36,7 @@ public class Helper {
 	public static String formatPhoneNumber(String phoneNumber)
 	{
 	    String fNum = null;
-	    phoneNumber.replaceAll("[^0-9]", "");
+	    phoneNumber = phoneNumber.replaceAll("[^0-9]", "");
 	 
 	    if(11 == phoneNumber.length())
 	    {

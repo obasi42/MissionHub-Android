@@ -119,7 +119,7 @@ public class ImageManager {
 	
 	/** Classes **/
 	
-	private class ImageRef {
+	private static class ImageRef {
 		public String url;
 		public ImageView imageView;
 		
@@ -130,10 +130,9 @@ public class ImageManager {
 	}
 	
 	//stores list of images to download
-	private class ImageQueue {
-		private Stack<ImageRef> imageRefs = 
-			new Stack<ImageRef>();
-
+	private static class ImageQueue {
+		private Stack<ImageRef> imageRefs = new Stack<ImageRef>();
+		
 		//removes all instances of this ImageView
 		public void Clean(ImageView view) {
 			
