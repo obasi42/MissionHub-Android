@@ -5,7 +5,7 @@
 	android:background="@drawable/mh_navbar">
 	<TextView android:layout_alignParentLeft="true"
 		android:layout_width="fill_parent" android:layout_height="fill_parent"
-		android:gravity="center" android:id="@+id/txt_contacts_title"
+		android:gravity="center" android:id="@+id/title"
 		android:textSize="18dp" android:textStyle="bold" android:textColor="@color/white"
 		android:text="@string/contacts_filter"
 		android:layout_marginRight="40dp" android:layout_marginLeft="40dp"></TextView>

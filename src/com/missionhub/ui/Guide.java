@@ -11,7 +11,7 @@ import android.util.Log;
 public class Guide {
 	
 	public static final int CONTACTS_MY_CONTACTS = 0;
-	public static final int CONTACTS_UNASSIGNED = 1;
+	public static final int CONTACTS_ALL = 1;
 	public static final int CONTACT = 2;
 	
 	public static final String PREFS_NAME = "MissionHubGuide";
@@ -29,9 +29,9 @@ public class Guide {
 				title = ctx.getString(R.string.guide_contacts);
 				message = ctx.getString(R.string.guide_contacts_msg);
 				break;
-			case CONTACTS_UNASSIGNED:
-				title = ctx.getString(R.string.guide_contacts_unassigned);
-				message = ctx.getString(R.string.guide_contacts_unassigned_msg);
+			case CONTACTS_ALL:
+				title = ctx.getString(R.string.guide_contacts_all);
+				message = ctx.getString(R.string.guide_contacts_all_msg);
 				break;
 			case CONTACT:
 				title = ctx.getString(R.string.guide_contact);

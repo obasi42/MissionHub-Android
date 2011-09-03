@@ -12,16 +12,13 @@
     <string name="surveys_exit">Exit Survey Mode?</string>
     <string name="surveys_exit_msg">Clicking OK will exit survey mode.</string>
     
-    <string name="contacts_my_contacts">My Contacts</string>
-    <string name="contacts_my_completed">My Completed Contacts</string>
-    <string name="contacts_unassigned">Unassigned Contacts</string>
-    <string name="contacts_tab_my_contacts">My Contacts</string>
-    <string name="contacts_tab_my_completed">My Completed</string>
-    <string name="contacts_tab_unassigned">Unassigned</string>  
+    <string name="contacts_my">My Contacts</string>
+    <string name="contacts_all">All Contacts</string>
+    <string name="contacts_tab_my">My Contacts</string>
+    <string name="contacts_tab_all">All Contacts</string>  
     <string name="contacts_search_hint">Search...</string>
-    <string name="contacts_no_data_my_contacts">No Assigned Contacts</string>
-    <string name="contacts_no_data_my_completed">No Completed Assigned Contacts</string>
-    <string name="contacts_no_data_unassigned">No Unassigned Contacts</string>
+    <string name="contacts_no_data_my">No Assigned Contacts To Display</string>
+    <string name="contacts_no_data_all">No Contacts To Display</string>
     <string name="contacts_menu_refresh">Refresh</string>
     <string name="contacts_actions">Contact Actions</string>
     <string name="contacts_make_leader">Promote to Leader</string>
@@ -31,6 +28,10 @@
     <string name="contacts_filter">Contact Filters</string>
     <string name="contacts_filter_predefined">Predefined</string>
     <string name="contacts_filter_pref_gender">Gender</string>
+    <string name="contacts_filter_my">My Contacts - Filters</string>
+    <string name="contacts_filter_all">All Contacts - Filters</string>
+    <string name="contacts_filter_not_filtered">Not Filtered</string>
+    <string name="contacts_filters_menu_clear">Clear Filters</string>
     
     <string name="contact_contact">Contact</string>
     <string name="contact_more">More Contact Info</string>
@@ -110,11 +111,11 @@
 	<string name="error_unexpected_response_msg">The MissionHub server returned unexpected data. Please try again later.</string>
 	
 	<string name="guide_contacts">My Contacts</string>
-	<string name="guide_contacts_msg">This view shows all contacts that have been assigned to you for follow-up. If the list is empty, you need your leader to assign contacts to you or go to ‘Unassigned’ in the lower right corner and assign contacts to yourself.</string>
-	<string name="guide_contacts_unassigned">Unassigned Contacts</string>
-	<string name="guide_contacts_unassigned_msg">This view shows all contacts that have been collected but not assigned. All designated leaders can access this page and can self-assign contacts. If you tap ‘Assign to me’, this contact will move to ‘My Contacts’.</string>
+	<string name="guide_contacts_msg">This view shows all contacts that have been assigned to you for follow-up. If the list is empty, you need your leader to assign contacts to you or go to ‘All Contacts’ in the lower right corner and assign contacts to yourself.</string>
+	<string name="guide_contacts_all">All Contacts</string>
+	<string name="guide_contacts_all_msg">This view shows all contacts that have been collected. All designated leaders can access this page and can self-assign contacts. If you tap ‘Assign to me’, this contact will move to ‘My Contacts’. Use filters to narrow your results by clicking on the arrows by the search box.</string>
 	<string name="guide_contact">Contact Information</string>
-	<string name="guide_contact_msg">You can learn about a contact and record your interactions with that person on this page. If you mark a contact as ‘Completed’, it will move to ‘My Completed’. Tap the rejoicing icon to add  Rejoicables to your interaction.</string>
+	<string name="guide_contact_msg">You can learn about a contact and record your interactions with that person on this page. Tap the rejoicing icon to add Rejoicables to your interaction.</string>
 
 	<string name="profile_header">Profile</string>
 	<string name="profile_change_current_organization">Change Current Organization:</string>

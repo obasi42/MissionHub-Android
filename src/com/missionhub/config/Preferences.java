@@ -63,13 +63,46 @@ public class Preferences {
 	}
 	
 	/**
-	 * Removed the stored organizationID
+	 * Removes the stored organizationID
 	 * @param ctx
 	 */
 	public static synchronized void removeOrganizationID(Context ctx) {
 		SharedPreferences settings = ctx.getSharedPreferences(PREFS_NAME, 0);
 		SharedPreferences.Editor editor = settings.edit();
 		editor.remove("organizationID");
+		editor.commit();
+	}
+
+	/**
+	 * Returns the stored lastRunVersion
+	 * @param ctx
+	 * @return the lastRunVersion or null
+	 */
+	public static synchronized String getLastRunVersion(Context ctx) {
+		SharedPreferences settings = ctx.getSharedPreferences(PREFS_NAME, 0);
+		return settings.getString("lastRunVersion", null);
+	}	
+	
+	/**
+	 * Sets the stored lastRunVersion
+	 * @param ctx
+	 * @param lastRunVersion
+	 */
+	public static synchronized void setLastRunVersion(Context ctx, String lastRunVersion) {
+		SharedPreferences settings = ctx.getSharedPreferences(PREFS_NAME, 0);
+		SharedPreferences.Editor editor = settings.edit();
+		editor.putString("lastRunVersion", lastRunVersion);
+		editor.commit();
+	}
+	
+	/**
+	 * Removes the stored lastRunVersion
+	 * @param ctx
+	 */
+	public static synchronized void removeLastRunVersion(Context ctx) {
+		SharedPreferences settings = ctx.getSharedPreferences(PREFS_NAME, 0);
+		SharedPreferences.Editor editor = settings.edit();
+		editor.remove("lastRunVersion");
 		editor.commit();
 	}
 }

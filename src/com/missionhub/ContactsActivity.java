@@ -54,10 +54,9 @@ public class ContactsActivity extends Activity {
 	public final static int RESULT_CHANGED = 1000;
 	
 	private final int TAB_MY = 0;
-	private final int TAB_COMPLETED = 1;
-	private final int TAB_UNASSIGNED = 2;
-
-	private int tab = TAB_MY;
+	private final int TAB_ALL = 1;
+	private int tab = TAB_MY; // Tab state
+	
 	private ListView contactsList;
 	private ContactItemAdapter adapter;
 	private ProgressBar progress;
@@ -65,7 +64,6 @@ public class ContactsActivity extends Activity {
 	private TextView txtTitle;
 	private EditText search;
 	private ToggleButton bottom_button_left;
-	private ToggleButton bottom_button_center;
 	private ToggleButton bottom_button_right;
 
 	private ArrayList<GContact> data = new ArrayList<GContact>();
@@ -90,7 +88,6 @@ public class ContactsActivity extends Activity {
 		search = (EditText) findViewById(R.id.contacts_search);
 
 		bottom_button_left = (ToggleButton) findViewById(R.id.bottom_button_left);
-		bottom_button_center = (ToggleButton) findViewById(R.id.bottom_button_center);
 		bottom_button_right = (ToggleButton) findViewById(R.id.bottom_button_right);
 		
 		search.addTextChangedListener(new ContactsSearchWatcher());
@@ -178,28 +175,24 @@ public class ContactsActivity extends Activity {
 	}
 
 	public void clickMyContacts(View v) {
-		bottom_button_center.setChecked(false);
-		bottom_button_right.setChecked(false);
 		bottom_button_left.setChecked(true);
+		bottom_button_right.setChecked(false);
 		setTab(TAB_MY, false);
 	}
 
-	public void clickMyCompleted(View v) {
+	public void clickAllContacts(View v) {
 		bottom_button_left.setChecked(false);
-		bottom_button_right.setChecked(false);
-		bottom_button_center.setChecked(true);
-		setTab(TAB_COMPLETED, false);
-	}
-
-	public void clickUnassigned(View v) {
-		bottom_button_left.setChecked(false);
-		bottom_button_center.setChecked(false);
 		bottom_button_right.setChecked(true);
-		setTab(TAB_UNASSIGNED, false);
+		setTab(TAB_ALL, false);
 	}
 	
 	public void clickFilter(View v) {
 		Intent i = new Intent(this, ContactsFilterActivity.class);
+		if (tab == TAB_MY) {
+			i.putExtra("TYPE", ContactsFilterActivity.TYPE_MY_CONTACTS);
+		} else if (tab == TAB_ALL) {
+			i.putExtra("TYPE", ContactsFilterActivity.TYPE_ALL_CONTACTS);
+		}
 		startActivityForResult(i, RESULT_CONTACTS_FILTER_ACTIVITY);
 	}
 
@@ -208,9 +201,8 @@ public class ContactsActivity extends Activity {
 			switch (tab) {
 			case TAB_MY:
 				bottom_button_left.setChecked(true); // First State
-				txtTitle.setText(R.string.contacts_my_contacts);
-				txtNoData.setText(R.string.contacts_no_data_my_contacts);
-				options.put("assigned_to_id", String.valueOf(User.getContact().getPerson().getId()));
+				txtTitle.setText(R.string.contacts_my);
+				txtNoData.setText(R.string.contacts_no_data_my);
 				Guide.display(this, Guide.CONTACTS_MY_CONTACTS);
 				try {
 					HashMap<String, String> params = new HashMap<String, String>();
@@ -218,24 +210,13 @@ public class ContactsActivity extends Activity {
 					FlurryAgent.onEvent("Contacts.ChangeTab", params);
 				} catch (Exception e) {}
 				break;
-			case TAB_COMPLETED:
-				txtTitle.setText(R.string.contacts_my_completed);
-				txtNoData.setText(R.string.contacts_no_data_my_completed);
-				options.put("assigned_to_id", String.valueOf(User.getContact().getPerson().getId()));
+			case TAB_ALL:
+				txtTitle.setText(R.string.contacts_all);
+				txtNoData.setText(R.string.contacts_no_data_all);
+				Guide.display(this, Guide.CONTACTS_ALL);
 				try {
 					HashMap<String, String> params = new HashMap<String, String>();
-					params.put("tab", "My Completed");
-					FlurryAgent.onEvent("Contacts.ChangeTab", params);
-				} catch (Exception e) {}
-				break;
-			case TAB_UNASSIGNED:
-				txtTitle.setText(R.string.contacts_unassigned);
-				txtNoData.setText(R.string.contacts_no_data_unassigned);
-				options.put("assigned_to_id", "none");
-				Guide.display(this, Guide.CONTACTS_UNASSIGNED);
-				try {
-					HashMap<String, String> params = new HashMap<String, String>();
-					params.put("tab", "Unassigned");
+					params.put("tab", "AllContacts");
 					FlurryAgent.onEvent("Contacts.ChangeTab", params);
 				} catch (Exception e) {}
 				break;
@@ -365,28 +346,44 @@ public class ContactsActivity extends Activity {
 	private void setFilters() {
 		HashMap<String, String> filters = new HashMap<String, String>();
 		
+		SharedPreferences sharedPrefs = null;
 		if (tab == TAB_MY) {
-			filters.put("status", "not_finished");
-		} else if (tab == TAB_COMPLETED) {
-			filters.put("status", "finished");
+			sharedPrefs = getBaseContext().getSharedPreferences(ContactsFilterActivity.TYPE_MY_CONTACTS, 0);
+			options.put("assigned_to_id", String.valueOf(User.getContact().getPerson().getId()));
+		} else if (tab == TAB_ALL) {
+			sharedPrefs = getBaseContext().getSharedPreferences(ContactsFilterActivity.TYPE_ALL_CONTACTS, 0);
+			options.remove("assigned_to_id");
 		}
+		filters.put("status", "not_finished"); // Default
 		
-		SharedPreferences sharedPrefs = getBaseContext().getSharedPreferences("contact_filters", 0);
 		Map<String, ?> prefs = sharedPrefs.getAll();
-		
 		Iterator<String> itr = prefs.keySet().iterator();
 		while (itr.hasNext()) {
 			String key = itr.next();
 			Object value = prefs.get(key);
 			
-			if (key.equalsIgnoreCase("gender")) {
-				String gender = value.toString();
-				if (gender.equalsIgnoreCase("male")) {
-					filters.put("gender", "male");
+			if (value instanceof String) {
+				// Assigned To Is Not Really A Filter
+				if (key.equalsIgnoreCase("assigned_to")) {
+					if (((String) value).equalsIgnoreCase("me")) {
+						options.put("assigned_to_id", String.valueOf(User.getContact().getPerson().getId()));
+					} else if (((String) value).equalsIgnoreCase("no_one")) {
+						options.put("assigned_to_id", "none");
+					} else {
+						options.remove("assigned_to_id");
+					}
+					continue;
 				}
-				if (gender.equalsIgnoreCase("female")) {
-					filters.put("gender", "female");
+				
+				// Ignore Not Filtered
+				if (((String) value).equalsIgnoreCase(ContactsFilterActivity.NOT_FILTERED)) {
+					filters.remove(key);
+					continue;
 				}
+				
+				filters.put(key, value.toString());
+			} else if (value instanceof Boolean) {
+				//TODO:
 			}
 		}
 		

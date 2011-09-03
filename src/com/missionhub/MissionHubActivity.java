@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.missionhub.auth.Auth;
 import com.missionhub.auth.User;
+import com.missionhub.config.Preferences;
 import com.missionhub.helpers.Flurry;
 
 public class MissionHubActivity extends Activity {
@@ -38,6 +39,7 @@ public class MissionHubActivity extends Activity {
 		setContentView(R.layout.main);
 		
 		Application.initVersion(this);
+		Preferences.setLastRunVersion(this, Application.getVersion());
 		Application.restoreApplicationState(savedInstanceState);
 		
 		mLogoutBar = (RelativeLayout) findViewById(R.id.logoutbar);
