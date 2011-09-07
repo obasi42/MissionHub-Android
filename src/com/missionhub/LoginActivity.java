@@ -169,11 +169,13 @@ public class LoginActivity extends Activity {
 		public void onPageFinished(WebView view, String url) {
 			Uri uri = Uri.parse(url);
 			String authorization = uri.getQueryParameter("authorization");
+						
 			if (authorization != null && uri.getPath().equalsIgnoreCase("/oauth/authorize")) {
 				CookieSyncManager.createInstance(LoginActivity.this);
 				CookieManager mgr = CookieManager.getInstance();
 				String cookieString = mgr.getCookie(Config.cookieHost);
-				if (cookieString != null && (cookieString.contains("_bonfire_session=") || cookieString.contains("_mh_session="))) {
+				
+				if (cookieString != null && (cookieString.contains("_mh_session=") && cookieString.contains("logged_in=true"))) {
 					mWebView.loadUrl(Config.oauthUrl + "/grant.json?authorization=" + authorization);
 					return;
 				}
