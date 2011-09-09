@@ -172,21 +172,21 @@ public class ContactsActivity extends Activity {
 		boolean filtered = false;
 		
 		if (filters.containsKey("status")) {
-			if (!(filters.get("status").equals("not_finished"))) {
+			if (!(filters.get("status").equalsIgnoreCase("not_finished"))) {
 				filtered = true;
 			}
-		}		
+		}
+		
+		filters.keySet().toString();
 		
 		if (tab == TAB_ALL) {
-			if (filters.containsKey("assigned_to")) {
-				if (!(filters.get("assigned_to").equals(ContactsFilterActivity.NOT_FILTERED))) {
-					filtered = true;
-				}
+			if (options.containsKey("assigned_to_id")) {
+				filtered = true;
 			}
 		}
 		
 		if (filters.containsKey("gender")) {
-			if (!(filters.get("gender").equals(ContactsFilterActivity.NOT_FILTERED))) {
+			if (!(filters.get("gender").equalsIgnoreCase(ContactsFilterActivity.NOT_FILTERED))) {
 				filtered = true;
 			}
 		}
