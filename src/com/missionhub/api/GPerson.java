@@ -20,7 +20,6 @@ public class GPerson {
 	private GIdNameProvider[] interests;
 	private GAssign assignment;
 	private GOrgGeneric[] organizational_roles;
-	private GOrgGeneric[] organization_membership;
 	private GEducation[] education;
 	
 	public String getFirst_name() { return first_name; }
@@ -41,7 +40,6 @@ public class GPerson {
 	public GIdNameProvider[] getInterests() { return interests; }
 	public GAssign getAssignment() { return assignment; }
 	public GOrgGeneric[] getOrganizational_roles() { return organizational_roles; }
-	public GOrgGeneric[] getOrganizational_memebership() { return organization_membership; }
 	public GEducation[] getEducation() { return education; }
 	
 	public void setFirst_name(String s) { first_name = s; }
@@ -62,6 +60,5 @@ public class GPerson {
 	public void setInterests(GIdNameProvider[] i) { interests = i; }
 	public void setAssignment(GAssign a) { assignment = a; }
 	public void setOrganizational_roles(GOrgGeneric[] g) { organizational_roles = g; }
-	public void setOrganization_membership(GOrgGeneric[] g) { organization_membership = g; }
 	public void setEducation(GEducation[] g) { education = g; }
 }

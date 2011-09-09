@@ -87,8 +87,7 @@ public class User {
 	 */
 	public static synchronized void setContact(GContact contact) throws MHException {
 		User.contact = contact;
-		initOrganizations(contact.getPerson());
-		initRoles(contact.getPerson());
+		initOrgsRoles(contact.getPerson());
 	}
 	
 	/**
@@ -195,41 +194,25 @@ public class User {
 	}
 
 	/**
-	 * Initializes the organizations object
+	 * Initializes a user's organizations and roles
 	 * @param person
 	 * @throws MHException
 	 */
-	private static synchronized void initOrganizations(GPerson person) throws MHException {
-		try {
-			final GOrgGeneric[] memberships = person.getOrganizational_memebership();
-			organizations.clear();
-			for (int i = 0; i < memberships.length; i++) {
-				final GOrgGeneric membership = memberships[i];
-				organizations.put(membership.getOrg_id(), membership);
-				if (membership.getPrimary().equalsIgnoreCase("true") || getPrimaryOrganizationID() < 0) {
-					setPrimaryOrganizationID(membership.getOrg_id());
-				}
-			}
-		} catch (Exception e) {
-			throw new MHException(e.getMessage(), User.class.getName() + ".initOrganizations", e.getStackTrace());
-		}
-	}
-
-	/**
-	 * Initializes the roles object
-	 * @param person
-	 * @throws MHException
-	 */
-	private static synchronized void initRoles(GPerson person) throws MHException {
+	private static synchronized void initOrgsRoles(GPerson person) throws MHException {
 		try {
 			final GOrgGeneric[] orgRoles = person.getOrganizational_roles();
+			organizations.clear();
 			roles.clear();
 			for (int i = 0; i < orgRoles.length; i++) {
-				final GOrgGeneric role = orgRoles[i];
-				roles.put(role.getOrg_id(), role.getRole());
+				final GOrgGeneric orgRole = orgRoles[i];
+				organizations.put(orgRole.getOrg_id(), orgRole);
+				if (orgRole.getPrimary().equalsIgnoreCase("true") || getPrimaryOrganizationID() < 0) {
+					setPrimaryOrganizationID(orgRole.getOrg_id());
+				}
+				roles.put(orgRole.getOrg_id(), orgRole.getRole());
 			}
 		} catch (Exception e) {
-			throw new MHException(e.getMessage(), User.class.getName() + ".initRoles", e.getStackTrace());
+			throw new MHException(e.getMessage(), User.class.getName() + ".initOrgsRoles", e.getStackTrace());
 		}
 	}
 }
