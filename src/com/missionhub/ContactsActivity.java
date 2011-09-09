@@ -41,6 +41,7 @@ import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -66,6 +67,7 @@ public class ContactsActivity extends Activity {
 	private EditText search;
 	private ToggleButton bottom_button_left;
 	private ToggleButton bottom_button_right;
+	private Button btnFilter;
 
 	private ArrayList<GContact> data = new ArrayList<GContact>();
 
@@ -90,6 +92,8 @@ public class ContactsActivity extends Activity {
 
 		bottom_button_left = (ToggleButton) findViewById(R.id.bottom_button_left);
 		bottom_button_right = (ToggleButton) findViewById(R.id.bottom_button_right);
+		
+		btnFilter = (Button) findViewById(R.id.btn_filter);
 		
 		search.addTextChangedListener(new ContactsSearchWatcher());
 
@@ -158,6 +162,39 @@ public class ContactsActivity extends Activity {
 			} catch (Exception e) {}
 			resetListView(false);
 			getMore();
+		}
+	}
+	
+	private void updateFilterIcon(HashMap<String, String> filters) {
+		if (filters == null || filters.isEmpty())
+			return;
+		
+		boolean filtered = false;
+		
+		if (filters.containsKey("status")) {
+			if (!(filters.get("status").equals("not_finished"))) {
+				filtered = true;
+			}
+		}		
+		
+		if (tab == TAB_ALL) {
+			if (filters.containsKey("assigned_to")) {
+				if (!(filters.get("assigned_to").equals(ContactsFilterActivity.NOT_FILTERED))) {
+					filtered = true;
+				}
+			}
+		}
+		
+		if (filters.containsKey("gender")) {
+			if (!(filters.get("gender").equals(ContactsFilterActivity.NOT_FILTERED))) {
+				filtered = true;
+			}
+		}
+		
+		if (filtered) {
+			btnFilter.setBackgroundResource(R.drawable.mh_searchband_more_active);
+		} else {
+			btnFilter.setBackgroundResource(R.drawable.mh_searchband_more);
 		}
 	}
 	
@@ -417,6 +454,8 @@ public class ContactsActivity extends Activity {
 			options.remove("filters");
 			options.remove("values");
 		}
+		
+		updateFilterIcon(filters);
 	}
 	
 	private String searchTerm = "";
