@@ -177,8 +177,6 @@ public class ContactsActivity extends Activity {
 			}
 		}
 		
-		filters.keySet().toString();
-		
 		if (tab == TAB_ALL) {
 			if (options.containsKey("assigned_to_id")) {
 				filtered = true;
