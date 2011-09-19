@@ -74,6 +74,18 @@
                below to <setup import="false" />.
              - customize to your needs.
     -->
-    <setup />
+	
+	<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" />
+
+	<target name="findbugs" depends="compile">
+		<mkdir dir="reports" />
+		<findbugs home="${findbugs.home}" output="xml"
+			outputFile="reports/findbugs.xml" excludeFilter="findbugs-exclude.xml">
+			<auxClasspath path="${android.jar}" />
+			<class location="${out.dir}" />
+		</findbugs>
+	</target>
+    
+	<setup />
 
 </project>
