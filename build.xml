@@ -80,7 +80,7 @@
 		<property name="config-target" value="${source.dir}/com/missionhub/config/Config.java"/>
 		
 		<!-- Copy the configuration file, replacing tokens in the file. -->
-		<copy file="${config-source}" tofile="${config-target}" overwrite="true" force="true" failonerror=true" encoding="utf-8">
+		<copy file="${config-source}" tofile="${config-target}" overwrite="true" force="true" failonerror="true" encoding="utf-8">
 			<filterset>
 				<filter token="CONFIG.MHBASEURL" value="${config.mh_baseurl}"/>
 				<filter token="CONFIG.MHCOOKIEHOST" value="${config.mh_cookiehost}"/>
