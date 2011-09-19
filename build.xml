@@ -74,7 +74,24 @@
                below to <setup import="false" />.
              - customize to your needs.
     -->
-	
+    
+	<target name="config">
+		<property name="config-source" value="${source.dir}/com/missionhub/config/Config.tpl"/>
+		<property name="config-target" value="${source.dir}/com/missionhub/config/Config.java"/>
+		
+		<!-- Copy the configuration file, replacing tokens in the file. -->
+		<copy file="${config-source}" tofile="${config-target}" overwrite="true" force="true" failonerror=true" encoding="utf-8">
+			<filterset>
+				<filter token="CONFIG.MHBASEURL" value="${config.mh_baseurl}"/>
+				<filter token="CONFIG.MHCOOKIEHOST" value="${config.mh_cookiehost}"/>
+				<filter token="CONFIG.MHCLIENTID" value="${config.mh_mhclientid}"/>
+				<filter token="CONFIG.MHCLIENTSECRET" value="${config.mh_clientsecret}"/>
+				<filter token="CONFIG.MHOAUTHSCOPE" value="${config.mh_oauthscope}"/>
+				<filter token="CONFIG.MHFLURRYKEY" value="${config.mh_flurrykey}"/>
+			</filterset>
+		</copy>
+	</target>
+    
 	<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" />
 
 	<target name="findbugs" depends="compile">
