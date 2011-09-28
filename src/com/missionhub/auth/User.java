@@ -157,7 +157,7 @@ public class User {
 	 * @return user's roles
 	 */
 	public static synchronized Set<String> getOrganizationRoles(int orgID) {
-		return null;
+		return roles.get(orgID);
 	}
 	
 	/**
