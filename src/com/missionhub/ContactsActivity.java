@@ -2,9 +2,12 @@ package com.missionhub;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import com.flurry.android.FlurryAgent;
 import com.google.gson.Gson;
+import com.missionhub.api.ApiClient;
 import com.missionhub.api.ApiResponseHandler;
 import com.missionhub.api.client.Contacts;
 import com.missionhub.api.client.Roles;
@@ -14,6 +17,7 @@ import com.missionhub.api.json.GOrgGeneric;
 import com.missionhub.auth.User;
 import com.missionhub.error.MHException;
 import com.missionhub.helpers.Flurry;
+import com.missionhub.helpers.U;
 import com.missionhub.ui.ContactItemAdapter;
 import com.missionhub.ui.DisplayError;
 import com.missionhub.ui.Guide;
@@ -22,6 +26,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
@@ -163,29 +168,24 @@ public class ContactsActivity extends Activity {
 		}
 	}
 	
-	private void updateFilterIcon(HashMap<String, String> filters) {
-		if (filters == null || filters.isEmpty())
+	private void updateFilterIcon() {
+		if (contactsOptions.getFilters().isEmpty())
 			return;
 		
 		boolean filtered = false;
 		
-		if (filters.containsKey("status")) {
-			if (!(filters.get("status").equalsIgnoreCase("not_finished"))) {
+		if (!contactsOptions.hasFilter("status", "uncontacted") || !contactsOptions.hasFilter("status", "attempted_contact") || !contactsOptions.hasFilter("status", "contacted")) {
+			filtered = true;
+		}
+		
+		if (tab == TAB_ALL) {
+			if (contactsOptions.hasFilter("assigned_to")) {
 				filtered = true;
 			}
 		}
 		
-		//TODO:
-//		if (tab == TAB_ALL) {
-//			if (options.containsKey("assigned_to_id")) {
-//				filtered = true;
-//			}
-//		}
-		
-		if (filters.containsKey("gender")) {
-			if (!(filters.get("gender").equalsIgnoreCase(ContactsFilterActivity.NOT_FILTERED))) {
-				filtered = true;
-			}
+		if (contactsOptions.hasFilter("gender")) {
+			filtered = true;
 		}
 		
 		if (filtered) {
@@ -262,11 +262,8 @@ public class ContactsActivity extends Activity {
 		}
 	}
 
-	//private int start = 0;
-	//private int limit = 15;
 	private boolean atEnd = false;
-	private boolean loading = false;
-	//private HashMap<String, String> options = new HashMap<String, String>();
+	
 	private ArrayList<Integer> contactIds = new ArrayList<Integer>();
 
 	private void resetListView(boolean notify) {
@@ -278,38 +275,27 @@ public class ContactsActivity extends Activity {
 		}
 		contactsOptions.setStart(0);
 		atEnd = false;
-		loading = false;
+		if (currentRequest != null) {
+			currentRequest.cancel(true);
+		}
+		hideProgress("contacts");
 	}
+	
+	ApiClient currentRequest;
 
 	private void getMore() {
-		if (loading || atEnd || processes.contains("loading_"+tab))
-			return;
-		
-		if (searchTerm != null && !searchTerm.equals("") &&  processes.contains("loading_"+searchTerm))
+		if (atEnd || processes.contains("contacts"))
 			return;
 
 		ApiResponseHandler responseHandler = new ApiResponseHandler() {
 
-			final int forTab = tab;
-			final String forTerm = searchTerm;
-
 			@Override
 			public void onStart() {
-				loading = true;
-				if (forTerm != null && !forTerm.equals("")){
-					showProgress("loading_"+forTerm);
-				} else {
-					showProgress("loading_"+forTab);
-				}
+				showProgress("contacts");
 			}
 
 			@Override
 			public void onSuccess(String response) {
-				if (forTerm != null && !forTerm.equals("") && !forTerm.equals(searchTerm)){
-					return;
-				} else if (forTab != tab){
-					return;
-				}
 				Gson gson = new Gson();
 				try {
 					GError error = gson.fromJson(response, GError.class);
@@ -360,96 +346,84 @@ public class ContactsActivity extends Activity {
 
 			@Override
 			public void onFinish() {
-				loading = false;
-				if (forTerm != null && !forTerm.equals("")){
-					hideProgress("loading_"+forTerm);
-				} else {
-					hideProgress("loading_"+forTab);
-				}
+				hideProgress("contacts");
 			}
 		};
 		
-		Contacts.list(this, contactsOptions, responseHandler);
+		setFilters();
+		currentRequest = Contacts.list(this, contactsOptions, responseHandler);
 		contactsOptions.incrementStart(contactsOptions.getLimit());
 	}
 
-	//TODO: fix
-//	private void setFilters() {
-//		HashMap<String, String> filters = new HashMap<String, String>();
-//		
-//		SharedPreferences sharedPrefs = null;
-//		if (tab == TAB_MY) {
-//			sharedPrefs = getBaseContext().getSharedPreferences(ContactsFilterActivity.TYPE_MY_CONTACTS, 0);
-//			options.put("assigned_to_id", String.valueOf(User.getContact().getPerson().getId()));
-//		} else if (tab == TAB_ALL) {
-//			sharedPrefs = getBaseContext().getSharedPreferences(ContactsFilterActivity.TYPE_ALL_CONTACTS, 0);
-//			options.remove("assigned_to_id");
-//		}
-//		filters.put("status", "not_finished"); // Default
-//		
-//		Map<String, ?> prefs = sharedPrefs.getAll();
-//		Iterator<String> itr = prefs.keySet().iterator();
-//		while (itr.hasNext()) {
-//			String key = itr.next();
-//			Object value = prefs.get(key);
-//			
-//			if (value instanceof String) {
-//				// Assigned To Is Not Really A Filter
-//				if (key.equalsIgnoreCase("assigned_to")) {
-//					if (((String) value).equalsIgnoreCase("me")) {
-//						options.put("assigned_to_id", String.valueOf(User.getContact().getPerson().getId()));
-//					} else if (((String) value).equalsIgnoreCase("no_one")) {
-//						options.put("assigned_to_id", "none");
-//					} else {
-//						options.remove("assigned_to_id");
-//					}
-//					continue;
-//				}
-//				
-//				// Ignore Not Filtered
-//				if (((String) value).equalsIgnoreCase(ContactsFilterActivity.NOT_FILTERED)) {
-//					filters.remove(key);
-//					continue;
-//				}
-//				
-//				filters.put(key, value.toString());
-//			} else if (value instanceof Boolean) {
-//				//TODO:
-//			}
-//		}
-//		
-//		StringBuffer filterKeys = new StringBuffer();
-//		StringBuffer filterValues = new StringBuffer();
-//		
-//		Iterator<Entry<String, String>> itr2 = filters.entrySet().iterator();
-//		while(itr2.hasNext()) {
-//			Entry<String, String> entry = itr2.next();
-//			final String key = entry.getKey();
-//			if (U.nullOrEmpty(key)) {
-//				continue;
-//			}
-//			final String value = entry.getValue();
-//			if (U.nullOrEmpty(value)) {
-//				continue;
-//			}
-//			filterKeys.append(key);
-//			filterValues.append(value);
-//			if (itr2.hasNext()) {
-//				filterKeys.append(",");
-//				filterValues.append(",");
-//			}
-//		}
-//		
-//		if (filterKeys.length() > 0 && filterValues.length() > 0) {
-//			options.put("filters", filterKeys.toString());
-//			options.put("values", filterValues.toString());
-//		} else {
-//			options.remove("filters");
-//			options.remove("values");
-//		}
-//		
-//		updateFilterIcon(filters);
-//	}
+	private void setFilters() {
+		
+		contactsOptions.clearFilters();
+		
+		SharedPreferences sharedPrefs = null;
+		if (tab == TAB_MY) {
+			sharedPrefs = getBaseContext().getSharedPreferences(ContactsFilterActivity.TYPE_MY_CONTACTS, 0);
+			contactsOptions.setFilter("assigned_to", String.valueOf(User.getContact().getPerson().getId()));
+		} else if (tab == TAB_ALL) {
+			sharedPrefs = getBaseContext().getSharedPreferences(ContactsFilterActivity.TYPE_ALL_CONTACTS, 0);
+			contactsOptions.removeFilter("assigned_to");
+		}
+		
+		// Not Finished Contacts
+		contactsOptions.addFilter("status", "uncontacted");
+		contactsOptions.addFilter("status", "attempted_contact");
+		contactsOptions.addFilter("status", "contacted");
+		
+		if (!U.nullOrEmpty(searchTerm)){
+			contactsOptions.setFilter("name", searchTerm);
+		}
+		
+		Map<String, ?> prefs = sharedPrefs.getAll();
+		Iterator<String> itr = prefs.keySet().iterator();
+		while (itr.hasNext()) {
+			String key = itr.next();
+			Object value = prefs.get(key);
+			
+			if (value instanceof String) {
+				// Assigned To Is Not Really A Filter
+				if (key.equalsIgnoreCase("assigned_to")) {
+					if (((String) value).equalsIgnoreCase("me")) {
+						contactsOptions.setFilter("assigned_to", String.valueOf(User.getContact().getPerson().getId()));
+					} else if (((String) value).equalsIgnoreCase("no_one")) {
+						contactsOptions.setFilter("assigned_to", "none");
+					} else {
+						contactsOptions.removeFilter("assigned_to");
+					}
+					continue;
+				}
+				
+				// Ignore Not Filtered
+				if (((String) value).equalsIgnoreCase(ContactsFilterActivity.NOT_FILTERED)) {
+					contactsOptions.removeFilter(key);
+					continue;
+				}
+				
+				if (key.equalsIgnoreCase("status")) {
+					if (((String) value).equalsIgnoreCase("not_finished")) {
+						contactsOptions.setFilter("status", "uncontacted");
+						contactsOptions.addFilter("status", "attempted_contact");
+						contactsOptions.addFilter("status", "contacted");
+					} else if (((String) value).equalsIgnoreCase("finished")) {
+						contactsOptions.setFilter("status", "completed");
+						contactsOptions.addFilter("status", "do_no_contact");
+					} else {
+						contactsOptions.setFilter("status", value.toString());
+					}
+					continue;
+				}
+				
+				contactsOptions.setFilter(key, value.toString());
+			} else if (value instanceof Boolean) {
+				//TODO:
+			}
+		}
+
+		updateFilterIcon();
+	}
 	
 	private String searchTerm = "";
 	private Handler searchHandler = new Handler();
@@ -476,7 +450,6 @@ public class ContactsActivity extends Activity {
 
 	private Runnable doSearch = new Runnable() {
 		public void run() {
-			contactsOptions.addFilter("name", searchTerm);
 			resetListView(true);
 			getMore();
 		}

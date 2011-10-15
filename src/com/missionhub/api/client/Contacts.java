@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import android.content.Context;
 
@@ -115,7 +116,7 @@ public class Contacts {
 				while (itr2.hasNext()) {
 					String val = itr2.next();
 					value.append(ApiHelper.stripUnsafeChars(val));
-					if (itr.hasNext()) {
+					if (itr2.hasNext()) {
 						value.append("|");
 					}
 				}
@@ -128,12 +129,37 @@ public class Contacts {
 			filters.put(filter, value);
 		}
 		
+		public void setFilter(String filter, String value) {
+			removeFilter(filter);
+			addFilter(filter, value);
+		}
+		
 		public void removeFilter(String filter) {
 			filters.removeAll(filter);
 		}
 		
 		public void removeFilterValue(String filter, String value) {
 			filters.remove(filter, value);
+		}
+		
+		public boolean hasFilter(String filter) {
+			return filters.containsKey(filter);
+		}
+		
+		public boolean hasFilter(String filter, String value) {
+			return filters.containsEntry(filter, value);
+		}
+		
+		public String getFilterValue(String filter) {
+			Iterator<String> itr = filters.get(filter).iterator();
+			while (itr.hasNext()) {
+				return itr.next();
+			}
+			return null;
+		}
+		
+		public Set<String> getFilterValues(String filter) {
+			return filters.get(filter);
 		}
 		
 		public void clearFilters() {
