@@ -7,8 +7,11 @@ import java.util.HashMap;
 import java.util.TimeZone;
 
 import com.google.gson.Gson;
-import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.missionhub.api.Api;
+import com.missionhub.api.ApiResponseHandler;
+import com.missionhub.api.client.ContactAssignment;
+import com.missionhub.api.client.Contacts;
+import com.missionhub.api.client.FollowupComments;
+import com.missionhub.api.client.Roles;
 import com.missionhub.api.json.GAssign;
 import com.missionhub.api.json.GContact;
 import com.missionhub.api.json.GContactAll;
@@ -561,15 +564,15 @@ public class ContactActivity extends Activity {
 
 	public void updatePerson(boolean force) {
 		if (processes.contains("contact") && !force) return;
-		Api.getContacts(contact.getPerson().getId(), contactResponseHandler);
+		Contacts.get(this, contact.getPerson().getId(), contactResponseHandler);
 	}
 
 	public void updateComments(boolean force) {
 		if (processes.contains("comment") && !force) return;
-		Api.getFollowupComments(contact.getPerson().getId(), commentResponseHandler);	
+		FollowupComments.get(this, contact.getPerson().getId(), commentResponseHandler);
 	}
 
-	private AsyncHttpResponseHandler contactResponseHandler = new AsyncHttpResponseHandler() {
+	private ApiResponseHandler contactResponseHandler = new ApiResponseHandler() {
 		@Override
 		public void onStart() {
 			showProgress("contact");
@@ -616,7 +619,7 @@ public class ContactActivity extends Activity {
 		}
 	};
 	
-	private AsyncHttpResponseHandler commentResponseHandler = new AsyncHttpResponseHandler() {
+	private ApiResponseHandler commentResponseHandler = new ApiResponseHandler() {
 		@Override
 		public void onStart() {
 			showProgress("comment");
@@ -679,13 +682,13 @@ public class ContactActivity extends Activity {
 
 	public void clickAssign() {
 		if (assignmentStatus == ASSIGNMENT_NONE) {
-			Api.createContactAssignment(contact.getPerson().getId(), User.getContact().getPerson().getId(), new AssignmentHandler(AssignmentHandler.TYPE_ASSIGN));
+			ContactAssignment.create(this, contact.getPerson().getId(), User.getContact().getPerson().getId(), new AssignmentHandler(AssignmentHandler.TYPE_ASSIGN));
 		} else if (assignmentStatus == ASSIGNMENT_ME) {
-			Api.deleteContactAssignment(contact.getPerson().getId(), new AssignmentHandler(AssignmentHandler.TYPE_UNASSIGN));
+			ContactAssignment.delete(this, contact.getPerson().getId(), new AssignmentHandler(AssignmentHandler.TYPE_UNASSIGN));
 		}
 	}
 
-	private class AssignmentHandler extends AsyncHttpResponseHandler {
+	private class AssignmentHandler extends ApiResponseHandler {
 
 		public static final int TYPE_ASSIGN = 0;
 		public static final int TYPE_UNASSIGN = 1;
@@ -919,13 +922,14 @@ public class ContactActivity extends Activity {
 		
 		if (canSave) {
 			String status = statusListTag.get(statusPos);
-			Api.postFollowupComment(contact.getPerson().getId(), User.getContact().getPerson().getId(), statusListTag.get(statusPos), commentStr, new SaveResponseHandler(status), rejoicables);
+			FollowupComments.Comment comment = new FollowupComments.Comment(contact.getPerson().getId(), User.getContact().getPerson().getId(), User.getOrganizationID(), statusListTag.get(statusPos), commentStr, rejoicables);
+			FollowupComments.post(this, comment, new SaveResponseHandler(status));
 		} else {
 			Toast.makeText(this, R.string.contact_cant_save, Toast.LENGTH_LONG).show();
 		}
 	}
 	
-	private class SaveResponseHandler extends AsyncHttpResponseHandler {
+	private class SaveResponseHandler extends ApiResponseHandler {
 
 		private String status;
 		
@@ -1006,10 +1010,10 @@ public class ContactActivity extends Activity {
 	
 	public void deleteComment(int id, boolean force) {
 		if (processes.contains("delete_comment") && !force) return;
-		Api.deleteComment(id, new DeleteCommentHandler(id));
+		FollowupComments.delete(this, id, new DeleteCommentHandler(id));
 	}
 	
-	private class DeleteCommentHandler extends AsyncHttpResponseHandler {
+	private class DeleteCommentHandler extends ApiResponseHandler {
 
 		private int commentid;
 		
@@ -1091,7 +1095,7 @@ public class ContactActivity extends Activity {
 		}
 	};
 	
-	private class ChangeRoleHandler extends AsyncHttpResponseHandler {
+	private class ChangeRoleHandler extends ApiResponseHandler {
 		
 		String role;
 		int contactId;
@@ -1125,7 +1129,7 @@ public class ContactActivity extends Activity {
 			ad.setButton(ad.getContext().getString(R.string.alert_retry), new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int id) {
 					dialog.dismiss();
-					Api.changeRole(role, id, new ChangeRoleHandler(role, contactId));
+					Roles.change(ContactActivity.this, id, role, new ChangeRoleHandler(role, contactId));
 				}
 			});
 			ad.show();
@@ -1152,7 +1156,7 @@ public class ContactActivity extends Activity {
 					builder.setTitle(R.string.contact_promote);
 					builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int id) {
-							Api.changeRole("leader", contactId, new ChangeRoleHandler("leader", contactId));
+							Roles.change(ContactActivity.this, contactId, "leader", new ChangeRoleHandler("leader", contactId));
 							dialog.dismiss();
 						}
 					});
@@ -1160,7 +1164,7 @@ public class ContactActivity extends Activity {
 					builder.setTitle(R.string.contact_demote);
 					builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int id) {
-							Api.changeRole("contact", contactId, new ChangeRoleHandler("contact", contactId));
+							Roles.change(ContactActivity.this, contactId, "contact", new ChangeRoleHandler("contact", contactId));
 							dialog.dismiss();
 						}
 					});

@@ -5,7 +5,7 @@ import com.google.gson.Gson;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
-import com.missionhub.api.Api;
+import com.missionhub.api.client.Login;
 import com.missionhub.api.json.GError;
 import com.missionhub.api.json.GLoginDone;
 import com.missionhub.auth.Auth;
@@ -68,7 +68,7 @@ public class LoginActivity extends Activity {
 		mWebView.getSettings().setSupportZoom(false);
 		mWebView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
 		mWebView.setWebViewClient(new InternalWebViewClient());
-		mWebView.loadUrl(Api.getLoginUrl());
+		mWebView.loadUrl(Login.getUrl());
 		
 		Flurry.pageView("Login");
 	}

@@ -1,6 +1,6 @@
 package com.missionhub;
 
-import com.missionhub.api.Api;
+import com.missionhub.api.client.Survey;
 import com.missionhub.helpers.Flurry;
 import com.missionhub.ui.DisplayError;
 
@@ -41,7 +41,7 @@ public class SurveysActivity extends Activity {
 		mWebView.getSettings().setSupportZoom(false);
 		mWebView.setWebViewClient(new InternalWebViewClient());
 		mWebView.setWebChromeClient(new InternalWebViewChrome());
-		mWebView.loadUrl(Api.getSurveysUrl());
+		mWebView.loadUrl(Survey.getUrl());
 
 		clearCookies();
 

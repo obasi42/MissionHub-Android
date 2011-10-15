@@ -1,9 +1,9 @@
 package com.missionhub.auth;
 
 import com.google.gson.Gson;
-import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.missionhub.R;
-import com.missionhub.api.Api;
+import com.missionhub.api.ApiResponseHandler;
+import com.missionhub.api.client.People;
 import com.missionhub.api.json.GContact;
 import com.missionhub.api.json.GError;
 import com.missionhub.api.json.GPerson;
@@ -79,7 +79,7 @@ public class Auth {
 		setAccessToken(Preferences.getAccessToken(ctx));
 		
 		if (getAccessToken() != null) {
-			AsyncHttpResponseHandler responseHandler = new AsyncHttpResponseHandler() {
+			ApiResponseHandler responseHandler = new ApiResponseHandler() {
 				
 				ProgressDialog mProgressDialog;
 				
@@ -128,7 +128,7 @@ public class Auth {
 					mProgressDialog.dismiss();
 				}
 			};
-			Api.getPeople("me", responseHandler);
+			People.getMe(context, responseHandler);
 			return true;
 		}
 		return false;
