@@ -42,8 +42,6 @@ public class MissionHubActivity extends Activity {
 		Preferences.setLastRunVersion(this, Application.getVersion());
 		Application.restoreApplicationState(savedInstanceState);
 		
-		Preferences.setAccessToken(this, "793ca00b2febe1252c8be70cfc8425217da8edc708a19a62cee4e8559053b822");
-		
 		mLogoutBar = (RelativeLayout) findViewById(R.id.logoutbar);
 		mLoggedIn = (LinearLayout) findViewById(R.id.loggedin);
 		mLoggedOut = (LinearLayout) findViewById(R.id.loggedout);
