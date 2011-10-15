@@ -48,6 +48,7 @@ public class MissionHubActivity extends Activity {
 		
 		mName = (TextView) findViewById(R.id.name);
 		
+		Auth.setLoggedIn(false);
 		Auth.checkToken(this, checkTokenHandler);
 		
 		Flurry.pageView("Main");
@@ -148,8 +149,9 @@ public class MissionHubActivity extends Activity {
 		public void handleMessage(Message msg) {
 			super.handleMessage(msg);
 			switch(msg.what) {
-				case Auth.SUCCESS: refreshView(); break;
+				case Auth.SUCCESS: Auth.setLoggedIn(true); refreshView(); break;
 				case Auth.RETRY: Auth.checkToken(MissionHubActivity.this, checkTokenHandler); break;
+				case Auth.FAILURE: Auth.setLoggedIn(false); refreshView(); break;
 			}
 		}
 	};
