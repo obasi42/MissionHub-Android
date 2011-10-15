@@ -1,4 +1,4 @@
-package com.missionhub.api;
+package com.missionhub.api.json;
 
 public class GOrgGeneric {
 	private int org_id;

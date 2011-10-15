@@ -3,8 +3,8 @@ package com.missionhub.ui;
 import java.util.ArrayList;
 
 import com.missionhub.R;
-import com.missionhub.api.GContact;
-import com.missionhub.api.GPerson;
+import com.missionhub.api.json.GContact;
+import com.missionhub.api.json.GPerson;
 import com.missionhub.helpers.Helper;
 
 import android.app.Activity;

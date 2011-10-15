@@ -1,6 +1,6 @@
 package com.missionhub.error;
 
-import com.missionhub.api.GError;
+import com.missionhub.api.json.GError;
 
 public class MHException extends Exception{
 	private static final long serialVersionUID = 1L;

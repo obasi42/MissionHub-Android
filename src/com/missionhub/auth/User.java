@@ -5,9 +5,9 @@ import java.util.Set;
 
 import com.google.common.collect.HashMultimap;
 import com.google.gson.Gson;
-import com.missionhub.api.GContact;
-import com.missionhub.api.GOrgGeneric;
-import com.missionhub.api.GPerson;
+import com.missionhub.api.json.GContact;
+import com.missionhub.api.json.GOrgGeneric;
+import com.missionhub.api.json.GPerson;
 import com.missionhub.error.MHException;
 
 import android.os.Bundle;

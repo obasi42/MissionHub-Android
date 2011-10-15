@@ -7,8 +7,8 @@ import java.util.Set;
 
 import com.flurry.android.FlurryAgent;
 import com.google.common.collect.HashMultimap;
-import com.missionhub.api.GOrgGeneric;
-import com.missionhub.api.GPerson;
+import com.missionhub.api.json.GOrgGeneric;
+import com.missionhub.api.json.GPerson;
 import com.missionhub.auth.User;
 import com.missionhub.config.Preferences;
 import com.missionhub.helpers.Flurry;

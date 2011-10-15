@@ -3,10 +3,10 @@ package com.missionhub.ui;
 import java.util.ArrayList;
 
 import com.missionhub.R;
-import com.missionhub.api.GComment;
-import com.missionhub.api.GCommenter;
-import com.missionhub.api.GFollowupComment;
-import com.missionhub.api.GRejoicable;
+import com.missionhub.api.json.GComment;
+import com.missionhub.api.json.GCommenter;
+import com.missionhub.api.json.GFollowupComment;
+import com.missionhub.api.json.GRejoicable;
 
 import android.app.Activity;
 import android.content.Context;

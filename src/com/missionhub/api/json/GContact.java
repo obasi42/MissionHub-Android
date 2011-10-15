@@ -1,5 +1,5 @@
-package com.missionhub.api;
-import com.missionhub.api.GContact;
+package com.missionhub.api.json;
+import com.missionhub.api.json.GContact;
 
 public class GContact {
 	public GPerson person;

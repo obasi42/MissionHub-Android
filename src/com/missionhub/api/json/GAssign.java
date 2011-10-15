@@ -1,4 +1,4 @@
-package com.missionhub.api;
+package com.missionhub.api.json;
 
 public class GAssign {
 	private GIdNameProvider[] assigned_to_person;
