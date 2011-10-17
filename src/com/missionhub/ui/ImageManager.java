@@ -18,8 +18,6 @@ import android.widget.ImageView;
 // FROM: http://codehenge.net/blog/2011/06/android-development-tutorial-asynchronous-lazy-loading-and-caching-of-listview-images/
 public class ImageManager {
 	
-	public static final String TAG = ImageManager.class.getSimpleName();
-	
 	// Just using a hashmap for the cache. SoftReferences would 
 	// be better, to avoid potential OutOfMemory exceptions
 	private HashMap<String, Bitmap> imageMap = new HashMap<String, Bitmap>();
@@ -41,11 +39,29 @@ public class ImageManager {
 			cacheDir = new File(sdDir,".missionhub/imgcache");
 		}
 		else
-			cacheDir = context.getCacheDir();
+			cacheDir = context.getCacheDir().getAbsoluteFile();
 		
 		if(!cacheDir.exists())
 			cacheDir.mkdirs();
+		
+		new Thread(new CacheCleaner()).start();
 	}
+	
+	private class CacheCleaner implements Runnable {
+		
+		public void run() {
+			File[] cacheFiles = cacheDir.listFiles();
+			for (File cacheFile : cacheFiles) {
+				try {
+					if (cacheFile.lastModified() + twoWeekMills < System.currentTimeMillis()){
+						cacheFile.delete();
+					}
+				} catch (Exception e) {}
+			}
+			return;
+	    }
+	}
+	
 	   
 	public void displayImage(String url, Activity activity, ImageView imageView) {
 		if(imageMap.containsKey(url)) {
@@ -96,16 +112,13 @@ public class ImageManager {
 				bitmap = BitmapFactory.decodeStream(new URL(url).openConnection().getInputStream());
 				writeFile(bitmap, f);
 			}
-		} catch (Exception e) {
-			Log.e(TAG, e.getMessage(), e);
-		}
+		} catch (Exception e) {}
 		
 		return bitmap;
 	}
 	
 	private void writeFile(Bitmap bmp, File f) {
 		FileOutputStream out = null;
-		
 		try {
 			out = new FileOutputStream(f);
 			bmp.compress(Bitmap.CompressFormat.PNG, 80, out);
