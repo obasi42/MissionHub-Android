@@ -12,7 +12,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.util.Log;
 import android.widget.ImageView;
 
 // FROM: http://codehenge.net/blog/2011/06/android-development-tutorial-asynchronous-lazy-loading-and-caching-of-listview-images/
@@ -77,12 +76,7 @@ public class ImageManager {
 		displayImage(url, activity, imageView);
 	}
 
-	private void queueImage(String url, Activity activity, ImageView imageView) {
-		
-		if (url != null) {
-			Log.i("URL", url);
-		}
-		
+	private void queueImage(String url, Activity activity, ImageView imageView) {		
 		// This ImageView might have been used for other images, so we clear 
 		// the queue of old tasks before starting.
 		if (url != null) {
