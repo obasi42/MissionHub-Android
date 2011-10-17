@@ -7,7 +7,7 @@
     <string name="main_contacts">Contacts</string>
     <string name="main_surveys">Surveys</string>
     
-    <string name="surveys_title">MHub Survey</string>
+    <string name="surveys_title">Survey Mode</string>
     <string name="surveys_loading">Loading...</string>
     <string name="surveys_exit">Exit Survey Mode?</string>
     <string name="surveys_exit_msg">Clicking OK will exit survey mode.</string>
