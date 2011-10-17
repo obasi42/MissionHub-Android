@@ -18,6 +18,8 @@ import android.widget.ImageView;
 // FROM: http://codehenge.net/blog/2011/06/android-development-tutorial-asynchronous-lazy-loading-and-caching-of-listview-images/
 public class ImageManager {
 	
+	public static final String TAG = ImageManager.class.getSimpleName();
+	
 	// Just using a hashmap for the cache. SoftReferences would 
 	// be better, to avoid potential OutOfMemory exceptions
 	private HashMap<String, Bitmap> imageMap = new HashMap<String, Bitmap>();
@@ -81,27 +83,24 @@ public class ImageManager {
 				imageLoaderThread.start();
 		}
 	}
+	
+	public static final long twoWeekMills = 1000 * 60 * 60 * 24 * 14;
 
 	private Bitmap getBitmap(String url) {
 		String filename = String.valueOf(url.hashCode());
 		File f = new File(cacheDir, filename);
-
-		// Is the bitmap in our cache?
+		
 		Bitmap bitmap = BitmapFactory.decodeFile(f.getPath());
-		if(bitmap != null) return bitmap;
-
-		// Nope, have to download it
 		try {
-			bitmap = BitmapFactory.decodeStream(new URL(url).openConnection().getInputStream());
-			// save bitmap to cache for later
-			writeFile(bitmap, f);
-			
-			Log.i("BITMAP", f.getAbsolutePath());
-			
-			return bitmap;
-		} catch (Exception ex) {
-			return null;
+			if (f.lastModified() + twoWeekMills < System.currentTimeMillis() || bitmap == null) {
+				bitmap = BitmapFactory.decodeStream(new URL(url).openConnection().getInputStream());
+				writeFile(bitmap, f);
+			}
+		} catch (Exception e) {
+			Log.e(TAG, e.getMessage(), e);
 		}
+		
+		return bitmap;
 	}
 	
 	private void writeFile(Bitmap bmp, File f) {
