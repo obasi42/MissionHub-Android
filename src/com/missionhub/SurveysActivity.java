@@ -42,7 +42,7 @@ public class SurveysActivity extends Activity {
 		mWebView.setWebViewClient(new InternalWebViewClient());
 		mWebView.setWebChromeClient(new InternalWebViewChrome());
 		mWebView.loadUrl(Survey.getUrl());
-
+		
 		clearCookies();
 
 		Flurry.pageView("Surveys");
@@ -139,10 +139,12 @@ public class SurveysActivity extends Activity {
 	@Override
 	public void onSaveInstanceState(Bundle b) {
 		b.putAll(Application.saveApplicationState(b));
+		((WebView) findViewById(R.id.webview_surveys)).saveState(b);
 	}
 	
 	@Override
 	public void onRestoreInstanceState(Bundle b) {
 		Application.restoreApplicationState(b);
+		((WebView) findViewById(R.id.webview_surveys)).restoreState(b);
 	}
 }
