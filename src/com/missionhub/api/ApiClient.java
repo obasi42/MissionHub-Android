@@ -12,11 +12,11 @@ public class ApiClient extends AsyncHttpClient {
 
 	public static final String TAG = "ApiClient";
 	
-	private Context ctx;
-	
+	private Context ctx;	
 	
 	public ApiClient (Context ctx) {
 		super();
+		
 		this.ctx = new ContextWrapper(ctx);
 	}
 

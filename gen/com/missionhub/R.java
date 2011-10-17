@@ -100,8 +100,7 @@ public final class R {
         public static final int bottom_button_left=0x7f0a000c;
         public static final int bottom_button_right=0x7f0a000e;
         public static final int btn_filter=0x7f0a0026;
-        public static final int clear=0x7f0a0040;
-        public static final int close=0x7f0a0031;
+        public static final int clear=0x7f0a003f;
         public static final int comment_comment=0x7f0a0003;
         public static final int comment_g_present=0x7f0a0005;
         public static final int comment_name=0x7f0a0002;
@@ -117,9 +116,9 @@ public final class R {
         public static final int contact_email=0x7f0a0016;
         public static final int contact_fields=0x7f0a001b;
         public static final int contact_header=0x7f0a000f;
-        public static final int contact_info_header=0x7f0a003b;
-        public static final int contact_info_info=0x7f0a003c;
-        public static final int contact_menu_refresh=0x7f0a003e;
+        public static final int contact_info_header=0x7f0a003a;
+        public static final int contact_info_info=0x7f0a003b;
+        public static final int contact_menu_refresh=0x7f0a003d;
         public static final int contact_name=0x7f0a0012;
         public static final int contact_nameview=0x7f0a0011;
         public static final int contact_phone=0x7f0a0014;
@@ -136,7 +135,7 @@ public final class R {
         public static final int contacts_list_contact_name=0x7f0a0019;
         public static final int contacts_list_contact_status=0x7f0a001a;
         public static final int contacts_progress=0x7f0a002a;
-        public static final int contacts_refresh=0x7f0a003f;
+        public static final int contacts_refresh=0x7f0a003e;
         public static final int contacts_search=0x7f0a0025;
         public static final int contacts_search_container=0x7f0a0024;
         public static final int contacts_top_bar=0x7f0a0022;
@@ -145,22 +144,22 @@ public final class R {
         public static final int linearLayout1=0x7f0a0028;
         public static final int list_header_title=0x7f0a002f;
         public static final int listview=0x7f0a000b;
-        public static final int loggedin=0x7f0a0036;
-        public static final int loggedout=0x7f0a0035;
-        public static final int logo=0x7f0a0034;
-        public static final int logoutbar=0x7f0a0032;
-        public static final int name=0x7f0a0033;
-        public static final int profile=0x7f0a0037;
-        public static final int profile_picture=0x7f0a0038;
+        public static final int loggedin=0x7f0a0035;
+        public static final int loggedout=0x7f0a0034;
+        public static final int logo=0x7f0a0033;
+        public static final int logoutbar=0x7f0a0031;
+        public static final int name=0x7f0a0032;
+        public static final int profile=0x7f0a0036;
+        public static final int profile_picture=0x7f0a0037;
         public static final int progress=0x7f0a000a;
-        public static final int spinner=0x7f0a0039;
+        public static final int spinner=0x7f0a0038;
         public static final int spinnerText=0x7f0a0020;
         public static final int title=0x7f0a0009;
         public static final int txt_contacts_no_data=0x7f0a002b;
         public static final int txt_contacts_title=0x7f0a0023;
-        public static final int version=0x7f0a003a;
+        public static final int version=0x7f0a0039;
         public static final int webview=0x7f0a0030;
-        public static final int webview_surveys=0x7f0a003d;
+        public static final int webview_surveys=0x7f0a003c;
     }
     public static final class layout {
         public static final int comment_list_item=0x7f030000;

@@ -2,6 +2,7 @@ package com.missionhub.auth;
 
 import com.google.gson.Gson;
 import com.missionhub.R;
+import com.missionhub.api.ApiClient;
 import com.missionhub.api.ApiResponseHandler;
 import com.missionhub.api.client.People;
 import com.missionhub.api.json.GContact;
@@ -16,6 +17,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -68,6 +70,8 @@ public class Auth {
 		Preferences.removeOrganizationID(ctx);
 	}
 	
+	private static ApiClient client;
+	
 	/**
 	 * Check Stored Access Token
 	 * @return true if has stored token
@@ -86,9 +90,20 @@ public class Auth {
 				@Override
 				public void onStart() {
 					mProgressDialog = ProgressDialog.show(ctx, "", ctx.getString(R.string.alert_logging_in), true);
+					mProgressDialog.setCancelable(true);
+					mProgressDialog.setOnCancelListener(new OnCancelListener(){
+						@Override
+						public void onCancel(DialogInterface dialog) {
+							client.cancel(true);
+							client = null;
+						}
+					});
 				}
 				@Override
 				public void onSuccess(String response) {
+					if (client == null)
+						return;
+					
 					Gson gson = new Gson();
 					try{
 						GError error = gson.fromJson(response, GError.class);
@@ -111,6 +126,9 @@ public class Auth {
 				}
 				@Override
 				public void onFailure(Throwable e) {
+					if (client == null)
+						return;
+					
 					Log.e(TAG, "Auto Login Failed", e);
 					h.sendEmptyMessage(Auth.FAILURE);
 					AlertDialog ad = DisplayError.display(ctx, e);
@@ -126,9 +144,10 @@ public class Auth {
 				@Override
 				public void onFinish() {
 					mProgressDialog.dismiss();
+					client = null;
 				}
 			};
-			People.getMe(context, responseHandler);
+			client = People.getMe(context, responseHandler);
 			return true;
 		}
 		return false;

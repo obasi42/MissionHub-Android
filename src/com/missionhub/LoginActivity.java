@@ -33,7 +33,6 @@ import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.Button;
 
 public class LoginActivity extends Activity {
 
@@ -41,7 +40,7 @@ public class LoginActivity extends Activity {
 
 	private ProgressDialog mProgressDialog;
 	private WebView mWebView;
-	private Button mCloseBtn;
+	//private Button mCloseBtn;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -61,7 +60,7 @@ public class LoginActivity extends Activity {
 			}
 		});
 
-		mCloseBtn = (Button) findViewById(R.id.close);
+		//mCloseBtn = (Button) findViewById(R.id.close);
 
 		mWebView = (WebView) findViewById(R.id.webview);
 		mWebView.getSettings().setJavaScriptEnabled(true);
@@ -105,11 +104,13 @@ public class LoginActivity extends Activity {
 	@Override
 	public void onSaveInstanceState(Bundle b) {
 		b.putAll(Application.saveApplicationState(b));
+		((WebView) findViewById(R.id.webview)).saveState(b);
 	}
 	
 	@Override
 	public void onRestoreInstanceState(Bundle b) {
 		Application.restoreApplicationState(b);
+		((WebView) findViewById(R.id.webview)).restoreState(b);
 	}
 
 	public void clickClose(View view) {
@@ -141,13 +142,12 @@ public class LoginActivity extends Activity {
 				mProgressDialog.hide();
 			}
 			mWebView.setVisibility(View.GONE);
-			mCloseBtn.setVisibility(View.GONE);
+			//mCloseBtn.setVisibility(View.GONE);
 			AlertDialog ad = DisplayError.display(LoginActivity.this, errorCode, description, failingUrl);
 			ad.setButton(ad.getContext().getString(R.string.alert_retry), new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int id) {
 					dialog.dismiss();
 					mWebView.setVisibility(View.VISIBLE);
-					mCloseBtn.setVisibility(View.VISIBLE);
 					mWebView.reload();
 				}
 			});
@@ -183,7 +183,6 @@ public class LoginActivity extends Activity {
 			String code = uri.getQueryParameter("code");
 			if (code != null && uri.getPath().equalsIgnoreCase("/oauth/done.json")) {
 				mWebView.setVisibility(View.GONE);
-				mCloseBtn.setVisibility(View.GONE);
 				getTokenFromCode(code);
 				return;
 			}
