@@ -70,7 +70,7 @@ public class Contacts {
 	public static class Options {
 		
 		private int start = 0;
-		private int limit = 15;
+		private int limit = 20;
 		
 		private HashMultimap<String, String> filters = HashMultimap.<String, String> create();
 		private HashMap<String, String> orderBy = new HashMap<String, String>();

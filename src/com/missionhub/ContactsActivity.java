@@ -12,10 +12,8 @@ import com.missionhub.api.ApiResponseHandler;
 import com.missionhub.api.client.Contacts;
 import com.missionhub.api.client.Roles;
 import com.missionhub.api.json.GContact;
-import com.missionhub.api.json.GError;
 import com.missionhub.api.json.GOrgGeneric;
 import com.missionhub.auth.User;
-import com.missionhub.error.MHException;
 import com.missionhub.helpers.Flurry;
 import com.missionhub.helpers.U;
 import com.missionhub.ui.ContactItemAdapter;
@@ -71,8 +69,6 @@ public class ContactsActivity extends Activity {
 	private Button btnFilter;
 
 	private ArrayList<GContact> data = new ArrayList<GContact>();
-	
-	Contacts.Options contactsOptions = new Contacts.Options();
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -99,13 +95,6 @@ public class ContactsActivity extends Activity {
 		btnFilter = (Button) findViewById(R.id.btn_filter);
 		
 		search.addTextChangedListener(new ContactsSearchWatcher());
-
-		// Large Screens
-		DisplayMetrics metrics = new DisplayMetrics();
-		getWindowManager().getDefaultDisplay().getMetrics(metrics);
-		if (metrics.heightPixels > 480) {
-			contactsOptions.setLimit(30);
-		}
 
 		setTab(TAB_MY, true);
 		
@@ -168,23 +157,23 @@ public class ContactsActivity extends Activity {
 		}
 	}
 	
-	private void updateFilterIcon() {
-		if (contactsOptions.getFilters().isEmpty())
+	private void updateFilterIcon(Contacts.Options options) {
+		if (options.getFilters().isEmpty())
 			return;
 		
 		boolean filtered = false;
 		
-		if (!contactsOptions.hasFilter("status", "uncontacted") || !contactsOptions.hasFilter("status", "attempted_contact") || !contactsOptions.hasFilter("status", "contacted")) {
+		if (!options.hasFilter("status", "uncontacted") || !options.hasFilter("status", "attempted_contact") || !options.hasFilter("status", "contacted")) {
 			filtered = true;
 		}
 		
 		if (tab == TAB_ALL) {
-			if (contactsOptions.hasFilter("assigned_to")) {
+			if (options.hasFilter("assigned_to")) {
 				filtered = true;
 			}
 		}
 		
-		if (contactsOptions.hasFilter("gender")) {
+		if (options.hasFilter("gender")) {
 			filtered = true;
 		}
 		
@@ -262,7 +251,7 @@ public class ContactsActivity extends Activity {
 		}
 	}
 
-	private boolean atEnd = false;
+	private boolean noMoreContacts = false;
 	
 	private ArrayList<Integer> contactIds = new ArrayList<Integer>();
 
@@ -273,108 +262,123 @@ public class ContactsActivity extends Activity {
 		if (notify) {
 			adapter.notifyDataSetChanged();
 		}
-		contactsOptions.setStart(0);
-		atEnd = false;
-		if (currentRequest != null) {
-			currentRequest.cancel(true);
+		hideProgress(options.toString());
+		
+		options = new Contacts.Options();
+		
+		// Large Screens
+		DisplayMetrics metrics = new DisplayMetrics();
+		getWindowManager().getDefaultDisplay().getMetrics(metrics);
+		if (metrics.heightPixels > 480) {
+			options.setLimit(40);
 		}
-		hideProgress("contacts");
+		
+		addFiltersOrder(options);
+		updateFilterIcon(options);
+		
+		noMoreContacts = false;
+		if (client != null) {
+			client.cancel(true);
+			client = null;
+		}
+	}	
+	
+	private ApiClient client = null;	
+	private Contacts.Options options = new Contacts.Options();
+	
+	private void getMore() {
+		if (client != null || noMoreContacts)
+			return;
+		
+		client = Contacts.list(this, options, new ContactsApiResponseHandler(options));
+		options.incrementStart(options.getLimit());
 	}
 	
-	ApiClient currentRequest;
-
-	private void getMore() {
-		if (atEnd || processes.contains("contacts"))
-			return;
-
-		ApiResponseHandler responseHandler = new ApiResponseHandler() {
-
-			@Override
-			public void onStart() {
-				showProgress("contacts");
+	private class ContactsApiResponseHandler extends ApiResponseHandler {
+		
+		Contacts.Options ops;
+		
+		public ContactsApiResponseHandler(Contacts.Options ops) {
+			super(GContact[].class);
+			this.ops = ops;
+		}
+		
+		@Override
+		public void onStart() {
+			showProgress(ops.toString());
+		}
+		
+		@Override 
+		public void onSuccess(Object gsonObject) {
+			if (ops != options) // This response was likely canceled
+				return;
+			
+			GContact[] contacts = (GContact[]) gsonObject;
+			if (contacts.length < options.getLimit()) {
+				noMoreContacts = true;
+			} else {
+				noMoreContacts = false;
 			}
-
-			@Override
-			public void onSuccess(String response) {
-				Gson gson = new Gson();
-				try {
-					GError error = gson.fromJson(response, GError.class);
-					onFailure(new MHException(error));
-				} catch (Exception out) {
-					try {
-						GContact[] contacts = gson.fromJson(response, GContact[].class);
-						if (contacts.length < contactsOptions.getLimit()) {
-							atEnd = true;
-						} else {
-							atEnd = false;
-						}
-						if (contacts.length > 0) {
-							for (GContact contact : contacts) {
-								final int id = contact.getPerson().getId();
-								if (!contactIds.contains(id)) {
-									contactIds.add(id);
-									data.add(contact);
-								}
-							}
-							adapter.notifyDataSetChanged();
-						}
-						if (data.size() <= 0) {
-							txtNoData.setVisibility(View.VISIBLE);
-						} else {
-							txtNoData.setVisibility(View.GONE);
-						}
-					} catch (Exception e) {
-						onFailure(e);
+			if (contacts.length > 0) {
+				for (GContact contact : contacts) {
+					final int id = contact.getPerson().getId();
+					if (!contactIds.contains(id)) {
+						contactIds.add(id);
+						data.add(contact);
 					}
 				}
+				adapter.notifyDataSetChanged();
 			}
-
-			@Override
-			public void onFailure(Throwable e) {
-				Log.e(TAG, "Contacts List Get More Failed", e);
-				AlertDialog ad = DisplayError.display(ContactsActivity.this, e);
-				ad.setButton(ad.getContext().getString(R.string.alert_retry), new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						dialog.dismiss();
-						contactsOptions.incrementStart(-contactsOptions.getLimit());
-						getMore();
-					}
-				});
-				ad.show();
-				Flurry.error(e, "Contacts.getMore");
+			if (data.size() <= 0) {
+				txtNoData.setVisibility(View.VISIBLE);
+			} else {
+				txtNoData.setVisibility(View.GONE);
 			}
-
-			@Override
-			public void onFinish() {
-				hideProgress("contacts");
-			}
-		};
+		}
 		
-		setFilters();
-		currentRequest = Contacts.list(this, contactsOptions, responseHandler);
-		contactsOptions.incrementStart(contactsOptions.getLimit());
+		@Override
+		public void onFailure(Throwable e) {
+			if (ops != options) // This response was likely canceled
+				return;
+			
+			Log.e(TAG, "Contacts List Get More Failed", e);
+			AlertDialog ad = DisplayError.display(ContactsActivity.this, e);
+			ad.setButton(ad.getContext().getString(R.string.alert_retry), new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					dialog.dismiss();
+					options.incrementStart(-options.getLimit());
+					getMore();
+				}
+			});
+			ad.show();
+			Flurry.error(e, "Contacts.getMore");
+		}
+		
+		@Override
+		public void onFinish() {
+			hideProgress(ops.toString());
+			client = null;
+		}
 	}
-
-	private void setFilters() {
-		
-		contactsOptions.clearFilters();
+	
+	private Contacts.Options addFiltersOrder(Contacts.Options options) {
 		
 		SharedPreferences sharedPrefs = null;
 		if (tab == TAB_MY) {
 			sharedPrefs = getBaseContext().getSharedPreferences(ContactsFilterActivity.TYPE_MY_CONTACTS, 0);
-			contactsOptions.setFilter("assigned_to", String.valueOf(User.getContact().getPerson().getId()));
+			options.setFilter("assigned_to", String.valueOf(User.getContact().getPerson().getId()));
 		} else if (tab == TAB_ALL) {
 			sharedPrefs = getBaseContext().getSharedPreferences(ContactsFilterActivity.TYPE_ALL_CONTACTS, 0);
-			contactsOptions.removeFilter("assigned_to");
+			options.removeFilter("assigned_to");
 		}
 		
 		// Not Finished Contacts
-		contactsOptions.addFilter("status", "uncontacted");
-		contactsOptions.addFilter("status", "attempted_contact");
-		contactsOptions.addFilter("status", "contacted");
+		options.addFilter("status", "uncontacted");
+		options.addFilter("status", "attempted_contact");
+		options.addFilter("status", "contacted");
 		
 		if (!U.nullOrEmpty(searchTerm)){
-			contactsOptions.setFilter("name", searchTerm);
+			options.setFilter("name", searchTerm);
 		}
 		
 		Map<String, ?> prefs = sharedPrefs.getAll();
@@ -387,42 +391,41 @@ public class ContactsActivity extends Activity {
 				// Assigned To Is Not Really A Filter
 				if (key.equalsIgnoreCase("assigned_to")) {
 					if (((String) value).equalsIgnoreCase("me")) {
-						contactsOptions.setFilter("assigned_to", String.valueOf(User.getContact().getPerson().getId()));
+						options.setFilter("assigned_to", String.valueOf(User.getContact().getPerson().getId()));
 					} else if (((String) value).equalsIgnoreCase("no_one")) {
-						contactsOptions.setFilter("assigned_to", "none");
+						options.setFilter("assigned_to", "none");
 					} else {
-						contactsOptions.removeFilter("assigned_to");
+						options.removeFilter("assigned_to");
 					}
 					continue;
 				}
 				
 				// Ignore Not Filtered
 				if (((String) value).equalsIgnoreCase(ContactsFilterActivity.NOT_FILTERED)) {
-					contactsOptions.removeFilter(key);
+					options.removeFilter(key);
 					continue;
 				}
 				
 				if (key.equalsIgnoreCase("status")) {
 					if (((String) value).equalsIgnoreCase("not_finished")) {
-						contactsOptions.setFilter("status", "uncontacted");
-						contactsOptions.addFilter("status", "attempted_contact");
-						contactsOptions.addFilter("status", "contacted");
+						options.setFilter("status", "uncontacted");
+						options.addFilter("status", "attempted_contact");
+						options.addFilter("status", "contacted");
 					} else if (((String) value).equalsIgnoreCase("finished")) {
-						contactsOptions.setFilter("status", "completed");
-						contactsOptions.addFilter("status", "do_no_contact");
+						options.setFilter("status", "completed");
+						options.addFilter("status", "do_no_contact");
 					} else {
-						contactsOptions.setFilter("status", value.toString());
+						options.setFilter("status", value.toString());
 					}
 					continue;
 				}
 				
-				contactsOptions.setFilter(key, value.toString());
+				options.setFilter(key, value.toString());
 			} else if (value instanceof Boolean) {
 				//TODO:
 			}
 		}
-
-		updateFilterIcon();
+		return options;
 	}
 	
 	private String searchTerm = "";
@@ -435,7 +438,6 @@ public class ContactsActivity extends Activity {
 			if (searchTerm.length() > 0) {
 				searchHandler.postDelayed(doSearch, 350);
 			} else if (searchTerm.length() <= 0) {
-				contactsOptions.removeFilter("name");
 				resetListView(true);
 				getMore();
 			}
@@ -457,7 +459,7 @@ public class ContactsActivity extends Activity {
 
 	private class ContactsScrollListener implements OnScrollListener {
 		public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-			if (totalItemCount - firstVisibleItem < 2.5 * visibleItemCount) {
+			if (totalItemCount - firstVisibleItem < 3 * visibleItemCount) {
 				getMore();
 			}
 		}
@@ -483,6 +485,7 @@ public class ContactsActivity extends Activity {
 		int contactId;
 
 		public ChangeRoleHandler(String role, int id) {
+			super();
 			this.role = role;
 			this.contactId = id;
 		}
@@ -493,19 +496,10 @@ public class ContactsActivity extends Activity {
 		}
 
 		@Override
-		public void onSuccess(String response) {
-			Gson gson = new Gson();
-			try {
-				GError error = gson.fromJson(response, GError.class);
-				onFailure(new MHException(error));
-			} catch (Exception out) {
-				try {
-					FlurryAgent.onEvent("Contacts.ChangeRole");
-				} catch (Exception e) {
-				}
-				resetListView(false);
-				getMore();
-			}
+		public void onSuccess() {
+			Flurry.event("Contacts.ChangeRole");
+			resetListView(false);
+			getMore();
 		}
 
 		@Override

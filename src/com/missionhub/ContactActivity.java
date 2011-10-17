@@ -16,7 +16,6 @@ import com.missionhub.api.json.GAssign;
 import com.missionhub.api.json.GContact;
 import com.missionhub.api.json.GContactAll;
 import com.missionhub.api.json.GEducation;
-import com.missionhub.api.json.GError;
 import com.missionhub.api.json.GFCTop;
 import com.missionhub.api.json.GFollowupComment;
 import com.missionhub.api.json.GIdNameProvider;
@@ -26,7 +25,6 @@ import com.missionhub.api.json.GPerson;
 import com.missionhub.api.json.GQA;
 import com.missionhub.api.json.GQuestion;
 import com.missionhub.auth.User;
-import com.missionhub.error.MHException;
 import com.missionhub.helpers.Flurry;
 import com.missionhub.helpers.Helper;
 import com.missionhub.helpers.U;
@@ -572,31 +570,20 @@ public class ContactActivity extends Activity {
 		FollowupComments.get(this, contact.getPerson().getId(), commentResponseHandler);
 	}
 
-	private ApiResponseHandler contactResponseHandler = new ApiResponseHandler() {
+	private ApiResponseHandler contactResponseHandler = new ApiResponseHandler(GContactAll.class) {
 		@Override
 		public void onStart() {
 			showProgress("contact");
 		}
 
 		@Override
-		public void onSuccess(String response) {
-			Gson gson = new Gson();
-			try {
-				GError error = gson.fromJson(response, GError.class);
-				onFailure(new MHException(error));
-			} catch (Exception out) {
-				Log.i(TAG, response);
-				try {
-					GContactAll contactAll = gson.fromJson(response, GContactAll.class);
-					ContactActivity.this.contactMeta = contactAll;
-					ContactActivity.this.contact = contactAll.getPeople()[0];
-					ContactActivity.this.updateHeader();
-					ContactActivity.this.updateMoreInfo();
-					ContactActivity.this.updateKeywords();
-				} catch (Exception e) {
-					onFailure(e);
-				}
-			}
+		public void onSuccess(Object gsonObject) {
+			GContactAll contactAll = (GContactAll) gsonObject;
+			ContactActivity.this.contactMeta = contactAll;
+			ContactActivity.this.contact = contactAll.getPeople()[0];
+			ContactActivity.this.updateHeader();
+			ContactActivity.this.updateMoreInfo();
+			ContactActivity.this.updateKeywords();
 		}
 
 		@Override
@@ -619,26 +606,16 @@ public class ContactActivity extends Activity {
 		}
 	};
 	
-	private ApiResponseHandler commentResponseHandler = new ApiResponseHandler() {
+	private ApiResponseHandler commentResponseHandler = new ApiResponseHandler(GFCTop[].class) {
 		@Override
 		public void onStart() {
 			showProgress("comment");
 		}
 
 		@Override
-		public void onSuccess(String response) {
-			Gson gson = new Gson();
-			try {
-				GError error = gson.fromJson(response, GError.class);
-				onFailure(new MHException(error));
-			} catch (Exception out) {
-				try {
-					GFCTop[] fcs = gson.fromJson(response, GFCTop[].class);
-					ContactActivity.this.processFollowupComments(fcs);
-				} catch (Exception e) {
-					onFailure(e);
-				}
-			}
+		public void onSuccess(Object gsonObject) {
+			GFCTop[] fcs = (GFCTop[]) gsonObject;
+			ContactActivity.this.processFollowupComments(fcs);
 		}
 
 		@Override
@@ -707,30 +684,24 @@ public class ContactActivity extends Activity {
 		}
 
 		@Override
-		public void onSuccess(String response) {
-			Gson gson = new Gson();
-			try {
-				GError error = gson.fromJson(response, GError.class);
-				onFailure(new MHException(error));
-			} catch (Exception out) {
-				if (type == TYPE_ASSIGN) {
-					assign.setText(R.string.contact_unassign);
-					assignmentStatus = ASSIGNMENT_ME;
-				} else if (type == TYPE_UNASSIGN) {
-					assign.setText(R.string.contact_assign_to_me);
-					assignmentStatus = ASSIGNMENT_NONE;
-				}
-				updatePerson(false);
-				try {
-					HashMap<String, String> params = new HashMap<String, String>();
-					if (type == ASSIGNMENT_ME) {
-						params.put("assignment", "Me");
-					} else if (type == ASSIGNMENT_NONE) {
-						params.put("assignment", "None");
-					}
-					Flurry.event("Contact.Assign", params);
-				} catch (Exception e) {}
+		public void onSuccess() {
+			if (type == TYPE_ASSIGN) {
+				assign.setText(R.string.contact_unassign);
+				assignmentStatus = ASSIGNMENT_ME;
+			} else if (type == TYPE_UNASSIGN) {
+				assign.setText(R.string.contact_assign_to_me);
+				assignmentStatus = ASSIGNMENT_NONE;
 			}
+			updatePerson(false);
+			try {
+				HashMap<String, String> params = new HashMap<String, String>();
+				if (type == ASSIGNMENT_ME) {
+					params.put("assignment", "Me");
+				} else if (type == ASSIGNMENT_NONE) {
+					params.put("assignment", "None");
+				}
+				Flurry.event("Contact.Assign", params);
+			} catch (Exception e) {}
 		}
 
 		@Override
@@ -934,6 +905,7 @@ public class ContactActivity extends Activity {
 		private String status;
 		
 		public SaveResponseHandler(String status) {
+			super();
 			this.status = status;
 		}
 		
@@ -944,22 +916,16 @@ public class ContactActivity extends Activity {
 		}
 
 		@Override
-		public void onSuccess(String response) {
-			Gson gson = new Gson();
-			try {
-				GError error = gson.fromJson(response, GError.class);
-				onFailure(new MHException(error));
-			} catch (Exception out) {
-				comment.setText("");
-				if (rejoicableListView != null) {
-					rejoicableListView.clearChoices();
-				}
-				contact.getPerson().setStatus(status);
-				updateComments(true);
-				try {
-       				Flurry.event("Contact.Comment.Save");
-       			} catch (Exception e) {}
+		public void onSuccess() {
+			comment.setText("");
+			if (rejoicableListView != null) {
+				rejoicableListView.clearChoices();
 			}
+			contact.getPerson().setStatus(status);
+			updateComments(true);
+			try {
+   				Flurry.event("Contact.Comment.Save");
+   			} catch (Exception e) {}
 		}
 
 		@Override
@@ -1018,6 +984,7 @@ public class ContactActivity extends Activity {
 		private int commentid;
 		
 		public DeleteCommentHandler(int commentid) {
+			super();
 			this.commentid = commentid;
 		}
 		
@@ -1027,17 +994,11 @@ public class ContactActivity extends Activity {
 		}
 
 		@Override
-		public void onSuccess(String response) {
-			Gson gson = new Gson();
+		public void onSuccess() {
+			updateComments(true);
 			try {
-				GError error = gson.fromJson(response, GError.class);
-				onFailure(new MHException(error));
-			} catch (Exception out) {
-				updateComments(true);
-				try {
-					Flurry.event("Contact.Comment.Delete");
-				} catch (Exception e) {}
-			}
+				Flurry.event("Contact.Comment.Delete");
+			} catch (Exception e) {}
 		}
 
 		@Override
@@ -1111,15 +1072,9 @@ public class ContactActivity extends Activity {
 		}
 
 		@Override
-		public void onSuccess(String response) {
-			Gson gson = new Gson();
-			try {
-				GError error = gson.fromJson(response, GError.class);
-				onFailure(new MHException(error));
-			} catch (Exception out) {
-				updatePerson(true);
-				Flurry.event("Contact.ChangeRole");
-			}
+		public void onSuccess() {
+			updatePerson(true);
+			Flurry.event("Contact.ChangeRole");
 		}
 
 		@Override
