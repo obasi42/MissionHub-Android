@@ -16,7 +16,6 @@ public class ApiClient extends AsyncHttpClient {
 	
 	public ApiClient (Context ctx) {
 		super();
-		
 		this.ctx = new ContextWrapper(ctx);
 	}
 
