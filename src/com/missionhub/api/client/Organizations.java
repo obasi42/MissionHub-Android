@@ -19,7 +19,7 @@ public class Organizations {
 	 */
 	public static ApiClient get(Context ctx, ApiResponseHandler responseHandler) {
 		ApiClient client = new ApiClient(ctx);
-		String url = ApiHelper.getAbsoluteJsonUrl("organizations");
+		String url = ApiHelper.getAbsoluteUrl("organizations");
 		RequestParams params = ApiHelper.getDefaultRequestParams();
 		client.get(url, params, responseHandler);
 		return client;
@@ -34,7 +34,7 @@ public class Organizations {
 	 */
 	public static ApiClient get(Context ctx, int organizationId, ApiResponseHandler responseHandler) {
 		ApiClient client = new ApiClient(ctx);
-		String url = ApiHelper.getAbsoluteJsonUrl("organizations", String.valueOf(organizationId));
+		String url = ApiHelper.getAbsoluteUrl("organizations", String.valueOf(organizationId));
 		RequestParams params = ApiHelper.getDefaultRequestParams();
 		client.get(url, params, responseHandler);
 		return client;
@@ -49,7 +49,7 @@ public class Organizations {
 	 */
 	public static ApiClient get(Context ctx, List<Integer> organizationIds, ApiResponseHandler responseHandler) {
 		ApiClient client = new ApiClient(ctx);
-		String url = ApiHelper.getAbsoluteJsonUrl("organizations", ApiHelper.toList(organizationIds));
+		String url = ApiHelper.getAbsoluteUrl("organizations", ApiHelper.toList(organizationIds));
 		RequestParams params = ApiHelper.getDefaultRequestParams();
 		client.get(url, params, responseHandler);
 		return client;

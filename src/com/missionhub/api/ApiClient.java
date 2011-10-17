@@ -7,6 +7,7 @@ import android.util.Log;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+import com.missionhub.config.Config;
 
 public class ApiClient extends AsyncHttpClient {
 
@@ -17,6 +18,7 @@ public class ApiClient extends AsyncHttpClient {
 	public ApiClient (Context ctx) {
 		super();
 		this.ctx = new ContextWrapper(ctx);
+		
 	}
 
 	/**
@@ -29,6 +31,7 @@ public class ApiClient extends AsyncHttpClient {
 	 */
 	public void get(String url, AsyncHttpResponseHandler responseHandler) {
 		Log.d(TAG, "GET: " + url);
+		addHeader("Accept", "application/vnd.missionhub-v"+Config.apiVersion+"+json");
 		get(ctx, url, null, responseHandler);
 	}
 
@@ -43,6 +46,7 @@ public class ApiClient extends AsyncHttpClient {
 	 */
 	public void get(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
 		Log.d(TAG, "GET: " + url + '?' + params.toString());
+		addHeader("Accept", "application/vnd.missionhub-v"+Config.apiVersion+"+json");
 		get(ctx, url, params, responseHandler);
 	}
 
@@ -56,6 +60,7 @@ public class ApiClient extends AsyncHttpClient {
 	 */
 	public void post(String url, AsyncHttpResponseHandler responseHandler) {
 		Log.d(TAG, "POST: " + url);
+		addHeader("Accept", "application/vnd.missionhub-v"+Config.apiVersion+"+json");
 		post(ctx, url, null, responseHandler);
 	}
 
@@ -71,6 +76,7 @@ public class ApiClient extends AsyncHttpClient {
 	 */
 	public void post(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
 		Log.d(TAG, "POST: " + url + "    PARAMS: " + params.toString());
+		addHeader("Accept", "application/vnd.missionhub-v"+Config.apiVersion+"+json");
 		post(ctx, url, params, responseHandler);
 	}
 	

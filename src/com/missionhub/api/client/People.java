@@ -20,7 +20,7 @@ public class People {
 	 */
 	public static ApiClient get(Context ctx, int personId, ApiResponseHandler responseHandler) {
 		ApiClient client = new ApiClient(ctx);
-		String url = ApiHelper.getAbsoluteJsonUrl("people", String.valueOf(personId));
+		String url = ApiHelper.getAbsoluteUrl("people", String.valueOf(personId));
 		RequestParams params = ApiHelper.getDefaultRequestParams();
 		client.get(url, params, responseHandler);
 		return client;
@@ -35,7 +35,7 @@ public class People {
 	 */
 	public static ApiClient get(Context ctx, List<Integer> personIds, ApiResponseHandler responseHandler) {
 		ApiClient client = new ApiClient(ctx);
-		String url = ApiHelper.getAbsoluteJsonUrl("people", ApiHelper.toList(personIds));
+		String url = ApiHelper.getAbsoluteUrl("people", ApiHelper.toList(personIds));
 		RequestParams params = ApiHelper.getDefaultRequestParams();
 		client.get(url, params, responseHandler);
 		return client;
@@ -49,7 +49,7 @@ public class People {
 	 */
 	public static ApiClient getMe(Context ctx, ApiResponseHandler responseHandler) {
 		ApiClient client = new ApiClient(ctx);
-		String url = ApiHelper.getAbsoluteJsonUrl("people", "me");
+		String url = ApiHelper.getAbsoluteUrl("people", "me");
 		RequestParams params = ApiHelper.getDefaultRequestParams();
 		client.get(url, params, responseHandler);
 		return client;

@@ -19,7 +19,7 @@ public class Roles {
 	 */
 	public static ApiClient change(Context ctx, int personId, String role, ApiResponseHandler responseHandler) {
 		ApiClient client = new ApiClient(ctx);
-		String url = ApiHelper.getAbsoluteJsonUrl("roles", String.valueOf(personId));
+		String url = ApiHelper.getAbsoluteUrl("roles", String.valueOf(personId));
 		RequestParams params = ApiHelper.getDefaultRequestParams();
 		params.put("role", role);
 		params.put("_method", "put");

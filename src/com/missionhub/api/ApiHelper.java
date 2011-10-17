@@ -50,10 +50,6 @@ public class ApiHelper {
 		return sb.toString();
 	}
 	
-	public static String getAbsoluteJsonUrl(String... actions) {
-		return getAbsoluteUrl(actions) + ".json";
-	}
-	
 	public static String toList(List<Integer> ids) {
 		StringBuffer idList = new StringBuffer();
 		Iterator<Integer> itr = ids.iterator();

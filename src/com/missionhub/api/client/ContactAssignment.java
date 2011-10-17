@@ -20,7 +20,7 @@ public class ContactAssignment {
 	 */
 	public static ApiClient create(Context ctx, int personId, int assignToPersonId, ApiResponseHandler responseHandler) {
 		ApiClient client = new ApiClient(ctx);
-		String url = ApiHelper.getAbsoluteJsonUrl("contact_assignments");
+		String url = ApiHelper.getAbsoluteUrl("contact_assignments");
 		RequestParams params = ApiHelper.getDefaultRequestParams();
 		params.put("assign_to", String.valueOf(assignToPersonId));
 		params.put("ids", String.valueOf(personId));
@@ -38,7 +38,7 @@ public class ContactAssignment {
 	 */
 	public static ApiClient delete(Context ctx, int personId, ApiResponseHandler responseHandler) {
 		ApiClient client = new ApiClient(ctx);
-		String url = ApiHelper.getAbsoluteJsonUrl("contact_assignments", String.valueOf(personId));
+		String url = ApiHelper.getAbsoluteUrl("contact_assignments", String.valueOf(personId));
 		RequestParams params = ApiHelper.getDefaultRequestParams();
 		params.put("_method", "delete");
 		params.put("id", String.valueOf(personId));
