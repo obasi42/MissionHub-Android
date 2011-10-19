@@ -1,34 +1,42 @@
 package com.missionhub;
 
+import greendroid.app.GDActivity;
+import greendroid.widget.ActionBar;
+import greendroid.widget.ActionBarItem;
+import greendroid.widget.LoaderActionBarItem;
+import greendroid.widget.ActionBarItem.Type;
+
 import com.missionhub.api.client.Survey;
 import com.missionhub.helpers.Flurry;
 import com.missionhub.ui.DisplayError;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.KeyEvent;
-import android.view.Window;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-public class SurveysActivity extends Activity {
+public class SurveysActivity extends GDActivity {
 
 	public static final String TAG = SurveysActivity.class.getName();
 	
 	private WebView mWebView;
+	
+	private LoaderActionBarItem indicator;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		getWindow().requestFeature(Window.FEATURE_PROGRESS);
 		setTitle(R.string.surveys_title);
-		setContentView(R.layout.surveys);
+		
+		setActionBarContentView(R.layout.surveys);
+		getActionBar().setType(ActionBar.Type.Empty);
+		indicator = (LoaderActionBarItem) addActionBarItem(Type.Refresh, R.id.action_bar_refresh);
 
 		Application.restoreApplicationState(savedInstanceState);
 		
@@ -47,6 +55,18 @@ public class SurveysActivity extends Activity {
 
 		Flurry.pageView("Surveys");
 	}
+	
+	@Override
+    public boolean onHandleActionBarItemClick(ActionBarItem item, int position) {
+        switch (item.getItemId()) {
+            case R.id.action_bar_refresh:
+            	mWebView.reload();
+                break;
+            default:
+                return super.onHandleActionBarItemClick(item, position);
+        }
+        return true;
+    }
 
 	private class InternalWebViewClient extends WebViewClient {
 		@Override
@@ -75,10 +95,10 @@ public class SurveysActivity extends Activity {
 
 	private class InternalWebViewChrome extends WebChromeClient {
 		public void onProgressChanged(WebView view, int progress) {
-			SurveysActivity.this.setTitle(R.string.surveys_loading);
+			indicator.setLoading(true);
 			SurveysActivity.this.setProgress(progress * 100);
 			if (progress == 100)
-				SurveysActivity.this.setTitle(R.string.surveys_title);
+				indicator.setLoading(false);
 		}
 	}
 

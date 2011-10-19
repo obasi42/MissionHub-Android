@@ -1,6 +1,9 @@
 package com.missionhub;
 
-import android.app.Activity;
+import greendroid.app.GDActivity;
+import greendroid.widget.ActionBar;
+import greendroid.widget.ActionBarItem;
+import greendroid.widget.NormalActionBarItem;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -9,25 +12,21 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.missionhub.auth.Auth;
-import com.missionhub.auth.User;
 import com.missionhub.config.Preferences;
 import com.missionhub.helpers.Flurry;
+import com.missionhub.ui.DashboardLayout;
 
-public class MissionHubActivity extends Activity {
+public class MissionHubActivity extends GDActivity {
 	
 	/* Logging Tag */
 	public static final String TAG = MissionHubActivity.class.getName();
 	
 	/* Views */
-	private LinearLayout mLoggedOut;
-	private LinearLayout mLoggedIn;
-	private RelativeLayout mLogoutBar;
-	private TextView mName;
+	private RelativeLayout mLoggedOut;
+	private DashboardLayout mLoggedIn;
 	
 	/* Activity Result Constants */
 	public final int RESULT_LOGIN_ACTIVITY = 0;
@@ -36,21 +35,31 @@ public class MissionHubActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main);
+		
+		setActionBarContentView(R.layout.main);
+		getActionBar().setType(ActionBar.Type.Dashboard);
+		getActionBar().setVisibility(View.GONE);
+		
+		addActionBarItem(getActionBar()
+                .newActionBarItem(NormalActionBarItem.class)
+                .setDrawable(R.drawable.action_bar_user)
+                .setContentDescription(R.string.action_bar_profile), R.id.action_bar_profile);
+		
+		addActionBarItem(getActionBar()
+                .newActionBarItem(NormalActionBarItem.class)
+                .setDrawable(R.drawable.action_bar_logout)
+                .setContentDescription(R.string.action_bar_logout), R.id.action_bar_logout);
 		
 		Application.initVersion(this);
 		Preferences.setLastRunVersion(this, Application.getVersion());
 		Application.restoreApplicationState(savedInstanceState);
 		
-		mLogoutBar = (RelativeLayout) findViewById(R.id.logoutbar);
-		mLoggedIn = (LinearLayout) findViewById(R.id.loggedin);
-		mLoggedOut = (LinearLayout) findViewById(R.id.loggedout);
-		
-		mName = (TextView) findViewById(R.id.name);
+		mLoggedIn = (DashboardLayout) findViewById(R.id.loggedin);
+		mLoggedOut = (RelativeLayout) findViewById(R.id.loggedout);
 		
 		Auth.setLoggedIn(false);
 		Auth.checkToken(this, checkTokenHandler);
-		
+        
 		Flurry.pageView("Main");
 	}
 	
@@ -123,15 +132,6 @@ public class MissionHubActivity extends Activity {
 		startActivityForResult(i, RESULT_LOGIN_ACTIVITY);
 	}
 	
-	public void clickLogout(View view) {
-		logout();
-	}
-	
-	public void clickProfile(View view) {
-		Intent i = new Intent(this, ProfileActivity.class);
-		startActivityForResult(i, RESULT_PROFILE_ACTIVITY);
-	}	
-	
 	public void clickSurveys(View view) {
 		Intent i = new Intent(this, SurveysActivity.class);
 		startActivity(i);
@@ -142,6 +142,25 @@ public class MissionHubActivity extends Activity {
 		Flurry.event("Main.Logout");
 		refreshView();
 	}
+	
+	
+	@Override
+    public boolean onHandleActionBarItemClick(ActionBarItem item, int position) {
+        switch (item.getItemId()) {
+	        case R.id.action_bar_profile:
+	        	Intent i = new Intent(this, ProfileActivity.class);
+	    		startActivityForResult(i, RESULT_PROFILE_ACTIVITY);
+	            break;
+            case R.id.action_bar_logout:
+            	logout();
+                break;
+            default:
+                return super.onHandleActionBarItemClick(item, position);
+        }
+        return true;
+    }
+	
+	
 	
 	/* Handles messages from Auth.checkToken */
 	private Handler checkTokenHandler = new Handler() {
@@ -161,14 +180,13 @@ public class MissionHubActivity extends Activity {
 	 */
 	public void refreshView() {
 		if (Auth.isLoggedIn()) {
+			getActionBar().setVisibility(View.VISIBLE);
 			mLoggedOut.setVisibility(View.GONE);
 			mLoggedIn.setVisibility(View.VISIBLE);
-			mLogoutBar.setVisibility(View.VISIBLE);
-			mName.setText(User.getContact().getPerson().getName());
 		} else {
+			getActionBar().setVisibility(View.GONE);
 			mLoggedIn.setVisibility(View.GONE);
 			mLoggedOut.setVisibility(View.VISIBLE);
-			mLogoutBar.setVisibility(View.GONE);
 		}
 	}
 }

@@ -1,5 +1,10 @@
 package com.missionhub;
 
+import greendroid.app.GDActivity;
+import greendroid.widget.ActionBarItem;
+import greendroid.widget.LoaderActionBarItem;
+import greendroid.widget.ActionBarItem.Type;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -38,7 +43,6 @@ import com.missionhub.ui.RejoicableAdapter;
 import com.missionhub.ui.SeparatedListAdapter;
 import com.missionhub.ui.SimpleListItem;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -48,9 +52,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -61,13 +62,12 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-public class ContactActivity extends Activity {
+public class ContactActivity extends GDActivity {
 
 	/* Logging Tag */
 	public static final String TAG = ContactActivity.class.getName();
@@ -88,14 +88,12 @@ public class ContactActivity extends Activity {
 	private GContact contact;
 
 	/* contact.xml */
-	private TextView title;
 	private ListView listView;
-	private ProgressBar progress;
+	private LoaderActionBarItem indicator;
 	private ToggleButton bottom_button_left;
 	private ToggleButton bottom_button_center;
 	private ToggleButton bottom_button_right;
 	private LinearLayout header;
-	private MenuItem refreshMenuItem;
 	
 	/* contact_header.xml */
 	private LinearLayout contactHeader;
@@ -168,12 +166,11 @@ public class ContactActivity extends Activity {
 		if (contact == null) {
 			finish();
 		}
-
-		/* contact.xml */
-		setContentView(R.layout.contact);
-		title = (TextView) findViewById(R.id.title);
+		setTitle(R.string.contact_contact);
+		setActionBarContentView(R.layout.contact);
+		indicator = (LoaderActionBarItem) addActionBarItem(Type.Refresh, R.id.action_bar_refresh);
+		
 		listView = (ListView) findViewById(R.id.listview);
-		progress = (ProgressBar) findViewById(R.id.progress);
 		bottom_button_left = (ToggleButton) findViewById(R.id.bottom_button_left);
 		bottom_button_center = (ToggleButton) findViewById(R.id.bottom_button_center);
 		bottom_button_right = (ToggleButton) findViewById(R.id.bottom_button_right);
@@ -259,25 +256,17 @@ public class ContactActivity extends Activity {
 	}
 	
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.contact, menu);
-		refreshMenuItem = menu.findItem(R.id.contact_menu_refresh);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle item selection
-		switch (item.getItemId()) {
-		case R.id.contact_menu_refresh:
-			Flurry.event("Contact.Refresh");
-			update(true);
-			return true;
-		default:
-			return super.onOptionsItemSelected(item);
-		}
-	}
+    public boolean onHandleActionBarItemClick(ActionBarItem item, int position) {
+        switch (item.getItemId()) {
+            case R.id.action_bar_refresh:
+            	Flurry.event("Contact.Refresh");
+    			update(true);
+                break;
+            default:
+                return super.onHandleActionBarItemClick(item, position);
+        }
+        return true;
+    }
 	
 	@Override
 	public void onSaveInstanceState(Bundle b) {
@@ -330,17 +319,13 @@ public class ContactActivity extends Activity {
 
 	private void showProgress(String process) {
 		processes.add(process);
-		if (refreshMenuItem != null) 
-			refreshMenuItem.setEnabled(false);
-		this.progress.setVisibility(View.VISIBLE);
+		indicator.setLoading(true);
 	}
 
 	private void hideProgress(String process) {
 		processes.remove(process);
 		if (processes.size() <= 0) {
-			if (refreshMenuItem != null) 
-				refreshMenuItem.setEnabled(true);
-			this.progress.setVisibility(View.GONE);
+			indicator.setLoading(false);
 		}
 	}
 
@@ -1162,7 +1147,7 @@ public class ContactActivity extends Activity {
 				bottom_button_left.setChecked(true); // First State
 				header.addView(post);
 				listView.setOnItemClickListener(null);
-				title.setText(R.string.contact_contact);
+				setTitle(R.string.contact_contact);
 				if (comments.isEmpty()) {
 					listView.setAdapter(noCommentAdapter);
 				} else {
@@ -1177,7 +1162,7 @@ public class ContactActivity extends Activity {
 				break;
 			case TAB_MORE_INFO:
 				header.removeView(post);
-				title.setText(R.string.contact_more);
+				setTitle(R.string.contact_more);
 				listView.setAdapter(infoAdapter);
 				listView.setOnItemLongClickListener(null);
 				listView.setOnItemClickListener(infoClickListener);
@@ -1189,7 +1174,7 @@ public class ContactActivity extends Activity {
 				break;
 			case TAB_SURVEYS:
 				header.removeView(post);
-				title.setText(R.string.contact_survey);
+				setTitle(R.string.contact_survey);
 				listView.setAdapter(keywordAdapter);
 				listView.setOnItemLongClickListener(null);
 				listView.setOnItemClickListener(null);

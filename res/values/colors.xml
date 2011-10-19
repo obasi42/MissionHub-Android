@@ -11,4 +11,6 @@
 	<color name="mh_blue">#0379AE</color>
 	<color name="medium_gray">#999</color>
 	<color name="dark_gray">#333</color>
+	
+	<color name="dashboard_label">#fff</color>
 </resources>

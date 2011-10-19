@@ -1,5 +1,9 @@
 package com.missionhub;
 
+import greendroid.app.GDActivity;
+import greendroid.widget.ActionBarItem;
+import greendroid.widget.NormalActionBarItem;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -14,7 +18,6 @@ import com.missionhub.config.Preferences;
 import com.missionhub.helpers.Flurry;
 import com.missionhub.ui.ImageManager;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -26,7 +29,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class ProfileActivity extends Activity {
+public class ProfileActivity extends GDActivity {
 
 	private GPerson person;
 	private LinkedList<String> spinnerOrgIDs = new LinkedList<String>();
@@ -42,7 +45,13 @@ public class ProfileActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
-		setContentView(R.layout.profile);
+		setTitle(R.string.profile_header);
+		setActionBarContentView(R.layout.profile);
+		
+		addActionBarItem(getActionBar()
+                .newActionBarItem(NormalActionBarItem.class)
+                .setDrawable(R.drawable.action_bar_logout)
+                .setContentDescription(R.string.action_bar_logout), R.id.action_bar_logout);
 		
 		person = User.getContact().getPerson();
 
@@ -131,12 +140,20 @@ public class ProfileActivity extends Activity {
 	    }
 	}
 	
-	public void clickLogout(View view) {
-		Intent i = new Intent();
-	       i.putExtra("logout", true);
-	       this.setResult(RESULT_OK, i);
-	       finish();
-	}
+	@Override
+    public boolean onHandleActionBarItemClick(ActionBarItem item, int position) {
+        switch (item.getItemId()) {
+            case R.id.action_bar_logout:
+            	Intent i = new Intent();
+        		i.putExtra("logout", true);
+        		this.setResult(RESULT_OK, i);
+        		finish();
+                break;
+            default:
+                return super.onHandleActionBarItemClick(item, position);
+        }
+        return true;
+    }
 	
 	private void createSpinnerArrays() {
 		

@@ -1,5 +1,11 @@
 package com.missionhub;
 
+import greendroid.app.GDActivity;
+import greendroid.widget.ActionBarItem;
+import greendroid.widget.ActionBarItem.Type;
+import greendroid.widget.LoaderActionBarItem;
+import greendroid.widget.NormalActionBarItem;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -15,39 +21,29 @@ import com.missionhub.api.json.GContact;
 import com.missionhub.api.json.GOrgGeneric;
 import com.missionhub.auth.User;
 import com.missionhub.helpers.Flurry;
-import com.missionhub.helpers.U;
 import com.missionhub.ui.ContactItemAdapter;
 import com.missionhub.ui.DisplayError;
 import com.missionhub.ui.Guide;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-public class ContactsActivity extends Activity {
+public class ContactsActivity extends GDActivity {
 
 	public static final String TAG = ContactsActivity.class.getName();
 
@@ -60,20 +56,26 @@ public class ContactsActivity extends Activity {
 	
 	private ListView contactsList;
 	private ContactItemAdapter adapter;
-	private ProgressBar progress;
 	private TextView txtNoData;
-	private TextView txtTitle;
-	private EditText search;
+	//private EditText search;
 	private ToggleButton bottom_button_left;
 	private ToggleButton bottom_button_right;
-	private Button btnFilter;
+	
+	private NormalActionBarItem searchIcon;
+	private LoaderActionBarItem indicator;
 
 	private ArrayList<GContact> data = new ArrayList<GContact>();
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.contacts);
+		setActionBarContentView(R.layout.contacts);
+		
+		indicator = (LoaderActionBarItem) addActionBarItem(Type.Refresh, R.id.action_bar_refresh);
+		searchIcon = (NormalActionBarItem) addActionBarItem(getActionBar()
+                .newActionBarItem(NormalActionBarItem.class)
+                .setDrawable(R.drawable.action_bar_search)
+                .setContentDescription(R.string.action_bar_search), R.id.action_bar_search);
 		
 		Application.restoreApplicationState(savedInstanceState);
 
@@ -84,45 +86,34 @@ public class ContactsActivity extends Activity {
 		contactsList.setOnItemClickListener(new ContactsOnItemClickListener());
 		contactsList.setOnItemLongClickListener(new ContactsOnItemLongClickListener());
 
-		progress = (ProgressBar) findViewById(R.id.contacts_progress);
 		txtNoData = (TextView) findViewById(R.id.txt_contacts_no_data);
-		txtTitle = (TextView) findViewById(R.id.txt_contacts_title);
-		search = (EditText) findViewById(R.id.contacts_search);
 
 		bottom_button_left = (ToggleButton) findViewById(R.id.bottom_button_left);
 		bottom_button_right = (ToggleButton) findViewById(R.id.bottom_button_right);
-		
-		btnFilter = (Button) findViewById(R.id.btn_filter);
-		
-		search.addTextChangedListener(new ContactsSearchWatcher());
 
 		setTab(TAB_MY, true);
 		
 		Flurry.pageView("Contacts");
 	}
-
+	
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.contacts, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle item selection
-		switch (item.getItemId()) {
-		case R.id.contacts_refresh:
-			try {
-				FlurryAgent.onEvent("Contacts.Refresh");
-			} catch (Exception e) {}
-			resetListView(false);
-			getMore();
-			return true;
-		default:
-			return super.onOptionsItemSelected(item);
-		}
-	}
+    public boolean onHandleActionBarItemClick(ActionBarItem item, int position) {
+        switch (item.getItemId()) {
+            case R.id.action_bar_refresh:
+            	try {
+    				FlurryAgent.onEvent("Contacts.Refresh");
+    			} catch (Exception e) {}
+    			resetListView(false);
+    			getMore();
+                break;
+            case R.id.action_bar_search:
+            	startSearch();
+                break;
+            default:
+                return super.onHandleActionBarItemClick(item, position);
+        }
+        return true;
+    }
 	
 	@Override
 	public void onSaveInstanceState(Bundle b) {
@@ -157,6 +148,26 @@ public class ContactsActivity extends Activity {
 		}
 	}
 	
+	@Override 
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_SEARCH) {
+			startSearch();
+			return true;
+		}
+		return super.onKeyDown(keyCode, event);
+		
+	}
+	
+	private void startSearch() {
+		Intent i = new Intent(this, ContactsFilterActivity.class);
+		if (tab == TAB_MY) {
+			i.putExtra("TYPE", ContactsFilterActivity.TYPE_MY_CONTACTS);
+		} else if (tab == TAB_ALL) {
+			i.putExtra("TYPE", ContactsFilterActivity.TYPE_ALL_CONTACTS);
+		}
+		startActivityForResult(i, RESULT_CONTACTS_FILTER_ACTIVITY);
+	}
+	
 	private void updateFilterIcon(Contacts.Options options) {
 		if (options.getFilters().isEmpty())
 			return;
@@ -178,9 +189,9 @@ public class ContactsActivity extends Activity {
 		}
 		
 		if (filtered) {
-			btnFilter.setBackgroundResource(R.drawable.mh_searchband_more_active);
+			searchIcon.setDrawable(R.drawable.action_bar_search_active);
 		} else {
-			btnFilter.setBackgroundResource(R.drawable.mh_searchband_more);
+			searchIcon.setDrawable(R.drawable.action_bar_search);
 		}
 	}
 	
@@ -188,13 +199,13 @@ public class ContactsActivity extends Activity {
 
 	private void showProgress(String process) {
 		processes.add(process);
-		this.progress.setVisibility(View.VISIBLE);
+		indicator.setLoading(true);
 	}
 
 	private void hideProgress(String process) {
 		processes.remove(process);
 		if (processes.size() <= 0) {
-			this.progress.setVisibility(View.GONE);
+			indicator.setLoading(false);
 		}
 	}
 
@@ -209,23 +220,13 @@ public class ContactsActivity extends Activity {
 		bottom_button_right.setChecked(true);
 		setTab(TAB_ALL, false);
 	}
-	
-	public void clickFilter(View v) {
-		Intent i = new Intent(this, ContactsFilterActivity.class);
-		if (tab == TAB_MY) {
-			i.putExtra("TYPE", ContactsFilterActivity.TYPE_MY_CONTACTS);
-		} else if (tab == TAB_ALL) {
-			i.putExtra("TYPE", ContactsFilterActivity.TYPE_ALL_CONTACTS);
-		}
-		startActivityForResult(i, RESULT_CONTACTS_FILTER_ACTIVITY);
-	}
 
 	private void setTab(int tab, boolean force) {
 		if (this.tab != tab || force) {
 			switch (tab) {
 			case TAB_MY:
 				bottom_button_left.setChecked(true); // First State
-				txtTitle.setText(R.string.contacts_my);
+				setTitle(R.string.contacts_my);
 				txtNoData.setText(R.string.contacts_no_data_my);
 				Guide.display(this, Guide.CONTACTS_MY_CONTACTS);
 				try {
@@ -235,7 +236,7 @@ public class ContactsActivity extends Activity {
 				} catch (Exception e) {}
 				break;
 			case TAB_ALL:
-				txtTitle.setText(R.string.contacts_all);
+				setTitle(R.string.contacts_all);
 				txtNoData.setText(R.string.contacts_no_data_all);
 				Guide.display(this, Guide.CONTACTS_ALL);
 				try {
@@ -377,10 +378,6 @@ public class ContactsActivity extends Activity {
 		options.addFilter("status", "attempted_contact");
 		options.addFilter("status", "contacted");
 		
-		if (!U.nullOrEmpty(searchTerm)){
-			options.setFilter("name", searchTerm);
-		}
-		
 		Map<String, ?> prefs = sharedPrefs.getAll();
 		Iterator<String> itr = prefs.keySet().iterator();
 		while (itr.hasNext()) {
@@ -428,35 +425,6 @@ public class ContactsActivity extends Activity {
 		return options;
 	}
 	
-	private String searchTerm = "";
-	private Handler searchHandler = new Handler();
-	
-	private class ContactsSearchWatcher implements TextWatcher {
-		public void afterTextChanged(Editable s) {
-			searchTerm = s.toString();
-			searchHandler.removeCallbacks(doSearch);
-			if (searchTerm.length() > 0) {
-				searchHandler.postDelayed(doSearch, 350);
-			} else if (searchTerm.length() <= 0) {
-				resetListView(true);
-				getMore();
-			}
-		}
-
-		public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-		}
-
-		public void onTextChanged(CharSequence s, int start, int before, int count) {
-		}
-	}
-
-	private Runnable doSearch = new Runnable() {
-		public void run() {
-			resetListView(true);
-			getMore();
-		}
-	};
-
 	private class ContactsScrollListener implements OnScrollListener {
 		public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 			if (totalItemCount - firstVisibleItem < 3 * visibleItemCount) {
