@@ -40,7 +40,6 @@ public class LoginActivity extends Activity {
 
 	private ProgressDialog mProgressDialog;
 	private WebView mWebView;
-	//private Button mCloseBtn;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -59,8 +58,6 @@ public class LoginActivity extends Activity {
 				finish();
 			}
 		});
-
-		//mCloseBtn = (Button) findViewById(R.id.close);
 
 		mWebView = (WebView) findViewById(R.id.webview);
 		mWebView.getSettings().setJavaScriptEnabled(true);
@@ -142,7 +139,6 @@ public class LoginActivity extends Activity {
 				mProgressDialog.hide();
 			}
 			mWebView.setVisibility(View.GONE);
-			//mCloseBtn.setVisibility(View.GONE);
 			AlertDialog ad = DisplayError.display(LoginActivity.this, errorCode, description, failingUrl);
 			ad.setButton(ad.getContext().getString(R.string.alert_retry), new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int id) {
