@@ -126,7 +126,6 @@ public class LoginActivity extends Activity {
 	private class InternalWebViewClient extends WebViewClient {
 		@Override
 		public boolean shouldOverrideUrlLoading(WebView view, String url) {
-			Log.d(TAG, url);
 			view.loadUrl(url);
 			return true;
 		}
