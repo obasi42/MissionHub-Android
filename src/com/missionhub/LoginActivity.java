@@ -1,5 +1,7 @@
 package com.missionhub;
 
+import java.net.URLDecoder;
+
 import com.flurry.android.FlurryAgent;
 import com.google.gson.Gson;
 import com.loopj.android.http.AsyncHttpClient;
@@ -124,6 +126,7 @@ public class LoginActivity extends Activity {
 	private class InternalWebViewClient extends WebViewClient {
 		@Override
 		public boolean shouldOverrideUrlLoading(WebView view, String url) {
+			Log.d(TAG, url);
 			view.loadUrl(url);
 			return true;
 		}
@@ -135,6 +138,16 @@ public class LoginActivity extends Activity {
 
 		@Override
 		public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+			if (errorCode == URI_ERROR) {
+				try {
+					Gson gson = new Gson();			
+					GError error = gson.fromJson(description, GError.class);
+					description = error.getError().getMessage();	
+				} catch (Exception e) {
+					description = getString(R.string.alert_error_msg);
+				}
+			}
+			
 			if (mProgressDialog.isShowing()) {
 				mProgressDialog.hide();
 			}
@@ -160,10 +173,18 @@ public class LoginActivity extends Activity {
 			});
 			ad.show();
 		}
+		
+		public static final int URI_ERROR = -1;
 
 		@Override
 		public void onPageFinished(WebView view, String url) {
 			Uri uri = Uri.parse(url);
+			
+			if (uri.getQueryParameter("error_description") != null) {
+				onReceivedError(view, URI_ERROR, URLDecoder.decode(uri.getQueryParameter("error_description")), url);
+				return;
+			}
+			
 			String authorization = uri.getQueryParameter("authorization");
 						
 			if (authorization != null && uri.getPath().equalsIgnoreCase("/oauth/authorize")) {
