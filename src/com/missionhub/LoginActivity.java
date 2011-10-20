@@ -85,6 +85,7 @@ public class LoginActivity extends Activity {
 	
 	@Override
 	public void finish() {
+		Log.e(TAG, "FINISH");
 		mWebView.stopLoading();
 		mProgressDialog.dismiss();
 		clearCookies();
