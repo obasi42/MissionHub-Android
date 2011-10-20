@@ -5,6 +5,7 @@ import java.net.URLDecoder;
 import com.flurry.android.FlurryAgent;
 import com.google.gson.Gson;
 import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.missionhub.api.ApiResponseHandler;
 import com.missionhub.api.client.Login;
@@ -13,6 +14,7 @@ import com.missionhub.api.json.GLoginDone;
 import com.missionhub.auth.Auth;
 import com.missionhub.config.Config;
 import com.missionhub.config.Preferences;
+import com.missionhub.error.MHException;
 import com.missionhub.helpers.Flurry;
 import com.missionhub.ui.DisplayError;
 
@@ -84,7 +86,6 @@ public class LoginActivity extends Activity {
 	
 	@Override
 	public void finish() {
-		Log.e(TAG, "FINISH");
 		mWebView.stopLoading();
 		mProgressDialog.dismiss();
 		clearCookies();
@@ -118,7 +119,6 @@ public class LoginActivity extends Activity {
 
 	private void returnWithToken() {
 		Intent i = new Intent();
-		Log.d(TAG, "RETURN WITH TOKEN: " + Auth.getAccessToken());
 		i.putExtra("token", Auth.getAccessToken());
 		this.setResult(RESULT_OK, i);
 		finish();
@@ -127,7 +127,6 @@ public class LoginActivity extends Activity {
 	private class InternalWebViewClient extends WebViewClient {
 		@Override
 		public boolean shouldOverrideUrlLoading(WebView view, String url) {
-			Log.e(TAG, "LOAD: " + url);
 			view.loadUrl(url);
 			return true;
 		}
@@ -139,7 +138,6 @@ public class LoginActivity extends Activity {
 
 		@Override
 		public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-			Log.e(TAG, "onRecievedError");
 			if (errorCode == URI_ERROR) {
 				try {
 					Gson gson = new Gson();			
@@ -181,8 +179,6 @@ public class LoginActivity extends Activity {
 		@Override
 		public void onPageFinished(WebView view, String url) {
 			Uri uri = Uri.parse(url);
-			
-			Log.e(TAG, "onPageFinished: " + url);
 			
 			if (uri.getQueryParameter("error_description") != null) {
 				onReceivedError(view, URI_ERROR, URLDecoder.decode(uri.getQueryParameter("error_description")), url);
@@ -239,21 +235,13 @@ public class LoginActivity extends Activity {
 			@Override
 			public void onStart() {
 				mProgressDialog.show();
-			}
-			
-			@Override 
-			public void onSuccess(String response) {
-				Log.e(TAG, "RESPONSE: " + response);
-				super.onSuccess(response);
+				gettingToken = true;
 			}
 			
 			@Override
 			public void onSuccess(Object gsonObject) {
 				GLoginDone loginDone = (GLoginDone) gsonObject;
 				Auth.setAccessToken(loginDone.getAccess_token());
-				
-				Log.e(TAG, "TOKEN: " + loginDone.getAccess_token());
-				
 				Preferences.setAccessToken(LoginActivity.this, loginDone.getAccess_token());
 				returnWithToken();
 			}
@@ -283,7 +271,6 @@ public class LoginActivity extends Activity {
 				mProgressDialog.hide();
 			}
 		});
-		gettingToken = true;
 	}
 	
 	private void clearCookies() {
