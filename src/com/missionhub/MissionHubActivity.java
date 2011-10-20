@@ -13,11 +13,12 @@ import android.os.Handler;
 import android.os.Message;
 import android.view.View;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.missionhub.auth.Auth;
+import com.missionhub.auth.User;
 import com.missionhub.config.Preferences;
 import com.missionhub.helpers.Flurry;
-import com.missionhub.ui.DashboardLayout;
 
 public class MissionHubActivity extends GDActivity {
 	
@@ -26,7 +27,9 @@ public class MissionHubActivity extends GDActivity {
 	
 	/* Views */
 	private RelativeLayout mLoggedOut;
-	private DashboardLayout mLoggedIn;
+	private RelativeLayout mLoggedIn;
+	private TextView mOrganization;
+	private TextView mName;
 	
 	/* Activity Result Constants */
 	public final int RESULT_LOGIN_ACTIVITY = 0;
@@ -35,6 +38,8 @@ public class MissionHubActivity extends GDActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		Preferences.setAccessToken(this, "30dd08ecd1d1abd1fab0828d96654d84d28b6591b666a871a20a5cb6c1733e34");
 		
 		setActionBarContentView(R.layout.main);
 		getActionBar().setType(ActionBar.Type.Dashboard);
@@ -54,8 +59,10 @@ public class MissionHubActivity extends GDActivity {
 		Preferences.setLastRunVersion(this, Application.getVersion());
 		Application.restoreApplicationState(savedInstanceState);
 		
-		mLoggedIn = (DashboardLayout) findViewById(R.id.loggedin);
+		mLoggedIn = (RelativeLayout) findViewById(R.id.loggedin);
 		mLoggedOut = (RelativeLayout) findViewById(R.id.loggedout);
+		mName = (TextView) findViewById(R.id.name);
+		mOrganization = (TextView) findViewById(R.id.organization);
 		
 		Auth.setLoggedIn(false);
 		Auth.checkToken(this, checkTokenHandler);
@@ -183,6 +190,8 @@ public class MissionHubActivity extends GDActivity {
 			getActionBar().setVisibility(View.VISIBLE);
 			mLoggedOut.setVisibility(View.GONE);
 			mLoggedIn.setVisibility(View.VISIBLE);
+			mName.setText(User.getContact().getPerson().getName());
+			mOrganization.setText(User.getOrganizations().get(User.getOrganizationID()).getName());
 		} else {
 			getActionBar().setVisibility(View.GONE);
 			mLoggedIn.setVisibility(View.GONE);

@@ -602,15 +602,17 @@ containing a value of this type.
     }
     public static final class color {
         public static final int black=0x7f060003;
-        public static final int comment_status=0x7f060008;
-        public static final int comment_time=0x7f060009;
-        public static final int dark_gray=0x7f06000c;
-        public static final int dashboard_label=0x7f06000d;
+        public static final int comment_status=0x7f060009;
+        public static final int comment_time=0x7f06000a;
+        public static final int dark_gray=0x7f06000d;
+        public static final int dashboard_bottom_bar=0x7f06000f;
+        public static final int dashboard_label=0x7f06000e;
         public static final int gd_action_bar_divider_tint=0x7f060001;
         public static final int gd_action_bar_tint=0x7f060000;
         public static final int light_gray=0x7f060007;
-        public static final int medium_gray=0x7f06000b;
-        public static final int mh_blue=0x7f06000a;
+        public static final int light_gray2=0x7f060008;
+        public static final int medium_gray=0x7f06000c;
+        public static final int mh_blue=0x7f06000b;
         public static final int opaque_background=0x7f060005;
         public static final int transparent=0x7f060004;
         public static final int webview_background=0x7f060006;
@@ -791,7 +793,7 @@ containing a value of this type.
         public static final int center=0x7f05000d;
         public static final int center_horizontal=0x7f05000c;
         public static final int center_vertical=0x7f05000b;
-        public static final int clear=0x7f050064;
+        public static final int clear=0x7f050066;
         public static final int comment_comment=0x7f05001c;
         public static final int comment_g_present=0x7f05001e;
         public static final int comment_name=0x7f05001b;
@@ -807,8 +809,8 @@ containing a value of this type.
         public static final int contact_email=0x7f05002d;
         public static final int contact_fields=0x7f050032;
         public static final int contact_header=0x7f050026;
-        public static final int contact_info_header=0x7f05005f;
-        public static final int contact_info_info=0x7f050060;
+        public static final int contact_info_header=0x7f050061;
+        public static final int contact_info_info=0x7f050062;
         public static final int contact_name=0x7f050029;
         public static final int contact_nameview=0x7f050028;
         public static final int contact_phone=0x7f05002b;
@@ -823,10 +825,11 @@ containing a value of this type.
         public static final int contacts_list_contact_image=0x7f05002f;
         public static final int contacts_list_contact_name=0x7f050030;
         public static final int contacts_list_contact_status=0x7f050031;
-        public static final int contacts_top_bar=0x7f050062;
+        public static final int contacts_top_bar=0x7f050064;
         public static final int dashboard=0x7f050001;
-        public static final int dashboard_contacts=0x7f050056;
-        public static final int dashboard_surveys=0x7f050057;
+        public static final int dashboard_bottom_bar=0x7f050056;
+        public static final int dashboard_contacts=0x7f050057;
+        public static final int dashboard_surveys=0x7f050058;
         public static final int egg_picture=0x7f05003e;
         public static final int egg_title=0x7f05003d;
         public static final int empty=0x7f050002;
@@ -862,24 +865,25 @@ containing a value of this type.
         public static final int list_header_title=0x7f050053;
         public static final int listview=0x7f050022;
         public static final int loggedin=0x7f050055;
-        public static final int loggedout=0x7f050058;
-        public static final int logo=0x7f050059;
+        public static final int loggedout=0x7f05005b;
+        public static final int logo=0x7f05005c;
         public static final int mdpi=0x7f050004;
         public static final int multiple=0x7f05000f;
-        public static final int name=0x7f05005c;
+        public static final int name=0x7f050059;
         public static final int normal=0x7f050000;
-        public static final int profile=0x7f05005a;
-        public static final int profile_picture=0x7f05005b;
+        public static final int organization=0x7f05005a;
+        public static final int profile=0x7f05005d;
+        public static final int profile_picture=0x7f05005e;
         public static final int right=0x7f05000a;
         public static final int single=0x7f05000e;
-        public static final int spinner=0x7f05005d;
+        public static final int spinner=0x7f05005f;
         public static final int spinnerText=0x7f050037;
-        public static final int title=0x7f050063;
+        public static final int title=0x7f050065;
         public static final int top=0x7f050007;
         public static final int txt_contacts_no_data=0x7f05003b;
-        public static final int version=0x7f05005e;
+        public static final int version=0x7f050060;
         public static final int webview=0x7f050054;
-        public static final int webview_surveys=0x7f050061;
+        public static final int webview_surveys=0x7f050063;
         public static final int xhdpi=0x7f050006;
     }
     public static final class layout {
@@ -1085,7 +1089,6 @@ containing a value of this type.
         public static final int yes=0x7f08008e;
     }
     public static final class style {
-        public static final int DashboardButton=0x7f09003c;
         public static final int GreenDroid=0x7f090006;
         /**  PopDownMenu 
          */
@@ -1175,7 +1178,10 @@ containing a value of this type.
         public static final int Theme_GreenDroid_Light=0x7f090037;
         public static final int Theme_GreenDroid_Light_NoTitleBar=0x7f090038;
         public static final int Theme_GreenDroid_NoTitleBar=0x7f090036;
-        public static final int Theme_MHActionBar=0x7f09003d;
+        public static final int Theme_MHActionBar=0x7f09003f;
+        public static final int dashboard_button=0x7f09003e;
+        public static final int dashboard_name=0x7f09003c;
+        public static final int dashboard_organization=0x7f09003d;
         public static final int logoutText=0x7f09003a;
         public static final int mh_button=0x7f090039;
     }

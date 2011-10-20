@@ -6,6 +6,7 @@
 	<color name="opaque_background">#99000000</color>
 	<color name="webview_background">#f0f0f0</color>
 	<color name="light_gray">#CCC</color>
+	<color name="light_gray2">#BBB</color>
 	<color name="comment_status">#666</color>
 	<color name="comment_time">#666</color>
 	<color name="mh_blue">#0379AE</color>
@@ -13,4 +14,5 @@
 	<color name="dark_gray">#333</color>
 	
 	<color name="dashboard_label">#fff</color>
+	<color name="dashboard_bottom_bar">#fff</color>
 </resources>
