@@ -1,0 +1,43 @@
+package com.missionhub.widget;
+
+import com.missionhub.R;
+
+import greendroid.widget.item.Item;
+import greendroid.widget.itemview.ItemView;
+import android.content.Context;
+import android.util.AttributeSet;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+public class ContactSurveyItemView extends LinearLayout implements ItemView {
+
+    private TextView mTextView;
+    private TextView mSubtextView;
+
+    public ContactSurveyItemView(Context context) {
+        this(context, null);
+    }
+
+    public ContactSurveyItemView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
+
+    public void prepareItemView() {
+        mTextView = (TextView) findViewById(R.id.text);
+        mSubtextView = (TextView) findViewById(R.id.subtext);
+    }
+
+    public void setObject(Item object) {
+        final ContactSurveyItem item = (ContactSurveyItem) object;
+        mTextView.setText(item.text);
+        
+        if (item.subtext == null || item.subtext.equals("")) {
+        	mSubtextView.setText(getContext().getString(R.string.contact_survey_no_answer));
+        	mSubtextView.setTextColor(getContext().getResources().getColor(R.color.medium_gray));
+        } else {
+        	mSubtextView.setText(item.subtext);
+        	mSubtextView.setTextColor(getContext().getResources().getColor(R.color.dark_gray));
+        }
+    }
+
+}

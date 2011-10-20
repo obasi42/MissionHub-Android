@@ -39,8 +39,6 @@ public class MissionHubActivity extends GDActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		Preferences.setAccessToken(this, "30dd08ecd1d1abd1fab0828d96654d84d28b6591b666a871a20a5cb6c1733e34");
-		
 		setActionBarContentView(R.layout.main);
 		getActionBar().setType(ActionBar.Type.Dashboard);
 		getActionBar().setVisibility(View.GONE);
@@ -166,8 +164,6 @@ public class MissionHubActivity extends GDActivity {
         }
         return true;
     }
-	
-	
 	
 	/* Handles messages from Auth.checkToken */
 	private Handler checkTokenHandler = new Handler() {

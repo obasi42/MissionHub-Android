@@ -2,6 +2,7 @@ package com.missionhub;
 
 import greendroid.app.GDActivity;
 import greendroid.widget.ActionBarItem;
+import greendroid.widget.ItemAdapter;
 import greendroid.widget.LoaderActionBarItem;
 import greendroid.widget.ActionBarItem.Type;
 
@@ -40,8 +41,9 @@ import com.missionhub.ui.Guide;
 import com.missionhub.ui.ImageManager;
 import com.missionhub.ui.Rejoicable;
 import com.missionhub.ui.RejoicableAdapter;
-import com.missionhub.ui.SeparatedListAdapter;
 import com.missionhub.ui.SimpleListItem;
+import com.missionhub.widget.ContactSurveyHeader;
+import com.missionhub.widget.ContactSurveyItem;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -136,7 +138,10 @@ public class ContactActivity extends GDActivity {
 	private ArrayList<SimpleListItem> info = new ArrayList<SimpleListItem>();
 	
 	/* Survey Adapter */
-	private SeparatedListAdapter keywordAdapter;
+	//private SeparatedListAdapter keywordAdapter;
+	
+	private ItemAdapter keywordAdapter;
+	
 	
 
 	@Override
@@ -219,7 +224,7 @@ public class ContactActivity extends GDActivity {
 		noComment.add(getString(R.string.contact_no_comments));
 		noCommentAdapter =  new ArrayAdapter<String>(this, R.layout.no_comment_list_item, noComment);
 		infoAdapter = new SimpleListItemAdapter(this, R.layout.simple_list_item, info);
-		keywordAdapter = new SeparatedListAdapter(this);
+		keywordAdapter = new ItemAdapter(this);
 		
 		/* Create ListView Header */
 		header = new LinearLayout(this);
@@ -506,7 +511,7 @@ public class ContactActivity extends GDActivity {
 		final GPerson person = contact.getPerson();
 		if (person == null) return;
 		
-		keywordAdapter = new SeparatedListAdapter(this);
+		keywordAdapter = new ItemAdapter(this);
 		
 		try {
 			final GKeyword[] keywords = contactMeta.getKeywords();
@@ -520,17 +525,12 @@ public class ContactActivity extends GDActivity {
 			}
 			for (GKeyword keyword : keywords) {
 				try {
-					ArrayList<SimpleListItem> keywordData = new ArrayList<SimpleListItem>();
+					keywordAdapter.add(new ContactSurveyHeader(getString(R.string.contact_survey_keyword) + ": " + keyword.getName()));
 					for (int q : keyword.getQuestions()) {
-						final GQuestion quesiton = questions.get(q);
+						final GQuestion question = questions.get(q);
 						final GQA qa = answers.get(q);
-						HashMap<String, String> data = new HashMap<String, String>();
-						data.put("id", String.valueOf(keyword.getKeyword_id()));
-						data.put("default", getString(R.string.contact_survey_no_answer));
-						keywordData.add(new SimpleListItem(quesiton.getLabel(), qa.getA(), data));
+						keywordAdapter.add(new ContactSurveyItem(question.getLabel(), qa.getA()));
 					}
-					SimpleListItemAdapter adapter = new SimpleListItemAdapter(this, R.layout.simple_list_item, keywordData);
-					keywordAdapter.addSection(getString(R.string.contact_survey_keyword) + ": " + keyword.getName(), adapter);
 				} catch (Exception e) {
 				}
 			}
