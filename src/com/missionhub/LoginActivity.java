@@ -5,7 +5,6 @@ import java.net.URLDecoder;
 import com.flurry.android.FlurryAgent;
 import com.google.gson.Gson;
 import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.missionhub.api.ApiResponseHandler;
 import com.missionhub.api.client.Login;
@@ -14,7 +13,6 @@ import com.missionhub.api.json.GLoginDone;
 import com.missionhub.auth.Auth;
 import com.missionhub.config.Config;
 import com.missionhub.config.Preferences;
-import com.missionhub.error.MHException;
 import com.missionhub.helpers.Flurry;
 import com.missionhub.ui.DisplayError;
 

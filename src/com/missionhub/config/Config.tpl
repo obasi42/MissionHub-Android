@@ -9,7 +9,7 @@ public class Config {
 	public static final String apiVersion = "2";
 	public static final String oauthClientId = "@CONFIG.MHCLIENTID@";
 	public static final String oauthClientSecret = "@CONFIG.MHCLIENTSECRET@";
-	public static final String oauthScope = "userinfo,contacts,contact_assignment,followup_comments,roles,organizations";
+	public static final String oauthScope = "userinfo,contacts,contact_assignment,followup_comments,roles,organization_info";
 	public static final String flurryKey = "@CONFIG.MHFLURRYKEY@";
 	
 }
