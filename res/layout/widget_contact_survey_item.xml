@@ -12,17 +12,13 @@
 		android:textSize="16dp"
 		android:id="@+id/text"
 		android:layout_width="fill_parent"
-		android:layout_height="0dp"
-		android:layout_weight="0.5"
-		android:gravity="bottom|left" />
+		android:layout_height="wrap_content" />
 
 	<TextView
 		android:textSize="14dp" 
 		android:textColor="@color/dark_gray"
 		android:id="@+id/subtext"
 		android:layout_width="fill_parent"
-		android:layout_height="0dp"
-		android:layout_weight="0.5"
-		android:gravity="top|left" />
+		android:layout_height="wrap_content" />
 		
 </com.missionhub.widget.ContactSurveyItemView>
