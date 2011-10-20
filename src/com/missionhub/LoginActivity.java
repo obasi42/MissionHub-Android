@@ -239,7 +239,12 @@ public class LoginActivity extends Activity {
 			@Override
 			public void onStart() {
 				mProgressDialog.show();
-				gettingToken = true;
+			}
+			
+			@Override 
+			public void onSuccess(String response) {
+				Log.e(TAG, "RESPONSE: " + response);
+				super.onSuccess(response);
 			}
 			
 			@Override
@@ -278,6 +283,7 @@ public class LoginActivity extends Activity {
 				mProgressDialog.hide();
 			}
 		});
+		gettingToken = true;
 	}
 	
 	private void clearCookies() {
