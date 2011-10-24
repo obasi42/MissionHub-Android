@@ -126,9 +126,6 @@ public class Auth {
 				}
 				@Override
 				public void onFailure(Throwable e) {
-					if (client == null)
-						return;
-					
 					Log.e(TAG, "Auto Login Failed", e);
 					h.sendEmptyMessage(Auth.FAILURE);
 					AlertDialog ad = DisplayError.display(ctx, e);
