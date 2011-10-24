@@ -97,6 +97,8 @@
 			</filterset>
 		</copy>
 	</target>
+
+	<target name="compile" depends="-compile"></target>
     
 	<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" />
 
