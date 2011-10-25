@@ -14,6 +14,7 @@ public class Flurry {
 	
 	public static void startSession(Context ctx) {
 		initFlurryUser();
+		FlurryAgent.setUseHttps(true);
 		FlurryAgent.onStartSession(ctx, Config.flurryKey);
 	}
 	
