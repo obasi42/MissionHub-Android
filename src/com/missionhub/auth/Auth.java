@@ -1,16 +1,14 @@
 package com.missionhub.auth;
 
-import com.google.gson.Gson;
 import com.missionhub.R;
 import com.missionhub.api.ApiClient;
 import com.missionhub.api.ApiResponseHandler;
 import com.missionhub.api.client.People;
 import com.missionhub.api.json.GContact;
-import com.missionhub.api.json.GError;
 import com.missionhub.api.json.GPerson;
 import com.missionhub.config.Preferences;
-import com.missionhub.error.MHException;
 import com.missionhub.helpers.Flurry;
+import com.missionhub.sql.convert.PersonJsonSql;
 import com.missionhub.ui.DisplayError;
 
 import android.app.AlertDialog;
@@ -76,20 +74,17 @@ public class Auth {
 	 * Check Stored Access Token
 	 * @return true if has stored token
 	 */
-	public static synchronized boolean checkToken(Context context, Handler handler) {
-		final Handler h = handler;
-		final Context ctx = context;
-		
-		setAccessToken(Preferences.getAccessToken(ctx));
+	public static synchronized boolean checkToken(final Context context, final Handler handler) {		
+		setAccessToken(Preferences.getAccessToken(context));
 		
 		if (getAccessToken() != null) {
-			ApiResponseHandler responseHandler = new ApiResponseHandler() {
+			ApiResponseHandler responseHandler = new ApiResponseHandler(GPerson[].class) {
 				
 				ProgressDialog mProgressDialog;
 				
 				@Override
 				public void onStart() {
-					mProgressDialog = ProgressDialog.show(ctx, "", ctx.getString(R.string.alert_logging_in), true);
+					mProgressDialog = ProgressDialog.show(context, "", context.getString(R.string.alert_logging_in), true);
 					mProgressDialog.setCancelable(true);
 					mProgressDialog.setOnCancelListener(new OnCancelListener(){
 						@Override
@@ -99,40 +94,37 @@ public class Auth {
 						}
 					});
 				}
-				@Override
-				public void onSuccess(String response) {
+				
+				@Override 
+				public void onSuccess(Object jsonObject) {
 					if (client == null)
 						return;
 					
-					Gson gson = new Gson();
-					try{
-						GError error = gson.fromJson(response, GError.class);
-						onFailure(new MHException(error));
-					} catch (Exception out){
-						try {
-							GPerson[] people = gson.fromJson(response, GPerson[].class);
-							if (people.length > 0) {
-								GContact contact = new GContact();
-								contact.setPerson(people[0]);
-								User.setContact(contact);
-								User.setOrganizationID(Preferences.getOrganizationID(ctx));
-								Auth.setLoggedIn(true);
-								h.sendEmptyMessage(Auth.SUCCESS);
-							}
-						} catch(Exception e) {
-							onFailure(e);
+					GPerson[] people = (GPerson[]) jsonObject; 
+					try {
+						if (people.length > 0) {
+							GContact contact = new GContact();
+							contact.setPerson(people[0]);
+							User.setContact(contact);
+							PersonJsonSql.update(context, contact);
+							User.setOrganizationID(Preferences.getOrganizationID(context));
+							Auth.setLoggedIn(true);
+							handler.sendEmptyMessage(Auth.SUCCESS);
 						}
+					} catch (Exception e) {
+						onFailure(e);
 					}
+					
 				}
 				@Override
 				public void onFailure(Throwable e) {
 					Log.e(TAG, "Auto Login Failed", e);
-					h.sendEmptyMessage(Auth.FAILURE);
-					AlertDialog ad = DisplayError.display(ctx, e);
+					handler.sendEmptyMessage(Auth.FAILURE);
+					AlertDialog ad = DisplayError.display(context, e);
 					ad.setButton(ad.getContext().getString(R.string.alert_retry), new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int id) {
 							dialog.dismiss();
-							h.sendEmptyMessage(Auth.RETRY);
+							handler.sendEmptyMessage(Auth.RETRY);
 						}
 					});
 					ad.show();
