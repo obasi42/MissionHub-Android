@@ -1,5 +1,8 @@
 package com.missionhub.config;
 
+import com.google.gson.Gson;
+import com.missionhub.api.json.GContact;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 
@@ -103,6 +106,30 @@ public class Preferences {
 		SharedPreferences settings = ctx.getSharedPreferences(PREFS_NAME, 0);
 		SharedPreferences.Editor editor = settings.edit();
 		editor.remove("lastRunVersion");
+		editor.commit();
+	}
+	
+	/**
+	 * Returns the stored organization ID
+	 * @param ctx
+	 * @return the org id or -1
+	 */
+	public static synchronized GContact getContact(Context ctx) {
+		SharedPreferences settings = ctx.getSharedPreferences(PREFS_NAME, 0);
+		Gson gson = new Gson();
+		return gson.fromJson(settings.getString("contact__", ""), GContact.class);
+	}
+	
+	/**
+	 * Sets the stored organizationID
+	 * @param ctx
+	 * @param organizationID
+	 */
+	public static synchronized void setContact(Context ctx, GContact contact) {
+		SharedPreferences settings = ctx.getSharedPreferences(PREFS_NAME, 0);
+		SharedPreferences.Editor editor = settings.edit();
+		Gson gson = new Gson();
+		editor.putString("contact__", gson.toJson(contact, GContact.class));
 		editor.commit();
 	}
 }

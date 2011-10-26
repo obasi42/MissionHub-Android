@@ -5,7 +5,14 @@ import java.util.HashMap;
 
 import com.missionhub.R;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
+import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.widget.Toast;
 
 public class Helper {
 	
@@ -66,5 +73,129 @@ public class Helper {
 	
 	public static synchronized int getStatusResourceId(String s) {
 		return statusMap.get(s);
+	}
+	
+	public static boolean hasPhoneAbility(Context ctx) {
+		TelephonyManager telephonyManager = (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
+		if (telephonyManager.getPhoneType() == TelephonyManager.PHONE_TYPE_NONE)
+			return false;
+
+		return true;
+	}
+	
+	public static void openFacebookProfile(final Context ctx, String uid) {
+		final String new_uid = uid;
+		AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+		builder.setTitle(R.string.contact_open_profile)
+		       .setCancelable(true)
+		       .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+		           public void onClick(DialogInterface dialog, int id) {
+		        	   try {
+		        		   Intent intent = new Intent(Intent.ACTION_VIEW);
+		        		   intent.setClassName("com.facebook.katana", "com.facebook.katana.ProfileTabHostActivity");
+		        		   intent.putExtra("extra_user_id", Long.parseLong(new_uid));
+		        		   ctx.startActivity(intent);
+		        		   try {
+			       				HashMap<String, String> params = new HashMap<String, String>();
+			       				params.put("method", "App");
+			       				Flurry.event("Contact.OpenFacebook", params);
+			       			} catch (Exception e) {}
+		        	   } catch(Exception e) {
+		        		   try {
+				       			Intent i = new Intent(Intent.ACTION_VIEW);
+				       			i.setData(Uri.parse("http://www.facebook.com/profile.php?id=" + new_uid));
+				       			ctx.startActivity(i);
+				       			try {
+				       				HashMap<String, String> params = new HashMap<String, String>();
+				       				params.put("method", "Browser");
+				       				Flurry.event("Contact.OpenFacebook", params);
+				       			} catch (Exception e2) {}
+				       		} catch(Exception f) {
+				       			Toast.makeText(ctx, R.string.contact_cant_open_profile, Toast.LENGTH_LONG).show();
+				       		}
+		        	   }
+		        	   dialog.dismiss();
+		           }
+		       })
+		       .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+		           public void onClick(DialogInterface dialog, int id) {
+		                dialog.cancel();
+		           }
+		       });
+		AlertDialog alert = builder.create();
+		alert.show();
+	}
+	
+	public static void openURL(final Context ctx, String url) {
+		final String new_url = url;
+		AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+		builder.setTitle(R.string.contact_open_url)
+		       .setCancelable(true)
+		       .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+		           public void onClick(DialogInterface dialog, int id) {
+		        	   try {
+		       			Intent i = new Intent(Intent.ACTION_VIEW);
+		       			i.setData(Uri.parse(new_url));
+		       			ctx.startActivity(i);
+		       		} catch(Exception e) {
+		       			Toast.makeText(ctx, R.string.contact_cant_open_profile, Toast.LENGTH_LONG).show();
+		       		}
+		        	   dialog.dismiss();
+		           }
+		       })
+		       .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+		           public void onClick(DialogInterface dialog, int id) {
+		                dialog.cancel();
+		           }
+		       });
+		AlertDialog alert = builder.create();
+		alert.show();
+	}
+	
+	public static void makePhoneCall(final Context ctx, String phoneNumber) {
+		try {
+			Intent intent = new Intent(Intent.ACTION_DIAL);
+			intent.setData(Uri.parse("tel:" + phoneNumber));
+			ctx.startActivity(intent);
+			try {
+				HashMap<String, String> params = new HashMap<String, String>();
+				params.put("method", "Phone");
+				Flurry.event("Contact.MakeContact", params);
+			} catch (Exception e) {}
+		} catch (Exception e) {
+			Toast.makeText(ctx, R.string.contact_cant_call, Toast.LENGTH_LONG).show();
+		}
+	}
+	
+	public static void sendSMS(final Context ctx, String phoneNumber) {
+		try {
+			Intent intent = new Intent(Intent.ACTION_VIEW);
+			intent.putExtra("address", phoneNumber);
+			intent.setType("vnd.android-dir/mms-sms");
+			ctx.startActivity(intent);
+			try {
+				HashMap<String, String> params = new HashMap<String, String>();
+				params.put("method", "SMS");
+				Flurry.event("Contact.MakeContact", params);
+			} catch (Exception e) {}
+		} catch (Exception e) {
+			Toast.makeText(ctx, R.string.contact_cant_sms, Toast.LENGTH_LONG).show();
+		}
+	}
+	
+	public static void sendEmail(final Context ctx, String emailAddress) {
+		try {
+			final Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
+			emailIntent.setType("plain/text");
+			emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[] { emailAddress });
+			ctx.startActivity(Intent.createChooser(emailIntent, ctx.getString(R.string.contact_send_email)));
+			try {
+				HashMap<String, String> params = new HashMap<String, String>();
+				params.put("method", "Email");
+				Flurry.event("Contact.MakeContact", params);
+			} catch (Exception e) {}
+		} catch (Exception e) {
+			Toast.makeText(ctx, R.string.contact_cant_email, Toast.LENGTH_LONG).show();
+		}
 	}
 }

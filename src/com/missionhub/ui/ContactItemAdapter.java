@@ -60,7 +60,7 @@ public class ContactItemAdapter extends ArrayAdapter<GContact> {
 			}
 			holder.status.setText(Helper.getStatusResourceId(person.getStatus()));
 			holder.image.setTag(person.getPicture());
-			imageManager.displayImage(person.getPicture(), activity, holder.image, R.drawable.default_contact);
+			imageManager.displayImage(person.getPicture(), holder.image, R.drawable.default_contact);
 		}
 		return v;
 	}

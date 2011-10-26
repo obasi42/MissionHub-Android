@@ -62,21 +62,21 @@ public class ImageManager {
 	}
 	
 	   
-	public void displayImage(String url, Activity activity, ImageView imageView) {
+	public void displayImage(String url, ImageView imageView) {
 		if(imageMap.containsKey(url)) {
 			imageView.setImageBitmap(imageMap.get(url));
 		} else {
-			queueImage(url, activity, imageView);
+			queueImage(url, imageView);
 			imageView.setImageResource(defaultImageResource);
 		}
 	}
 	
-	public void displayImage(String url, Activity activity, ImageView imageView, int defaultResource) {
+	public void displayImage(String url, ImageView imageView, int defaultResource) {
 		defaultImageResource = defaultResource;
-		displayImage(url, activity, imageView);
+		displayImage(url, imageView);
 	}
 
-	private void queueImage(String url, Activity activity, ImageView imageView) {		
+	private void queueImage(String url, ImageView imageView) {		
 		// This ImageView might have been used for other images, so we clear 
 		// the queue of old tasks before starting.
 		if (url != null) {

@@ -42,8 +42,8 @@ import com.missionhub.ui.ImageManager;
 import com.missionhub.ui.Rejoicable;
 import com.missionhub.ui.RejoicableAdapter;
 import com.missionhub.ui.SimpleListItem;
-import com.missionhub.widget.ContactSurveyHeader;
-import com.missionhub.widget.ContactSurveyItem;
+import com.missionhub.ui.widget.ContactSurveyHeader;
+import com.missionhub.ui.widget.ContactSurveyItem;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -147,7 +147,7 @@ public class ContactActivity extends GDActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		
 		/* Restore contact from savedInstanceState if possible */
 		Gson gson = new Gson();
 		Intent i = getIntent();
@@ -350,7 +350,7 @@ public class ContactActivity extends GDActivity {
 		if (person.getPicture() != null && !currentProfilePicture.equals(person.getPicture())) {
 			currentProfilePicture = person.getPicture();
 			profilePicture.setTag(person.getPicture() + "?type=large");
-			imageManager.displayImage(person.getPicture() + "?type=large", ContactActivity.this, profilePicture, defaultImage);
+			imageManager.displayImage(person.getPicture() + "?type=large", profilePicture, defaultImage);
 		}
 		if (person.getName() != null) {
 			name.setText(person.getName());

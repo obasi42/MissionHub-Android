@@ -1,5 +1,4 @@
-
-package com.missionhub.widget;
+package com.missionhub.ui.widget;
 
 import com.missionhub.R;
 

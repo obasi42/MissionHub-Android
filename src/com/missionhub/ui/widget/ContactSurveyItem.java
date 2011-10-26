@@ -1,4 +1,4 @@
-package com.missionhub.widget;
+package com.missionhub.ui.widget;
 
 import greendroid.widget.item.TextItem;
 import greendroid.widget.itemview.ItemView;

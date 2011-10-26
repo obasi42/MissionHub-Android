@@ -77,7 +77,7 @@ public class CommentItemAdapter extends ArrayAdapter<GFollowupComment> {
 			}
 			if (comment != null) {
 				holder.picture.setTag(commenter.getPicture()+"?type=square");
-				imageManager.displayImage(commenter.getPicture()+"?type=square", activity, holder.picture, R.drawable.default_contact);
+				imageManager.displayImage(commenter.getPicture()+"?type=square", holder.picture, R.drawable.default_contact);
 				holder.name.setText(commenter.getName());
 				holder.status.setText(statusListRes.get(statusListTag.indexOf(comment.getStatus())));
 				if (comment.getComment() == null || comment.getComment().equals("")) {

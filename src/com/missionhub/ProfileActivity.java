@@ -88,7 +88,7 @@ public class ProfileActivity extends GDActivity {
 		if (person.getPicture() != null && !currentProfilePicture.equals(person.getPicture())) {
 			currentProfilePicture = person.getPicture();
 			profilePicture.setTag(person.getPicture() + "?type=large");
-			imageManager.displayImage(person.getPicture() + "?type=large", ProfileActivity.this, profilePicture, defaultImage);
+			imageManager.displayImage(person.getPicture() + "?type=large", profilePicture, defaultImage);
 		}
 		
 		/* Egg Count */
