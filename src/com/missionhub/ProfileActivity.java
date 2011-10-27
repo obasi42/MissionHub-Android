@@ -1,6 +1,5 @@
 package com.missionhub;
 
-import greendroid.app.GDActivity;
 import greendroid.widget.ActionBarItem;
 import greendroid.widget.NormalActionBarItem;
 
@@ -11,11 +10,9 @@ import java.util.Set;
 
 import com.flurry.android.FlurryAgent;
 import com.google.common.collect.HashMultimap;
-import com.missionhub.api.json.GOrgGeneric;
-import com.missionhub.api.json.GPerson;
-import com.missionhub.auth.User;
 import com.missionhub.config.Preferences;
 import com.missionhub.helpers.Flurry;
+import com.missionhub.sql.OrganizationalRole;
 import com.missionhub.ui.ImageManager;
 
 import android.content.Intent;
@@ -29,9 +26,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class ProfileActivity extends GDActivity {
+public class ProfileActivity extends Activity {
 
-	private GPerson person;
 	private LinkedList<String> spinnerOrgIDs = new LinkedList<String>();
 	private LinkedList<String> spinnerNames = new LinkedList<String>();
 	private int currentSpinnerIndex;
@@ -52,8 +48,6 @@ public class ProfileActivity extends GDActivity {
                 .newActionBarItem(NormalActionBarItem.class)
                 .setDrawable(R.drawable.action_bar_logout)
                 .setContentDescription(R.string.action_bar_logout), R.id.action_bar_logout);
-		
-		person = User.getContact().getPerson();
 
 		/* Spinner */
 		createSpinnerArrays();
@@ -64,7 +58,7 @@ public class ProfileActivity extends GDActivity {
 		
 		/* Name */
 		TextView name = (TextView) findViewById(R.id.name);
-		name.setText(person.getName());
+		name.setText(getUser().getPerson().getName());
 		
 		/* Version */
 		TextView version = (TextView) findViewById(R.id.version);
@@ -78,37 +72,30 @@ public class ProfileActivity extends GDActivity {
 		profilePicture = (ImageView) findViewById(R.id.profile_picture);
 		imageManager = new ImageManager(getApplicationContext());
 		int defaultImage = R.drawable.facebook_question;
-		if (person.getGender() != null) {
-			if (person.getGender().equalsIgnoreCase("male")) {
+		if (getUser().getPerson().getGender() != null) {
+			if (getUser().getPerson().getGender().equalsIgnoreCase("male")) {
 				defaultImage = R.drawable.facebook_male;
-			} else if (person.getGender().equalsIgnoreCase("female")) {
+			} else if (getUser().getPerson().getGender().equalsIgnoreCase("female")) {
 				defaultImage = R.drawable.facebook_female;
 			}
 		}
-		if (person.getPicture() != null && !currentProfilePicture.equals(person.getPicture())) {
-			currentProfilePicture = person.getPicture();
-			profilePicture.setTag(person.getPicture() + "?type=large");
-			imageManager.displayImage(person.getPicture() + "?type=large", profilePicture, defaultImage);
+		if (getUser().getPerson().getPicture() != null && !currentProfilePicture.equals(getUser().getPerson().getPicture())) {
+			currentProfilePicture = getUser().getPerson().getPicture();
+			profilePicture.setTag(getUser().getPerson().getPicture() + "?type=large");
+			imageManager.displayImage(getUser().getPerson().getPicture() + "?type=large", profilePicture, defaultImage);
 		}
 		
 		/* Egg Count */
 		clicks = 0;
 		
-		Flurry.pageView("Profile");
+		Flurry.pageView(this, "Profile");
 	}
 	
 	@Override
 	public void onStart() {
 		super.onStart();
-		Flurry.startSession(this);
 		spinner.setSelection(currentSpinnerIndex);
 		spinner.setOnItemSelectedListener(new MyOnItemSelectedListener());
-	}
-	
-	@Override
-	public void onStop() {
-	   super.onStop();
-	   Flurry.endSession(this);
 	}
 	
 	@Override
@@ -122,7 +109,7 @@ public class ProfileActivity extends GDActivity {
 	    public void onItemSelected(AdapterView<?> parent,
 	        View view, int pos, long id) {
 	    	currentSpinnerOrgID = spinnerOrgIDs.get(pos);
-	    	if (!currentSpinnerOrgID.equalsIgnoreCase(String.valueOf(User.getOrganizationID()))) {
+	    	if (!currentSpinnerOrgID.equalsIgnoreCase(String.valueOf(getUser().getOrganizationID()))) {
 	    		try {
 	    			HashMap<String, String> params = new HashMap<String, String>();
 	    			params.put("orgID", spinnerOrgIDs.get(pos));
@@ -131,7 +118,7 @@ public class ProfileActivity extends GDActivity {
 	  	      Toast.makeText(parent.getContext(), "Your current organization is now " +
 	  		          parent.getItemAtPosition(pos).toString(), Toast.LENGTH_LONG).show();
 	  	      Preferences.setOrganizationID(ProfileActivity.this, Integer.parseInt(currentSpinnerOrgID));
-	  	      User.setOrganizationID(Integer.parseInt(currentSpinnerOrgID));
+	  	      getUser().setOrganizationID(Integer.parseInt(currentSpinnerOrgID));
 	    	}
 	    }
 
@@ -157,8 +144,8 @@ public class ProfileActivity extends GDActivity {
 	
 	private void createSpinnerArrays() {
 		
-		final HashMultimap<Integer, String> roles = User.getRoles();
-		final HashMap<Integer, GOrgGeneric> organizations = User.getOrganizations();
+		final HashMultimap<Integer, String> roles = getUser().getRoles();
+		final HashMap<Integer, OrganizationalRole> organizations = getUser().getOrganizations();
 		
 		Iterator<Integer> it = roles.keySet().iterator();
 
@@ -169,7 +156,7 @@ public class ProfileActivity extends GDActivity {
 			if (orgRoles.contains("admin") || orgRoles.contains("leader")) {
 				spinnerOrgIDs.add(String.valueOf(key));
 				spinnerNames.add(organizations.get(key).getName());
-				if (key == User.getOrganizationID()) {
+				if (key == getUser().getOrganizationID()) {
 					currentSpinnerOrgID = String.valueOf(key);
 					currentSpinnerIndex = count;
 				}

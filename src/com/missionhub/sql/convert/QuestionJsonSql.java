@@ -1,6 +1,6 @@
 package com.missionhub.sql.convert;
 
-import com.missionhub.MissionHubApplication;
+import com.missionhub.Application;
 import com.missionhub.api.json.GQuestion;
 import com.missionhub.sql.Question;
 import com.missionhub.sql.QuestionDao;
@@ -12,7 +12,7 @@ public class QuestionJsonSql {
 	public static void update(Context context, int organizationId, GQuestion[] questions) {
 		if (questions == null) return;
 		
-		MissionHubApplication app = (MissionHubApplication) context.getApplicationContext();
+		Application app = (Application) context.getApplicationContext();
 		QuestionDao qd = app.getDbSession().getQuestionDao();
 		
 		for (GQuestion question : questions) {

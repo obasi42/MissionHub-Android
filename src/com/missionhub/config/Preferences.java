@@ -1,8 +1,5 @@
 package com.missionhub.config;
 
-import com.google.gson.Gson;
-import com.missionhub.api.json.GContact;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 
@@ -75,6 +72,39 @@ public class Preferences {
 		editor.remove("organizationID");
 		editor.commit();
 	}
+	
+	/**
+	 * Returns the stored user's id
+	 * @param ctx
+	 * @return the org id or -1
+	 */
+	public static synchronized int getUserID(Context ctx) {
+		SharedPreferences settings = ctx.getSharedPreferences(PREFS_NAME, 0);
+		return settings.getInt("userID", -1);
+	}
+	
+	/**
+	 * Sets the stored user's id
+	 * @param ctx
+	 * @param organizationID
+	 */
+	public static synchronized void setUserID(Context ctx, int organizationID) {
+		SharedPreferences settings = ctx.getSharedPreferences(PREFS_NAME, 0);
+		SharedPreferences.Editor editor = settings.edit();
+		editor.putInt("userID", organizationID);
+		editor.commit();
+	}
+	
+	/**
+	 * Removes the stored organizationID
+	 * @param ctx
+	 */
+	public static synchronized void removeUserID(Context ctx) {
+		SharedPreferences settings = ctx.getSharedPreferences(PREFS_NAME, 0);
+		SharedPreferences.Editor editor = settings.edit();
+		editor.remove("userID");
+		editor.commit();
+	}
 
 	/**
 	 * Returns the stored lastRunVersion
@@ -106,30 +136,6 @@ public class Preferences {
 		SharedPreferences settings = ctx.getSharedPreferences(PREFS_NAME, 0);
 		SharedPreferences.Editor editor = settings.edit();
 		editor.remove("lastRunVersion");
-		editor.commit();
-	}
-	
-	/**
-	 * Returns the stored organization ID
-	 * @param ctx
-	 * @return the org id or -1
-	 */
-	public static synchronized GContact getContact(Context ctx) {
-		SharedPreferences settings = ctx.getSharedPreferences(PREFS_NAME, 0);
-		Gson gson = new Gson();
-		return gson.fromJson(settings.getString("contact__", ""), GContact.class);
-	}
-	
-	/**
-	 * Sets the stored organizationID
-	 * @param ctx
-	 * @param organizationID
-	 */
-	public static synchronized void setContact(Context ctx, GContact contact) {
-		SharedPreferences settings = ctx.getSharedPreferences(PREFS_NAME, 0);
-		SharedPreferences.Editor editor = settings.edit();
-		Gson gson = new Gson();
-		editor.putString("contact__", gson.toJson(contact, GContact.class));
 		editor.commit();
 	}
 }

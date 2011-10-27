@@ -5,7 +5,7 @@ import java.util.List;
 
 import android.content.Context;
 
-import com.missionhub.MissionHubApplication;
+import com.missionhub.Application;
 import com.missionhub.api.json.GQA;
 import com.missionhub.sql.Answer;
 import com.missionhub.sql.AnswerDao;
@@ -16,7 +16,7 @@ public class AnswerJsonSql {
 	public static void update(Context context, int personId, int organizationId, GQA[] form) {
 		if (form == null) return;
 		
-		MissionHubApplication app = (MissionHubApplication) context.getApplicationContext();
+		Application app = (Application) context.getApplicationContext();
 		AnswerDao ad = app.getDbSession().getAnswerDao();
 		
 		// Delete current answers in org

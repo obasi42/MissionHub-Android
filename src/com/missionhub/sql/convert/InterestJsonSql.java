@@ -5,7 +5,7 @@ import java.util.List;
 
 import android.content.Context;
 
-import com.missionhub.MissionHubApplication;
+import com.missionhub.Application;
 import com.missionhub.api.json.GIdNameProvider;
 import com.missionhub.sql.Interest;
 import com.missionhub.sql.InterestDao;
@@ -16,7 +16,7 @@ public class InterestJsonSql {
 	public static void update(Context context, int personId, GIdNameProvider[] interests) {
 		if (interests == null) return;
 		
-		MissionHubApplication app = (MissionHubApplication) context.getApplicationContext();
+		Application app = (Application) context.getApplicationContext();
 		InterestDao id = app.getDbSession().getInterestDao();
 		
 		// Delete all current stored interests for this contact

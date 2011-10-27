@@ -5,7 +5,7 @@ import java.util.List;
 
 import android.content.Context;
 
-import com.missionhub.MissionHubApplication;
+import com.missionhub.Application;
 import com.missionhub.api.json.GEducation;
 import com.missionhub.sql.Education;
 import com.missionhub.sql.EducationDao;
@@ -16,7 +16,7 @@ public class EducationJsonSql {
 	public static void update(Context context, int personId, GEducation[] educations) {
 		if (educations == null) return;
 		
-		MissionHubApplication app = (MissionHubApplication) context.getApplicationContext();
+		Application app = (Application) context.getApplicationContext();
 		EducationDao ed = app.getDbSession().getEducationDao();
 		
 		// Delete all current stored educations for this person

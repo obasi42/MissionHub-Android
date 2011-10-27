@@ -48,8 +48,6 @@ public class ContactsFilterActivity extends PreferenceActivity implements OnShar
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
         
-        Application.restoreApplicationState(savedInstanceState);
-        
         type = getIntent().getStringExtra("TYPE");
         PreferenceManager prefMgr = getPreferenceManager();
         prefMgr.setSharedPreferencesName(type);
@@ -85,7 +83,7 @@ public class ContactsFilterActivity extends PreferenceActivity implements OnShar
         this.setContentView(rootView);
         setPreferenceScreen(screen);
         
-        Flurry.pageView("ContactsFilter");
+        Flurry.pageView(this, "ContactsFilter");
     }
     
     private PreferenceScreen createPreferenceHierarchy() {
@@ -164,28 +162,6 @@ public class ContactsFilterActivity extends PreferenceActivity implements OnShar
         super.onPause();
         getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
     }
-    
-	@Override
-	public void onSaveInstanceState(Bundle b) {
-		b.putAll(Application.saveApplicationState(b));
-	}
-	
-	@Override
-	public void onRestoreInstanceState(Bundle b) {
-		Application.restoreApplicationState(b);
-	}
-	
-	@Override
-	public void onStart() {
-	   super.onStart();
-	   Flurry.startSession(this);
-	}
-	
-	@Override
-	public void onStop() {
-	   super.onStop();
-	   Flurry.endSession(this);
-	}
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

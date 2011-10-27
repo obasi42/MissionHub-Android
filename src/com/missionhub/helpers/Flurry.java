@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 import com.flurry.android.Constants;
 import com.flurry.android.FlurryAgent;
-import com.missionhub.auth.User;
+import com.missionhub.Application;
 import com.missionhub.config.Config;
 import com.missionhub.error.MHException;
 
@@ -13,7 +13,7 @@ import android.content.Context;
 public class Flurry {
 	
 	public static void startSession(Context ctx) {
-		initFlurryUser();
+		initFlurryUser(ctx);
 		FlurryAgent.setUseHttps(true);
 		FlurryAgent.onStartSession(ctx, Config.flurryKey);
 	}
@@ -22,9 +22,9 @@ public class Flurry {
 		FlurryAgent.onEndSession(ctx);
 	}
 	
-	public static void pageView(String page) {
+	public static void pageView(Context ctx, String page) {
 		try {
-			initFlurryUser();
+			initFlurryUser(ctx);
 			FlurryAgent.onPageView();
 			HashMap<String, String> params = new HashMap<String, String>();
 			params.put("page", page);
@@ -32,27 +32,27 @@ public class Flurry {
 		} catch (Exception e) {}
 	}
 	
-	public static void event(String event) {
+	public static void event(Context ctx, String event) {
 		try {
-			initFlurryUser();
+			initFlurryUser(ctx);
 			FlurryAgent.onEvent(event);
 		} catch (Exception e) {}
 	}
 	
-	public static void event(String event, HashMap<String, String> params) {
+	public static void event(Context ctx, String event, HashMap<String, String> params) {
 		try {
-			initFlurryUser();
+			initFlurryUser(ctx);
 			FlurryAgent.onEvent(event, params);
 		} catch (Exception e) {}
 	}
 	
-	public static void error(Throwable e, String title) {
+	public static void error(Context ctx, Throwable e, String title) {
 		try {
 			if (e == null) return;
 			
 			String userId = "";
 			try {
-				userId = String.valueOf(User.getContact().getPerson().getId());
+				userId = String.valueOf(((Application) ctx.getApplicationContext()).getUser().getId());
 			} catch (Exception e2) {}
 			
 			
@@ -77,18 +77,18 @@ public class Flurry {
 	/**
 	 * Set FlurryAgent data based on contact object
 	 */
-	private static void initFlurryUser() {
+	private static void initFlurryUser(Context ctx) {
 		try {
-			FlurryAgent.setUserId(String.valueOf(User.getContact().getPerson().getId()));
+			FlurryAgent.setUserId(String.valueOf(((Application) ctx.getApplicationContext()).getUser().getId()));
 		} catch (Exception e) {
 			try {
 				FlurryAgent.setUserId(null);
 			} catch (Exception e2) {}
 		}
 		try {
-			if (User.getContact().getPerson().getGender().equals("male")) {
+			if (((Application) ctx.getApplicationContext()).getUser().getPerson().getGender().equals("male")) {
 				FlurryAgent.setGender(Constants.MALE);
-			} else if (User.getContact().getPerson().getGender().equals("female")) {
+			} else if (((Application) ctx.getApplicationContext()).getUser().getPerson().getGender().equals("female")) {
 				FlurryAgent.setGender(Constants.FEMALE);
 			}
 		} catch (Exception e) {}

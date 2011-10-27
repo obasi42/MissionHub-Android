@@ -1,6 +1,5 @@
 package com.missionhub;
 
-import greendroid.app.GDActivity;
 import greendroid.widget.ActionBar;
 import greendroid.widget.ActionBarItem;
 import greendroid.widget.LoaderActionBarItem;
@@ -21,7 +20,7 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-public class SurveysActivity extends GDActivity {
+public class SurveysActivity extends Activity {
 
 	public static final String TAG = SurveysActivity.class.getName();
 	
@@ -37,8 +36,6 @@ public class SurveysActivity extends GDActivity {
 		setActionBarContentView(R.layout.surveys);
 		getActionBar().setType(ActionBar.Type.Empty);
 		indicator = (LoaderActionBarItem) addActionBarItem(Type.Refresh, R.id.action_bar_refresh);
-
-		Application.restoreApplicationState(savedInstanceState);
 		
 		mWebView = (WebView) findViewById(R.id.webview_surveys);
 		mWebView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
@@ -49,11 +46,11 @@ public class SurveysActivity extends GDActivity {
 		mWebView.getSettings().setSupportZoom(false);
 		mWebView.setWebViewClient(new InternalWebViewClient());
 		mWebView.setWebChromeClient(new InternalWebViewChrome());
-		mWebView.loadUrl(Survey.getUrl());
+		mWebView.loadUrl(Survey.getUrl(this));
 		
 		clearCookies();
 
-		Flurry.pageView("Surveys");
+		Flurry.pageView(this, "Surveys");
 	}
 	
 	@Override
@@ -143,28 +140,14 @@ public class SurveysActivity extends GDActivity {
 		}
 		return super.onKeyDown(keyCode, event);
 	}
-
-	@Override
-	public void onStart() {
-		super.onStart();
-		Flurry.startSession(this);
-	}
-
-	@Override
-	public void onStop() {
-		super.onStop();
-		Flurry.endSession(this);
-	}
 	
 	@Override
 	public void onSaveInstanceState(Bundle b) {
-		b.putAll(Application.saveApplicationState(b));
 		((WebView) findViewById(R.id.webview_surveys)).saveState(b);
 	}
 	
 	@Override
 	public void onRestoreInstanceState(Bundle b) {
-		Application.restoreApplicationState(b);
 		((WebView) findViewById(R.id.webview_surveys)).restoreState(b);
 	}
 }

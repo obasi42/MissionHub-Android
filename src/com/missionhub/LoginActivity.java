@@ -2,7 +2,6 @@ package com.missionhub;
 
 import java.net.URLDecoder;
 
-import com.flurry.android.FlurryAgent;
 import com.google.gson.Gson;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.RequestParams;
@@ -10,13 +9,12 @@ import com.missionhub.api.ApiResponseHandler;
 import com.missionhub.api.client.Login;
 import com.missionhub.api.json.GError;
 import com.missionhub.api.json.GLoginDone;
-import com.missionhub.auth.Auth;
 import com.missionhub.config.Config;
 import com.missionhub.config.Preferences;
 import com.missionhub.helpers.Flurry;
+import com.missionhub.sql.convert.PersonJsonSql;
 import com.missionhub.ui.DisplayError;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -46,9 +44,8 @@ public class LoginActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		overridePendingTransition(R.anim.fadein, R.anim.fadeout);
-		setContentView(R.layout.login);
-
-		Application.restoreApplicationState(savedInstanceState);
+		setActionBarContentView(R.layout.login);
+		getActionBar().setVisibility(View.GONE);
 		
 		clearCookies();
 
@@ -67,19 +64,7 @@ public class LoginActivity extends Activity {
 		mWebView.setWebViewClient(new InternalWebViewClient());
 		mWebView.loadUrl(Login.getUrl());
 		
-		Flurry.pageView("Login");
-	}
-	
-	@Override
-	public void onStart() {
-	   super.onStart();
-	   FlurryAgent.onStartSession(this, Config.flurryKey);
-	}
-	
-	@Override
-	public void onStop() {
-	   super.onStop();
-	   FlurryAgent.onEndSession(this);
+		Flurry.pageView(this, "Login");
 	}
 	
 	@Override
@@ -101,13 +86,11 @@ public class LoginActivity extends Activity {
 	
 	@Override
 	public void onSaveInstanceState(Bundle b) {
-		b.putAll(Application.saveApplicationState(b));
 		((WebView) findViewById(R.id.webview)).saveState(b);
 	}
 	
 	@Override
 	public void onRestoreInstanceState(Bundle b) {
-		Application.restoreApplicationState(b);
 		((WebView) findViewById(R.id.webview)).restoreState(b);
 	}
 
@@ -117,7 +100,7 @@ public class LoginActivity extends Activity {
 
 	private void returnWithToken() {
 		Intent i = new Intent();
-		i.putExtra("token", Auth.getAccessToken());
+		i.putExtra("token", getUser().getAccessToken());
 		this.setResult(RESULT_OK, i);
 		finish();
 	}
@@ -239,8 +222,12 @@ public class LoginActivity extends Activity {
 			@Override
 			public void onSuccess(Object gsonObject) {
 				GLoginDone loginDone = (GLoginDone) gsonObject;
-				Auth.setAccessToken(loginDone.getAccess_token());
+				
+				PersonJsonSql.update(getApplicationContext(), loginDone.getPerson());
 				Preferences.setAccessToken(LoginActivity.this, loginDone.getAccess_token());
+				Preferences.setUserID(LoginActivity.this, loginDone.getPerson().getId());
+				
+				getUser().setAccessToken(loginDone.getAccess_token());
 				returnWithToken();
 			}
 			
@@ -260,7 +247,7 @@ public class LoginActivity extends Activity {
 					}
 				});
 				ad.show();
-				Flurry.error(e, "Login.getTokenFromCode");
+				Flurry.error(LoginActivity.this, e, "Login.getTokenFromCode");
 			}
 
 			@Override

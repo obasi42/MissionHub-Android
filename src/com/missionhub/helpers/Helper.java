@@ -98,7 +98,7 @@ public class Helper {
 		        		   try {
 			       				HashMap<String, String> params = new HashMap<String, String>();
 			       				params.put("method", "App");
-			       				Flurry.event("Contact.OpenFacebook", params);
+			       				Flurry.event(ctx, "Contact.OpenFacebook", params);
 			       			} catch (Exception e) {}
 		        	   } catch(Exception e) {
 		        		   try {
@@ -108,7 +108,7 @@ public class Helper {
 				       			try {
 				       				HashMap<String, String> params = new HashMap<String, String>();
 				       				params.put("method", "Browser");
-				       				Flurry.event("Contact.OpenFacebook", params);
+				       				Flurry.event(ctx, "Contact.OpenFacebook", params);
 				       			} catch (Exception e2) {}
 				       		} catch(Exception f) {
 				       			Toast.makeText(ctx, R.string.contact_cant_open_profile, Toast.LENGTH_LONG).show();
@@ -160,7 +160,7 @@ public class Helper {
 			try {
 				HashMap<String, String> params = new HashMap<String, String>();
 				params.put("method", "Phone");
-				Flurry.event("Contact.MakeContact", params);
+				Flurry.event(ctx, "Contact.MakeContact", params);
 			} catch (Exception e) {}
 		} catch (Exception e) {
 			Toast.makeText(ctx, R.string.contact_cant_call, Toast.LENGTH_LONG).show();
@@ -176,7 +176,7 @@ public class Helper {
 			try {
 				HashMap<String, String> params = new HashMap<String, String>();
 				params.put("method", "SMS");
-				Flurry.event("Contact.MakeContact", params);
+				Flurry.event(ctx, "Contact.MakeContact", params);
 			} catch (Exception e) {}
 		} catch (Exception e) {
 			Toast.makeText(ctx, R.string.contact_cant_sms, Toast.LENGTH_LONG).show();
@@ -192,7 +192,7 @@ public class Helper {
 			try {
 				HashMap<String, String> params = new HashMap<String, String>();
 				params.put("method", "Email");
-				Flurry.event("Contact.MakeContact", params);
+				Flurry.event(ctx, "Contact.MakeContact", params);
 			} catch (Exception e) {}
 		} catch (Exception e) {
 			Toast.makeText(ctx, R.string.contact_cant_email, Toast.LENGTH_LONG).show();

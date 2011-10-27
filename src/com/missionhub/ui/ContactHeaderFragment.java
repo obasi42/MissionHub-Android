@@ -1,8 +1,8 @@
 package com.missionhub.ui;
 
 import com.missionhub.R;
-import com.missionhub.api.json.GContact;
 import com.missionhub.helpers.Helper;
+import com.missionhub.sql.Person;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -18,7 +18,7 @@ public class ContactHeaderFragment extends Fragment {
 
 	public static final String TAG = ContactHeaderFragment.class.getSimpleName();
 	
-	private GContact contact;
+	private Person person;
 	
 	private ImageView mPicture;
 	private TextView mName;
@@ -63,34 +63,34 @@ public class ContactHeaderFragment extends Fragment {
         return root;
 	}
 	
-	public void setContact (GContact contact) {
-		this.contact = contact;
+	public void setPerson (Person person) {
+		this.person = person;
 		update();
 	}
 	
 	private void update() {
 		try {
-			mName.setText(contact.getPerson().getName());
+			mName.setText(person.getName());
 		} catch (Exception e) {	Log.w(TAG, e.getMessage(), e); }
 		
 		try {
 			int defaultImage = R.drawable.facebook_question;
-			if (contact.getPerson().getGender() != null) {
-				if (contact.getPerson().getGender().equalsIgnoreCase("male")) {
+			if (person.getGender() != null) {
+				if (person.getGender().equalsIgnoreCase("male")) {
 					defaultImage = R.drawable.facebook_male;
-				} else if (contact.getPerson().getGender().equalsIgnoreCase("female")) {
+				} else if (person.getGender().equalsIgnoreCase("female")) {
 					defaultImage = R.drawable.facebook_female;
 				}
 			}
-			if (contact.getPerson().getPicture() != null && !currentProfilePicture.equals(contact.getPerson().getPicture())) {
-				currentProfilePicture = contact.getPerson().getPicture();
-				mPicture.setTag(contact.getPerson().getPicture() + "?type=large");
-				imageManager.displayImage(contact.getPerson().getPicture() + "?type=large", mPicture, defaultImage);
+			if (person.getPicture() != null && !currentProfilePicture.equals(person.getPicture())) {
+				currentProfilePicture = person.getPicture();
+				mPicture.setTag(person.getPicture() + "?type=large");
+				imageManager.displayImage(person.getPicture() + "?type=large", mPicture, defaultImage);
 			}
 		} catch (Exception e) {	Log.w(TAG, e.getMessage(), e); }
 		
 		try {
-			if (contact.getPerson().getPhone_number() != null && Helper.hasPhoneAbility(mPhone.getContext())) {
+			if (person.getPhone_number() != null && Helper.hasPhoneAbility(mPhone.getContext())) {
 				mPhone.setVisibility(View.VISIBLE);
 				mSms.setVisibility(View.VISIBLE);
 			} else {
@@ -100,7 +100,7 @@ public class ContactHeaderFragment extends Fragment {
 		} catch (Exception e) {	Log.w(TAG, e.getMessage(), e); }
 		
 		try {
-			if (contact.getPerson().getEmail_address() != null) {
+			if (person.getEmail_address() != null) {
 				mEmail.setVisibility(View.VISIBLE);
 			} else {
 				mEmail.setVisibility(View.GONE);
@@ -110,25 +110,25 @@ public class ContactHeaderFragment extends Fragment {
 	
 	private void clickPicture(View view) {
 		try {
-			Helper.openFacebookProfile(view.getContext(), contact.getPerson().getFb_id());	
+			Helper.openFacebookProfile(view.getContext(), person.getFb_id());	
 		} catch (Exception e) {	Log.w(TAG, e.getMessage(), e); }
 	}
 	
 	private void clickPhone(View view) {
 		try {
-			Helper.makePhoneCall(view.getContext(), contact.getPerson().getPhone_number());
+			Helper.makePhoneCall(view.getContext(), person.getPhone_number());
 		} catch (Exception e) {	Log.w(TAG, e.getMessage(), e); }
 	}
 	
 	private void clickSms(View view) {
 		try {
-			Helper.sendSMS(view.getContext(), contact.getPerson().getPhone_number());
+			Helper.sendSMS(view.getContext(), person.getPhone_number());
 		} catch (Exception e) {	Log.w(TAG, e.getMessage(), e); }
 	}
 	
 	private void clickEmail(View view) {
 		try {
-			Helper.sendEmail(view.getContext(), contact.getPerson().getEmail_address());
+			Helper.sendEmail(view.getContext(), person.getEmail_address());
 		} catch (Exception e) {	Log.w(TAG, e.getMessage(), e); }
 	}
 }

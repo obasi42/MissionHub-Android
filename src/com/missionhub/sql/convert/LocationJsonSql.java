@@ -5,7 +5,7 @@ import java.util.List;
 
 import android.content.Context;
 
-import com.missionhub.MissionHubApplication;
+import com.missionhub.Application;
 import com.missionhub.api.json.GIdNameProvider;
 import com.missionhub.sql.Location;
 import com.missionhub.sql.LocationDao;
@@ -16,7 +16,7 @@ public class LocationJsonSql {
 	public static void update(Context context, int personId, GIdNameProvider location) {
 		if (location == null) return;
 		
-		MissionHubApplication app = (MissionHubApplication) context.getApplicationContext();
+		Application app = (Application) context.getApplicationContext();
 		LocationDao ld = app.getDbSession().getLocationDao();
 		
 		// Delete current location

@@ -5,7 +5,7 @@ import java.util.List;
 
 import android.content.Context;
 
-import com.missionhub.MissionHubApplication;
+import com.missionhub.Application;
 import com.missionhub.api.json.GOrgGeneric;
 import com.missionhub.sql.Organization;
 import com.missionhub.sql.OrganizationDao;
@@ -18,7 +18,7 @@ public class OrganizationRoleJsonSql {
 	public static void update(Context context, int personId, GOrgGeneric[] roles) {
 		if (roles == null) return;
 		
-		MissionHubApplication app = (MissionHubApplication) context.getApplicationContext();
+		Application app = (Application) context.getApplicationContext();
 		OrganizationalRoleDao ord = app.getDbSession().getOrganizationalRoleDao();
 		OrganizationDao od = app.getDbSession().getOrganizationDao();
 		
@@ -35,7 +35,8 @@ public class OrganizationRoleJsonSql {
 			or.setName(role.getName());
 			or.setOrg_id(role.getOrg_id());
 			or.setPerson_id(personId);
-			or.setPrimary(Boolean.getBoolean(role.getPrimary()));
+			if (role.getPrimary() != null)
+				or.setPrimary(Boolean.parseBoolean(role.getPrimary()));
 			or.setRole(role.getRole());
 			ord.insert(or);
 			

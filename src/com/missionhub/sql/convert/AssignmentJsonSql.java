@@ -5,7 +5,7 @@ import java.util.List;
 
 import android.content.Context;
 
-import com.missionhub.MissionHubApplication;
+import com.missionhub.Application;
 import com.missionhub.api.json.GAssign;
 import com.missionhub.api.json.GIdNameProvider;
 import com.missionhub.api.json.GPerson;
@@ -19,7 +19,7 @@ public class AssignmentJsonSql {
 	public static void update(Context context, int personId, int organizationId, GAssign assign) {
 		if (assign == null) return;
 		
-		MissionHubApplication app = (MissionHubApplication) context.getApplicationContext();
+		Application app = (Application) context.getApplicationContext();
 		AssignmentDao ad = app.getDbSession().getAssignmentDao();
 		
 		// Delete all current stored assignments for this contact

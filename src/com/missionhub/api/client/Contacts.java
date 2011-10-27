@@ -26,7 +26,7 @@ public class Contacts {
 	public static ApiClient list(Context ctx, Contacts.Options options, ApiResponseHandler responseHandler) {
 		ApiClient client = new ApiClient(ctx);
 		String url = ApiHelper.getAbsoluteUrl("contacts");
-		RequestParams params = ApiHelper.getDefaultRequestParams();
+		RequestParams params = ApiHelper.getDefaultRequestParams(ctx);
 		options.appendLimits(params);
 		options.appendFiltersParams(params);
 		options.appendOrderByParam(params);
@@ -44,7 +44,7 @@ public class Contacts {
 	public static ApiClient get(Context ctx, int personId, ApiResponseHandler responseHandler) {
 		ApiClient client = new ApiClient(ctx);
 		String url = ApiHelper.getAbsoluteUrl("contacts", String.valueOf(personId));
-		RequestParams params = ApiHelper.getDefaultRequestParams();
+		RequestParams params = ApiHelper.getDefaultRequestParams(ctx);
 		client.get(url, params, responseHandler);
 		return client;
 	}
@@ -59,7 +59,7 @@ public class Contacts {
 	public static ApiClient get(Context ctx, List<Integer> personIds, ApiResponseHandler responseHandler) {
 		ApiClient client = new ApiClient(ctx);
 		String url = ApiHelper.getAbsoluteUrl("contacts", ApiHelper.toList(personIds));
-		RequestParams params = ApiHelper.getDefaultRequestParams();
+		RequestParams params = ApiHelper.getDefaultRequestParams(ctx);
 		client.get(url, params, responseHandler);
 		return client;
 	}

@@ -15,12 +15,10 @@
     <application
         android:icon="@drawable/icon"
         android:label="@string/app_name"
-        android:name=".MissionHubApplication" >
+        android:name=".Application" >
         <activity
-            android:debuggable="true"
-            android:label="@string/app_name"
             android:name=".MissionHubActivity"
-            android:screenOrientation="portrait"
+            android:label="@string/app_name"
             android:theme="@style/Theme.MHActionBar" >
             <intent-filter >
                 <action android:name="android.intent.action.MAIN" />
@@ -29,9 +27,9 @@
             </intent-filter>
         </activity>
         <activity
-            android:configChanges="orientation"
             android:name=".LoginActivity"
-            android:theme="@android:style/Theme.NoTitleBar" >
+            android:configChanges="orientation"
+            android:theme="@style/Theme.MHActionBar" >
         </activity>
         <activity
             android:name=".ContactsActivity"
@@ -45,8 +43,8 @@
             android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
         <activity
-            android:configChanges="orientation"
             android:name=".SurveysActivity"
+            android:configChanges="orientation"
             android:theme="@style/Theme.MHActionBar" >
         </activity>
         <activity
@@ -68,7 +66,7 @@
         <activity
             android:name=".EggActivity"
             android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.NoTitleBar" >
+            android:theme="@style/Theme.MHActionBar" >
         </activity>
     </application>
 

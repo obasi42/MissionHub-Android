@@ -1,64 +1,103 @@
 package com.missionhub;
 
-import android.content.Context;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.os.Bundle;
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
-import com.missionhub.auth.Auth;
-import com.missionhub.auth.User;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Handler;
+import android.os.Message;
 
-public class Application {
+import com.missionhub.config.Preferences;
+import com.missionhub.sql.DaoMaster;
+import com.missionhub.sql.DaoMaster.DevOpenHelper;
+import com.missionhub.sql.DaoSession;
 
-	/* Running Application Version */
-	private static String version;
+import de.greenrobot.dao.IdentityScopeType;
 
-	/**
-	 * Saves the application state to a bundle
-	 * @param b the bundle
-	 * @return the bundle with saved state
-	 */
-	public static Bundle saveApplicationState(Bundle b) {
-		b.putString("_version", version);
-		Auth.saveState(b);
-		User.saveState(b);
-		return b;
-	}
+import greendroid.app.GDApplication;
+
+public class Application extends GDApplication {
 	
-	/**
-	 * Restores the application's state from a bundle
-	 * @param b the bundle
-	 */
-	public static void restoreApplicationState(Bundle b) {
-		if (b == null || b.isEmpty()) return;
-		version = b.getString("_appVersion");
-		Auth.restoreState(b);
-		User.restoreState(b);
-	}
+	public static final int MESSAGE_USER_LOGGED_OUT = 0;
+	public static final int MESSAGE_USER_LOGGED_IN = 1;
+	public static final int MESSAGE_USER_REFRESH_STARTED = 2;
+	public static final int MESSAGE_USER_REFRESH_END = 3;
+	public static final int MESSAGE_USER_REFRESH_ERROR = 4; 
 	
-	/**
-	 * Sets the version number for the app from the package manager
-	 * Only needs to be run once, version is saved by saveApplicationState
-	 * @param ctx
-	 */
-	public static synchronized void initVersion(Context ctx) {
-		try {
-			Application.setVersion(String.valueOf(ctx.getPackageManager().getPackageInfo(ctx.getPackageName(), 0).versionCode));
-		} catch (NameNotFoundException e) {}
-	}
+	/* Application Level Handlers */
+	private List<WeakReference<Handler>> handlers = Collections.synchronizedList(new ArrayList<WeakReference<Handler>>());
 	
-	/**
-	 * Set the version number
-	 * @param version Application Version
-	 */
-	public static synchronized void setVersion(String version) {
-		Application.version = version;
-	}
+	private SQLiteDatabase db;
+	private DaoSession daoSession;
+	private ApplicationUser user;
 	
-	/**
-	 * Returns the application's version number
-	 * @return
-	 */
-	public static synchronized String getVersion() {
-		return version;
-	}
+    @Override
+    public Class<?> getHomeActivityClass() {
+        return MissionHubActivity.class;
+    }
+    
+    public void registerHandler(Handler h) {
+    	handlers.add(new WeakReference<Handler>(h));
+    }
+    
+    public synchronized void postMessage(int message) {
+    	List<WeakReference<Handler>> delete = Collections.synchronizedList(new ArrayList<WeakReference<Handler>>());
+    	Iterator<WeakReference<Handler>> itr = handlers.iterator();
+    	while(itr.hasNext()) {
+    		WeakReference<Handler> wr = itr.next();
+    		Handler h = wr.get();
+    		if (h != null) {
+    			Message m = h.obtainMessage();
+    			m.what = message;
+    			h.sendMessage(m);
+    		} else {
+    			delete.add(wr);
+    		}
+    	}
+    	handlers.removeAll(delete);
+    	delete.clear();
+    }
+    
+    @Override
+    public void onTerminate() {
+    	db.close();
+    	super.onTerminate();
+    }
+    
+    public SQLiteDatabase getDb() {
+    	if (db == null) {
+    		DevOpenHelper helper = new DaoMaster.DevOpenHelper(getApplicationContext(), "mh-db", null);
+            db = helper.getWritableDatabase();
+    	}
+    	return db;
+    }
+
+    public DaoSession getDbSession() {
+    	if (daoSession == null) {
+    		DaoMaster daoMaster = new DaoMaster(getDb());
+            daoSession = daoMaster.newSession(IdentityScopeType.None);
+    	}
+    	return daoSession;
+    }
+    
+    public ApplicationUser getUser() {
+    	return getUser(Preferences.getUserID(this));
+    }
+    
+    public ApplicationUser getUser(int personId) {
+    	if (user == null) {
+    		user = new ApplicationUser(this, personId);
+    	}
+    	return user;
+    }
+    
+    public String getVersion() {
+    	try {
+    		return String.valueOf(getPackageManager().getPackageInfo(getPackageName(), 0).versionCode);
+    	} catch (Exception e) {}
+    	return null;
+    }
 }

@@ -1,6 +1,5 @@
 package com.missionhub;
 
-import greendroid.app.GDActivity;
 import greendroid.widget.ActionBarItem;
 import greendroid.widget.ActionBarItem.Type;
 import greendroid.widget.LoaderActionBarItem;
@@ -18,8 +17,8 @@ import com.missionhub.api.ApiResponseHandler;
 import com.missionhub.api.client.Contacts;
 import com.missionhub.api.client.Roles;
 import com.missionhub.api.json.GContact;
+import com.missionhub.api.json.GMetaContact;
 import com.missionhub.api.json.GOrgGeneric;
-import com.missionhub.auth.User;
 import com.missionhub.helpers.Flurry;
 import com.missionhub.ui.ContactItemAdapter;
 import com.missionhub.ui.DisplayError;
@@ -43,7 +42,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-public class ContactsActivity extends GDActivity {
+public class ContactsActivity extends Activity {
 
 	public static final String TAG = ContactsActivity.class.getName();
 
@@ -76,8 +75,6 @@ public class ContactsActivity extends GDActivity {
                 .newActionBarItem(NormalActionBarItem.class)
                 .setDrawable(R.drawable.action_bar_search)
                 .setContentDescription(R.string.action_bar_search), R.id.action_bar_search);
-		
-		Application.restoreApplicationState(savedInstanceState);
 
 		contactsList = (ListView) findViewById(R.id.contacts_list);
 		adapter = new ContactItemAdapter(this, R.layout.contact_list_item, data);
@@ -93,7 +90,7 @@ public class ContactsActivity extends GDActivity {
 
 		setTab(TAB_MY, true);
 		
-		Flurry.pageView("Contacts");
+		Flurry.pageView(this, "Contacts");
 	}
 	
 	@Override
@@ -114,28 +111,6 @@ public class ContactsActivity extends GDActivity {
         }
         return true;
     }
-	
-	@Override
-	public void onSaveInstanceState(Bundle b) {
-		b.putAll(Application.saveApplicationState(b));
-	}
-	
-	@Override
-	public void onRestoreInstanceState(Bundle b) {
-		Application.restoreApplicationState(b);
-	}
-	
-	@Override
-	public void onStart() {
-	   super.onStart();
-	   Flurry.startSession(this);
-	}
-	
-	@Override
-	public void onStop() {
-	   super.onStop();
-	   Flurry.endSession(this);
-	}
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -300,7 +275,7 @@ public class ContactsActivity extends GDActivity {
 		Contacts.Options ops;
 		
 		public ContactsApiResponseHandler(Contacts.Options ops) {
-			super(GContact[].class);
+			super(GMetaContact.class);
 			this.ops = ops;
 		}
 		
@@ -314,7 +289,8 @@ public class ContactsActivity extends GDActivity {
 			if (ops != options) // This response was likely canceled
 				return;
 			
-			GContact[] contacts = (GContact[]) gsonObject;
+			GMetaContact contactMeta = (GMetaContact) gsonObject;
+			GContact[] contacts = contactMeta.getContacts();
 			if (contacts.length < options.getLimit()) {
 				noMoreContacts = true;
 			} else {
@@ -352,7 +328,7 @@ public class ContactsActivity extends GDActivity {
 				}
 			});
 			ad.show();
-			Flurry.error(e, "Contacts.getMore");
+			Flurry.error(ContactsActivity.this, e, "Contacts.getMore");
 		}
 		
 		@Override
@@ -367,7 +343,7 @@ public class ContactsActivity extends GDActivity {
 		SharedPreferences sharedPrefs = null;
 		if (tab == TAB_MY) {
 			sharedPrefs = getBaseContext().getSharedPreferences(ContactsFilterActivity.TYPE_MY_CONTACTS, 0);
-			options.setFilter("assigned_to", String.valueOf(User.getContact().getPerson().getId()));
+			options.setFilter("assigned_to", String.valueOf(getUser().getId()));
 		} else if (tab == TAB_ALL) {
 			sharedPrefs = getBaseContext().getSharedPreferences(ContactsFilterActivity.TYPE_ALL_CONTACTS, 0);
 			options.removeFilter("assigned_to");
@@ -388,7 +364,7 @@ public class ContactsActivity extends GDActivity {
 				// Assigned To Is Not Really A Filter
 				if (key.equalsIgnoreCase("assigned_to")) {
 					if (((String) value).equalsIgnoreCase("me")) {
-						options.setFilter("assigned_to", String.valueOf(User.getContact().getPerson().getId()));
+						options.setFilter("assigned_to", String.valueOf(getUser().getId()));
 					} else if (((String) value).equalsIgnoreCase("no_one")) {
 						options.setFilter("assigned_to", "none");
 					} else {
@@ -465,7 +441,7 @@ public class ContactsActivity extends GDActivity {
 
 		@Override
 		public void onSuccess() {
-			Flurry.event("Contacts.ChangeRole");
+			Flurry.event(ContactsActivity.this, "Contacts.ChangeRole");
 			resetListView(false);
 			getMore();
 		}
@@ -481,7 +457,7 @@ public class ContactsActivity extends GDActivity {
 				}
 			});
 			ad.show();
-			Flurry.error(e, "Contacts.ChangeRoleHandler");
+			Flurry.error(ContactsActivity.this, e, "Contacts.ChangeRoleHandler");
 		}
 
 		@Override
@@ -495,10 +471,10 @@ public class ContactsActivity extends GDActivity {
 		@Override
 		public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 			final GContact contact = (GContact) parent.getAdapter().getItem(position);
-			if (contact != null && contact.getPerson() != null && User.hasRole("admin")) {
+			if (contact != null && contact.getPerson() != null && getUser().hasRole("admin")) {
 				String contactRole = "contact";
 	    		for (GOrgGeneric role : contact.getPerson().getOrganizational_roles()) {
-					if (role.getOrg_id() == User.getOrganizationID()) {
+					if (role.getOrg_id() == getUser().getOrganizationID()) {
 						contactRole = role.getRole();
 						break;
 					}

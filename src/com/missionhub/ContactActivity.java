@@ -1,6 +1,5 @@
 package com.missionhub;
 
-import greendroid.app.GDActivity;
 import greendroid.widget.ActionBarItem;
 import greendroid.widget.ItemAdapter;
 import greendroid.widget.LoaderActionBarItem;
@@ -26,11 +25,11 @@ import com.missionhub.api.json.GFCTop;
 import com.missionhub.api.json.GFollowupComment;
 import com.missionhub.api.json.GIdNameProvider;
 import com.missionhub.api.json.GKeyword;
+import com.missionhub.api.json.GMetaGFCTop;
 import com.missionhub.api.json.GOrgGeneric;
 import com.missionhub.api.json.GPerson;
 import com.missionhub.api.json.GQA;
 import com.missionhub.api.json.GQuestion;
-import com.missionhub.auth.User;
 import com.missionhub.helpers.Flurry;
 import com.missionhub.helpers.Helper;
 import com.missionhub.helpers.U;
@@ -69,7 +68,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-public class ContactActivity extends GDActivity {
+public class ContactActivity extends Activity {
 
 	/* Logging Tag */
 	public static final String TAG = ContactActivity.class.getName();
@@ -165,7 +164,6 @@ public class ContactActivity extends GDActivity {
 						contact = gson.fromJson(savedInstanceState.getString("contactJSON"), GContact.class);
 					}
 				} catch (Exception e) { Log.i(TAG, "Expand from instance failed", e); }
-				Application.restoreApplicationState(savedInstanceState);
 			}
 		}
 		if (contact == null) {
@@ -242,7 +240,7 @@ public class ContactActivity extends GDActivity {
 		/* Display The Guide Pop-Up If Not Hidden */
 		Guide.display(this, Guide.CONTACT);
 		
-		Flurry.pageView("Contact");
+		Flurry.pageView(this, "Contact");
 	}
 
 	@Override
@@ -264,7 +262,7 @@ public class ContactActivity extends GDActivity {
     public boolean onHandleActionBarItemClick(ActionBarItem item, int position) {
         switch (item.getItemId()) {
             case R.id.action_bar_refresh:
-            	Flurry.event("Contact.Refresh");
+            	Flurry.event(this, "Contact.Refresh");
     			update(true);
                 break;
             default:
@@ -284,7 +282,6 @@ public class ContactActivity extends GDActivity {
 				b.putString("contactJSON", gson.toJson(contact));
 			}
 		} catch (Exception e) {Log.i(TAG, "save state failed", e); };
-		b.putAll(Application.saveApplicationState(b));
 	}
 	
 	@Override
@@ -298,7 +295,6 @@ public class ContactActivity extends GDActivity {
 				contact = gson.fromJson(b.getString("contactJSON"), GContact.class);
 		 	}
 		} catch (Exception e) {Log.i(TAG, "restore state failed", e); }
-		Application.restoreApplicationState(b);
 	}
 	
 	@Override
@@ -306,18 +302,6 @@ public class ContactActivity extends GDActivity {
 		super.onResume();
 		update(true);
 		updateHeader();
-	}
-	
-	@Override
-	public void onStart() {
-	   super.onStart();
-	   Flurry.startSession(this);
-	}
-	
-	@Override
-	public void onStop() {
-	   super.onStop();
-	   Flurry.endSession(this);
 	}
 	
 	private ArrayList<String> processes = new ArrayList<String>();
@@ -374,7 +358,7 @@ public class ContactActivity extends GDActivity {
 			if (assign.getPerson_assigned_to() != null) {
 				GIdNameProvider[] gids = assign.getPerson_assigned_to();
 				for (GIdNameProvider gid : gids) {
-					if (User.getContact().getPerson().getId() == Integer.parseInt(gid.getId())) {
+					if (getUser().getId() == Integer.parseInt(gid.getId())) {
 						assignmentStatus = ASSIGNMENT_ME;
 						break;
 					} else {
@@ -412,17 +396,17 @@ public class ContactActivity extends GDActivity {
 			info.add(new SimpleListItem(getString(R.string.contact_info_facebook_header), getString(R.string.contact_info_facebook_link), data));
 		}
 		
-		if (User.hasRole("admin")) {
+		if (getUser().hasRole("admin")) {
 			HashMap<String, String> data = new HashMap<String, String>();
 			String contactRole = "contact";
 			for (GOrgGeneric role : person.getOrganizational_roles()) {
-				if (role.getOrg_id() == User.getOrganizationID()) {
+				if (role.getOrg_id() == getUser().getOrganizationID()) {
 					contactRole = role.getRole();
 					break;
 				}
 			}
 			data.put("role", contactRole);
-			data.put("org_id", String.valueOf(User.getOrganizationID()));
+			data.put("org_id", String.valueOf(getUser().getOrganizationID()));
 			data.put("contact_id", String.valueOf(person.getId()));
 			if (contactRole.equals("contact")) {
 				info.add(new SimpleListItem(getString(R.string.contact_role), getString(R.string.contact_role_promote), data));
@@ -582,7 +566,7 @@ public class ContactActivity extends GDActivity {
 				}
 			});
 			ad.show();
-			Flurry.error(e, "Contact.contactResponseHandler");
+			Flurry.error(ContactActivity.this, e, "Contact.contactResponseHandler");
 		}
 
 		@Override
@@ -591,7 +575,7 @@ public class ContactActivity extends GDActivity {
 		}
 	};
 	
-	private ApiResponseHandler commentResponseHandler = new ApiResponseHandler(GFCTop[].class) {
+	private ApiResponseHandler commentResponseHandler = new ApiResponseHandler(GMetaGFCTop.class) {
 		@Override
 		public void onStart() {
 			showProgress("comment");
@@ -599,7 +583,8 @@ public class ContactActivity extends GDActivity {
 
 		@Override
 		public void onSuccess(Object gsonObject) {
-			GFCTop[] fcs = (GFCTop[]) gsonObject;
+			GMetaGFCTop fcsm = (GMetaGFCTop) gsonObject;
+			GFCTop[] fcs = fcsm.getFollowup_comments();
 			ContactActivity.this.processFollowupComments(fcs);
 		}
 
@@ -614,7 +599,7 @@ public class ContactActivity extends GDActivity {
 				}
 			});
 			ad.show();
-			Flurry.error(e, "Contact.commentResponseHandler");
+			Flurry.error(ContactActivity.this, e, "Contact.commentResponseHandler");
 		}
 
 		@Override
@@ -630,7 +615,9 @@ public class ContactActivity extends GDActivity {
 	protected void processFollowupComments(GFCTop[] fcs) {
 		comments.clear();
 		for (GFCTop gfc : fcs) {
-			comments.add(gfc.getFollowup_comment());
+			if (gfc.getFollowup_comment().getComment().getDeleted_at() == null) {
+				comments.add(gfc.getFollowup_comment());
+			}
 		}
 		if (tab == TAB_CONTACT) {
 			if (comments.isEmpty()) {
@@ -644,7 +631,7 @@ public class ContactActivity extends GDActivity {
 
 	public void clickAssign() {
 		if (assignmentStatus == ASSIGNMENT_NONE) {
-			ContactAssignment.create(this, contact.getPerson().getId(), User.getContact().getPerson().getId(), new AssignmentHandler(AssignmentHandler.TYPE_ASSIGN));
+			ContactAssignment.create(this, contact.getPerson().getId(), getUser().getId(), new AssignmentHandler(AssignmentHandler.TYPE_ASSIGN));
 		} else if (assignmentStatus == ASSIGNMENT_ME) {
 			ContactAssignment.delete(this, contact.getPerson().getId(), new AssignmentHandler(AssignmentHandler.TYPE_UNASSIGN));
 		}
@@ -685,7 +672,7 @@ public class ContactActivity extends GDActivity {
 				} else if (type == ASSIGNMENT_NONE) {
 					params.put("assignment", "None");
 				}
-				Flurry.event("Contact.Assign", params);
+				Flurry.event(ContactActivity.this, "Contact.Assign", params);
 			} catch (Exception e) {}
 		}
 
@@ -700,7 +687,7 @@ public class ContactActivity extends GDActivity {
 				}
 			});
 			ad.show();
-			Flurry.error(e, "Contact.AssignmentHandler");
+			Flurry.error(ContactActivity.this, e, "Contact.AssignmentHandler");
 		}
 
 		@Override
@@ -735,7 +722,7 @@ public class ContactActivity extends GDActivity {
 			try {
 				HashMap<String, String> params = new HashMap<String, String>();
 				params.put("method", "Phone");
-				Flurry.event("Contact.MakeContact", params);
+				Flurry.event(ContactActivity.this, "Contact.MakeContact", params);
 			} catch (Exception e) {}
 		} catch (Exception e) {
 			Toast.makeText(this, R.string.contact_cant_call, Toast.LENGTH_LONG).show();
@@ -751,7 +738,7 @@ public class ContactActivity extends GDActivity {
 			try {
 				HashMap<String, String> params = new HashMap<String, String>();
 				params.put("method", "SMS");
-				Flurry.event("Contact.MakeContact", params);
+				Flurry.event(ContactActivity.this, "Contact.MakeContact", params);
 			} catch (Exception e) {}
 		} catch (Exception e) {
 			Toast.makeText(this, R.string.contact_cant_sms, Toast.LENGTH_LONG).show();
@@ -767,7 +754,7 @@ public class ContactActivity extends GDActivity {
 			try {
 				HashMap<String, String> params = new HashMap<String, String>();
 				params.put("method", "Email");
-				Flurry.event("Contact.MakeContact", params);
+				Flurry.event(ContactActivity.this, "Contact.MakeContact", params);
 			} catch (Exception e) {}
 		} catch (Exception e) {
 			Toast.makeText(this, R.string.contact_cant_email, Toast.LENGTH_LONG).show();
@@ -815,7 +802,7 @@ public class ContactActivity extends GDActivity {
 		        		   try {
 			       				HashMap<String, String> params = new HashMap<String, String>();
 			       				params.put("method", "App");
-			       				Flurry.event("Contact.OpenFacebook", params);
+			       				Flurry.event(ContactActivity.this, "Contact.OpenFacebook", params);
 			       			} catch (Exception e) {}
 		        	   } catch(Exception e) {
 		        		   try {
@@ -825,7 +812,7 @@ public class ContactActivity extends GDActivity {
 				       			try {
 				       				HashMap<String, String> params = new HashMap<String, String>();
 				       				params.put("method", "Browser");
-				       				Flurry.event("Contact.OpenFacebook", params);
+				       				Flurry.event(ContactActivity.this, "Contact.OpenFacebook", params);
 				       			} catch (Exception e2) {}
 				       		} catch(Exception f) {
 				       			Toast.makeText(ContactActivity.this, R.string.contact_cant_open_profile, Toast.LENGTH_LONG).show();
@@ -878,7 +865,7 @@ public class ContactActivity extends GDActivity {
 		
 		if (canSave) {
 			String status = statusListTag.get(statusPos);
-			FollowupComments.Comment comment = new FollowupComments.Comment(contact.getPerson().getId(), User.getContact().getPerson().getId(), User.getOrganizationID(), statusListTag.get(statusPos), commentStr, rejoicables);
+			FollowupComments.Comment comment = new FollowupComments.Comment(contact.getPerson().getId(), getUser().getId(), getUser().getOrganizationID(), statusListTag.get(statusPos), commentStr, rejoicables);
 			FollowupComments.post(this, comment, new SaveResponseHandler(status));
 		} else {
 			Toast.makeText(this, R.string.contact_cant_save, Toast.LENGTH_LONG).show();
@@ -909,7 +896,7 @@ public class ContactActivity extends GDActivity {
 			contact.getPerson().setStatus(status);
 			updateComments(true);
 			try {
-   				Flurry.event("Contact.Comment.Save");
+   				Flurry.event(ContactActivity.this, "Contact.Comment.Save");
    			} catch (Exception e) {}
 		}
 
@@ -924,7 +911,7 @@ public class ContactActivity extends GDActivity {
 				}
 			});
 			ad.show();
-			Flurry.error(e, "Contact.SaveResponseHandler");
+			Flurry.error(ContactActivity.this, e, "Contact.SaveResponseHandler");
 		}
 
 		@Override
@@ -982,7 +969,7 @@ public class ContactActivity extends GDActivity {
 		public void onSuccess() {
 			updateComments(true);
 			try {
-				Flurry.event("Contact.Comment.Delete");
+				Flurry.event(ContactActivity.this, "Contact.Comment.Delete");
 			} catch (Exception e) {}
 		}
 
@@ -997,7 +984,7 @@ public class ContactActivity extends GDActivity {
 				}
 			});
 			ad.show();
-			Flurry.error(e, "Contact.DeleteCommentHandler");
+			Flurry.error(ContactActivity.this, e, "Contact.DeleteCommentHandler");
 		}
 
 		@Override
@@ -1012,10 +999,10 @@ public class ContactActivity extends GDActivity {
 			if (comment == null) return false;
 			
 			boolean canDelete = false;
-			if (User.hasRole("admin")) {
+			if (getUser().hasRole("admin")) {
 				canDelete = true;
-			} else if (User.hasRole("leader")) {
-				if (comment.getComment().getCommenter().getId() == User.getContact().getPerson().getId()) {
+			} else if (getUser().hasRole("leader")) {
+				if (comment.getComment().getCommenter().getId() == getUser().getId()) {
 					canDelete = true;
 				}
 			}
@@ -1059,7 +1046,7 @@ public class ContactActivity extends GDActivity {
 		@Override
 		public void onSuccess() {
 			updatePerson(true);
-			Flurry.event("Contact.ChangeRole");
+			Flurry.event(ContactActivity.this, "Contact.ChangeRole");
 		}
 
 		@Override
@@ -1073,7 +1060,7 @@ public class ContactActivity extends GDActivity {
 				}
 			});
 			ad.show();
-			Flurry.error(e, "Contact.ChangeRoleHandler");
+			Flurry.error(ContactActivity.this, e, "Contact.ChangeRoleHandler");
 		}
 
 		@Override
@@ -1157,7 +1144,7 @@ public class ContactActivity extends GDActivity {
 				try {
 					HashMap<String, String> params = new HashMap<String, String>();
 					params.put("tab", "Contact");
-					Flurry.event("Contact.ChangeTab", params);
+					Flurry.event(this, "Contact.ChangeTab", params);
 				} catch (Exception e) {}
 				break;
 			case TAB_MORE_INFO:
@@ -1169,7 +1156,7 @@ public class ContactActivity extends GDActivity {
 				try {
 					HashMap<String, String> params = new HashMap<String, String>();
 					params.put("tab", "More Info");
-					Flurry.event("Contact.ChangeTab", params);
+					Flurry.event(this, "Contact.ChangeTab", params);
 				} catch (Exception e) {}
 				break;
 			case TAB_SURVEYS:
@@ -1181,7 +1168,7 @@ public class ContactActivity extends GDActivity {
 				try {
 					HashMap<String, String> params = new HashMap<String, String>();
 					params.put("tab", "Surveys");
-					Flurry.event("Contact.ChangeTab", params);
+					Flurry.event(this, "Contact.ChangeTab", params);
 				} catch (Exception e) {}
 				break;
 			}

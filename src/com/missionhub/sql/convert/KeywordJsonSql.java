@@ -3,7 +3,7 @@ package com.missionhub.sql.convert;
 import java.util.Iterator;
 import java.util.List;
 
-import com.missionhub.MissionHubApplication;
+import com.missionhub.Application;
 import com.missionhub.api.json.GKeyword;
 import com.missionhub.sql.Keyword;
 import com.missionhub.sql.KeywordDao;
@@ -18,7 +18,7 @@ public class KeywordJsonSql {
 	public static void update(Context context, int organizationId, GKeyword[] keywords) {
 		if (keywords == null) return;
 		
-		MissionHubApplication app = (MissionHubApplication) context.getApplicationContext();
+		Application app = (Application) context.getApplicationContext();
 		KeywordDao kd = app.getDbSession().getKeywordDao();
 		KeywordQuestionDao kqd = app.getDbSession().getKeywordQuestionDao();
 		

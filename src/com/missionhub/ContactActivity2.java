@@ -1,6 +1,5 @@
 package com.missionhub;
 
-import com.missionhub.auth.User;
 import com.missionhub.ui.ContactHeaderFragment;
 import com.missionhub.ui.widget.Tab;
 
@@ -9,11 +8,10 @@ import android.support.v4.app.FragmentManager;
 import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
-import greendroid.app.GDActivity;
 import greendroid.widget.ActionBar;
 import greendroid.widget.ActionBarItem.Type;
 
-public class ContactActivity2 extends GDActivity {
+public class ContactActivity2 extends Activity {
 
 	private TabHost mTabHost;
 	private ListView mAboutListView;
@@ -29,6 +27,8 @@ public class ContactActivity2 extends GDActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		//int personId = savedInstanceState.getInt("personId", getUser().getId());
 
 		setActionBarContentView(R.layout.activity_contact);
 		getActionBar().setType(ActionBar.Type.Dashboard);
@@ -48,7 +48,7 @@ public class ContactActivity2 extends GDActivity {
 		
 		FragmentManager fm = getSupportFragmentManager();
 		contactHeader = (ContactHeaderFragment) fm.findFragmentById(R.id.fragment_contact_header);
-		contactHeader.setContact(User.getContact());
+		contactHeader.setPerson(getUser().getPerson());
 
 		setupTab(R.id.tab_contact_about, TAG_ABOUT, R.string.contact_tab_about, R.drawable.gd_action_bar_info);
 		setupTab(R.id.tab_contact_status, TAG_STATUS, R.string.contact_tab_status, R.drawable.gd_action_bar_list);

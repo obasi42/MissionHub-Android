@@ -1,30 +1,25 @@
 package com.missionhub;
 
-import greendroid.app.GDActivity;
 import greendroid.widget.ActionBar;
 import greendroid.widget.ActionBarItem;
 import greendroid.widget.NormalActionBarItem;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.google.gson.Gson;
-import com.missionhub.api.json.GContact;
-import com.missionhub.auth.Auth;
-import com.missionhub.auth.User;
 import com.missionhub.config.Preferences;
-import com.missionhub.error.MHException;
 import com.missionhub.helpers.Flurry;
-import com.missionhub.sql.convert.PersonJsonSql;
 
-public class MissionHubActivity extends GDActivity {
+public class MissionHubActivity extends Activity {
 
 	/* Logging Tag */
 	public static final String TAG = MissionHubActivity.class.getName();
@@ -53,67 +48,31 @@ public class MissionHubActivity extends GDActivity {
 		addActionBarItem(getActionBar().newActionBarItem(NormalActionBarItem.class).setDrawable(R.drawable.action_bar_logout)
 				.setContentDescription(R.string.action_bar_logout), R.id.action_bar_logout);
 
-		Application.initVersion(this);
-		Preferences.setLastRunVersion(this, Application.getVersion());
-		Application.restoreApplicationState(savedInstanceState);
+		
+		Preferences.setLastRunVersion(this, ((Application) getApplicationContext()).getVersion());
 
 		mLoggedIn = (RelativeLayout) findViewById(R.id.loggedin);
 		mLoggedOut = (RelativeLayout) findViewById(R.id.loggedout);
 		mName = (TextView) findViewById(R.id.name);
 		mOrganization = (TextView) findViewById(R.id.organization);
 		
-		Auth.setLoggedIn(false);
-		Auth.checkToken(this, checkTokenHandler);
+		getApp().registerHandler(appHandler);
 		
-//		try {
-//			User.setContact(Preferences.getContact(this));
-//			Auth.setAccessToken(Preferences.getAccessToken(this));
-//			Auth.setLoggedIn(true);
-//			
-//			PersonJsonSql.update(this, User.getContact());
-//			
-//			Intent i = new Intent(getApplicationContext(), ContactActivity2.class);
-//			Gson gson = new Gson();
-//			String contactJSON = gson.toJson(User.getContact());
-//			i.putExtra("contactJSON", contactJSON);
-//			startActivity(i);
-//		} catch (MHException e) {
-//			e.printStackTrace();
-//		}
+		if (!getUser().isLoggedIn()) {
+			getUser().refresh(this);
+		}
 		
-		Flurry.pageView("Main");
-	}
-
-	@Override
-	public void onSaveInstanceState(Bundle b) {
-		b.putAll(Application.saveApplicationState(b));
-	}
-
-	@Override
-	public void onRestoreInstanceState(Bundle b) {
-		Application.restoreApplicationState(b);
+		Flurry.pageView(this, "Main");
 	}
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == RESULT_LOGIN_ACTIVITY && resultCode == RESULT_OK) {
-			Auth.checkToken(this, checkTokenHandler);
+			getUser();
 		}
 		if (requestCode == RESULT_PROFILE_ACTIVITY && resultCode == RESULT_OK && data.hasExtra("logout")) {
 			logout();
 		}
-	}
-
-	@Override
-	public void onStart() {
-		super.onStart();
-		Flurry.startSession(this);
-	}
-
-	@Override
-	public void onStop() {
-		super.onStop();
-		Flurry.endSession(this);
 	}
 
 	@Override
@@ -127,7 +86,7 @@ public class MissionHubActivity extends GDActivity {
 		builder.setTitle(R.string.alert_learn_more).setIcon(R.drawable.ic_dialog_info).setMessage(R.string.alert_learn_more_msg)
 				.setPositiveButton(R.string.alert_ok, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
-						Flurry.event("Main.AboutLink");
+						Flurry.event(MissionHubActivity.this, "Main.AboutLink");
 						Uri uri = Uri.parse("http://missionhub.com?mobile=0");
 						startActivity(new Intent(Intent.ACTION_VIEW, uri));
 					}
@@ -156,9 +115,8 @@ public class MissionHubActivity extends GDActivity {
 	}
 
 	public void logout() {
-		Auth.logout(getBaseContext());
-		Flurry.event("Main.Logout");
-		refreshView();
+		getUser().logout();
+		Flurry.event(this, "Main.Logout");
 	}
 
 	@Override
@@ -177,41 +135,36 @@ public class MissionHubActivity extends GDActivity {
 		return true;
 	}
 
-	/* Handles messages from Auth.checkToken */
-	private Handler checkTokenHandler = new Handler() {
+	/* Handles messages from Application */
+	private Handler appHandler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
 			super.handleMessage(msg);
+			
+			Log.d(TAG, "GOT MESSAGE: " + msg);
+			
 			switch (msg.what) {
-			case Auth.SUCCESS:
-				Auth.setLoggedIn(true);
-				refreshView();
-				break;
-			case Auth.RETRY:
-				Auth.checkToken(MissionHubActivity.this, checkTokenHandler);
-				break;
-			case Auth.FAILURE:
-				Auth.setLoggedIn(false);
+			case Application.MESSAGE_USER_LOGGED_IN:
+			case Application.MESSAGE_USER_LOGGED_OUT:
 				refreshView();
 				break;
 			}
 		}
 	};
-
-	/**
-	 * Refreshes the main view based on user's logged in status
-	 */
+	
 	public void refreshView() {
-		if (Auth.isLoggedIn()) {
+		if (getUser().isLoggedIn()) {
 			getActionBar().setVisibility(View.VISIBLE);
 			mLoggedOut.setVisibility(View.GONE);
 			mLoggedIn.setVisibility(View.VISIBLE);
-			mName.setText(User.getContact().getPerson().getName());
-			mOrganization.setText(User.getOrganizations().get(User.getOrganizationID()).getName());
-		} else {
+			mName.setText(getUser().getPerson().getName());
+			mOrganization.setText(getUser().getOrganizations().get(getUser().getOrganizationID()).getName());
+			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+		} else{
 			getActionBar().setVisibility(View.GONE);
 			mLoggedIn.setVisibility(View.GONE);
 			mLoggedOut.setVisibility(View.VISIBLE);
+			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		}
 	}
 }

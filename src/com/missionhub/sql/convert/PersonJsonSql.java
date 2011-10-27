@@ -2,11 +2,10 @@ package com.missionhub.sql.convert;
 
 import java.util.Date;
 
-import com.missionhub.MissionHubApplication;
+import com.missionhub.Application;
 import com.missionhub.api.json.GContact;
 import com.missionhub.api.json.GContactAll;
 import com.missionhub.api.json.GPerson;
-import com.missionhub.auth.User;
 import com.missionhub.helpers.U;
 import com.missionhub.sql.Person;
 import com.missionhub.sql.PersonDao;
@@ -18,7 +17,7 @@ public class PersonJsonSql {
 	public static void update(Context context, GPerson person) {
 		if (person == null) return;
 		
-		MissionHubApplication app = (MissionHubApplication) context.getApplicationContext();
+		Application app = (Application) context.getApplicationContext();
 		PersonDao pd = app.getDbSession().getPersonDao();
 		
 		Person p = pd.load(person.getId());
@@ -70,9 +69,14 @@ public class PersonJsonSql {
 			p.setLocale(person.getLocale());
 		
 		OrganizationRoleJsonSql.update(context, person.getId(), person.getOrganizational_roles());
-		AssignmentJsonSql.update(context, person.getId(), Integer.parseInt(person.getRequest_org_id()), person.getAssignment());
+		
+		if (person.getRequest_org_id() != null)
+			AssignmentJsonSql.update(context, person.getId(), Integer.parseInt(person.getRequest_org_id()), person.getAssignment());
+		
 		InterestJsonSql.update(context, person.getId(), person.getInterests());
+		
 		EducationJsonSql.update(context, person.getId(), person.getEducation());
+		
 		LocationJsonSql.update(context, person.getId(), person.getLocation());
 		
 		pd.insertOrReplace(p);
@@ -90,7 +94,7 @@ public class PersonJsonSql {
 		if (contact == null) return;
 		if (contact.getPeople() == null) return;
 		
-		int organizationId = User.getOrganizationID();
+		int organizationId = -1;
 		
 		for (GContact c : contact.getPeople()) {
 			update(context, c);

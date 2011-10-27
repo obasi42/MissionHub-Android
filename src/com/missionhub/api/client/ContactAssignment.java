@@ -3,10 +3,10 @@ package com.missionhub.api.client;
 import android.content.Context;
 
 import com.loopj.android.http.RequestParams;
+import com.missionhub.Application;
 import com.missionhub.api.ApiClient;
 import com.missionhub.api.ApiHelper;
 import com.missionhub.api.ApiResponseHandler;
-import com.missionhub.auth.User;
 
 public class ContactAssignment {
 
@@ -21,10 +21,10 @@ public class ContactAssignment {
 	public static ApiClient create(Context ctx, int personId, int assignToPersonId, ApiResponseHandler responseHandler) {
 		ApiClient client = new ApiClient(ctx);
 		String url = ApiHelper.getAbsoluteUrl("contact_assignments");
-		RequestParams params = ApiHelper.getDefaultRequestParams();
+		RequestParams params = ApiHelper.getDefaultRequestParams(ctx);
 		params.put("assign_to", String.valueOf(assignToPersonId));
 		params.put("ids", String.valueOf(personId));
-		params.put("organization_id", String.valueOf(User.getOrganizationID()));
+		params.put("organization_id", String.valueOf(((Application) ctx.getApplicationContext()).getUser().getOrganizationID()));
 		client.post(url, params, responseHandler);
 		return client;
 	}
@@ -39,7 +39,7 @@ public class ContactAssignment {
 	public static ApiClient delete(Context ctx, int personId, ApiResponseHandler responseHandler) {
 		ApiClient client = new ApiClient(ctx);
 		String url = ApiHelper.getAbsoluteUrl("contact_assignments", String.valueOf(personId));
-		RequestParams params = ApiHelper.getDefaultRequestParams();
+		RequestParams params = ApiHelper.getDefaultRequestParams(ctx);
 		params.put("_method", "delete");
 		params.put("id", String.valueOf(personId));
 		client.post(url, params, responseHandler);

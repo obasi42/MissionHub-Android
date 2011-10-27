@@ -141,12 +141,13 @@ public class ImageManager {
 		
 		//removes all instances of this ImageView
 		public void Clean(ImageView view) {
-			
+			try {
 			for(int i = 0 ;i < imageRefs.size();) {
 				if(imageRefs.get(i).imageView == view)
 					imageRefs.remove(i);
 				else ++i;
 			}
+			} catch (Exception e) {}
 		}
 	}
 	

@@ -30,7 +30,7 @@ public class FollowupComments {
 	public static ApiClient get(Context ctx, int personId, ApiResponseHandler responseHandler) {
 		ApiClient client = new ApiClient(ctx);
 		String url = ApiHelper.getAbsoluteUrl("followup_comments", String.valueOf(personId));
-		RequestParams params = ApiHelper.getDefaultRequestParams();
+		RequestParams params = ApiHelper.getDefaultRequestParams(ctx);
 		client.get(url, params, responseHandler);
 		return client;
 	}
@@ -45,7 +45,7 @@ public class FollowupComments {
 	public static ApiClient post(Context ctx, FollowupComments.Comment comment, ApiResponseHandler responseHandler) {
 		ApiClient client = new ApiClient(ctx);
 		String url = ApiHelper.getAbsoluteUrl("followup_comments");
-		RequestParams params = ApiHelper.getDefaultRequestParams();
+		RequestParams params = ApiHelper.getDefaultRequestParams(ctx);
 		params.put("json", comment.getJson());
 		client.post(url, params, responseHandler);
 		return client;
@@ -61,7 +61,7 @@ public class FollowupComments {
 	public static ApiClient delete(Context ctx, int commentId, ApiResponseHandler responseHandler) {
 		ApiClient client = new ApiClient(ctx);
 		String url = ApiHelper.getAbsoluteUrl("followup_comments", String.valueOf(commentId));
-		RequestParams params = ApiHelper.getDefaultRequestParams();
+		RequestParams params = ApiHelper.getDefaultRequestParams(ctx);
 		params.put("_method", "delete");
 		client.post(url, params, responseHandler);
 		return client;
@@ -77,7 +77,7 @@ public class FollowupComments {
 	public static ApiClient delete(Context ctx, List<Integer> commentIds, ApiResponseHandler responseHandler) {
 		ApiClient client = new ApiClient(ctx);
 		String url = ApiHelper.getAbsoluteUrl("followup_comments", ApiHelper.toList(commentIds));
-		RequestParams params = ApiHelper.getDefaultRequestParams();
+		RequestParams params = ApiHelper.getDefaultRequestParams(ctx);
 		params.put("_method", "delete");
 		client.post(url, params, responseHandler);
 		return client;
