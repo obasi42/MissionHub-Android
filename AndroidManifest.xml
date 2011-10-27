@@ -39,7 +39,6 @@
         </activity>
         <activity
             android:name=".ContactsFilterActivity"
-            android:screenOrientation="portrait"
             android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
         <activity
@@ -59,7 +58,6 @@
         </activity>
         <activity
             android:name=".ProfileActivity"
-            android:screenOrientation="portrait"
             android:theme="@style/Theme.MHActionBar"
             android:windowSoftInputMode="stateHidden|adjustPan" >
         </activity>
