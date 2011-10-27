@@ -37,7 +37,7 @@
 		<ImageView android:src="@drawable/mh_logo"
 			android:layout_height="100dp" android:layout_width="fill_parent"
 			android:id="@+id/logo" android:layout_alignParentTop="true"
-			android:layout_alignParentLeft="true" android:layout_marginTop="40dp"></ImageView>
+			android:layout_alignParentLeft="true" android:layout_marginTop="60dp"></ImageView>
 		<LinearLayout android:layout_height="wrap_content"
 			android:layout_width="fill_parent" android:layout_alignParentBottom="true"
 			android:orientation="vertical">
