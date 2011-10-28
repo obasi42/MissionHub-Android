@@ -6,14 +6,14 @@
     android:orientation="horizontal"
     android:padding="8dp" >
 
-    <com.missionhub.ui.widget.BezelImageView
+    <com.missionhub.ui.widget.RoundedImageView
         android:id="@+id/picture"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_marginRight="10dp"
         android:clickable="true"
         android:src="@drawable/default_contact" >
-    </com.missionhub.ui.widget.BezelImageView>
+    </com.missionhub.ui.widget.RoundedImageView>
 
     <TextView
         android:id="@+id/name"

@@ -417,10 +417,8 @@ public class ContactsActivity extends Activity {
 	private class ContactsOnItemClickListener implements OnItemClickListener {
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 			GContact contact = (GContact) parent.getAdapter().getItem(position);
-			Intent i = new Intent(getApplicationContext(), ContactActivity.class);
-			Gson gson = new Gson();
-			String contactJSON = gson.toJson(contact);
-			i.putExtra("contactJSON", contactJSON);
+			Intent i = new Intent(getApplicationContext(), ContactActivity2.class);
+			i.putExtra("personId", contact.getPerson().getId());
 			startActivity(i);
 		}
 	}

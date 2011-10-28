@@ -4,9 +4,10 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
+    android:background="@drawable/mh_gradient"
     android:padding="8dp" >
 
-    <com.missionhub.ui.widget.BezelImageView
+    <com.missionhub.ui.widget.RoundedImageView
         android:id="@+id/picture"
         android:adjustViewBounds="true"
         android:maxWidth="110dp"
@@ -17,7 +18,7 @@
         android:layout_marginRight="10dp"
         android:clickable="true"
         android:src="@drawable/facebook_question" >
-    </com.missionhub.ui.widget.BezelImageView>
+    </com.missionhub.ui.widget.RoundedImageView>
 
     <LinearLayout
         android:layout_width="fill_parent"
