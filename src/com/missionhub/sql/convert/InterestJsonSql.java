@@ -4,8 +4,10 @@ import java.util.Iterator;
 import java.util.List;
 
 import android.content.Context;
+import android.os.Bundle;
 
 import com.missionhub.Application;
+import com.missionhub.api.ApiNotifier;
 import com.missionhub.api.json.GIdNameProvider;
 import com.missionhub.sql.Interest;
 import com.missionhub.sql.InterestDao;
@@ -14,6 +16,10 @@ import com.missionhub.sql.InterestDao.Properties;
 public class InterestJsonSql {
 	
 	public static void update(Context context, int personId, GIdNameProvider[] interests) {
+		update(context, personId, interests, null);
+	}
+	
+	public static void update(Context context, int personId, GIdNameProvider[] interests, String tag) {
 		if (interests == null) return;
 		
 		Application app = (Application) context.getApplicationContext();
@@ -23,7 +29,14 @@ public class InterestJsonSql {
 		List<Interest> currentInterests = id.queryBuilder().where(Properties.Person_id.eq(personId)).list();
 		Iterator<Interest> itr = currentInterests.iterator();
 		while(itr.hasNext()) {
-			id.delete(itr.next());
+			Interest i = itr.next();
+			id.delete(i);
+			
+			Bundle b = new Bundle();
+			b.putLong("id", i.get_id());
+			b.putInt("personId", i.getPerson_id());
+			if (tag != null) b.putString("tag", tag);
+			app.getApiNotifier().postMessage(ApiNotifier.Type.DELETE_INTEREST, b);
 		}
 		
 		// Insert interests
@@ -34,7 +47,13 @@ public class InterestJsonSql {
 			i.setName(interest.getName());
 			i.setPerson_id(personId);
 			i.setProvider(interest.getProvider());
-			id.insert(i);
+			long id2 = id.insert(i);
+			
+			Bundle b = new Bundle();
+			b.putLong("id", id2);
+			b.putInt("personId", i.getPerson_id());
+			if (tag != null) b.putString("tag", tag);
+			app.getApiNotifier().postMessage(ApiNotifier.Type.UPDATE_INTEREST, b);
 		}
 	}
 }

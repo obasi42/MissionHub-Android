@@ -172,12 +172,14 @@ public class ContactsActivity extends Activity {
 	
 	private ArrayList<String> processes = new ArrayList<String>();
 
-	private void showProgress(String process) {
+	@Override
+	public void showProgress(String process) {
 		processes.add(process);
 		indicator.setLoading(true);
 	}
 
-	private void hideProgress(String process) {
+	@Override
+	public void hideProgress(String process) {
 		processes.remove(process);
 		if (processes.size() <= 0) {
 			indicator.setLoading(false);

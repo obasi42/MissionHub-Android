@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root_contact_header"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="8dp" >
+
+    <com.missionhub.ui.widget.BezelImageView
+        android:id="@+id/picture"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginRight="10dp"
+        android:clickable="true"
+        android:src="@drawable/default_contact" >
+    </com.missionhub.ui.widget.BezelImageView>
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:ellipsize="end"
+        android:gravity="center_vertical"
+        android:maxLines="2"
+        android:text="TextView"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textStyle="bold" >
+    </TextView>
+
+</LinearLayout>

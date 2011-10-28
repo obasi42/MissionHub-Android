@@ -152,6 +152,8 @@ public class MissionHubActivity extends Activity {
 		}
 	};
 	
+	private boolean open = false;
+	
 	public void refreshView() {
 		if (getUser().isLoggedIn()) {
 			getActionBar().setVisibility(View.VISIBLE);

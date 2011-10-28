@@ -12,11 +12,11 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-public class SimpleListItemAdapter  extends ArrayAdapter<SimpleListItem>{
-	private ArrayList<SimpleListItem> items;
+public class ListItemAdapterSimple  extends ArrayAdapter<ListItemSimple>{
+	private ArrayList<ListItemSimple> items;
 	private Activity activity;
 
-	public SimpleListItemAdapter(Activity a, int textViewResourceId, ArrayList<SimpleListItem> items) {
+	public ListItemAdapterSimple(Activity a, int textViewResourceId, ArrayList<ListItemSimple> items) {
 		super(a, textViewResourceId, items);
 		this.items = items;
 		activity = a;
@@ -34,7 +34,7 @@ public class SimpleListItemAdapter  extends ArrayAdapter<SimpleListItem>{
 		ViewHolder holder;
 		if (v == null) {		
 			LayoutInflater vi = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			v = vi.inflate(R.layout.simple_list_item, null);
+			v = vi.inflate(R.layout.list_item_simple, null);
 			holder = new ViewHolder();
 			holder.header = (TextView) v.findViewById(R.id.contact_info_header);
 			holder.info = (TextView) v.findViewById(R.id.contact_info_info);
@@ -43,7 +43,7 @@ public class SimpleListItemAdapter  extends ArrayAdapter<SimpleListItem>{
 		else
 			holder=(ViewHolder)v.getTag();
 
-		final SimpleListItem item = items.get(position);
+		final ListItemSimple item = items.get(position);
 		if (item != null) {
 			holder.header.setText(item.header);
 			String info = item.info;

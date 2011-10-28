@@ -4,4 +4,7 @@
         <item type="id" name="action_bar_search"></item>
         <item type="id" name="action_bar_logout"></item>
         <item type="id" name="action_bar_profile"></item>
+        <item type="id" name="action_bar_take_photo"></item>
+        <item type="id" name="action_bar_export"></item>
+        <item type="id" name="action_bar_edit"></item>
     </resources>

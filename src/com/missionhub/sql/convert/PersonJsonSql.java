@@ -3,18 +3,25 @@ package com.missionhub.sql.convert;
 import java.util.Date;
 
 import com.missionhub.Application;
+import com.missionhub.api.ApiNotifier;
 import com.missionhub.api.json.GContact;
 import com.missionhub.api.json.GContactAll;
 import com.missionhub.api.json.GPerson;
+import com.missionhub.helpers.Helper;
 import com.missionhub.helpers.U;
 import com.missionhub.sql.Person;
 import com.missionhub.sql.PersonDao;
 
 import android.content.Context;
+import android.os.Bundle;
 
 public class PersonJsonSql {
 	
 	public static void update(Context context, GPerson person) {
+		update(context, person, null);
+	}
+
+	public static void update(Context context, GPerson person, String tag) {
 		if (person == null) return;
 		
 		Application app = (Application) context.getApplicationContext();
@@ -45,10 +52,10 @@ public class PersonJsonSql {
 			p.setStatus(person.getStatus());
 		
 		if (!U.nullOrEmpty(person.getFirst_contact_date()))
-			p.setFirst_contact_date(new Date(person.getFirst_contact_date()));
+			p.setFirst_contact_date(Helper.getDateFromUTCString(person.getFirst_contact_date()));
 		
 		if (!U.nullOrEmpty(person.getDate_surveyed()))
-			p.setDate_surveyed(new Date(person.getDate_surveyed()));
+			p.setDate_surveyed(Helper.getDateFromUTCString(person.getDate_surveyed()));
 		
 		if (person.getFirst_name() != null)
 			p.setFirst_name(person.getFirst_name());
@@ -68,40 +75,56 @@ public class PersonJsonSql {
 		if (person.getLocale() != null)
 			p.setLocale(person.getLocale());
 		
-		OrganizationRoleJsonSql.update(context, person.getId(), person.getOrganizational_roles());
+		p.setRetrieved(new Date());
+		
+		OrganizationRoleJsonSql.update(context, person.getId(), person.getOrganizational_roles(), tag);
 		
 		if (person.getRequest_org_id() != null)
-			AssignmentJsonSql.update(context, person.getId(), Integer.parseInt(person.getRequest_org_id()), person.getAssignment());
+			AssignmentJsonSql.update(context, person.getId(), Integer.parseInt(person.getRequest_org_id()), person.getAssignment(), tag);
 		
-		InterestJsonSql.update(context, person.getId(), person.getInterests());
+		InterestJsonSql.update(context, person.getId(), person.getInterests(), tag);
 		
-		EducationJsonSql.update(context, person.getId(), person.getEducation());
+		EducationJsonSql.update(context, person.getId(), person.getEducation(), tag);
 		
-		LocationJsonSql.update(context, person.getId(), person.getLocation());
+		LocationJsonSql.update(context, person.getId(), person.getLocation(), tag);
 		
-		pd.insertOrReplace(p);
+		long id = pd.insertOrReplace(p);
+		
+		Bundle b = new Bundle();
+		if (tag != null) b.putString("tag", tag);
+		b.putLong("id", id);
+		b.putInt("personId", p.get_id());
+		app.getApiNotifier().postMessage(ApiNotifier.Type.UPDATE_PERSON, b);
 	}
 	
 	public static void update(Context context, GContact contact) {
+		update(context, contact, null);
+	}
+	
+	public static void update(Context context, GContact contact, String tag) {
 		if (contact == null) return;
-		update(context, contact.getPerson());
+		update(context, contact.getPerson(), tag);
 		
 		if (contact.getPerson() != null)
-			AnswerJsonSql.update(context, contact.getPerson().getId(), Integer.parseInt(contact.getPerson().getRequest_org_id()), contact.getForm());
+			AnswerJsonSql.update(context, contact.getPerson().getId(), Integer.parseInt(contact.getPerson().getRequest_org_id()), contact.getForm(), tag);
 	}
 	
 	public static void update(Context context, GContactAll contact) {
+		update(context, contact, null);
+	}
+	
+	public static void update(Context context, GContactAll contact, String tag) {
 		if (contact == null) return;
 		if (contact.getPeople() == null) return;
 		
 		int organizationId = -1;
 		
 		for (GContact c : contact.getPeople()) {
-			update(context, c);
+			update(context, c, tag);
 			organizationId = Integer.parseInt(c.getPerson().getRequest_org_id());
 		}
 		
-		KeywordJsonSql.update(context, organizationId, contact.getKeywords());
-		QuestionJsonSql.update(context, organizationId, contact.getQuestions());
+		KeywordJsonSql.update(context, organizationId, contact.getKeywords(), tag);
+		QuestionJsonSql.update(context, organizationId, contact.getQuestions(), tag);
 	}
 }

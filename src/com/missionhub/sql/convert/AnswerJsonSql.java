@@ -4,16 +4,22 @@ import java.util.Iterator;
 import java.util.List;
 
 import android.content.Context;
+import android.os.Bundle;
 
 import com.missionhub.Application;
+import com.missionhub.api.ApiNotifier;
 import com.missionhub.api.json.GQA;
 import com.missionhub.sql.Answer;
 import com.missionhub.sql.AnswerDao;
 import com.missionhub.sql.AnswerDao.Properties;
 
 public class AnswerJsonSql {
-
+	
 	public static void update(Context context, int personId, int organizationId, GQA[] form) {
+		update(context, personId, organizationId, form, null);
+	}
+
+	public static void update(Context context, int personId, int organizationId, GQA[] form, String tag) {
 		if (form == null) return;
 		
 		Application app = (Application) context.getApplicationContext();
@@ -23,7 +29,14 @@ public class AnswerJsonSql {
 		List<Answer> currentAnswers = ad.queryBuilder().where(Properties.Person_id.eq(personId), Properties.Organization_id.eq(organizationId)).list();
 		Iterator<Answer> itr = currentAnswers.iterator();
 		while(itr.hasNext()) {
-			ad.delete(itr.next());
+			Answer a = itr.next();
+			ad.delete(a);
+			
+			Bundle b = new Bundle();
+			b.putLong("id", a.get_id());
+			b.putInt("personId", a.getPerson_id());
+			if (tag != null) b.putString("tag", tag);
+			app.getApiNotifier().postMessage(ApiNotifier.Type.DELETE_ANSWER, b);
 		}
 		
 		for (GQA answer : form) {
@@ -32,8 +45,13 @@ public class AnswerJsonSql {
 			a.setPerson_id(personId);
 			a.setAnswer(answer.getA());
 			a.setQuestion_id(answer.getQ());
-			ad.insert(a);
+			long id = ad.insert(a);
+			
+			Bundle b = new Bundle();
+			b.putLong("id", id);
+			b.putInt("personId", a.getPerson_id());
+			if (tag != null) b.putString("tag", tag);
+			app.getApiNotifier().postMessage(ApiNotifier.Type.UPDATE_ANSWER, b);
 		}
 	}
-	
 }

@@ -2,6 +2,7 @@ package com.missionhub.ui;
 
 import com.missionhub.R;
 import com.missionhub.helpers.Helper;
+import com.missionhub.helpers.U;
 import com.missionhub.sql.Person;
 
 import android.os.Bundle;
@@ -65,7 +66,8 @@ public class ContactHeaderFragment extends Fragment {
 	
 	public void setPerson (Person person) {
 		this.person = person;
-		update();
+		if (person != null) 
+			update();
 	}
 	
 	private void update() {
@@ -110,25 +112,29 @@ public class ContactHeaderFragment extends Fragment {
 	
 	private void clickPicture(View view) {
 		try {
-			Helper.openFacebookProfile(view.getContext(), person.getFb_id());	
+			if (!U.nullOrEmpty(person.getFb_id()))
+				Helper.openFacebookProfile(view.getContext(), person.getFb_id());	
 		} catch (Exception e) {	Log.w(TAG, e.getMessage(), e); }
 	}
 	
 	private void clickPhone(View view) {
 		try {
-			Helper.makePhoneCall(view.getContext(), person.getPhone_number());
+			if (!U.nullOrEmpty(person.getPhone_number()))
+				Helper.makePhoneCall(view.getContext(), person.getPhone_number());
 		} catch (Exception e) {	Log.w(TAG, e.getMessage(), e); }
 	}
 	
 	private void clickSms(View view) {
 		try {
-			Helper.sendSMS(view.getContext(), person.getPhone_number());
+			if (!U.nullOrEmpty(person.getPhone_number()))
+				Helper.sendSMS(view.getContext(), person.getPhone_number());
 		} catch (Exception e) {	Log.w(TAG, e.getMessage(), e); }
 	}
 	
 	private void clickEmail(View view) {
 		try {
-			Helper.sendEmail(view.getContext(), person.getEmail_address());
+			if (!U.nullOrEmpty(person.getEmail_address()))
+				Helper.sendEmail(view.getContext(), person.getEmail_address());
 		} catch (Exception e) {	Log.w(TAG, e.getMessage(), e); }
 	}
 }

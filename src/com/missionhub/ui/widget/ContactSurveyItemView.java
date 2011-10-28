@@ -1,6 +1,7 @@
 package com.missionhub.ui.widget;
 
 import com.missionhub.R;
+import com.missionhub.ui.widget.item.ContactSurveyItem;
 
 import greendroid.widget.item.Item;
 import greendroid.widget.itemview.ItemView;

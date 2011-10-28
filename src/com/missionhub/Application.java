@@ -10,6 +10,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
 import android.os.Message;
 
+import com.missionhub.api.ApiNotifier;
 import com.missionhub.config.Preferences;
 import com.missionhub.sql.DaoMaster;
 import com.missionhub.sql.DaoMaster.DevOpenHelper;
@@ -33,6 +34,7 @@ public class Application extends GDApplication {
 	private SQLiteDatabase db;
 	private DaoSession daoSession;
 	private ApplicationUser user;
+	private ApiNotifier apiNotifier;
 	
     @Override
     public Class<?> getHomeActivityClass() {
@@ -92,6 +94,12 @@ public class Application extends GDApplication {
     		user = new ApplicationUser(this, personId);
     	}
     	return user;
+    }
+    
+    public ApiNotifier getApiNotifier() {
+    	if (apiNotifier == null)
+    		apiNotifier = new ApiNotifier(this);
+    	return apiNotifier;
     }
     
     public String getVersion() {

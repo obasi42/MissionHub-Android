@@ -1,4 +1,4 @@
-package com.missionhub.ui.widget;
+package com.missionhub.ui.widget.item;
 
 import com.missionhub.R;
 
@@ -7,12 +7,12 @@ import greendroid.widget.itemview.ItemView;
 import android.content.Context;
 import android.view.ViewGroup;
 
-public class ContactSurveyHeader extends TextItem {
+public class ContactSurveyHeaderItem extends TextItem {
 
     /**
      * @hide
      */
-    public ContactSurveyHeader() {
+    public ContactSurveyHeaderItem() {
         this(null);
     }
 
@@ -21,7 +21,7 @@ public class ContactSurveyHeader extends TextItem {
      * 
      * @param text The text for this SeparatorItem
      */
-    public ContactSurveyHeader(String text) {
+    public ContactSurveyHeaderItem(String text) {
         super(text);
         enabled = false;
     }

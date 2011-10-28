@@ -4,8 +4,10 @@ import java.util.Iterator;
 import java.util.List;
 
 import android.content.Context;
+import android.os.Bundle;
 
 import com.missionhub.Application;
+import com.missionhub.api.ApiNotifier;
 import com.missionhub.api.json.GAssign;
 import com.missionhub.api.json.GIdNameProvider;
 import com.missionhub.api.json.GPerson;
@@ -17,6 +19,10 @@ import com.missionhub.sql.AssignmentDao.Properties;
 public class AssignmentJsonSql {
 	
 	public static void update(Context context, int personId, int organizationId, GAssign assign) {
+		update(context, personId, organizationId, assign, null);
+	}
+	
+	public static void update(Context context, int personId, int organizationId, GAssign assign, String tag) {
 		if (assign == null) return;
 		
 		Application app = (Application) context.getApplicationContext();
@@ -26,7 +32,15 @@ public class AssignmentJsonSql {
 		List<Assignment> currentAssignments = ad.queryBuilder().where(Properties.Organization_id.eq(organizationId), Properties.Assigned_to_id.eq(personId)).list();
 		Iterator<Assignment> itr = currentAssignments.iterator();
 		while(itr.hasNext()) {
-			ad.delete(itr.next());
+			Assignment assignment = itr.next();
+			ad.delete(assignment);
+			
+			Bundle b = new Bundle();
+			b.putLong("id", assignment.get_id());
+			b.putInt("personId", assignment.getPerson_id());
+			b.putInt("assignedToPersonId", assignment.getAssigned_to_id());
+			if (tag != null) b.putString("tag", tag);
+			app.getApiNotifier().postMessage(ApiNotifier.Type.DELETE_ASSIGNMENT, b);
 		}
 		
 		GIdNameProvider[] assignedToPeople = assign.getAssigned_to_person();
@@ -35,13 +49,20 @@ public class AssignmentJsonSql {
 			assignment.setAssigned_to_id(personId);
 			assignment.setPerson_id(Integer.valueOf(assignedToPerson.getId()));
 			assignment.setOrganization_id(organizationId);
-			ad.insert(assignment);
+			long id = ad.insert(assignment);
+			
+			Bundle b = new Bundle();
+			b.putLong("id", id);
+			b.putInt("personId", assignment.getPerson_id());
+			b.putInt("assignedToPersonId", assignment.getAssigned_to_id());
+			if (tag != null) b.putString("tag", tag);
+			app.getApiNotifier().postMessage(ApiNotifier.Type.UPDATE_ASSIGNMENT, b);
 			
 			// Add person stubs
 			GPerson person = new GPerson();
 			person.setId(Integer.valueOf(assignedToPerson.getId()));
 			person.setName(assignedToPerson.getName());
-			PersonJsonSql.update(context, person);
+			PersonJsonSql.update(context, person, tag);
 		}
 	}
 	

@@ -34,15 +34,16 @@ import com.missionhub.helpers.Flurry;
 import com.missionhub.helpers.Helper;
 import com.missionhub.helpers.U;
 import com.missionhub.ui.CommentItemAdapter;
-import com.missionhub.ui.SimpleListItemAdapter;
+import com.missionhub.ui.ListItemAdapterSimple;
 import com.missionhub.ui.DisplayError;
 import com.missionhub.ui.Guide;
 import com.missionhub.ui.ImageManager;
 import com.missionhub.ui.Rejoicable;
 import com.missionhub.ui.RejoicableAdapter;
-import com.missionhub.ui.SimpleListItem;
-import com.missionhub.ui.widget.ContactSurveyHeader;
-import com.missionhub.ui.widget.ContactSurveyItem;
+import com.missionhub.ui.ListItemSimple;
+import com.missionhub.ui.widget.item.ContactAboutItem;
+import com.missionhub.ui.widget.item.ContactSurveyHeaderItem;
+import com.missionhub.ui.widget.item.ContactSurveyItem;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -133,8 +134,8 @@ public class ContactActivity extends Activity {
 	private ArrayList<GFollowupComment> comments = new ArrayList<GFollowupComment>();
 	
 	/* Info Tab Adapter */
-	private SimpleListItemAdapter infoAdapter;
-	private ArrayList<SimpleListItem> info = new ArrayList<SimpleListItem>();
+	private ListItemAdapterSimple infoAdapter;
+	private ArrayList<ListItemSimple> info = new ArrayList<ListItemSimple>();
 	
 	/* Survey Adapter */
 	//private SeparatedListAdapter keywordAdapter;
@@ -221,7 +222,7 @@ public class ContactActivity extends Activity {
 		ArrayList<String> noComment = new ArrayList<String>();
 		noComment.add(getString(R.string.contact_no_comments));
 		noCommentAdapter =  new ArrayAdapter<String>(this, R.layout.no_comment_list_item, noComment);
-		infoAdapter = new SimpleListItemAdapter(this, R.layout.simple_list_item, info);
+		infoAdapter = new ListItemAdapterSimple(this, R.layout.list_item_simple, info);
 		keywordAdapter = new ItemAdapter(this);
 		
 		/* Create ListView Header */
@@ -306,12 +307,14 @@ public class ContactActivity extends Activity {
 	
 	private ArrayList<String> processes = new ArrayList<String>();
 
-	private void showProgress(String process) {
+	@Override
+	public void showProgress(String process) {
 		processes.add(process);
 		indicator.setLoading(true);
 	}
 
-	private void hideProgress(String process) {
+	@Override
+	public void hideProgress(String process) {
 		processes.remove(process);
 		if (processes.size() <= 0) {
 			indicator.setLoading(false);
@@ -393,7 +396,7 @@ public class ContactActivity extends Activity {
 		if (!U.nullOrEmpty(person.getFb_id())) {
 			HashMap<String, String> data = new HashMap<String, String>();
 			data.put("facebook_id", person.getFb_id());
-			info.add(new SimpleListItem(getString(R.string.contact_info_facebook_header), getString(R.string.contact_info_facebook_link), data));
+			info.add(new ListItemSimple(getString(R.string.contact_info_facebook_header), getString(R.string.contact_info_facebook_link), data));
 		}
 		
 		if (getUser().hasRole("admin")) {
@@ -409,16 +412,16 @@ public class ContactActivity extends Activity {
 			data.put("org_id", String.valueOf(getUser().getOrganizationID()));
 			data.put("contact_id", String.valueOf(person.getId()));
 			if (contactRole.equals("contact")) {
-				info.add(new SimpleListItem(getString(R.string.contact_role), getString(R.string.contact_role_promote), data));
+				info.add(new ListItemSimple(getString(R.string.contact_role), getString(R.string.contact_role_promote), data));
 			} else if (contactRole.equals("leader")) {
-				info.add(new SimpleListItem(getString(R.string.contact_role), getString(R.string.contact_role_demote), data));
+				info.add(new ListItemSimple(getString(R.string.contact_role), getString(R.string.contact_role_demote), data));
 			} else if (contactRole.equals("admin")){
-				info.add(new SimpleListItem(getString(R.string.contact_role), getString(R.string.contact_role_admin)));
+				info.add(new ListItemSimple(getString(R.string.contact_role), getString(R.string.contact_role_admin)));
 			}
 		}
 		
 		if(person.getAssignment() != null && person.getAssignment().getPerson_assigned_to().length > 0) {
-			info.add(new SimpleListItem(getString(R.string.contact_info_assigned_to), person.getAssignment().getPerson_assigned_to()[0].getName()));
+			info.add(new ListItemSimple(getString(R.string.contact_info_assigned_to), person.getAssignment().getPerson_assigned_to()[0].getName()));
 		}
 		
 		if(!U.nullOrEmpty(person.getFirst_contact_date())) {
@@ -426,24 +429,24 @@ public class ContactActivity extends Activity {
 			SimpleDateFormat formatter = new SimpleDateFormat("MMMMM d, yyyy hh:mm aaa");
 			formatter.setTimeZone(TimeZone.getDefault());
 			String formattedDate = formatter.format(date);
-			info.add(new SimpleListItem(getString(R.string.contact_info_first_contact_date), formattedDate));
+			info.add(new ListItemSimple(getString(R.string.contact_info_first_contact_date), formattedDate));
 		}
 		
 		if(!U.nullOrEmpty(person.getPhone_number())) {
 			HashMap<String, String> data = new HashMap<String, String>();
 			data.put("phone", person.getPhone_number());
 			String prettyPhoneNumber = Helper.formatPhoneNumber(person.getPhone_number());
-			info.add(new SimpleListItem(getString(R.string.contact_info_phone_number), prettyPhoneNumber, data));
+			info.add(new ListItemSimple(getString(R.string.contact_info_phone_number), prettyPhoneNumber, data));
 		}
 		
 		if(!U.nullOrEmpty(person.getEmail_address())) {
 			HashMap<String, String> data = new HashMap<String, String>();
 			data.put("email", person.getEmail_address());
-			info.add(new SimpleListItem(getString(R.string.contact_info_email_address), person.getEmail_address(), data));
+			info.add(new ListItemSimple(getString(R.string.contact_info_email_address), person.getEmail_address(), data));
 		}
 		
 		if(!U.nullOrEmpty(person.getBirthday())) {
-			info.add(new SimpleListItem(getString(R.string.contact_info_birthday), person.getBirthday()));
+			info.add(new ListItemSimple(getString(R.string.contact_info_birthday), person.getBirthday()));
 		}
 		
 		if(person.getInterests().length > 0) {
@@ -455,7 +458,7 @@ public class ContactActivity extends Activity {
 					interests.append(", ");
 				}
 			}
-			info.add(new SimpleListItem(getString(R.string.contact_info_interests), interests.toString()));
+			info.add(new ListItemSimple(getString(R.string.contact_info_interests), interests.toString()));
 		}
 		
 		if(person.getEducation().length > 0) {
@@ -479,12 +482,12 @@ public class ContactActivity extends Activity {
 					}
 					value += education.getYear().getName();
 				}
-			info.add(new SimpleListItem(title, value));	
+			info.add(new ListItemSimple(title, value));	
 			}
 		}
 		
 		if(!U.nullOrEmpty(person.getLocation()) && !U.nullOrEmpty(person.getLocation().getName())) {
-			info.add(new SimpleListItem(getString(R.string.contact_info_location), person.getLocation().getName()));
+			info.add(new ListItemSimple(getString(R.string.contact_info_location), person.getLocation().getName()));
 		}
 		
 		infoAdapter.notifyDataSetChanged();
@@ -509,7 +512,7 @@ public class ContactActivity extends Activity {
 			}
 			for (GKeyword keyword : keywords) {
 				try {
-					keywordAdapter.add(new ContactSurveyHeader(getString(R.string.contact_survey_keyword) + ": " + keyword.getName()));
+					keywordAdapter.add(new ContactSurveyHeaderItem(getString(R.string.contact_survey_keyword) + ": " + keyword.getName()));
 					for (int q : keyword.getQuestions()) {
 						final GQuestion question = questions.get(q);
 						final GQA qa = answers.get(q);
@@ -1071,7 +1074,7 @@ public class ContactActivity extends Activity {
 	
 	private OnItemClickListener infoClickListener = new OnItemClickListener() {
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-			final SimpleListItem item = (SimpleListItem) parent.getAdapter().getItem(position);
+			final ListItemSimple item = (ListItemSimple) parent.getAdapter().getItem(position);
 			if (item == null || item.data == null) return;
 			
 			if (item.data.containsKey("role")) {

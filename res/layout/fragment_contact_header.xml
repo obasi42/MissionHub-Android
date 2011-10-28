@@ -6,15 +6,18 @@
     android:orientation="horizontal"
     android:padding="8dp" >
 
-    <ImageView
+    <com.missionhub.ui.widget.BezelImageView
         android:id="@+id/picture"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:adjustViewBounds="true"
+        android:maxWidth="110dp"
+        android:maxHeight="150dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginRight="10dp"
         android:clickable="true"
         android:src="@drawable/facebook_question" >
-    </ImageView>
+    </com.missionhub.ui.widget.BezelImageView>
 
     <LinearLayout
         android:layout_width="fill_parent"
@@ -30,7 +33,7 @@
             android:ellipsize="end"
             android:maxLines="2"
             android:text="TextView"
-            android:textAppearance="?android:attr/textAppearanceLarge" 
+            android:textAppearance="?android:attr/textAppearanceMedium" 
             android:textStyle="bold"
             >
         </TextView>

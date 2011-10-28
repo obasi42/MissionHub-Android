@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.missionhub.Application;
+import com.missionhub.api.ApiNotifier;
 import com.missionhub.api.json.GKeyword;
 import com.missionhub.sql.Keyword;
 import com.missionhub.sql.KeywordDao;
@@ -12,10 +13,15 @@ import com.missionhub.sql.KeywordQuestionDao;
 import com.missionhub.sql.KeywordQuestionDao.Properties;
 
 import android.content.Context;
+import android.os.Bundle;
 
 public class KeywordJsonSql {
 	
 	public static void update(Context context, int organizationId, GKeyword[] keywords) {
+		update(context, organizationId, keywords, null);
+	}
+	
+	public static void update(Context context, int organizationId, GKeyword[] keywords, String tag) {
 		if (keywords == null) return;
 		
 		Application app = (Application) context.getApplicationContext();
@@ -34,7 +40,15 @@ public class KeywordJsonSql {
 			List<KeywordQuestion> keywordQuestions = kqd.queryBuilder().where(Properties.Keyword_id.eq(keyword.getKeyword_id())).list();
 			Iterator<KeywordQuestion> itr = keywordQuestions.iterator();
 			while (itr.hasNext()) {
-				kqd.delete(itr.next());
+				KeywordQuestion kq = itr.next();
+				kqd.delete(kq);
+				Bundle b = new Bundle();
+				b.putLong("id", kq.get_id());
+				b.putInt("organizationId", k.getOrganization_id());
+				b.putInt("keywordId", kq.getKeyword_id());
+				b.putInt("questionId", kq.getQuestion_id());
+				if (tag != null) b.putString("tag", tag);
+				app.getApiNotifier().postMessage(ApiNotifier.Type.DELETE_KEYWORD_QUESTION, b);
 			}
 			
 			if (keyword.getQuestions() != null) {
@@ -42,11 +56,25 @@ public class KeywordJsonSql {
 					KeywordQuestion kq = new KeywordQuestion();
 					kq.setKeyword_id(keyword.getKeyword_id());
 					kq.setQuestion_id(question);
-					kqd.insert(kq);
+					long id = kqd.insert(kq);
+					
+					Bundle b = new Bundle();
+					b.putLong("id", id);
+					b.putInt("organizationId", k.getOrganization_id());
+					b.putInt("keywordId", kq.getKeyword_id());
+					b.putInt("questionId", kq.getQuestion_id());
+					if (tag != null) b.putString("tag", tag);
+					app.getApiNotifier().postMessage(ApiNotifier.Type.UPDATE_KEYWORD_QUESTION, b);
 				}
 			}
 			
-			kd.insertOrReplace(k);
+			long id = kd.insertOrReplace(k);
+			
+			Bundle b = new Bundle();
+			b.putLong("id", id);
+			b.putInt("organizationId", k.getOrganization_id());
+			if (tag != null) b.putString("tag", tag);
+			app.getApiNotifier().postMessage(ApiNotifier.Type.UPDATE_KEYWORD, b);
 		}
 		
 	}

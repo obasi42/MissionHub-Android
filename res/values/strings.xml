@@ -42,6 +42,7 @@
     <string name="contact_survey">Contact Surveys</string>
     <string name="contact_assign_to_me">Assign To Me</string>
     <string name="contact_unassign">Unassign</string>
+    <string name="contact_invalid_person">Invalid Person Id</string>
     <string name="contact_assign_locked">Assignment Locked</string>
     <string name="contact_comment_hint">Add comment here...</string>
     <string name="contact_comment_save">Save</string>
@@ -70,6 +71,7 @@
     <string name="contact_info_class_of">Class of</string>
     <string name="contact_info_location">Location</string>
     <string name="contact_info_assigned_to">Assigned to</string>
+    <string name="contact_info_surveyed_date">Last Survey Date</string>
     <string name="contact_info_first_contact_date">First Contact Date</string>
     <string name="contact_info_phone_number">Phone Number</string>
     <string name="contact_info_email_address">E-mail Address</string>
