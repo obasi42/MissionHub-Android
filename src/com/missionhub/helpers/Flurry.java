@@ -5,8 +5,8 @@ import java.util.HashMap;
 import com.flurry.android.Constants;
 import com.flurry.android.FlurryAgent;
 import com.missionhub.Application;
+import com.missionhub.MHException;
 import com.missionhub.config.Config;
-import com.missionhub.error.MHException;
 
 import android.content.Context;
 

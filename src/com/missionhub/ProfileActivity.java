@@ -10,9 +10,9 @@ import java.util.Set;
 
 import com.flurry.android.FlurryAgent;
 import com.google.common.collect.HashMultimap;
+import com.missionhub.api.model.sql.OrganizationalRole;
 import com.missionhub.config.Preferences;
 import com.missionhub.helpers.Flurry;
-import com.missionhub.model.sql.OrganizationalRole;
 import com.missionhub.ui.ImageManager;
 
 import android.content.Intent;

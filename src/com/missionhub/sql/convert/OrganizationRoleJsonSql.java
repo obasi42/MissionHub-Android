@@ -9,12 +9,12 @@ import android.os.Bundle;
 import com.google.common.primitives.Ints;
 import com.missionhub.Application;
 import com.missionhub.api.ApiNotifier;
-import com.missionhub.model.json.GOrgGeneric;
-import com.missionhub.model.sql.Organization;
-import com.missionhub.model.sql.OrganizationDao;
-import com.missionhub.model.sql.OrganizationalRole;
-import com.missionhub.model.sql.OrganizationalRoleDao;
-import com.missionhub.model.sql.OrganizationalRoleDao.Properties;
+import com.missionhub.api.model.json.GOrgGeneric;
+import com.missionhub.api.model.sql.Organization;
+import com.missionhub.api.model.sql.OrganizationDao;
+import com.missionhub.api.model.sql.OrganizationalRole;
+import com.missionhub.api.model.sql.OrganizationalRoleDao;
+import com.missionhub.api.model.sql.OrganizationalRoleDao.Properties;
 
 public class OrganizationRoleJsonSql {
 	

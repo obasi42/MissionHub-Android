@@ -8,12 +8,12 @@ import android.os.Bundle;
 
 import com.missionhub.Application;
 import com.missionhub.api.ApiNotifier;
-import com.missionhub.model.json.GAssign;
-import com.missionhub.model.json.GIdNameProvider;
-import com.missionhub.model.json.GPerson;
-import com.missionhub.model.sql.Assignment;
-import com.missionhub.model.sql.AssignmentDao;
-import com.missionhub.model.sql.AssignmentDao.Properties;
+import com.missionhub.api.model.json.GAssign;
+import com.missionhub.api.model.json.GIdNameProvider;
+import com.missionhub.api.model.json.GPerson;
+import com.missionhub.api.model.sql.Assignment;
+import com.missionhub.api.model.sql.AssignmentDao;
+import com.missionhub.api.model.sql.AssignmentDao.Properties;
 
 
 public class AssignmentJsonSql {

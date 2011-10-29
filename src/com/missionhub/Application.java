@@ -11,10 +11,10 @@ import android.os.Handler;
 import android.os.Message;
 
 import com.missionhub.api.ApiNotifier;
+import com.missionhub.api.model.sql.DaoMaster;
+import com.missionhub.api.model.sql.DaoSession;
+import com.missionhub.api.model.sql.DaoMaster.DevOpenHelper;
 import com.missionhub.config.Preferences;
-import com.missionhub.model.sql.DaoMaster;
-import com.missionhub.model.sql.DaoSession;
-import com.missionhub.model.sql.DaoMaster.DevOpenHelper;
 
 import de.greenrobot.dao.IdentityScopeType;
 

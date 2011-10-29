@@ -1,8 +1,8 @@
 package com.missionhub.ui;
 
 import com.google.gson.JsonParseException;
+import com.missionhub.MHException;
 import com.missionhub.R;
-import com.missionhub.error.MHException;
 
 import android.app.AlertDialog;
 import android.content.Context;

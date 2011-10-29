@@ -3,9 +3,9 @@ package com.missionhub.ui;
 import java.util.ArrayList;
 
 import com.missionhub.R;
+import com.missionhub.api.model.json.GContact;
+import com.missionhub.api.model.json.GPerson;
 import com.missionhub.helpers.Helper;
-import com.missionhub.model.json.GContact;
-import com.missionhub.model.json.GPerson;
 
 import android.app.Activity;
 import android.content.Context;

@@ -4,8 +4,8 @@ import java.lang.reflect.Type;
 
 import com.google.gson.Gson;
 import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.missionhub.error.MHException;
-import com.missionhub.model.json.GError;
+import com.missionhub.MHException;
+import com.missionhub.api.model.json.GError;
 
 public class ApiResponseHandler extends AsyncHttpResponseHandler {
 	

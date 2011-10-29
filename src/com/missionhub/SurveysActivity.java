@@ -5,7 +5,7 @@ import greendroid.widget.ActionBarItem;
 import greendroid.widget.LoaderActionBarItem;
 import greendroid.widget.ActionBarItem.Type;
 
-import com.missionhub.api.client.Survey;
+import com.missionhub.api.Survey;
 import com.missionhub.helpers.Flurry;
 import com.missionhub.ui.DisplayError;
 

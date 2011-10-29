@@ -1,9 +1,9 @@
 package com.missionhub.ui;
 
 import com.missionhub.R;
+import com.missionhub.api.model.sql.Person;
 import com.missionhub.helpers.Helper;
 import com.missionhub.helpers.U;
-import com.missionhub.model.sql.Person;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;

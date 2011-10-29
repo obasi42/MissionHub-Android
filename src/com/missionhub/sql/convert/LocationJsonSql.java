@@ -8,10 +8,10 @@ import android.os.Bundle;
 
 import com.missionhub.Application;
 import com.missionhub.api.ApiNotifier;
-import com.missionhub.model.json.GIdNameProvider;
-import com.missionhub.model.sql.Location;
-import com.missionhub.model.sql.LocationDao;
-import com.missionhub.model.sql.LocationDao.Properties;
+import com.missionhub.api.model.json.GIdNameProvider;
+import com.missionhub.api.model.sql.Location;
+import com.missionhub.api.model.sql.LocationDao;
+import com.missionhub.api.model.sql.LocationDao.Properties;
 
 public class LocationJsonSql {
 	

@@ -5,12 +5,12 @@ import java.util.List;
 
 import com.missionhub.Application;
 import com.missionhub.api.ApiNotifier;
-import com.missionhub.model.json.GKeyword;
-import com.missionhub.model.sql.Keyword;
-import com.missionhub.model.sql.KeywordDao;
-import com.missionhub.model.sql.KeywordQuestion;
-import com.missionhub.model.sql.KeywordQuestionDao;
-import com.missionhub.model.sql.KeywordQuestionDao.Properties;
+import com.missionhub.api.model.json.GKeyword;
+import com.missionhub.api.model.sql.Keyword;
+import com.missionhub.api.model.sql.KeywordDao;
+import com.missionhub.api.model.sql.KeywordQuestion;
+import com.missionhub.api.model.sql.KeywordQuestionDao;
+import com.missionhub.api.model.sql.KeywordQuestionDao.Properties;
 
 import android.content.Context;
 import android.os.Bundle;
