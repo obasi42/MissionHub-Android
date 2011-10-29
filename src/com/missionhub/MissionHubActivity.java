@@ -55,7 +55,7 @@ public class MissionHubActivity extends Activity {
 		mLoggedOut = (RelativeLayout) findViewById(R.id.loggedout);
 		mName = (TextView) findViewById(R.id.name);
 		mOrganization = (TextView) findViewById(R.id.organization);
-		
+				
 		getApp().registerHandler(appHandler);
 		
 		if (!getUser().isLoggedIn()) {
@@ -151,8 +151,6 @@ public class MissionHubActivity extends Activity {
 			}
 		}
 	};
-	
-	private boolean open = false;
 	
 	public void refreshView() {
 		if (getUser().isLoggedIn()) {

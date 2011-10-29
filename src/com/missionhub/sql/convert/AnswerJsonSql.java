@@ -8,10 +8,10 @@ import android.os.Bundle;
 
 import com.missionhub.Application;
 import com.missionhub.api.ApiNotifier;
-import com.missionhub.api.json.GQA;
-import com.missionhub.sql.Answer;
-import com.missionhub.sql.AnswerDao;
-import com.missionhub.sql.AnswerDao.Properties;
+import com.missionhub.model.json.GQA;
+import com.missionhub.model.sql.Answer;
+import com.missionhub.model.sql.AnswerDao;
+import com.missionhub.model.sql.AnswerDao.Properties;
 
 public class AnswerJsonSql {
 	

@@ -2,9 +2,9 @@ package com.missionhub.sql.convert;
 
 import com.missionhub.Application;
 import com.missionhub.api.ApiNotifier;
-import com.missionhub.api.json.GQuestion;
-import com.missionhub.sql.Question;
-import com.missionhub.sql.QuestionDao;
+import com.missionhub.model.json.GQuestion;
+import com.missionhub.model.sql.Question;
+import com.missionhub.model.sql.QuestionDao;
 
 import android.content.Context;
 import android.os.Bundle;

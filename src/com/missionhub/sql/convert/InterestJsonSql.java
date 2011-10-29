@@ -8,10 +8,10 @@ import android.os.Bundle;
 
 import com.missionhub.Application;
 import com.missionhub.api.ApiNotifier;
-import com.missionhub.api.json.GIdNameProvider;
-import com.missionhub.sql.Interest;
-import com.missionhub.sql.InterestDao;
-import com.missionhub.sql.InterestDao.Properties;
+import com.missionhub.model.json.GIdNameProvider;
+import com.missionhub.model.sql.Interest;
+import com.missionhub.model.sql.InterestDao;
+import com.missionhub.model.sql.InterestDao.Properties;
 
 public class InterestJsonSql {
 	

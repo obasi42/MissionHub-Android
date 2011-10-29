@@ -1,7 +1,7 @@
 package com.missionhub.ui;
 
 import com.missionhub.R;
-import com.missionhub.sql.Person;
+import com.missionhub.model.sql.Person;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;

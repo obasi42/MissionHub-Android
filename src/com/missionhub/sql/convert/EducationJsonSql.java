@@ -8,10 +8,10 @@ import android.os.Bundle;
 
 import com.missionhub.Application;
 import com.missionhub.api.ApiNotifier;
-import com.missionhub.api.json.GEducation;
-import com.missionhub.sql.Education;
-import com.missionhub.sql.EducationDao;
-import com.missionhub.sql.EducationDao.Properties;
+import com.missionhub.model.json.GEducation;
+import com.missionhub.model.sql.Education;
+import com.missionhub.model.sql.EducationDao;
+import com.missionhub.model.sql.EducationDao.Properties;
 
 public class EducationJsonSql {
 	

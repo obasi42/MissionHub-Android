@@ -12,9 +12,9 @@ import android.os.Message;
 
 import com.missionhub.api.ApiNotifier;
 import com.missionhub.config.Preferences;
-import com.missionhub.sql.DaoMaster;
-import com.missionhub.sql.DaoMaster.DevOpenHelper;
-import com.missionhub.sql.DaoSession;
+import com.missionhub.model.sql.DaoMaster;
+import com.missionhub.model.sql.DaoSession;
+import com.missionhub.model.sql.DaoMaster.DevOpenHelper;
 
 import de.greenrobot.dao.IdentityScopeType;
 

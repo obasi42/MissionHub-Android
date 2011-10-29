@@ -7,11 +7,11 @@ import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.RequestParams;
 import com.missionhub.api.ApiResponseHandler;
 import com.missionhub.api.client.Login;
-import com.missionhub.api.json.GError;
-import com.missionhub.api.json.GLoginDone;
 import com.missionhub.config.Config;
 import com.missionhub.config.Preferences;
 import com.missionhub.helpers.Flurry;
+import com.missionhub.model.json.GError;
+import com.missionhub.model.json.GLoginDone;
 import com.missionhub.sql.convert.PersonJsonSql;
 import com.missionhub.ui.DisplayError;
 

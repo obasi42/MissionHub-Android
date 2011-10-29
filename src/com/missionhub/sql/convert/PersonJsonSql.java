@@ -4,13 +4,13 @@ import java.util.Date;
 
 import com.missionhub.Application;
 import com.missionhub.api.ApiNotifier;
-import com.missionhub.api.json.GContact;
-import com.missionhub.api.json.GContactAll;
-import com.missionhub.api.json.GPerson;
 import com.missionhub.helpers.Helper;
 import com.missionhub.helpers.U;
-import com.missionhub.sql.Person;
-import com.missionhub.sql.PersonDao;
+import com.missionhub.model.json.GContact;
+import com.missionhub.model.json.GContactAll;
+import com.missionhub.model.json.GPerson;
+import com.missionhub.model.sql.Person;
+import com.missionhub.model.sql.PersonDao;
 
 import android.content.Context;
 import android.os.Bundle;
