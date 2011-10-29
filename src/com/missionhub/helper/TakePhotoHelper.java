@@ -1,4 +1,4 @@
-package com.missionhub.helpers;
+package com.missionhub.helper;
 
 import java.io.File;
 

@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.missionhub.api.ApiNotifier;
-import com.missionhub.helpers.Flurry;
+import com.missionhub.helper.Flurry;
 
 import greendroid.app.GDActivity;
 

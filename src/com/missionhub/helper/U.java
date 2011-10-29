@@ -1,4 +1,4 @@
-package com.missionhub.helpers;
+package com.missionhub.helper;
 
 public class U {
 	public static boolean nullOrEmpty(Object obj) {

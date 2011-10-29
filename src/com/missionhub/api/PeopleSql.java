@@ -7,9 +7,9 @@ import android.os.Bundle;
 
 import com.missionhub.Application;
 import com.missionhub.api.ApiNotifier.Type;
+import com.missionhub.api.convert.PersonJsonSql;
 import com.missionhub.api.model.json.GMetaPerson;
 import com.missionhub.api.model.json.GPerson;
-import com.missionhub.sql.convert.PersonJsonSql;
 
 public class PeopleSql {
 	

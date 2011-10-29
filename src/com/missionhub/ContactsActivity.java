@@ -19,7 +19,7 @@ import com.missionhub.api.Roles;
 import com.missionhub.api.model.json.GContact;
 import com.missionhub.api.model.json.GMetaContact;
 import com.missionhub.api.model.json.GOrgGeneric;
-import com.missionhub.helpers.Flurry;
+import com.missionhub.helper.Flurry;
 import com.missionhub.ui.ContactItemAdapter;
 import com.missionhub.ui.DisplayError;
 import com.missionhub.ui.Guide;

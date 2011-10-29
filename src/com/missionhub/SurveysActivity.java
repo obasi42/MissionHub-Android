@@ -6,7 +6,7 @@ import greendroid.widget.LoaderActionBarItem;
 import greendroid.widget.ActionBarItem.Type;
 
 import com.missionhub.api.Survey;
-import com.missionhub.helpers.Flurry;
+import com.missionhub.helper.Flurry;
 import com.missionhub.ui.DisplayError;
 
 import android.app.AlertDialog;

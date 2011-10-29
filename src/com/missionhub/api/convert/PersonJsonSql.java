@@ -1,4 +1,4 @@
-package com.missionhub.sql.convert;
+package com.missionhub.api.convert;
 
 import java.util.Date;
 
@@ -9,8 +9,8 @@ import com.missionhub.api.model.json.GContactAll;
 import com.missionhub.api.model.json.GPerson;
 import com.missionhub.api.model.sql.Person;
 import com.missionhub.api.model.sql.PersonDao;
-import com.missionhub.helpers.Helper;
-import com.missionhub.helpers.U;
+import com.missionhub.helper.Helper;
+import com.missionhub.helper.U;
 
 import android.content.Context;
 import android.os.Bundle;

@@ -9,7 +9,7 @@ import android.os.Build;
 import com.loopj.android.http.RequestParams;
 import com.missionhub.Application;
 import com.missionhub.config.Config;
-import com.missionhub.helpers.U;
+import com.missionhub.helper.U;
 
 public class ApiHelper {
 	

@@ -17,7 +17,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.missionhub.config.Preferences;
-import com.missionhub.helpers.Flurry;
+import com.missionhub.helper.Flurry;
 
 public class MissionHubActivity extends Activity {
 

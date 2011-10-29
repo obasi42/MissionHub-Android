@@ -2,7 +2,7 @@ package com.missionhub;
 
 import java.util.HashMap;
 
-import com.missionhub.helpers.Flurry;
+import com.missionhub.helper.Flurry;
 
 import android.os.Bundle;
 import android.view.View;
