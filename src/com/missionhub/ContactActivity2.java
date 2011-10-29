@@ -3,7 +3,7 @@ package com.missionhub;
 import java.util.Iterator;
 import java.util.List;
 
-import com.missionhub.api.PeopleSql;
+import com.missionhub.api.People;
 import com.missionhub.api.ApiNotifier.Type;
 import com.missionhub.api.model.sql.Assignment;
 import com.missionhub.api.model.sql.Education;
@@ -184,7 +184,7 @@ public class ContactActivity2 extends Activity {
 	}
 
 	private void updateContact() {
-		PeopleSql.get(this, personId, ContactActivity2.this.toString());
+		People.get(this, personId, ContactActivity2.this.toString());
 	}
 
 	private void setupAboutList() {
