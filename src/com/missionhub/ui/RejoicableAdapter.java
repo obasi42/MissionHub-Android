@@ -27,7 +27,7 @@ public class RejoicableAdapter extends ArrayAdapter<Rejoicable> {
 		View v = convertView;
 		if (v == null) {		
 			LayoutInflater vi = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			v = (CheckedTextView) vi.inflate(R.layout.rejoiceable_item, null);
+			v = vi.inflate(R.layout.rejoiceable_item, null);
 		}
 
 		final Rejoicable rejoicable = rejoicables.get(position);

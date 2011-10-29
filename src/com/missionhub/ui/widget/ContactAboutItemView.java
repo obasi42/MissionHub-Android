@@ -26,12 +26,14 @@ public class ContactAboutItemView extends LinearLayout implements ItemView {
 		super(context, attrs);
 	}
 
+	@Override
 	public void prepareItemView() {
 		mTextView = (TextView) findViewById(R.id.text);
 		mSubtextView = (TextView) findViewById(R.id.subtext);
 		mImageView = (ImageView) findViewById(R.id.icon);
 	}
 
+	@Override
 	public void setObject(Item object) {
 		final ContactAboutItem item = (ContactAboutItem) object;
 		if (item.text != null) {

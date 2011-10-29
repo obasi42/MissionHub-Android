@@ -23,12 +23,14 @@ public class ContactSurveyItemView extends LinearLayout implements ItemView {
         super(context, attrs);
     }
 
-    public void prepareItemView() {
+    @Override
+	public void prepareItemView() {
         mTextView = (TextView) findViewById(R.id.text);
         mSubtextView = (TextView) findViewById(R.id.subtext);
     }
 
-    public void setObject(Item object) {
+    @Override
+	public void setObject(Item object) {
         final ContactSurveyItem item = (ContactSurveyItem) object;
         mTextView.setText(item.text);
         

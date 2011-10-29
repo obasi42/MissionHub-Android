@@ -39,6 +39,7 @@ public class DisplayError {
 				.setIcon(R.drawable.ic_dialog_alert)
 				.setMessage(message)
 				.setNeutralButton(R.string.alert_close, new DialogInterface.OnClickListener() {
+					@Override
 					public void onClick(DialogInterface dialog, int id) {
 						dialog.cancel();
 					}

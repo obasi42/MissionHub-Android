@@ -89,7 +89,8 @@ public class Helper {
 		builder.setTitle(R.string.contact_open_profile)
 		       .setCancelable(true)
 		       .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-		           public void onClick(DialogInterface dialog, int id) {
+		           @Override
+				public void onClick(DialogInterface dialog, int id) {
 		        	   try {
 		        		   Intent intent = new Intent(Intent.ACTION_VIEW);
 		        		   intent.setClassName("com.facebook.katana", "com.facebook.katana.ProfileTabHostActivity");
@@ -118,7 +119,8 @@ public class Helper {
 		           }
 		       })
 		       .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-		           public void onClick(DialogInterface dialog, int id) {
+		           @Override
+				public void onClick(DialogInterface dialog, int id) {
 		                dialog.cancel();
 		           }
 		       });
@@ -132,7 +134,8 @@ public class Helper {
 		builder.setTitle(R.string.contact_open_url)
 		       .setCancelable(true)
 		       .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-		           public void onClick(DialogInterface dialog, int id) {
+		           @Override
+				public void onClick(DialogInterface dialog, int id) {
 		        	   try {
 		       			Intent i = new Intent(Intent.ACTION_VIEW);
 		       			i.setData(Uri.parse(new_url));
@@ -144,7 +147,8 @@ public class Helper {
 		           }
 		       })
 		       .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-		           public void onClick(DialogInterface dialog, int id) {
+		           @Override
+				public void onClick(DialogInterface dialog, int id) {
 		                dialog.cancel();
 		           }
 		       });

@@ -185,7 +185,8 @@ public class ContactsFilterActivity extends PreferenceActivity implements OnShar
 	    }
 	}
 
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+    @Override
+	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
     	setSummary(preferences.get(key), sharedPreferences.getAll());
     	this.setResult(ContactsActivity.RESULT_CHANGED);
     }

@@ -377,6 +377,7 @@ public class ApplicationUser {
 			if (!silent) {
 				AlertDialog ad = DisplayError.display(ctx, e);
 				ad.setButton(ad.getContext().getString(R.string.alert_retry), new DialogInterface.OnClickListener() {
+					@Override
 					public void onClick(DialogInterface dialog, int id) {
 						dialog.dismiss();
 						fetchPerson(ctx, silent);

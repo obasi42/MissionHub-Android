@@ -38,26 +38,30 @@ public class ContactHeaderFragment extends Fragment {
         
         mPicture = (ImageView) root.findViewById(R.id.picture);
         mPicture.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
+            @Override
+			public void onClick(View view) {
                 clickPicture(view);
             }
         });
         mName = (TextView) root.findViewById(R.id.name);
         mPhone = (Button) root.findViewById(R.id.phone);
         mPhone.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
+            @Override
+			public void onClick(View view) {
                 clickPhone(view);
             }
         });
         mSms = (Button) root.findViewById(R.id.sms);
         mSms.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
+            @Override
+			public void onClick(View view) {
                 clickSms(view);
             }
         });
         mEmail = (Button) root.findViewById(R.id.email);
         mEmail.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
+            @Override
+			public void onClick(View view) {
                 clickEmail(view);
             }
         });

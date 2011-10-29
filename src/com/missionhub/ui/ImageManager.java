@@ -48,6 +48,7 @@ public class ImageManager {
 	
 	private class CacheCleaner implements Runnable {
 		
+		@Override
 		public void run() {
 			File[] cacheFiles = cacheDir.listFiles();
 			for (File cacheFile : cacheFiles) {
@@ -153,6 +154,7 @@ public class ImageManager {
 	
 	private class ImageQueueManager implements Runnable {
 		//@Override
+		@Override
 		public void run() {
 			try {
 				while(true) {
@@ -205,6 +207,7 @@ public class ImageManager {
 			imageView=i;
 		}
 		
+		@Override
 		public void run() {
 			if(bitmap != null)
 				imageView.setImageBitmap(bitmap);

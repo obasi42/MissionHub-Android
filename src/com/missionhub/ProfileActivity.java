@@ -106,7 +106,8 @@ public class ProfileActivity extends Activity {
 	
 	public class MyOnItemSelectedListener implements OnItemSelectedListener {
 
-	    public void onItemSelected(AdapterView<?> parent,
+	    @Override
+		public void onItemSelected(AdapterView<?> parent,
 	        View view, int pos, long id) {
 	    	currentSpinnerOrgID = spinnerOrgIDs.get(pos);
 	    	if (!currentSpinnerOrgID.equalsIgnoreCase(String.valueOf(getUser().getOrganizationID()))) {
@@ -122,7 +123,8 @@ public class ProfileActivity extends Activity {
 	    	}
 	    }
 
-	    public void onNothingSelected(AdapterView<?> parent) {
+	    @Override
+		public void onNothingSelected(AdapterView<?> parent) {
 	      // Do nothing.
 	    }
 	}

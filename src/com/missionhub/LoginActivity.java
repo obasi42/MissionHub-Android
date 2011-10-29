@@ -52,6 +52,7 @@ public class LoginActivity extends Activity {
 		mProgressDialog = ProgressDialog.show(LoginActivity.this, "", LoginActivity.this.getString(R.string.alert_loading), true);
 		mProgressDialog.setCancelable(true);
 		mProgressDialog.setOnCancelListener(new OnCancelListener() {
+			@Override
 			public void onCancel(DialogInterface dialog) {
 				finish();
 			}
@@ -60,7 +61,7 @@ public class LoginActivity extends Activity {
 		mWebView = (WebView) findViewById(R.id.webview);
 		mWebView.getSettings().setJavaScriptEnabled(true);
 		mWebView.getSettings().setSupportZoom(false);
-		mWebView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
+		mWebView.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_OVERLAY);
 		mWebView.setWebViewClient(new InternalWebViewClient());
 		mWebView.loadUrl(Login.getUrl());
 		
@@ -135,19 +136,22 @@ public class LoginActivity extends Activity {
 			mWebView.setVisibility(View.GONE);
 			AlertDialog ad = DisplayError.display(LoginActivity.this, errorCode, description, failingUrl);
 			ad.setButton(ad.getContext().getString(R.string.alert_retry), new DialogInterface.OnClickListener() {
+				@Override
 				public void onClick(DialogInterface dialog, int id) {
 					dialog.dismiss();
 					mWebView.setVisibility(View.VISIBLE);
 					mWebView.reload();
 				}
 			});
-			ad.setButton(AlertDialog.BUTTON_NEUTRAL, getString(R.string.alert_close), new DialogInterface.OnClickListener() {
+			ad.setButton(DialogInterface.BUTTON_NEUTRAL, getString(R.string.alert_close), new DialogInterface.OnClickListener() {
+				@Override
 				public void onClick(DialogInterface dialog, int id) {
 					dialog.dismiss();
 					finish();
 				}
 			});
 			ad.setOnCancelListener(new OnCancelListener(){
+				@Override
 				public void onCancel(DialogInterface dialog) {
 					finish();
 				}
@@ -235,13 +239,15 @@ public class LoginActivity extends Activity {
 			public void onFailure(Throwable e) {
 				Log.e(TAG, "Login Failed", e);
 				AlertDialog ad = DisplayError.display(LoginActivity.this, e);
-				ad.setButton(AlertDialog.BUTTON_NEUTRAL, getString(R.string.alert_close), new DialogInterface.OnClickListener() {
+				ad.setButton(DialogInterface.BUTTON_NEUTRAL, getString(R.string.alert_close), new DialogInterface.OnClickListener() {
+					@Override
 					public void onClick(DialogInterface dialog, int id) {
 						dialog.dismiss();
 						finish();
 					}
 				});
 				ad.setOnCancelListener(new OnCancelListener(){
+					@Override
 					public void onCancel(DialogInterface dialog) {
 						finish();
 					}

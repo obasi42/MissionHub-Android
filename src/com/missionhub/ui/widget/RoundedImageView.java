@@ -24,12 +24,14 @@ public class RoundedImageView extends ImageView {
 		this.mBounds = localRectF;
 	}
 
+	@Override
 	protected void onDraw(Canvas canvas) {
 		Path localPath = this.mClippingPath;
 		canvas.clipPath(localPath);
 		super.onDraw(canvas);
 	}
 
+	@Override
 	public void onLayout(boolean changed, int left, int top, int right, int bottom) {
 		this.mClippingPath.reset();
 		RectF localRectF1 = this.mBounds;

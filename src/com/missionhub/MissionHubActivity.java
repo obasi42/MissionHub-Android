@@ -85,12 +85,14 @@ public class MissionHubActivity extends Activity {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(R.string.alert_learn_more).setIcon(R.drawable.ic_dialog_info).setMessage(R.string.alert_learn_more_msg)
 				.setPositiveButton(R.string.alert_ok, new DialogInterface.OnClickListener() {
+					@Override
 					public void onClick(DialogInterface dialog, int id) {
 						Flurry.event(MissionHubActivity.this, "Main.AboutLink");
 						Uri uri = Uri.parse("http://missionhub.com?mobile=0");
 						startActivity(new Intent(Intent.ACTION_VIEW, uri));
 					}
 				}).setNegativeButton(R.string.alert_cancel, new DialogInterface.OnClickListener() {
+					@Override
 					public void onClick(DialogInterface dialog, int id) {
 						dialog.cancel();
 					}

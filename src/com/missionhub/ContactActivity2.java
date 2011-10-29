@@ -16,7 +16,6 @@ import com.missionhub.helper.TakePhotoHelper;
 import com.missionhub.helper.U;
 import com.missionhub.ui.ContactHeaderFragment;
 import com.missionhub.ui.ContactHeaderSmallFragment;
-import com.missionhub.ui.widget.ContactAboutItemView;
 import com.missionhub.ui.widget.Tab;
 import com.missionhub.ui.widget.item.ContactAboutItem;
 

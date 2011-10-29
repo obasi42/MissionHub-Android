@@ -21,10 +21,12 @@ public class ContactSurveyHeaderView extends TextView implements ItemView {
         super(context, attrs, defStyle);
     }
 
-    public void prepareItemView() {
+    @Override
+	public void prepareItemView() {
     }
 
-    public void setObject(Item object) {
+    @Override
+	public void setObject(Item object) {
         final TextItem item = (TextItem) object;
         setText(item.text);
     }

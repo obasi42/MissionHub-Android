@@ -41,7 +41,6 @@ import com.missionhub.ui.ImageManager;
 import com.missionhub.ui.Rejoicable;
 import com.missionhub.ui.RejoicableAdapter;
 import com.missionhub.ui.ListItemSimple;
-import com.missionhub.ui.widget.item.ContactAboutItem;
 import com.missionhub.ui.widget.item.ContactSurveyHeaderItem;
 import com.missionhub.ui.widget.item.ContactSurveyItem;
 
@@ -563,6 +562,7 @@ public class ContactActivity extends Activity {
 			Log.e(TAG, "Contact Fetch Failed", e);
 			AlertDialog ad = DisplayError.display(ContactActivity.this, e);
 			ad.setButton(ad.getContext().getString(R.string.alert_retry), new DialogInterface.OnClickListener() {
+				@Override
 				public void onClick(DialogInterface dialog, int id) {
 					dialog.dismiss();
 					updatePerson(true);
@@ -596,6 +596,7 @@ public class ContactActivity extends Activity {
 			Log.e(TAG, "Comment Fetch Failed", e);
 			AlertDialog ad = DisplayError.display(ContactActivity.this, e);
 			ad.setButton(ad.getContext().getString(R.string.alert_retry), new DialogInterface.OnClickListener() {
+				@Override
 				public void onClick(DialogInterface dialog, int id) {
 					dialog.dismiss();
 					updateComments(true);

@@ -44,11 +44,13 @@ public class Guide {
 				.setIcon(R.drawable.ic_dialog_info)
 				.setMessage(message)
 				.setPositiveButton(R.string.alert_hide, new DialogInterface.OnClickListener() {
+					@Override
 					public void onClick(DialogInterface dialog, int id) {
 						dialog.cancel();
 					}
 				})
 				.setNegativeButton(R.string.alert_dont_show, new DialogInterface.OnClickListener() {
+					@Override
 					public void onClick(DialogInterface dialog, int id) {
 						dialog.cancel();
 						setDontShow(context, guideId);

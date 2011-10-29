@@ -14,6 +14,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.KeyEvent;
+import android.view.View;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.WebChromeClient;
@@ -38,7 +39,7 @@ public class SurveysActivity extends Activity {
 		indicator = (LoaderActionBarItem) addActionBarItem(Type.Refresh, R.id.action_bar_refresh);
 		
 		mWebView = (WebView) findViewById(R.id.webview_surveys);
-		mWebView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
+		mWebView.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_OVERLAY);
 		mWebView.getSettings().setAllowFileAccess(false);
 		mWebView.getSettings().setJavaScriptEnabled(true);
 		mWebView.getSettings().setSaveFormData(false);
@@ -76,12 +77,14 @@ public class SurveysActivity extends Activity {
 		public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
 			AlertDialog ad = DisplayError.display(SurveysActivity.this, errorCode, description, failingUrl);
 			ad.setButton(ad.getContext().getString(R.string.alert_retry), new DialogInterface.OnClickListener() {
+				@Override
 				public void onClick(DialogInterface dialog, int id) {
 					dialog.dismiss();
 					mWebView.reload();
 				}
 			});
-			ad.setButton(AlertDialog.BUTTON_NEUTRAL, getString(R.string.alert_close), new DialogInterface.OnClickListener() {
+			ad.setButton(DialogInterface.BUTTON_NEUTRAL, getString(R.string.alert_close), new DialogInterface.OnClickListener() {
+				@Override
 				public void onClick(DialogInterface dialog, int id) {
 					dialog.dismiss();
 				}
@@ -91,6 +94,7 @@ public class SurveysActivity extends Activity {
 	}
 
 	private class InternalWebViewChrome extends WebChromeClient {
+		@Override
 		public void onProgressChanged(WebView view, int progress) {
 			indicator.setLoading(true);
 			SurveysActivity.this.setProgress(progress * 100);
@@ -118,11 +122,13 @@ public class SurveysActivity extends Activity {
 				.setMessage(R.string.surveys_exit_msg)
 				.setCancelable(false)
 				.setPositiveButton(R.string.alert_ok, new DialogInterface.OnClickListener() {
+					@Override
 					public void onClick(DialogInterface dialog, int id) {
 						dialog.dismiss();
 						SurveysActivity.this.finish();
 					}
 				}).setNegativeButton(R.string.alert_cancel, new DialogInterface.OnClickListener() {
+					@Override
 					public void onClick(DialogInterface dialog, int id) {
 						dialog.cancel();
 					}

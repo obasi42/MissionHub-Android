@@ -11,7 +11,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 import com.flurry.android.FlurryAgent;
-import com.google.gson.Gson;
 import com.missionhub.api.ApiClient;
 import com.missionhub.api.ApiResponseHandler;
 import com.missionhub.api.Contacts;
@@ -323,6 +322,7 @@ public class ContactsActivity extends Activity {
 			Log.e(TAG, "Contacts List Get More Failed", e);
 			AlertDialog ad = DisplayError.display(ContactsActivity.this, e);
 			ad.setButton(ad.getContext().getString(R.string.alert_retry), new DialogInterface.OnClickListener() {
+				@Override
 				public void onClick(DialogInterface dialog, int id) {
 					dialog.dismiss();
 					options.incrementStart(-options.getLimit());
@@ -404,17 +404,20 @@ public class ContactsActivity extends Activity {
 	}
 	
 	private class ContactsScrollListener implements OnScrollListener {
+		@Override
 		public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 			if (totalItemCount - firstVisibleItem < 3 * visibleItemCount) {
 				getMore();
 			}
 		}
 
+		@Override
 		public void onScrollStateChanged(AbsListView view, int scrollState) {
 		}
 	}
 	
 	private class ContactsOnItemClickListener implements OnItemClickListener {
+		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 			GContact contact = (GContact) parent.getAdapter().getItem(position);
 			Intent i = new Intent(getApplicationContext(), ContactActivity2.class);
@@ -451,6 +454,7 @@ public class ContactsActivity extends Activity {
 			Log.e(TAG, "Change Role Failed", e);
 			AlertDialog ad = DisplayError.display(ContactsActivity.this, e);
 			ad.setButton(ad.getContext().getString(R.string.alert_retry), new DialogInterface.OnClickListener() {
+				@Override
 				public void onClick(DialogInterface dialog, int id) {
 					dialog.dismiss();
 					Roles.change(ContactsActivity.this, id, role, new ChangeRoleHandler(role, contactId));
@@ -493,7 +497,8 @@ public class ContactsActivity extends Activity {
 				itemsArray = items.toArray(itemsArray);
 				
 				builder.setItems(itemsArray, new DialogInterface.OnClickListener() {
-				    public void onClick(DialogInterface dialog, int item) {
+				    @Override
+					public void onClick(DialogInterface dialog, int item) {
 				    	if (items.get(item).equals(getString(R.string.contacts_actions_promote))) {
 				    		Roles.change(ContactsActivity.this, contact.getPerson().getId(), "leader", new ChangeRoleHandler("leader", contact.getPerson().getId()));
 				    	} else if (items.get(item).equals(getString(R.string.contacts_actions_demote))) {
