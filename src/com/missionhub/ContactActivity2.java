@@ -3,7 +3,7 @@ package com.missionhub;
 import java.util.Iterator;
 import java.util.List;
 
-import com.missionhub.api.People;
+import com.missionhub.api.Contacts;
 import com.missionhub.api.ApiNotifier.Type;
 import com.missionhub.api.model.sql.Assignment;
 import com.missionhub.api.model.sql.Education;
@@ -101,7 +101,7 @@ public class ContactActivity2 extends Activity {
 
 		mTabHost.setCurrentTabByTag(TAG_STATUS);
 
-		getApiNotifier().subscribe(personListener, Type.UPDATE_PERSON, Type.JSON_PEOPLE_ON_START, Type.JSON_PEOPLE_ON_FINISH, Type.JSON_PEOPLE_ON_FAILURE);
+		getApiNotifier().subscribe(personListener, Type.UPDATE_PERSON, Type.JSON_CONTACTS_ON_START, Type.JSON_CONTACTS_ON_FINISH, Type.JSON_CONTACTS_ON_FAILURE);
 
 		person = getApp().getDbSession().getPersonDao().load(personId);
 
@@ -142,7 +142,7 @@ public class ContactActivity2 extends Activity {
 	private Handler personListener = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
-			if (Type.JSON_PEOPLE_ON_START.ordinal() == msg.what) {
+			if (Type.JSON_CONTACTS_ON_START.ordinal() == msg.what) {
 				showProgress(msg.getData().getString("tag"));
 			}
 
@@ -155,11 +155,11 @@ public class ContactActivity2 extends Activity {
 				}
 			}
 
-			if (Type.JSON_PEOPLE_ON_FINISH.ordinal() == msg.what) {
+			if (Type.JSON_CONTACTS_ON_FINISH.ordinal() == msg.what) {
 				hideProgress(msg.getData().getString("tag"));
 			}
 
-			if (Type.JSON_PEOPLE_ON_FAILURE.ordinal() == msg.what) {
+			if (Type.JSON_CONTACTS_ON_FAILURE.ordinal() == msg.what) {
 				Throwable t = (Throwable) msg.getData().getSerializable("throwable");
 				Log.e("THROWABLE", "THROWABLE", t);
 			}
@@ -184,7 +184,7 @@ public class ContactActivity2 extends Activity {
 	}
 
 	private void updateContact() {
-		People.get(this, personId, ContactActivity2.this.toString());
+		Contacts.get(this, personId, ContactActivity2.this.toString());
 	}
 
 	private void setupAboutList() {

@@ -1,5 +1,6 @@
 package com.missionhub.api;
 
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -10,8 +11,76 @@ import android.content.Context;
 
 import com.google.common.collect.HashMultimap;
 import com.loopj.android.http.RequestParams;
+import com.missionhub.api.convert.PersonJsonSql;
+import com.missionhub.api.model.json.GContact;
+import com.missionhub.api.model.json.GContactAll;
+import com.missionhub.api.model.json.GMetaContact;
 
 public class Contacts {
+	
+	/**
+	 * Get a list of basic hash contacts
+	 * @param ctx
+	 * @param options
+	 * @param tag
+	 */
+	public static void list(Context ctx, Contacts.Options options, String tag) {
+		list(ctx, options, new ContactsListNotifierResponseHandler(ctx, GMetaContact.class, tag, "CONTACTS"));
+	}
+	
+	private static class ContactsListNotifierResponseHandler extends ApiNotifierResponseHandler {
+
+		public ContactsListNotifierResponseHandler(Context ctx, Type t, String tag, String type) {
+			super(ctx, t, tag, type);
+		}
+		
+		@Override
+		public void onSuccess(Object gMetaContact) {
+			GMetaContact contacts = (GMetaContact) gMetaContact;
+			for (GContact contact : contacts.getContacts()) {
+				PersonJsonSql.update(ctx, contact, tag);		
+			}
+			//TODO: handle questions and keywords
+			super.onSuccess(gMetaContact);
+		}
+	}
+	
+	/**
+	 * Get an individual full-hash contact
+	 * @param ctx
+	 * @param personId
+	 * @param tag
+	 */
+	public static void get(Context ctx, int personId, String tag) {
+		get(ctx, personId, new ContactsNotifierResponseHandler(ctx, GContactAll.class, tag, "CONTACTS"));
+	}
+	
+	/**
+	 * Get multiple full-hash contacts
+	 * @param ctx
+	 * @param personIds
+	 * @param tag
+	 */
+	public static void get(Context ctx, List<Integer> personIds, String tag) {
+		get(ctx, personIds, new ContactsNotifierResponseHandler(ctx, GContactAll.class, tag, "CONTACTS"));
+	}
+	
+	private static class ContactsNotifierResponseHandler extends ApiNotifierResponseHandler {
+
+		public ContactsNotifierResponseHandler(Context ctx, Type t, String tag, String type) {
+			super(ctx, t, tag, type);
+		}
+		
+		@Override
+		public void onSuccess(Object gContactAll) {
+			GContactAll contacts = (GContactAll) gContactAll;
+			for (GContact contact : contacts.getPeople()) {
+				PersonJsonSql.update(ctx, contact, tag);		
+			}
+			//TODO: handle questions and keywords
+			super.onSuccess(gContactAll);
+		}
+	}
 	
 	/**
 	 * Get a list of basic hash contacts
@@ -198,6 +267,22 @@ public class Contacts {
 		
 		public void clearOrderBy() {
 			orderBy.clear();
+		}
+		
+		public String getTag() {
+			RequestParams params = new RequestParams();
+			this.appendFiltersParams(params);
+			this.appendOrderByParam(params);
+			return params.toString();
+		}
+		
+		@Override
+		public String toString() {
+			RequestParams params = new RequestParams();
+			this.appendFiltersParams(params);
+			this.appendLimits(params);
+			this.appendOrderByParam(params);
+			return params.toString();
 		}
 	}
 }

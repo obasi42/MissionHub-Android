@@ -1,11 +1,14 @@
 package com.missionhub.api;
 
+import java.lang.reflect.Type;
 import java.util.List;
 
 import android.content.Context;
 
 import com.loopj.android.http.RequestParams;
+import com.missionhub.api.convert.PersonJsonSql;
 import com.missionhub.api.model.json.GMetaPerson;
+import com.missionhub.api.model.json.GPerson;
 
 public class People {
 	
@@ -16,7 +19,7 @@ public class People {
 	 * @param tag a tag to track the request
 	 */
 	public static void get(Context ctx, int personId, String tag) {
-		get(ctx, personId, new ApiNotifierResponseHandler(ctx, GMetaPerson.class, tag, "PEOPLE"));
+		get(ctx, personId, new PeopleNotifierResponseHandler(ctx, GMetaPerson.class, tag, "PEOPLE"));
 	}
 	
 	/**
@@ -26,7 +29,7 @@ public class People {
 	 * @param tag a tag to track the request
 	 */
 	public static void get(Context ctx, List<Integer> personIds, String tag) {
-		People.get(ctx, personIds, new ApiNotifierResponseHandler(ctx, GMetaPerson.class, tag, "PEOPLE"));
+		People.get(ctx, personIds, new PeopleNotifierResponseHandler(ctx, GMetaPerson.class, tag, "PEOPLE"));
 	}
 	
 	/**
@@ -35,8 +38,24 @@ public class People {
 	 * @param tag a tag to track the request
 	 */
 	public static void getMe(Context ctx, String tag) {
-		People.getMe(ctx, new ApiNotifierResponseHandler(ctx, GMetaPerson.class, tag, "PEOPLE"));
-	}	
+		People.getMe(ctx, new PeopleNotifierResponseHandler(ctx, GMetaPerson.class, tag, "PEOPLE"));
+	}
+	
+	private static class PeopleNotifierResponseHandler extends ApiNotifierResponseHandler {
+
+		public PeopleNotifierResponseHandler(Context ctx, Type t, String tag, String type) {
+			super(ctx, t, tag, type);
+		}
+		
+		@Override
+		public void onSuccess(Object gMetaPerson) {
+			GMetaPerson people = (GMetaPerson) gMetaPerson;
+			for (GPerson person : people.getPeople()) {
+				PersonJsonSql.update(ctx, person, tag);		
+			}
+			super.onSuccess(gMetaPerson);
+		}
+	}
 	
 	/**
 	 * Get a single person
