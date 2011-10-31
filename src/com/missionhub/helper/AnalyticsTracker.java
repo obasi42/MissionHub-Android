@@ -18,12 +18,10 @@ public class AnalyticsTracker {
 	public static final int SCOPE_PAGE_LEVEL = 3;
 
 	private GoogleAnalyticsTracker tracker;
-	private Context context;
 
 	public AnalyticsTracker(Context context) {
 		try {
-			this.context = context;
-			GoogleAnalyticsTracker tracker = GoogleAnalyticsTracker.getInstance();
+			tracker = GoogleAnalyticsTracker.getInstance();
 			tracker.startNewSession(Config.gAnalyticsKey, 20, context);
 			tracker.setProductVersion("MissionHubAndroid", ((Application) context.getApplicationContext()).getVersion());
 			if (Config.debug) {
@@ -34,21 +32,18 @@ public class AnalyticsTracker {
 			Log.w(TAG, e.getMessage(), e);
 		}
 	}
-
-	private void setCustomVars() {
-		try {
-			tracker.setCustomVar(1, "market", Config.market.name(), SCOPE_SESSION_LEVEL);
-			tracker.setCustomVar(2, "android_release", Build.VERSION.RELEASE, SCOPE_SESSION_LEVEL);
-			tracker.setCustomVar(3, "android_model", Build.MODEL, SCOPE_SESSION_LEVEL);
-			tracker.setCustomVar(4, "gender", ((Application) context.getApplicationContext()).getUser().getPerson().getGender(), SCOPE_VISITOR_LEVEL);
-		} catch (Exception e) {
-			Log.w(TAG, e.getMessage(), e);
-		}
+	
+	public GoogleAnalyticsTracker getTracker() {
+		return tracker;
 	}
 
+	private void setCustomVars() {
+		tracker.setCustomVar(1, "market", Config.market.name(), SCOPE_SESSION_LEVEL);
+	}
+	
 	public void setCustomVar(String name, String value, int scope) {
 		try {
-			tracker.setCustomVar(5, name, value, scope);
+			tracker.setCustomVar(2, name, value, scope);
 		} catch (Exception e) {
 			Log.w(TAG, e.getMessage(), e);
 		}
