@@ -16,6 +16,7 @@ import com.missionhub.ui.ImageManager;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -26,6 +27,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class ProfileActivity extends Activity {
+	
+	private static final String TAG = ProfileActivity.class.getSimpleName();
 
 	private LinkedList<String> spinnerOrgIDs = new LinkedList<String>();
 	private LinkedList<String> spinnerNames = new LinkedList<String>();
@@ -105,7 +108,7 @@ public class ProfileActivity extends Activity {
 	
 	public class MyOnItemSelectedListener implements OnItemSelectedListener {
 
-	    @Override
+		@Override
 		public void onItemSelected(AdapterView<?> parent,
 	        View view, int pos, long id) {
 	    	currentSpinnerOrgID = spinnerOrgIDs.get(pos);
@@ -114,7 +117,7 @@ public class ProfileActivity extends Activity {
 	    			HashMap<String, String> params = new HashMap<String, String>();
 	    			params.put("orgID", spinnerOrgIDs.get(pos));
 	    			FlurryAgent.onEvent("Profile.ChangeOrg", params);
-	    		} catch (Exception e) {}
+	    		} catch (Exception e) { Log.w(TAG, e.getMessage(), e); }
 	  	      Toast.makeText(parent.getContext(), "Your current organization is now " +
 	  		          parent.getItemAtPosition(pos).toString(), Toast.LENGTH_LONG).show();
 	  	      Preferences.setOrganizationID(ProfileActivity.this, Integer.parseInt(currentSpinnerOrgID));

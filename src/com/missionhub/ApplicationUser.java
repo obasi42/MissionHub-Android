@@ -99,6 +99,10 @@ public class ApplicationUser {
 		return person;
 	}
 	
+	private synchronized void setPerson(Person person) {
+		this.person = person;
+	}
+	
 	/**
 	 * Get the User's access token
 	 * @return
@@ -293,6 +297,7 @@ public class ApplicationUser {
 	 */
 	public synchronized void logout() {
 		person = new Person();
+		id = -1;
 		organizations.clear();
 		organizationID = -1;
 		primaryOrganizationID = -1;
@@ -308,27 +313,45 @@ public class ApplicationUser {
 	private ApiClient client;
 	private ProgressDialog mProgressDialog;
 	
+	
+	private synchronized ApiClient getApiClient() {
+		return client;
+	}
+	
+	private synchronized void setApiClient(ApiClient client) {
+		this.client = client;
+	}
+	
+	private synchronized ProgressDialog getProgressDialog() {
+		return mProgressDialog;
+	}
+	
+	private synchronized void setProgressDialog(ProgressDialog pd) {
+		mProgressDialog = pd;
+	}
+	
+	
 	/**
 	 * Check Stored Access Token
 	 * @return true if has stored token
 	 */
 	private synchronized boolean fetchPerson(final Context ctx, boolean silent) {
 		if (getAccessToken() != null) {
-			client = new ApiClient(ctx);
+			setApiClient(new ApiClient(ctx));
 			
 			if (!silent) {
-				mProgressDialog = ProgressDialog.show(ctx, "", ctx.getString(R.string.alert_logging_in), true);
-				mProgressDialog.setCancelable(true);
-				mProgressDialog.setOnCancelListener(new OnCancelListener(){
+				setProgressDialog(ProgressDialog.show(ctx, "", ctx.getString(R.string.alert_logging_in), true));
+				getProgressDialog().setCancelable(true);
+				getProgressDialog().setOnCancelListener(new OnCancelListener(){
 					@Override
 					public void onCancel(DialogInterface dialog) {
-						client.cancel(true);
-						client = null;
+						getApiClient().cancel(true);
+						setApiClient(null);
 					}
 				});
 			}
 			
-			client = People.getMe(ctx, new MeResponseHandler(ctx, silent));
+			setApiClient(People.getMe(ctx, new MeResponseHandler(ctx, silent)));
 			return true;
 		}
 		return false;
@@ -347,7 +370,7 @@ public class ApplicationUser {
 		
 		@Override
 		public void onSuccess(Object gMetaPerson) {
-			if (client == null)
+			if (getApiClient() == null)
 				return;
 			
 			GMetaPerson personMeta = (GMetaPerson) gMetaPerson;
@@ -357,7 +380,7 @@ public class ApplicationUser {
 					PersonJsonSql.update(ctx, people[0]);
 					setId(people[0].getId());
 					PersonDao pd = ((Application) ctx.getApplicationContext()).getDbSession().getPersonDao();
-					person = pd.load(id);
+					setPerson(pd.load(getId()));
 					update();
 				}
 			} catch (Exception e) {
@@ -367,10 +390,10 @@ public class ApplicationUser {
 		
 		@Override
 		public void onFailure(Throwable e) {
-			if (client == null)
+			if (getApiClient() == null)
 				return;
 			
-			person = null;
+			setPerson(null);
 			
 			if (!silent) {
 				AlertDialog ad = DisplayError.display(ctx, e);
@@ -388,8 +411,8 @@ public class ApplicationUser {
 		
 		@Override
 		public void onFinish() {
-			if (mProgressDialog != null && mProgressDialog.isShowing())
-				mProgressDialog.dismiss();
+			if (getProgressDialog() != null && getProgressDialog().isShowing())
+				getProgressDialog().dismiss();
 		}
 	};
 }

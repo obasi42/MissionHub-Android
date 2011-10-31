@@ -2,6 +2,6 @@
 <FindBugsFilter>
 	<Match>
 		<Class name="~.*\.R\$.*"/>
-		<Bug code="Nm"/>
+		<Bug pattern="NM_CLASS_NAMING_CONVENTION"/>
 	</Match>
 </FindBugsFilter>

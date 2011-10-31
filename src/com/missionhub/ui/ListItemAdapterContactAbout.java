@@ -12,12 +12,12 @@ import android.widget.TextView;
 
 public class ListItemAdapterContactAbout  extends ArrayAdapter<ListItemContactAbout>{
 	private ArrayList<ListItemContactAbout> items;
-	private Context context;
+	//private Context context;
 
 	public ListItemAdapterContactAbout(Context context, ArrayList<ListItemContactAbout> items) {
 		super(context, android.R.layout.simple_list_item_1, items);
 		this.items = items;
-		this.context = context;
+		//this.context = context;
 	}
 
 	public static class ViewHolder{

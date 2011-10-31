@@ -97,7 +97,9 @@ public class ContactsActivity extends Activity {
             case R.id.action_bar_refresh:
             	try {
     				FlurryAgent.onEvent("Contacts.Refresh");
-    			} catch (Exception e) {}
+    			} catch (Exception e) {
+    				Log.w(TAG, e.getMessage(), e);
+    			}
     			resetListView(false);
     			getMore();
                 break;
@@ -115,7 +117,9 @@ public class ContactsActivity extends Activity {
 		if (requestCode == RESULT_CONTACTS_FILTER_ACTIVITY && resultCode == RESULT_CHANGED) {
 			try {
 				FlurryAgent.onEvent("Contacts.Refresh");
-			} catch (Exception e) {}
+			} catch (Exception e) {
+				Log.w(TAG, e.getMessage(), e);
+			}
 			resetListView(false);
 			getMore();
 		}

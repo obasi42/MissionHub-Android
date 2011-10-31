@@ -726,7 +726,9 @@ public class ContactActivity extends Activity {
 				HashMap<String, String> params = new HashMap<String, String>();
 				params.put("method", "Phone");
 				//Flurry.event(ContactActivity.this, "Contact.MakeContact", params);
-			} catch (Exception e) {}
+			} catch (Exception e) {
+				Log.w(TAG, e.getMessage(), e);
+			}
 		} catch (Exception e) {
 			Toast.makeText(this, R.string.contact_cant_call, Toast.LENGTH_LONG).show();
 		}
@@ -742,7 +744,9 @@ public class ContactActivity extends Activity {
 				HashMap<String, String> params = new HashMap<String, String>();
 				params.put("method", "SMS");
 				//Flurry.event(ContactActivity.this, "Contact.MakeContact", params);
-			} catch (Exception e) {}
+			} catch (Exception e) {
+				Log.w(TAG, e.getMessage(), e);
+			}
 		} catch (Exception e) {
 			Toast.makeText(this, R.string.contact_cant_sms, Toast.LENGTH_LONG).show();
 		}
@@ -758,7 +762,9 @@ public class ContactActivity extends Activity {
 				HashMap<String, String> params = new HashMap<String, String>();
 				params.put("method", "Email");
 				//Flurry.event(ContactActivity.this, "Contact.MakeContact", params);
-			} catch (Exception e) {}
+			} catch (Exception e) {
+				Log.w(TAG, e.getMessage(), e);
+			}
 		} catch (Exception e) {
 			Toast.makeText(this, R.string.contact_cant_email, Toast.LENGTH_LONG).show();
 		}
@@ -806,7 +812,9 @@ public class ContactActivity extends Activity {
 			       				HashMap<String, String> params = new HashMap<String, String>();
 			       				params.put("method", "App");
 			       				//Flurry.event(ContactActivity.this, "Contact.OpenFacebook", params);
-			       			} catch (Exception e) {}
+			       			} catch (Exception e) {
+			       				Log.w(TAG, e.getMessage(), e);
+			       			}
 		        	   } catch(Exception e) {
 		        		   try {
 				       			Intent i = new Intent(Intent.ACTION_VIEW);
@@ -997,6 +1005,7 @@ public class ContactActivity extends Activity {
 	};
 	
 	private OnItemLongClickListener commentLongClickListener = new OnItemLongClickListener() {
+		@Override
 		public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 			final GFollowupComment comment = (GFollowupComment) parent.getAdapter().getItem(position);
 			if (comment == null) return false;
@@ -1016,7 +1025,8 @@ public class ContactActivity extends Activity {
 				builder.setIcon(R.drawable.ic_menu_start_conversation);
 				builder.setTitle(R.string.comment_actions);
 				builder.setItems(items, new DialogInterface.OnClickListener() {
-				    public void onClick(DialogInterface dialog, int item) {
+				    @Override
+					public void onClick(DialogInterface dialog, int item) {
 				    	if (item == 0) {
 				    		deleteComment(comment.getComment().getId(), false);
 				    	}
@@ -1073,6 +1083,7 @@ public class ContactActivity extends Activity {
 	};
 	
 	private OnItemClickListener infoClickListener = new OnItemClickListener() {
+		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 			final ListItemSimple item = (ListItemSimple) parent.getAdapter().getItem(position);
 			if (item == null || item.data == null) return;
