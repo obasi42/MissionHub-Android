@@ -87,11 +87,14 @@
 		<!-- Copy the configuration file, replacing tokens in the file. -->
 		<copy file="${config-source}" tofile="${config-target}" overwrite="true" failonerror="true" encoding="utf-8">
 			<filterset>
+				<filter token="CONFIG.MHDEBUG" value="${config.mh_debug}"/>
+				<filter token="CONFIG.MHMARKET" value="${config.mh_market}"/>
 				<filter token="CONFIG.MHBASEURL" value="${config.mh_baseurl}"/>
 				<filter token="CONFIG.MHCOOKIEHOST" value="${config.mh_cookiehost}"/>
 				<filter token="CONFIG.MHCLIENTID" value="${config.mh_mhclientid}"/>
 				<filter token="CONFIG.MHCLIENTSECRET" value="${config.mh_clientsecret}"/>
 				<filter token="CONFIG.MHFLURRYKEY" value="${config.mh_flurrykey}"/>
+				<filter token="CONFIG.MHGANALYTICSKEY" values="${config.mh_ganalyticskey}"
 			</filterset>
 		</copy>
 	</target>

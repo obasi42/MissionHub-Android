@@ -4,12 +4,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import android.os.Bundle;
+
+import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 import com.missionhub.api.ApiNotifier;
+import com.missionhub.config.Config;
 import com.missionhub.helper.Flurry;
 
 import greendroid.app.GDActivity;
 
 public class Activity extends GDActivity {
+	
+	private GoogleAnalyticsTracker tracker;
 	
 	public ApplicationUser getUser() {
 		Application app = (Application) getApplicationContext();
@@ -27,6 +33,23 @@ public class Activity extends GDActivity {
 	
 	public ApiNotifier getApiNotifier() {
 		return getApp().getApiNotifier();
+	}
+	
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		tracker = GoogleAnalyticsTracker.getInstance();
+		tracker.startNewSession(Config.gAnalyticsKey, 20, this);
+		if (Config.debug) {
+			tracker.setDebug(true);
+			tracker.setDryRun(true);
+		}
+		super.onCreate(savedInstanceState);
+	}
+	
+	@Override
+	public void onDestroy() {
+		tracker.stopSession();
+		super.onDestroy();
 	}
 	
 	@Override
@@ -53,5 +76,9 @@ public class Activity extends GDActivity {
 		if (progress.isEmpty()) {
 			setProgressVisible(false);
 		}
+	}
+	
+	public GoogleAnalyticsTracker getTracker() {
+		return tracker;
 	}
 }

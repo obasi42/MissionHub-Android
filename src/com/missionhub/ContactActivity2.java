@@ -32,6 +32,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TabHost;
+import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TabHost.TabSpec;
 import android.widget.Toast;
 import greendroid.widget.ActionBar;
@@ -41,7 +42,7 @@ import greendroid.widget.ItemAdapter;
 public class ContactActivity2 extends Activity {
 
 	public static final String TAG = ContactActivity2.class.getSimpleName();
-
+	
 	private int personId = -1;
 	private Person person;
 
@@ -66,6 +67,10 @@ public class ContactActivity2 extends Activity {
 	private static final String PROGRESS_TAKE_PHOTO = "TAKE_PHOTO";
 
 	private static final int RESULT_TAKE_PHOTO = 0;
+	
+	// STATE
+	private int lastRetrieved = -1;
+	private String tabTag = TAG_STATUS;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -99,7 +104,17 @@ public class ContactActivity2 extends Activity {
 		setupTab(R.id.tab_contact_status, TAG_STATUS, R.string.contact_tab_status, R.drawable.gd_action_bar_list);
 		setupTab(R.id.tab_contact_surveys, TAG_SURVEYS, R.string.contact_tab_surveys, R.drawable.gd_action_bar_slideshow);
 
-		mTabHost.setCurrentTabByTag(TAG_STATUS);
+		if (savedInstanceState != null) {
+			tabTag = savedInstanceState.getString("tabTag");
+		}
+		
+		mTabHost.setCurrentTabByTag(tabTag);
+		mTabHost.setOnTabChangedListener(new OnTabChangeListener() {
+			@Override
+			public void onTabChanged(String tabId) {
+				tabTag = tabId;
+			}
+		});
 
 		getApiNotifier().subscribe(personListener, Type.UPDATE_PERSON, Type.JSON_CONTACTS_ON_START, Type.JSON_CONTACTS_ON_FINISH, Type.JSON_CONTACTS_ON_FAILURE);
 
@@ -137,6 +152,18 @@ public class ContactActivity2 extends Activity {
 
 		if (requestCode == RESULT_TAKE_PHOTO)
 			hideProgress(PROGRESS_TAKE_PHOTO);
+	}
+	
+	@Override
+	public void onSaveInstanceState(Bundle savedInstanceState) {
+		savedInstanceState.putInt("lastRetrieved", lastRetrieved);
+		savedInstanceState.putString("tabTag", tabTag);
+	}
+	
+	@Override
+	public void onRestoreInstanceState(Bundle savedInstanceState){
+		lastRetrieved = savedInstanceState.getInt("lastRetrieved", -1);
+		tabTag = savedInstanceState.getString("tabTag");
 	}
 
 	private Handler personListener = new Handler() {
