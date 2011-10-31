@@ -1,6 +1,10 @@
 package com.missionhub.config;
 
 public class Config {
+
+	public static enum Market {
+		ANDROID, AMAZON
+	}
 	
 	public static final boolean debug = @CONFIG.MHDEBUG@;
 	public static final Market market = @CONFIG.MHMARKET@;
