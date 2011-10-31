@@ -93,8 +93,7 @@
 				<filter token="CONFIG.MHCOOKIEHOST" value="${config.mh_cookiehost}"/>
 				<filter token="CONFIG.MHCLIENTID" value="${config.mh_mhclientid}"/>
 				<filter token="CONFIG.MHCLIENTSECRET" value="${config.mh_clientsecret}"/>
-				<filter token="CONFIG.MHFLURRYKEY" value="${config.mh_flurrykey}"/>
-				<filter token="CONFIG.MHGANALYTICSKEY" values="${config.mh_ganalyticskey}"
+				<filter token="CONFIG.MHGANALYTICSKEY" values="${config.mh_ganalyticskey}"/>
 			</filterset>
 		</copy>
 	</target>
