@@ -6,7 +6,6 @@ import com.missionhub.config.Config;
 
 import android.app.Activity;
 import android.content.Context;
-import android.os.Build;
 import android.util.Log;
 
 public class AnalyticsTracker {
