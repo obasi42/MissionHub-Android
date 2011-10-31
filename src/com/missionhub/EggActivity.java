@@ -1,8 +1,6 @@
 package com.missionhub;
 
-import java.util.HashMap;
-
-import com.missionhub.helper.Flurry;
+import com.missionhub.helper.AnalyticsTracker;
 
 import android.os.Bundle;
 import android.view.View;
@@ -21,12 +19,8 @@ public class EggActivity extends Activity {
 		setTitle(R.string.egg_title);
 		iv = (ImageView) findViewById(R.id.egg_picture);
 		
-		Flurry.pageView(this, "Egg");
-		try {
-			HashMap<String, String> params = new HashMap<String, String>();
-			params.put("userid", String.valueOf(getUser().getId()));
-			Flurry.event(this, "EggView", params);
-		} catch (Exception e) {}
+		getTracker().setCustomVar("personId", String.valueOf(getUser().getId()), AnalyticsTracker.SCOPE_PAGE_LEVEL);
+		getTracker().trackActivityView(this);
 	}
 	
 	private int clicks = 0;

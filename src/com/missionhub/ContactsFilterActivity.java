@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import com.missionhub.helper.Flurry;
-
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
@@ -83,7 +81,7 @@ public class ContactsFilterActivity extends PreferenceActivity implements OnShar
         this.setContentView(rootView);
         setPreferenceScreen(screen);
         
-        Flurry.pageView(this, "ContactsFilter");
+        //TODO Add Tracking
     }
     
     private PreferenceScreen createPreferenceHierarchy() {

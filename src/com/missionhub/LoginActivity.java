@@ -12,7 +12,6 @@ import com.missionhub.api.model.json.GError;
 import com.missionhub.api.model.json.GLoginDone;
 import com.missionhub.config.Config;
 import com.missionhub.config.Preferences;
-import com.missionhub.helper.Flurry;
 import com.missionhub.ui.DisplayError;
 
 import android.app.AlertDialog;
@@ -65,7 +64,7 @@ public class LoginActivity extends Activity {
 		mWebView.setWebViewClient(new InternalWebViewClient());
 		mWebView.loadUrl(Login.getUrl());
 		
-		Flurry.pageView(this, "Login");
+		getTracker().trackActivityView(this);
 	}
 	
 	@Override
@@ -253,7 +252,6 @@ public class LoginActivity extends Activity {
 					}
 				});
 				ad.show();
-				Flurry.error(LoginActivity.this, e, "Login.getTokenFromCode");
 			}
 
 			@Override

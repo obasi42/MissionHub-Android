@@ -18,7 +18,6 @@ import com.missionhub.api.Roles;
 import com.missionhub.api.model.json.GContact;
 import com.missionhub.api.model.json.GMetaContact;
 import com.missionhub.api.model.json.GOrgGeneric;
-import com.missionhub.helper.Flurry;
 import com.missionhub.ui.ContactItemAdapter;
 import com.missionhub.ui.DisplayError;
 import com.missionhub.ui.Guide;
@@ -89,7 +88,7 @@ public class ContactsActivity extends Activity {
 
 		setTab(TAB_MY, true);
 		
-		Flurry.pageView(this, "Contacts");
+		getTracker().trackActivityView(this);
 	}
 	
 	@Override
@@ -330,7 +329,7 @@ public class ContactsActivity extends Activity {
 				}
 			});
 			ad.show();
-			Flurry.error(ContactsActivity.this, e, "Contacts.getMore");
+			//Flurry.error(ContactsActivity.this, e, "Contacts.getMore");
 		}
 		
 		@Override
@@ -444,7 +443,7 @@ public class ContactsActivity extends Activity {
 
 		@Override
 		public void onSuccess() {
-			Flurry.event(ContactsActivity.this, "Contacts.ChangeRole");
+			//Flurry.event(ContactsActivity.this, "Contacts.ChangeRole");
 			resetListView(false);
 			getMore();
 		}
@@ -461,7 +460,7 @@ public class ContactsActivity extends Activity {
 				}
 			});
 			ad.show();
-			Flurry.error(ContactsActivity.this, e, "Contacts.ChangeRoleHandler");
+			//Flurry.error(ContactsActivity.this, e, "Contacts.ChangeRoleHandler");
 		}
 
 		@Override

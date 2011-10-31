@@ -6,7 +6,6 @@ import greendroid.widget.LoaderActionBarItem;
 import greendroid.widget.ActionBarItem.Type;
 
 import com.missionhub.api.Survey;
-import com.missionhub.helper.Flurry;
 import com.missionhub.ui.DisplayError;
 
 import android.app.AlertDialog;
@@ -51,7 +50,7 @@ public class SurveysActivity extends Activity {
 		
 		clearCookies();
 
-		Flurry.pageView(this, "Surveys");
+		getTracker().trackActivityView(this);
 	}
 	
 	@Override

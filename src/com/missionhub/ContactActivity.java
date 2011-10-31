@@ -30,7 +30,6 @@ import com.missionhub.api.model.json.GOrgGeneric;
 import com.missionhub.api.model.json.GPerson;
 import com.missionhub.api.model.json.GQA;
 import com.missionhub.api.model.json.GQuestion;
-import com.missionhub.helper.Flurry;
 import com.missionhub.helper.Helper;
 import com.missionhub.helper.U;
 import com.missionhub.ui.CommentItemAdapter;
@@ -240,7 +239,7 @@ public class ContactActivity extends Activity {
 		/* Display The Guide Pop-Up If Not Hidden */
 		Guide.display(this, Guide.CONTACT);
 		
-		Flurry.pageView(this, "Contact");
+		getTracker().trackActivityView(this);
 	}
 
 	@Override
@@ -262,7 +261,7 @@ public class ContactActivity extends Activity {
     public boolean onHandleActionBarItemClick(ActionBarItem item, int position) {
         switch (item.getItemId()) {
             case R.id.action_bar_refresh:
-            	Flurry.event(this, "Contact.Refresh");
+            	//Flurry.event(this, "Contact.Refresh");
     			update(true);
                 break;
             default:
@@ -569,7 +568,7 @@ public class ContactActivity extends Activity {
 				}
 			});
 			ad.show();
-			Flurry.error(ContactActivity.this, e, "Contact.contactResponseHandler");
+			//Flurry.error(ContactActivity.this, e, "Contact.contactResponseHandler");
 		}
 
 		@Override
@@ -603,7 +602,7 @@ public class ContactActivity extends Activity {
 				}
 			});
 			ad.show();
-			Flurry.error(ContactActivity.this, e, "Contact.commentResponseHandler");
+			//Flurry.error(ContactActivity.this, e, "Contact.commentResponseHandler");
 		}
 
 		@Override
@@ -676,7 +675,7 @@ public class ContactActivity extends Activity {
 				} else if (type == ASSIGNMENT_NONE) {
 					params.put("assignment", "None");
 				}
-				Flurry.event(ContactActivity.this, "Contact.Assign", params);
+				//Flurry.event(ContactActivity.this, "Contact.Assign", params);
 			} catch (Exception e) {}
 		}
 
@@ -691,7 +690,7 @@ public class ContactActivity extends Activity {
 				}
 			});
 			ad.show();
-			Flurry.error(ContactActivity.this, e, "Contact.AssignmentHandler");
+			//Flurry.error(ContactActivity.this, e, "Contact.AssignmentHandler");
 		}
 
 		@Override
@@ -726,7 +725,7 @@ public class ContactActivity extends Activity {
 			try {
 				HashMap<String, String> params = new HashMap<String, String>();
 				params.put("method", "Phone");
-				Flurry.event(ContactActivity.this, "Contact.MakeContact", params);
+				//Flurry.event(ContactActivity.this, "Contact.MakeContact", params);
 			} catch (Exception e) {}
 		} catch (Exception e) {
 			Toast.makeText(this, R.string.contact_cant_call, Toast.LENGTH_LONG).show();
@@ -742,7 +741,7 @@ public class ContactActivity extends Activity {
 			try {
 				HashMap<String, String> params = new HashMap<String, String>();
 				params.put("method", "SMS");
-				Flurry.event(ContactActivity.this, "Contact.MakeContact", params);
+				//Flurry.event(ContactActivity.this, "Contact.MakeContact", params);
 			} catch (Exception e) {}
 		} catch (Exception e) {
 			Toast.makeText(this, R.string.contact_cant_sms, Toast.LENGTH_LONG).show();
@@ -758,7 +757,7 @@ public class ContactActivity extends Activity {
 			try {
 				HashMap<String, String> params = new HashMap<String, String>();
 				params.put("method", "Email");
-				Flurry.event(ContactActivity.this, "Contact.MakeContact", params);
+				//Flurry.event(ContactActivity.this, "Contact.MakeContact", params);
 			} catch (Exception e) {}
 		} catch (Exception e) {
 			Toast.makeText(this, R.string.contact_cant_email, Toast.LENGTH_LONG).show();
@@ -806,7 +805,7 @@ public class ContactActivity extends Activity {
 		        		   try {
 			       				HashMap<String, String> params = new HashMap<String, String>();
 			       				params.put("method", "App");
-			       				Flurry.event(ContactActivity.this, "Contact.OpenFacebook", params);
+			       				//Flurry.event(ContactActivity.this, "Contact.OpenFacebook", params);
 			       			} catch (Exception e) {}
 		        	   } catch(Exception e) {
 		        		   try {
@@ -816,7 +815,7 @@ public class ContactActivity extends Activity {
 				       			try {
 				       				HashMap<String, String> params = new HashMap<String, String>();
 				       				params.put("method", "Browser");
-				       				Flurry.event(ContactActivity.this, "Contact.OpenFacebook", params);
+				       				//Flurry.event(ContactActivity.this, "Contact.OpenFacebook", params);
 				       			} catch (Exception e2) {}
 				       		} catch(Exception f) {
 				       			Toast.makeText(ContactActivity.this, R.string.contact_cant_open_profile, Toast.LENGTH_LONG).show();
@@ -900,7 +899,7 @@ public class ContactActivity extends Activity {
 			contact.getPerson().setStatus(status);
 			updateComments(true);
 			try {
-   				Flurry.event(ContactActivity.this, "Contact.Comment.Save");
+   				//Flurry.event(ContactActivity.this, "Contact.Comment.Save");
    			} catch (Exception e) {}
 		}
 
@@ -915,7 +914,7 @@ public class ContactActivity extends Activity {
 				}
 			});
 			ad.show();
-			Flurry.error(ContactActivity.this, e, "Contact.SaveResponseHandler");
+			//Flurry.error(ContactActivity.this, e, "Contact.SaveResponseHandler");
 		}
 
 		@Override
@@ -973,7 +972,7 @@ public class ContactActivity extends Activity {
 		public void onSuccess() {
 			updateComments(true);
 			try {
-				Flurry.event(ContactActivity.this, "Contact.Comment.Delete");
+				//Flurry.event(ContactActivity.this, "Contact.Comment.Delete");
 			} catch (Exception e) {}
 		}
 
@@ -988,7 +987,7 @@ public class ContactActivity extends Activity {
 				}
 			});
 			ad.show();
-			Flurry.error(ContactActivity.this, e, "Contact.DeleteCommentHandler");
+			//Flurry.error(ContactActivity.this, e, "Contact.DeleteCommentHandler");
 		}
 
 		@Override
@@ -1050,7 +1049,7 @@ public class ContactActivity extends Activity {
 		@Override
 		public void onSuccess() {
 			updatePerson(true);
-			Flurry.event(ContactActivity.this, "Contact.ChangeRole");
+			//Flurry.event(ContactActivity.this, "Contact.ChangeRole");
 		}
 
 		@Override
@@ -1064,7 +1063,7 @@ public class ContactActivity extends Activity {
 				}
 			});
 			ad.show();
-			Flurry.error(ContactActivity.this, e, "Contact.ChangeRoleHandler");
+		//	Flurry.error(ContactActivity.this, e, "Contact.ChangeRoleHandler");
 		}
 
 		@Override
@@ -1148,7 +1147,7 @@ public class ContactActivity extends Activity {
 				try {
 					HashMap<String, String> params = new HashMap<String, String>();
 					params.put("tab", "Contact");
-					Flurry.event(this, "Contact.ChangeTab", params);
+					//Flurry.event(this, "Contact.ChangeTab", params);
 				} catch (Exception e) {}
 				break;
 			case TAB_MORE_INFO:
@@ -1160,7 +1159,7 @@ public class ContactActivity extends Activity {
 				try {
 					HashMap<String, String> params = new HashMap<String, String>();
 					params.put("tab", "More Info");
-					Flurry.event(this, "Contact.ChangeTab", params);
+					//Flurry.event(this, "Contact.ChangeTab", params);
 				} catch (Exception e) {}
 				break;
 			case TAB_SURVEYS:
@@ -1172,7 +1171,7 @@ public class ContactActivity extends Activity {
 				try {
 					HashMap<String, String> params = new HashMap<String, String>();
 					params.put("tab", "Surveys");
-					Flurry.event(this, "Contact.ChangeTab", params);
+					//Flurry.event(this, "Contact.ChangeTab", params);
 				} catch (Exception e) {}
 				break;
 			}

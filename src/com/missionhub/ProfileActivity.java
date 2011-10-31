@@ -12,7 +12,6 @@ import com.flurry.android.FlurryAgent;
 import com.google.common.collect.HashMultimap;
 import com.missionhub.api.model.sql.OrganizationalRole;
 import com.missionhub.config.Preferences;
-import com.missionhub.helper.Flurry;
 import com.missionhub.ui.ImageManager;
 
 import android.content.Intent;
@@ -88,7 +87,7 @@ public class ProfileActivity extends Activity {
 		/* Egg Count */
 		clicks = 0;
 		
-		Flurry.pageView(this, "Profile");
+		getTracker().trackActivityView(this);
 	}
 	
 	@Override

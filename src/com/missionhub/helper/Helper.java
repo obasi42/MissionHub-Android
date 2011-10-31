@@ -96,21 +96,11 @@ public class Helper {
 		        		   intent.setClassName("com.facebook.katana", "com.facebook.katana.ProfileTabHostActivity");
 		        		   intent.putExtra("extra_user_id", Long.parseLong(new_uid));
 		        		   ctx.startActivity(intent);
-		        		   try {
-			       				HashMap<String, String> params = new HashMap<String, String>();
-			       				params.put("method", "App");
-			       				Flurry.event(ctx, "Contact.OpenFacebook", params);
-			       			} catch (Exception e) {}
 		        	   } catch(Exception e) {
 		        		   try {
 				       			Intent i = new Intent(Intent.ACTION_VIEW);
 				       			i.setData(Uri.parse("http://www.facebook.com/profile.php?id=" + new_uid));
 				       			ctx.startActivity(i);
-				       			try {
-				       				HashMap<String, String> params = new HashMap<String, String>();
-				       				params.put("method", "Browser");
-				       				Flurry.event(ctx, "Contact.OpenFacebook", params);
-				       			} catch (Exception e2) {}
 				       		} catch(Exception f) {
 				       			Toast.makeText(ctx, R.string.contact_cant_open_profile, Toast.LENGTH_LONG).show();
 				       		}
@@ -161,11 +151,6 @@ public class Helper {
 			Intent intent = new Intent(Intent.ACTION_DIAL);
 			intent.setData(Uri.parse("tel:" + phoneNumber));
 			ctx.startActivity(intent);
-			try {
-				HashMap<String, String> params = new HashMap<String, String>();
-				params.put("method", "Phone");
-				Flurry.event(ctx, "Contact.MakeContact", params);
-			} catch (Exception e) {}
 		} catch (Exception e) {
 			Toast.makeText(ctx, R.string.contact_cant_call, Toast.LENGTH_LONG).show();
 		}
@@ -177,11 +162,6 @@ public class Helper {
 			intent.putExtra("address", phoneNumber);
 			intent.setType("vnd.android-dir/mms-sms");
 			ctx.startActivity(intent);
-			try {
-				HashMap<String, String> params = new HashMap<String, String>();
-				params.put("method", "SMS");
-				Flurry.event(ctx, "Contact.MakeContact", params);
-			} catch (Exception e) {}
 		} catch (Exception e) {
 			Toast.makeText(ctx, R.string.contact_cant_sms, Toast.LENGTH_LONG).show();
 		}
@@ -193,11 +173,6 @@ public class Helper {
 			emailIntent.setType("plain/text");
 			emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[] { emailAddress });
 			ctx.startActivity(Intent.createChooser(emailIntent, ctx.getString(R.string.contact_send_email)));
-			try {
-				HashMap<String, String> params = new HashMap<String, String>();
-				params.put("method", "Email");
-				Flurry.event(ctx, "Contact.MakeContact", params);
-			} catch (Exception e) {}
 		} catch (Exception e) {
 			Toast.makeText(ctx, R.string.contact_cant_email, Toast.LENGTH_LONG).show();
 		}

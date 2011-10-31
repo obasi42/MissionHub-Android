@@ -6,16 +6,14 @@ import java.util.List;
 
 import android.os.Bundle;
 
-import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 import com.missionhub.api.ApiNotifier;
-import com.missionhub.config.Config;
-import com.missionhub.helper.Flurry;
+import com.missionhub.helper.AnalyticsTracker;
 
 import greendroid.app.GDActivity;
 
 public class Activity extends GDActivity {
 	
-	private GoogleAnalyticsTracker tracker;
+	private AnalyticsTracker tracker;
 	
 	public ApplicationUser getUser() {
 		Application app = (Application) getApplicationContext();
@@ -37,12 +35,7 @@ public class Activity extends GDActivity {
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		tracker = GoogleAnalyticsTracker.getInstance();
-		tracker.startNewSession(Config.gAnalyticsKey, 20, this);
-		if (Config.debug) {
-			tracker.setDebug(true);
-			tracker.setDryRun(true);
-		}
+		tracker = new AnalyticsTracker(this);
 		super.onCreate(savedInstanceState);
 	}
 	
@@ -50,18 +43,6 @@ public class Activity extends GDActivity {
 	public void onDestroy() {
 		tracker.stopSession();
 		super.onDestroy();
-	}
-	
-	@Override
-	public void onStart() {
-	   super.onStart();
-	   Flurry.startSession(this);
-	}
-	
-	@Override
-	public void onStop() {
-	   super.onStop();
-	   Flurry.endSession(this);
 	}
 	
 	public List<String> progress = Collections.synchronizedList(new ArrayList<String>());
@@ -78,7 +59,7 @@ public class Activity extends GDActivity {
 		}
 	}
 	
-	public GoogleAnalyticsTracker getTracker() {
+	public AnalyticsTracker getTracker() {
 		return tracker;
 	}
 }

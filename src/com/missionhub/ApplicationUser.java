@@ -18,7 +18,6 @@ import com.missionhub.api.model.sql.Person;
 import com.missionhub.api.model.sql.PersonDao;
 import com.missionhub.api.model.sql.OrganizationalRoleDao.Properties;
 import com.missionhub.config.Preferences;
-import com.missionhub.helper.Flurry;
 import com.missionhub.helper.U;
 import com.missionhub.ui.DisplayError;
 
@@ -285,7 +284,6 @@ public class ApplicationUser {
 			}
 		} catch (Exception e) {
 			Log.e(TAG, "Failed to initOrgRoles", e);
-			Flurry.error(ctx, e, "Failed to initOrgRoles");
 		}
 	}
 	
@@ -385,9 +383,7 @@ public class ApplicationUser {
 				});
 				ad.show();
 			}
-			
 			Log.e(TAG, "Auto Login Failed", e);
-			Flurry.error(ctx, e, "ApplicationUser.fetchUser");
 		}
 		
 		@Override

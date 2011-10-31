@@ -17,7 +17,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.missionhub.config.Preferences;
-import com.missionhub.helper.Flurry;
 
 public class MissionHubActivity extends Activity {
 
@@ -62,7 +61,7 @@ public class MissionHubActivity extends Activity {
 			getUser().refresh(this);
 		}
 		
-		Flurry.pageView(this, "Main");
+		getTracker().trackActivityView(this);
 	}
 
 	@Override
@@ -87,7 +86,7 @@ public class MissionHubActivity extends Activity {
 				.setPositiveButton(R.string.alert_ok, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int id) {
-						Flurry.event(MissionHubActivity.this, "Main.AboutLink");
+						getTracker().trackEvent(MissionHubActivity.class.getCanonicalName(), "Click", "About", 0);
 						Uri uri = Uri.parse("http://missionhub.com?mobile=0");
 						startActivity(new Intent(Intent.ACTION_VIEW, uri));
 					}
@@ -118,7 +117,7 @@ public class MissionHubActivity extends Activity {
 
 	public void logout() {
 		getUser().logout();
-		Flurry.event(this, "Main.Logout");
+		getTracker().trackEvent(MissionHubActivity.class.getCanonicalName(), "Action", "Logout", 0);
 	}
 
 	@Override
