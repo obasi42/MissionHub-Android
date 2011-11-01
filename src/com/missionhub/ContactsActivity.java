@@ -15,6 +15,7 @@ import com.missionhub.api.ApiClient;
 import com.missionhub.api.ApiResponseHandler;
 import com.missionhub.api.Contacts;
 import com.missionhub.api.Roles;
+import com.missionhub.api.convert.PersonJsonSql;
 import com.missionhub.api.model.json.GContact;
 import com.missionhub.api.model.json.GMetaContact;
 import com.missionhub.api.model.json.GOrgGeneric;
@@ -302,6 +303,7 @@ public class ContactsActivity extends Activity {
 			}
 			if (contacts.length > 0) {
 				for (GContact contact : contacts) {
+					PersonJsonSql.update(ContactsActivity.this, contact, contact.getPerson().getName());
 					final int id = contact.getPerson().getId();
 					if (!contactIds.contains(id)) {
 						contactIds.add(id);

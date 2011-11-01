@@ -33,7 +33,6 @@
             android:layout_marginBottom="10dp"
             android:ellipsize="end"
             android:maxLines="2"
-            android:text="TextView"
             android:textAppearance="?android:attr/textAppearanceMedium" 
             android:textStyle="bold"
             >
