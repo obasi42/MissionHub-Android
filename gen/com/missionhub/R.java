@@ -1113,6 +1113,7 @@ containing a value of this type.
         public static final int guide_contacts_all=0x7f080086;
         public static final int guide_contacts_all_msg=0x7f080087;
         public static final int guide_contacts_msg=0x7f080085;
+        public static final int loading=0x7f080096;
         public static final int main_about=0x7f08001e;
         public static final int main_contacts=0x7f080020;
         public static final int main_login=0x7f08001f;

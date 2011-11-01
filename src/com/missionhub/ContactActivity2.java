@@ -21,7 +21,6 @@ import com.missionhub.ui.widget.item.ContactAboutItem;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -39,11 +38,12 @@ import android.widget.Toast;
 import greendroid.widget.ActionBar;
 import greendroid.widget.ActionBarItem;
 import greendroid.widget.ItemAdapter;
+import greendroid.widget.item.ProgressItem;
 
 public class ContactActivity2 extends Activity {
 
 	public static final String TAG = ContactActivity2.class.getSimpleName();
-	
+
 	private int personId = -1;
 	private Person person;
 
@@ -69,6 +69,8 @@ public class ContactActivity2 extends Activity {
 
 	private static final int RESULT_TAKE_PHOTO = 0;
 	
+	private ProgressItem progressItem;
+
 	// STATE
 	private int lastRetrieved = -1;
 	private String tabTag = TAG_STATUS;
@@ -108,7 +110,7 @@ public class ContactActivity2 extends Activity {
 		if (savedInstanceState != null) {
 			tabTag = savedInstanceState.getString("tabTag");
 		}
-		
+
 		mTabHost.setCurrentTabByTag(tabTag);
 		mTabHost.setOnTabChangedListener(new OnTabChangeListener() {
 			@Override
@@ -116,6 +118,8 @@ public class ContactActivity2 extends Activity {
 				tabTag = tabId;
 			}
 		});
+		
+		progressItem = new ProgressItem(getString(R.string.loading), true);
 
 		getApiNotifier().subscribe(this, personListener, Type.UPDATE_PERSON, Type.JSON_CONTACTS_ON_START, Type.JSON_CONTACTS_ON_FINISH, Type.JSON_CONTACTS_ON_FAILURE);
 
@@ -154,15 +158,15 @@ public class ContactActivity2 extends Activity {
 		if (requestCode == RESULT_TAKE_PHOTO)
 			hideProgress(PROGRESS_TAKE_PHOTO);
 	}
-	
+
 	@Override
 	public void onSaveInstanceState(Bundle savedInstanceState) {
 		savedInstanceState.putInt("lastRetrieved", lastRetrieved);
 		savedInstanceState.putString("tabTag", tabTag);
 	}
-	
+
 	@Override
-	public void onRestoreInstanceState(Bundle savedInstanceState){
+	public void onRestoreInstanceState(Bundle savedInstanceState) {
 		lastRetrieved = savedInstanceState.getInt("lastRetrieved", -1);
 		tabTag = savedInstanceState.getString("tabTag");
 	}
@@ -178,7 +182,7 @@ public class ContactActivity2 extends Activity {
 				if (msg.getData().getInt("personId") == personId) {
 					person = getApp().getDbSession().getPersonDao().load(personId);
 					updateHeaders();
-					updateAboutList();
+					updateAboutList(false);
 					updateSurveysList();
 				}
 			}
@@ -207,7 +211,7 @@ public class ContactActivity2 extends Activity {
 	}
 
 	private void update() {
-		updateAboutList();
+		updateAboutList(true);
 		updateContact();
 		updateStatusList();
 	}
@@ -223,8 +227,8 @@ public class ContactActivity2 extends Activity {
 
 		mAboutListAdapter = new ItemAdapter(this);
 		mAboutListView.setAdapter(mAboutListAdapter);
-		
-		mAboutListView.setOnItemClickListener(new OnItemClickListener(){
+
+		mAboutListView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				final ContactAboutItem item = (ContactAboutItem) mAboutListAdapter.getItem(position);
@@ -256,7 +260,7 @@ public class ContactActivity2 extends Activity {
 		mSurveysListView.setAdapter(mSurveysListAdapter);
 	}
 
-	private void updateAboutList() {
+	private void updateAboutList(boolean partial) {
 		if (person == null)
 			return;
 
@@ -265,8 +269,8 @@ public class ContactActivity2 extends Activity {
 
 		// Email
 		if (!U.nullOrEmpty(person.getEmail_address()))
-			mAboutListAdapter.add(new ContactAboutItem(getString(R.string.contact_info_email_address), person.getEmail_address(), getResources()
-					.getDrawable(R.drawable.action_email), new ContactAboutItem.Action() {
+			mAboutListAdapter.add(new ContactAboutItem(getString(R.string.contact_info_email_address), person.getEmail_address(), getResources().getDrawable(
+					R.drawable.action_email), new ContactAboutItem.Action() {
 				@Override
 				public void run() {
 					Helper.sendEmail(ContactActivity2.this, person.getEmail_address());
@@ -292,108 +296,116 @@ public class ContactActivity2 extends Activity {
 					Helper.openFacebookProfile(ContactActivity2.this, person.getFb_id());
 				}
 			}));
+		
+		
+		mAboutListAdapter.add(progressItem);
 
-		// Role
-		if (getUser().hasRole("admin")) {
-			String contactRole = "contact";
-			for (OrganizationalRole role : person.getOrganizationalRole()) {
-				if (role.getOrg_id() == getUser().getOrganizationID()) {
-					contactRole = role.getRole();
-					break;
+		if (!partial) {
+
+			// Role
+			if (getUser().hasRole("admin")) {
+				String contactRole = "contact";
+				for (OrganizationalRole role : person.getOrganizationalRole()) {
+					if (role.getOrg_id() == getUser().getOrganizationID()) {
+						contactRole = role.getRole();
+						break;
+					}
 				}
-			}
-			if (contactRole.equals("contact")) {
-				mAboutListAdapter.add(new ContactAboutItem(getString(R.string.contact_role), getString(R.string.contact_role_promote), null, new ContactAboutItem.Action() {
-					@Override
-					public void run() {
-						// TODO:
-					}
-				}));
-			} else if (contactRole.equals("leader")) {
-				mAboutListAdapter.add(new ContactAboutItem(getString(R.string.contact_role), getString(R.string.contact_role_demote), null, new ContactAboutItem.Action() {
-					@Override
-					public void run() {
-						// TODO:
-					}
-				}));
-			} else if (contactRole.equals("admin")) {
-				mAboutListAdapter.add(new ContactAboutItem(getString(R.string.contact_role), getString(R.string.contact_role_admin), null, new ContactAboutItem.Action() {
-					@Override
-					public void run() {
-						// TODO:
-					}
-				}));
-			}
-		}
-
-		// Assignment
-		List<Assignment> assignedTo = person.getAssigned_to_contacts();
-		for (Assignment a : assignedTo) {
-			mAboutListAdapter.add(new ContactAboutItem(getString(R.string.contact_info_assigned_to), getApp().getDbSession().getPersonDao().load(a.getAssigned_to_id()).getName(),
-					null, new ContactAboutItem.Action() {
+				if (contactRole.equals("contact")) {
+					mAboutListAdapter.add(new ContactAboutItem(getString(R.string.contact_role), getString(R.string.contact_role_promote), null, new ContactAboutItem.Action() {
 						@Override
 						public void run() {
 							// TODO:
 						}
 					}));
-		}
-
-		// First Contact Date
-		if (!U.nullOrEmpty(person.getFirst_contact_date()))
-			mAboutListAdapter.add(new ContactAboutItem(getString(R.string.contact_info_first_contact_date), person.getFirst_contact_date().toLocaleString()));
-
-		// Surveyed Date
-		if (!U.nullOrEmpty(person.getDate_surveyed()))
-			mAboutListAdapter.add(new ContactAboutItem(getString(R.string.contact_info_surveyed_date), person.getDate_surveyed().toLocaleString()));
-
-		// Birthday
-		if (!U.nullOrEmpty(person.getBirthday())) {
-			mAboutListAdapter.add(new ContactAboutItem(getString(R.string.contact_info_birthday), person.getBirthday()));
-		}
-
-		// Interests
-		StringBuffer interests = new StringBuffer();
-		Iterator<Interest> interestItr = person.getInterest().iterator();
-		while (interestItr.hasNext()) {
-			final Interest interest = interestItr.next();
-			interests.append(interest.getName());
-			if (interestItr.hasNext()) {
-				interests.append(", ");
-			}
-		}
-		if (interests.length() > 0) {
-			mAboutListAdapter.add(new ContactAboutItem(getString(R.string.contact_info_interests), interests.toString()));
-		}
-
-		// Education
-		Iterator<Education> eduItr = person.getEducation().iterator();
-		while (eduItr.hasNext()) {
-			final Education edu = eduItr.next();
-
-			String title = edu.getType();
-			if (title == null)
-				title = getString(R.string.contact_info_education);
-
-			StringBuffer value = new StringBuffer();
-
-			if (edu.getSchool_name() != null) {
-				value.append(edu.getSchool_name());
-			}
-
-			if (edu.getYear_name() != null) {
-				if (value.length() > 0) {
-					value.append(" " + getString(R.string.contact_info_class_of) + " ");
+				} else if (contactRole.equals("leader")) {
+					mAboutListAdapter.add(new ContactAboutItem(getString(R.string.contact_role), getString(R.string.contact_role_demote), null, new ContactAboutItem.Action() {
+						@Override
+						public void run() {
+							// TODO:
+						}
+					}));
+				} else if (contactRole.equals("admin")) {
+					mAboutListAdapter.add(new ContactAboutItem(getString(R.string.contact_role), getString(R.string.contact_role_admin), null, new ContactAboutItem.Action() {
+						@Override
+						public void run() {
+							// TODO:
+						}
+					}));
 				}
-				value.append(edu.getYear_name());
 			}
 
-			mAboutListAdapter.add(new ContactAboutItem(title, value.toString()));
-		}
+			// Assignment
+			List<Assignment> assignedTo = person.getAssigned_to_contacts();
+			for (Assignment a : assignedTo) {
+				mAboutListAdapter.add(new ContactAboutItem(getString(R.string.contact_info_assigned_to), getApp().getDbSession().getPersonDao().load(a.getAssigned_to_id())
+						.getName(), null, new ContactAboutItem.Action() {
+					@Override
+					public void run() {
+						// TODO:
+					}
+				}));
+			}
 
-		Iterator<Location> locationItr = person.getLocation().iterator();
-		while (locationItr.hasNext()) {
-			final Location location = locationItr.next();
-			mAboutListAdapter.add(new ContactAboutItem(getString(R.string.contact_info_location), location.getName()));
+			// First Contact Date
+			if (!U.nullOrEmpty(person.getFirst_contact_date()))
+				mAboutListAdapter.add(new ContactAboutItem(getString(R.string.contact_info_first_contact_date), person.getFirst_contact_date().toLocaleString()));
+
+			// Surveyed Date
+			if (!U.nullOrEmpty(person.getDate_surveyed()))
+				mAboutListAdapter.add(new ContactAboutItem(getString(R.string.contact_info_surveyed_date), person.getDate_surveyed().toLocaleString()));
+
+			// Birthday
+			if (!U.nullOrEmpty(person.getBirthday())) {
+				mAboutListAdapter.add(new ContactAboutItem(getString(R.string.contact_info_birthday), person.getBirthday()));
+			}
+
+			// Interests
+			StringBuffer interests = new StringBuffer();
+			Iterator<Interest> interestItr = person.getInterest().iterator();
+			while (interestItr.hasNext()) {
+				final Interest interest = interestItr.next();
+				interests.append(interest.getName());
+				if (interestItr.hasNext()) {
+					interests.append(", ");
+				}
+			}
+			if (interests.length() > 0) {
+				mAboutListAdapter.add(new ContactAboutItem(getString(R.string.contact_info_interests), interests.toString()));
+			}
+
+			// Education
+			Iterator<Education> eduItr = person.getEducation().iterator();
+			while (eduItr.hasNext()) {
+				final Education edu = eduItr.next();
+
+				String title = edu.getType();
+				if (title == null)
+					title = getString(R.string.contact_info_education);
+
+				StringBuffer value = new StringBuffer();
+
+				if (edu.getSchool_name() != null) {
+					value.append(edu.getSchool_name());
+				}
+
+				if (edu.getYear_name() != null) {
+					if (value.length() > 0) {
+						value.append(" " + getString(R.string.contact_info_class_of) + " ");
+					}
+					value.append(edu.getYear_name());
+				}
+
+				mAboutListAdapter.add(new ContactAboutItem(title, value.toString()));
+			}
+
+			Iterator<Location> locationItr = person.getLocation().iterator();
+			while (locationItr.hasNext()) {
+				final Location location = locationItr.next();
+				mAboutListAdapter.add(new ContactAboutItem(getString(R.string.contact_info_location), location.getName()));
+			}
+
+			mAboutListAdapter.remove(progressItem);
 		}
 
 		mAboutListAdapter.notifyDataSetChanged();

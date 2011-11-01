@@ -130,7 +130,7 @@
 	
 	<string name="egg_title">Rejoicables 4TW</string>
 	<string name="egg_title_todd">For You Todd...</string>
-	
+	    
 	<string name="yes">Yes</string>
 	<string name="no">No</string>
 	
@@ -138,4 +138,5 @@
 	<string name="action_bar_search">Search</string>
 	<string name="action_bar_logout">Logout</string>
 	<string name="action_bar_profile">Profile</string>
+	<string name="loading">Loading...</string>
 </resources>
