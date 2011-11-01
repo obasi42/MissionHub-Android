@@ -21,6 +21,7 @@ import com.missionhub.ui.widget.item.ContactAboutItem;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -116,7 +117,7 @@ public class ContactActivity2 extends Activity {
 			}
 		});
 
-		getApiNotifier().subscribe(personListener, Type.UPDATE_PERSON, Type.JSON_CONTACTS_ON_START, Type.JSON_CONTACTS_ON_FINISH, Type.JSON_CONTACTS_ON_FAILURE);
+		getApiNotifier().subscribe(this, personListener, Type.UPDATE_PERSON, Type.JSON_CONTACTS_ON_START, Type.JSON_CONTACTS_ON_FINISH, Type.JSON_CONTACTS_ON_FAILURE);
 
 		person = getApp().getDbSession().getPersonDao().load(personId);
 
@@ -206,6 +207,7 @@ public class ContactActivity2 extends Activity {
 	}
 
 	private void update() {
+		updateAboutList();
 		updateContact();
 		updateStatusList();
 	}

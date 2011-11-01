@@ -13,7 +13,6 @@ import com.google.common.collect.HashMultimap;
 import com.loopj.android.http.RequestParams;
 import com.missionhub.api.convert.PersonJsonSql;
 import com.missionhub.api.model.json.GContact;
-import com.missionhub.api.model.json.GContactAll;
 import com.missionhub.api.model.json.GMetaContact;
 
 public class Contacts {
@@ -52,7 +51,7 @@ public class Contacts {
 	 * @param tag
 	 */
 	public static void get(Context ctx, int personId, String tag) {
-		get(ctx, personId, new ContactsNotifierResponseHandler(ctx, GContactAll.class, tag, "CONTACTS"));
+		get(ctx, personId, new ContactsNotifierResponseHandler(ctx, GMetaContact.class, tag, "CONTACTS"));
 	}
 	
 	/**
@@ -62,7 +61,7 @@ public class Contacts {
 	 * @param tag
 	 */
 	public static void get(Context ctx, List<Integer> personIds, String tag) {
-		get(ctx, personIds, new ContactsNotifierResponseHandler(ctx, GContactAll.class, tag, "CONTACTS"));
+		get(ctx, personIds, new ContactsNotifierResponseHandler(ctx, GMetaContact.class, tag, "CONTACTS"));
 	}
 	
 	private static class ContactsNotifierResponseHandler extends ApiNotifierResponseHandler {
@@ -73,8 +72,8 @@ public class Contacts {
 		
 		@Override
 		public void onSuccess(Object gContactAll) {
-			GContactAll contacts = (GContactAll) gContactAll;
-			for (GContact contact : contacts.getPeople()) {
+			GMetaContact contacts = (GMetaContact) gContactAll;
+			for (GContact contact : contacts.getContacts()) {
 				PersonJsonSql.update(ctx, contact, tag);		
 			}
 			//TODO: handle questions and keywords

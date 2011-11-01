@@ -34,7 +34,7 @@ public class ApplicationUser {
 	private Application ctx;
 	
 	/* Logging Tag */
-	public static String TAG = ApplicationUser.class.getName();
+	public static final String TAG = ApplicationUser.class.getName();
 	
 	/* User's person Id */
 	private int id;

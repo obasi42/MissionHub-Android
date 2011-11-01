@@ -16,6 +16,9 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.missionhub.api.ApiNotifier;
+import com.missionhub.api.Organizations;
+import com.missionhub.api.ApiNotifier.Type;
 import com.missionhub.config.Preferences;
 
 public class MissionHubActivity extends Activity {
@@ -62,6 +65,8 @@ public class MissionHubActivity extends Activity {
 		}
 		
 		getTracker().trackActivityView(this);
+		
+		getApiNotifier().subscribe(this, apiHandler, ApiNotifier.Type.ALL);
 	}
 
 	@Override
@@ -153,6 +158,16 @@ public class MissionHubActivity extends Activity {
 		}
 	};
 	
+	private Handler apiHandler = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			super.handleMessage(msg);
+			if (Type.UPDATE_ORGANIZATION.ordinal() == msg.what) {
+				Log.w(TAG, "UPDATE ORGANIZATION: " + msg.getData().getLong("id"));
+			}
+		}
+	};
+	
 	public void refreshView() {
 		if (getUser().isLoggedIn()) {
 			getActionBar().setVisibility(View.VISIBLE);
@@ -161,6 +176,8 @@ public class MissionHubActivity extends Activity {
 			mName.setText(getUser().getPerson().getName());
 			mOrganization.setText(getUser().getOrganizations().get(getUser().getOrganizationID()).getName());
 			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+			
+			Organizations.get(this, "HERE!");
 		} else{
 			getActionBar().setVisibility(View.GONE);
 			mLoggedIn.setVisibility(View.GONE);

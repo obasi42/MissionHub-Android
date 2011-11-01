@@ -19,37 +19,45 @@ public class LocationJsonSql {
 		update(context, personId, location, null);
 	}
 	
-	public static void update(Context context, int personId, GIdNameProvider location, String tag) {
+	public static void update(final Context context, final int personId, final GIdNameProvider location, final String tag) {
 		if (location == null) return;
 		
-		Application app = (Application) context.getApplicationContext();
-		LocationDao ld = app.getDbSession().getLocationDao();
-		
-		// Delete current location
-		List<Location> currentLocation = ld.queryBuilder().where(Properties.Person_id.eq(personId)).list();
-		Iterator<Location> itr = currentLocation.iterator();
-		while(itr.hasNext()) {
-			Location l = itr.next();
-			ld.delete(l);
-			
-			Bundle b = new Bundle();
-			b.putLong("id", l.get_id());
-			b.putInt("personId", l.getPerson_id());
-			if (tag != null) b.putString("tag", tag);
-			app.getApiNotifier().postMessage(ApiNotifier.Type.DELETE_LOCATION, b);
-		}
-		
-		Location l = new Location();
-		l.setLocation_id(location.getId());
-		l.setName(location.getName());
-		l.setPerson_id(personId);
-		l.setProvider(location.getProvider());
-		long id = ld.insert(l);
-		
-		Bundle b = new Bundle();
-		b.putLong("id", id);
-		b.putInt("personId", l.getPerson_id());
-		if (tag != null) b.putString("tag", tag);
-		app.getApiNotifier().postMessage(ApiNotifier.Type.UPDATE_LOCATION, b);
+		Thread t = new Thread(new Runnable() {
+		    public void run() {
+				Application app = (Application) context.getApplicationContext();
+				LocationDao ld = app.getDbSession().getLocationDao();
+
+				// Delete current location
+				List<Location> currentLocation = ld.queryBuilder().where(Properties.Person_id.eq(personId)).list();
+				Iterator<Location> itr = currentLocation.iterator();
+				while (itr.hasNext()) {
+					Location l = itr.next();
+					ld.delete(l);
+
+					Bundle b = new Bundle();
+					b.putLong("id", l.get_id());
+					b.putInt("personId", l.getPerson_id());
+					if (tag != null)
+						b.putString("tag", tag);
+					app.getApiNotifier().postMessage(ApiNotifier.Type.DELETE_LOCATION, b);
+				}
+
+				Location l = new Location();
+				l.setLocation_id(location.getId());
+				l.setName(location.getName());
+				l.setPerson_id(personId);
+				l.setProvider(location.getProvider());
+				long id = ld.insert(l);
+
+				Bundle b = new Bundle();
+				b.putLong("id", id);
+				b.putInt("personId", l.getPerson_id());
+				if (tag != null)
+					b.putString("tag", tag);
+				app.getApiNotifier().postMessage(ApiNotifier.Type.UPDATE_LOCATION, b);
+		    }
+		});
+		t.setPriority(Thread.MIN_PRIORITY);
+		t.start();
 	}
 }

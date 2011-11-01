@@ -4,6 +4,7 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.loopj.android.http.RequestParams;
 import com.missionhub.api.convert.PersonJsonSql;
@@ -54,6 +55,10 @@ public class People {
 				PersonJsonSql.update(ctx, person, tag);		
 			}
 			super.onSuccess(gMetaPerson);
+		}
+		
+		public void onFailure(Throwable t) {
+			Log.e("People", t.getMessage(), t);
 		}
 	}
 	

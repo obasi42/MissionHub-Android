@@ -24,7 +24,7 @@ public class KeywordDao extends AbstractDao<Keyword, Integer> {
     public static class Properties {
         public final static Property _id = new Property(0, Integer.class, "_id", true, "_ID");
         public final static Property Organization_id = new Property(1, Integer.class, "organization_id", false, "ORGANIZATION_ID");
-        public final static Property Name = new Property(2, String.class, "name", false, "NAME");
+        public final static Property Keyword = new Property(2, String.class, "keyword", false, "KEYWORD");
         public final static Property State = new Property(3, String.class, "state", false, "STATE");
     };
 
@@ -43,7 +43,7 @@ public class KeywordDao extends AbstractDao<Keyword, Integer> {
         String sql = "CREATE TABLE " + (ifNotExists? "IF NOT EXISTS ": "") + "'KEYWORD' (" + //
                 "'_ID' INTEGER PRIMARY KEY ," + // 0: _id
                 "'ORGANIZATION_ID' INTEGER," + // 1: organization_id
-                "'NAME' TEXT," + // 2: name
+                "'KEYWORD' TEXT," + // 2: keyword
                 "'STATE' TEXT);"; // 3: state
         db.execSQL(sql);
     }
@@ -69,9 +69,9 @@ public class KeywordDao extends AbstractDao<Keyword, Integer> {
             stmt.bindLong(2, organization_id);
         }
  
-        String name = entity.getName();
-        if (name != null) {
-            stmt.bindString(3, name);
+        String keyword = entity.getKeyword();
+        if (keyword != null) {
+            stmt.bindString(3, keyword);
         }
  
         String state = entity.getState();
@@ -92,7 +92,7 @@ public class KeywordDao extends AbstractDao<Keyword, Integer> {
         Keyword entity = new Keyword( //
             cursor.isNull(offset + 0) ? null : cursor.getInt(offset + 0), // _id
             cursor.isNull(offset + 1) ? null : cursor.getInt(offset + 1), // organization_id
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // name
+            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // keyword
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3) // state
         );
         return entity;
@@ -103,7 +103,7 @@ public class KeywordDao extends AbstractDao<Keyword, Integer> {
     public void readEntity(Cursor cursor, Keyword entity, int offset) {
         entity.set_id(cursor.isNull(offset + 0) ? null : cursor.getInt(offset + 0));
         entity.setOrganization_id(cursor.isNull(offset + 1) ? null : cursor.getInt(offset + 1));
-        entity.setName(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
+        entity.setKeyword(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setState(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
      }
     

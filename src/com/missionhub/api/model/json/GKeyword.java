@@ -1,16 +1,18 @@
 package com.missionhub.api.model.json;
 
 public class GKeyword {
-	private String name;
-	private int keyword_id;
-	private int[] questions;
+	private String keyword;
+	private int id;
+	private GQuestion[] questions;
+	private String state;
 	
-	public String getName() { return name; }
-	public int getKeyword_id() { return keyword_id; }
-	public int[] getQuestions() { return questions; }
+	public String getKeyword() { return keyword; }
+	public int getId() { return id; }
+	public GQuestion[] getQuestions() { return questions; }
+	public String getState() { return state; }
 	
-	public void setName(String s) { name = s; }
-	public void setKeyword_id(int i) { keyword_id = i; }
-	public void setQuestions(int[] i) { questions = i; }
-	
+	public void setKeyword(String s) { keyword = s; }
+	public void setId(int i) { id = i; }
+	public void setQuestions(GQuestion[] i) { questions = i; }
+	public void setState(String s) { state = s; }
 }

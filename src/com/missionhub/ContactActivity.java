@@ -19,12 +19,13 @@ import com.missionhub.api.FollowupComments;
 import com.missionhub.api.Roles;
 import com.missionhub.api.model.json.GAssign;
 import com.missionhub.api.model.json.GContact;
-import com.missionhub.api.model.json.GContactAll;
+import com.missionhub.api.model.json.GMetaContact;
 import com.missionhub.api.model.json.GEducation;
 import com.missionhub.api.model.json.GFCTop;
 import com.missionhub.api.model.json.GFollowupComment;
 import com.missionhub.api.model.json.GIdNameProvider;
 import com.missionhub.api.model.json.GKeyword;
+import com.missionhub.api.model.json.GMetaContact;
 import com.missionhub.api.model.json.GMetaGFCTop;
 import com.missionhub.api.model.json.GOrgGeneric;
 import com.missionhub.api.model.json.GPerson;
@@ -84,7 +85,7 @@ public class ContactActivity extends Activity {
 	private final int DIALOG_REJOICABLES = 0;
 	
 	/* The currently displayed contact */
-	private GContactAll contactMeta;
+	private GMetaContact contactMeta;
 	private GContact contact;
 
 	/* contact.xml */
@@ -157,7 +158,7 @@ public class ContactActivity extends Activity {
 			if (savedInstanceState != null) {
 				try {
 					if (savedInstanceState.containsKey("contactMetaJSON")) {
-						contactMeta = gson.fromJson(savedInstanceState.getString("contactMetaJSON"), GContactAll.class);
+						contactMeta = gson.fromJson(savedInstanceState.getString("contactMetaJSON"), GMetaContact.class);
 					}
 					if (savedInstanceState.containsKey("contactJSON")) {
 						contact = gson.fromJson(savedInstanceState.getString("contactJSON"), GContact.class);
@@ -288,7 +289,7 @@ public class ContactActivity extends Activity {
 		try {
 			Gson gson = new Gson();
 			if (b.containsKey("contactMetaJSON")) {
-				contactMeta = gson.fromJson(b.getString("contactMetaJSON"), GContactAll.class);
+				contactMeta = gson.fromJson(b.getString("contactMetaJSON"), GMetaContact.class);
 			}
 			if (b.containsKey("contactJSON")) {
 				contact = gson.fromJson(b.getString("contactJSON"), GContact.class);
@@ -497,7 +498,7 @@ public class ContactActivity extends Activity {
 		if (person == null) return;
 		
 		keywordAdapter = new ItemAdapter(this);
-		
+		/*
 		try {
 			final GKeyword[] keywords = contactMeta.getKeywords();
 			HashMap<Integer, GQuestion> questions = new HashMap<Integer, GQuestion>();
@@ -523,6 +524,7 @@ public class ContactActivity extends Activity {
 		if (tab == TAB_SURVEYS) {
 			listView.setAdapter(keywordAdapter);
 		}
+		*/
 	}
 	
 	public void update(boolean force) {
@@ -540,7 +542,7 @@ public class ContactActivity extends Activity {
 		FollowupComments.get(this, contact.getPerson().getId(), commentResponseHandler);
 	}
 
-	private ApiResponseHandler contactResponseHandler = new ApiResponseHandler(GContactAll.class) {
+	private ApiResponseHandler contactResponseHandler = new ApiResponseHandler(GMetaContact.class) {
 		@Override
 		public void onStart() {
 			showProgress("contact");
@@ -548,9 +550,9 @@ public class ContactActivity extends Activity {
 
 		@Override
 		public void onSuccess(Object gsonObject) {
-			GContactAll contactAll = (GContactAll) gsonObject;
+			GMetaContact contactAll = (GMetaContact) gsonObject;
 			ContactActivity.this.contactMeta = contactAll;
-			ContactActivity.this.contact = contactAll.getPeople()[0];
+			ContactActivity.this.contact = contactAll.getContacts()[0];
 			ContactActivity.this.updateHeader();
 			ContactActivity.this.updateMoreInfo();
 			ContactActivity.this.updateKeywords();

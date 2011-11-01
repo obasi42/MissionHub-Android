@@ -8,7 +8,7 @@ public class Keyword {
 
     private Integer _id;
     private Integer organization_id;
-    private String name;
+    private String keyword;
     private String state;
 
     public Keyword() {
@@ -18,10 +18,10 @@ public class Keyword {
         this._id = _id;
     }
 
-    public Keyword(Integer _id, Integer organization_id, String name, String state) {
+    public Keyword(Integer _id, Integer organization_id, String keyword, String state) {
         this._id = _id;
         this.organization_id = organization_id;
-        this.name = name;
+        this.keyword = keyword;
         this.state = state;
     }
 
@@ -41,12 +41,12 @@ public class Keyword {
         this.organization_id = organization_id;
     }
 
-    public String getName() {
-        return name;
+    public String getKeyword() {
+        return keyword;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setKeyword(String keyword) {
+        this.keyword = keyword;
     }
 
     public String getState() {

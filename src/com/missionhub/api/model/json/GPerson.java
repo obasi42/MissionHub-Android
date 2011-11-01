@@ -22,6 +22,7 @@ public class GPerson {
 	private GAssign assignment;
 	private GOrgGeneric[] organizational_roles;
 	private GEducation[] education;
+	private String num_contacts;
 	
 	public String getFirst_name() { return first_name; }
 	public String getLast_name() { return last_name; }
@@ -43,6 +44,7 @@ public class GPerson {
 	public GAssign getAssignment() { return assignment; }
 	public GOrgGeneric[] getOrganizational_roles() { return organizational_roles; }
 	public GEducation[] getEducation() { return education; }
+	public String getNum_contacts() { return num_contacts; }
 	
 	public void setFirst_name(String s) { first_name = s; }
 	public void setLast_name(String s) { last_name = s; }	
@@ -64,4 +66,5 @@ public class GPerson {
 	public void setAssignment(GAssign a) { assignment = a; }
 	public void setOrganizational_roles(GOrgGeneric[] g) { organizational_roles = g; }
 	public void setEducation(GEducation[] g) { education = g; }
+	public void setNum_contacts(String s) { num_contacts = s; }
 }
