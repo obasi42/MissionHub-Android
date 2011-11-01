@@ -56,10 +56,6 @@ public class People {
 			}
 			super.onSuccess(gMetaPerson);
 		}
-		
-		public void onFailure(Throwable t) {
-			Log.e("People", t.getMessage(), t);
-		}
 	}
 	
 	/**
