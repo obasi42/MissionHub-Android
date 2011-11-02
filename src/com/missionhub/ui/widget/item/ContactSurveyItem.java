@@ -39,7 +39,6 @@ public class ContactSurveyItem extends TextItem {
     public ContactSurveyItem(String text, String subtext) {
         super(text);
         this.subtext = subtext;
-        enabled = false;
     }
 
     @Override

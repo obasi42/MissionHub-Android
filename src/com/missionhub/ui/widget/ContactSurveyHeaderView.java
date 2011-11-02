@@ -30,6 +30,8 @@ public class ContactSurveyHeaderView extends TextView implements ItemView {
 	public void setObject(Item object) {
         final ContactSurveyHeaderItem item = (ContactSurveyHeaderItem) object;
         setText(item.text);
+        
+        setClickable(true);
     }
     
     @Override

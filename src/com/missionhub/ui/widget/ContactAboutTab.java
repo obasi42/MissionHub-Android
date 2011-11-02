@@ -77,7 +77,6 @@ public class ContactAboutTab extends LinearLayout {
 		});
 
 		progressItem = new ProgressItem(activity.getString(R.string.loading), true);
-		progressItem.enabled = false;
 	}
 
 	public void setPerson(Person person) {

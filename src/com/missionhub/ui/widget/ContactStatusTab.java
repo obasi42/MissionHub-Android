@@ -52,7 +52,6 @@ public class ContactStatusTab extends LinearLayout {
 		mListView.setAdapter(mListAdapter);
 
 		progressItem = new ProgressItem(activity.getString(R.string.loading), true);
-		progressItem.enabled = false;
 	}
 
 	public void setPerson(Person person) {

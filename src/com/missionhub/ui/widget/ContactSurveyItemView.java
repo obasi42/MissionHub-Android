@@ -40,7 +40,8 @@ public class ContactSurveyItemView extends LinearLayout implements ItemView {
         } else {
         	mSubtextView.setText(item.subtext);
         	mSubtextView.setTextColor(getContext().getResources().getColor(R.color.dark_gray));
-        }
+        }        
+        this.setClickable(true);
     }
 
 	@Override

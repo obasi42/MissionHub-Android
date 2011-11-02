@@ -177,7 +177,7 @@ public class MissionHubActivity extends Activity {
 			mOrganization.setText(getUser().getOrganizations().get(getUser().getOrganizationID()).getName());
 			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
 			
-			Organizations.get(this, "HERE!");
+			//Organizations.get(this, "HERE!");
 		} else{
 			getActionBar().setVisibility(View.GONE);
 			mLoggedIn.setVisibility(View.GONE);

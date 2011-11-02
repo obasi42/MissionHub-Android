@@ -9,8 +9,8 @@
         android:layout_height="fill_parent"
         android:background="@color/white"
         android:cacheColorHint="@color/white"
-        android:divider="#E2E2E2"
-        android:dividerHeight="1dp"
+        android:dividerHeight="0px"
+        android:divider="#333"
         android:fadeScrollbars="true" />
 
 </LinearLayout>

@@ -23,7 +23,6 @@ public class ContactSurveyHeaderItem extends TextItem {
      */
     public ContactSurveyHeaderItem(String text) {
         super(text);
-        enabled = false;
     }
 
     @Override
