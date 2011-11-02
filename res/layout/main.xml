@@ -1,54 +1,119 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="fill_parent" android:layout_height="fill_parent"
-	android:background="@drawable/mh_background">
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/mh_background" >
 
-	<RelativeLayout android:id="@+id/loggedin"
-		android:visibility="visible" android:layout_width="fill_parent"
-		android:layout_height="fill_parent">
-		<com.missionhub.ui.DashboardLayout
-			android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_above="@+id/dashboard_bottom_bar">
+    <RelativeLayout
+        android:id="@+id/loggedin"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:visibility="visible" >
 
-			<Button android:id="@+id/dashboard_contacts" style="@style/dashboard_button"
-				android:text="@string/dashboard_contacts" android:drawableTop="@drawable/dashboard_contacts"
-				android:onClick="clickContacts" />
+        <com.missionhub.ui.DashboardLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_above="@+id/dashboard_bottom_bar" >
 
-			<!-- <Button android:id="@+id/dashboard_groups" style="@style/DashboardButton" 
+            <Button
+                android:id="@+id/dashboard_contacts"
+                style="@style/dashboard_button"
+                android:drawableTop="@drawable/dashboard_contacts"
+                android:onClick="clickContacts"
+                android:text="@string/dashboard_contacts" />
+
+            <!--
+                 <Button android:id="@+id/dashboard_groups" style="@style/DashboardButton" 
 				android:text="@string/dashboard_groups" android:drawableTop="@drawable/dashboard_groups" 
-				android:onClick="clickGroups"/> -->
+				android:onClick="clickGroups"/>
+            -->
 
-			<Button android:id="@+id/dashboard_surveys" style="@style/dashboard_button"
-				android:text="@string/dashboard_surveys" android:drawableTop="@drawable/dashboard_surveys"
-				android:onClick="clickSurveys" />
-		</com.missionhub.ui.DashboardLayout>
-		
-		
-		<LinearLayout android:id="@+id/dashboard_bottom_bar" android:orientation="vertical" android:layout_height="wrap_content" android:layout_width="fill_parent" android:layout_alignParentBottom="true" android:background="#072940" android:paddingBottom="8dp">
-			<View android:layout_height="1dp" android:layout_width="fill_parent" android:background="#999"/>
-			<View android:layout_height="1dp" android:layout_width="fill_parent" android:background="#DDD" android:layout_marginBottom="8dp"/>
-			<TextView style="@style/dashboard_name" android:layout_height="wrap_content" android:text="Chris Roemmich" android:layout_width="fill_parent" android:id="@+id/name" android:gravity="center"></TextView>
-			<TextView style="@style/dashboard_organization" android:layout_height="wrap_content" android:text="Cru" android:layout_width="fill_parent" android:id="@+id/organization" android:gravity="center"></TextView>
-		</LinearLayout>
-	</RelativeLayout>
+            <Button
+                android:id="@+id/dashboard_surveys"
+                style="@style/dashboard_button"
+                android:drawableTop="@drawable/dashboard_surveys"
+                android:onClick="clickSurveys"
+                android:text="@string/dashboard_surveys" />
+        </com.missionhub.ui.DashboardLayout>
 
-	<RelativeLayout android:layout_width="fill_parent"
-		android:layout_height="fill_parent" android:id="@+id/loggedout"
-		android:visibility="gone">
-		<ImageView android:src="@drawable/mh_logo"
-			android:layout_height="100dp" android:layout_width="fill_parent"
-			android:id="@+id/logo" android:layout_alignParentTop="true"
-			android:layout_alignParentLeft="true" android:layout_marginTop="60dp"></ImageView>
-		<LinearLayout android:layout_height="wrap_content"
-			android:layout_width="fill_parent" android:layout_alignParentBottom="true"
-			android:orientation="vertical">
+        <LinearLayout
+            android:id="@+id/dashboard_bottom_bar"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:background="#072940"
+            android:orientation="vertical"
+            android:paddingBottom="8dp" >
 
-			<Button style="@style/mh_button" android:layout_width="fill_parent"
-				android:layout_height="106dp" android:text="@string/main_about"
-				android:onClick="clickAbout"></Button>
-			<Button style="@style/mh_button" android:layout_width="fill_parent"
-				android:layout_height="106dp" android:text="@string/main_login"
-				android:onClick="clickLogin"></Button>
-		</LinearLayout>
-	</RelativeLayout>
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:background="#999" />
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="8dp"
+                android:background="#DDD" />
+
+            <TextView
+                android:id="@+id/name"
+                style="@style/dashboard_name"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Chris Roemmich" >
+            </TextView>
+
+            <TextView
+                android:id="@+id/organization"
+                style="@style/dashboard_organization"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Cru" >
+            </TextView>
+        </LinearLayout>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/loggedout"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:visibility="gone" >
+
+        <ImageView
+            android:id="@+id/logo"
+            android:layout_width="fill_parent"
+            android:layout_height="100dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="60dp"
+            android:src="@drawable/mh_logo" >
+        </ImageView>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:orientation="vertical" >
+
+            <Button
+                style="@style/mh_button"
+                android:layout_width="fill_parent"
+                android:layout_height="106dp"
+                android:onClick="clickAbout"
+                android:text="@string/main_about" >
+            </Button>
+
+            <Button
+                style="@style/mh_button"
+                android:layout_width="fill_parent"
+                android:layout_height="106dp"
+                android:onClick="clickLogin"
+                android:text="@string/main_login" >
+            </Button>
+        </LinearLayout>
+    </RelativeLayout>
 
 </RelativeLayout>

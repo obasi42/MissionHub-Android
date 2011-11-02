@@ -1,24 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<com.missionhub.ui.widget.ContactSurveyItemView
-	xmlns:android="http://schemas.android.com/apk/res/android"
+<com.missionhub.ui.widget.ContactSurveyItemView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="5dp" >
-	
-	<TextView
-		android:textColor="@color/mh_blue" 
-		android:textSize="16dp"
-		android:id="@+id/text"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content" />
 
-	<TextView
-		android:textSize="14dp" 
-		android:textColor="@color/dark_gray"
-		android:id="@+id/subtext"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content" />
-		
+    <TextView
+        android:id="@+id/text"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/mh_blue"
+        android:textSize="16dp" />
+
+    <TextView
+        android:id="@+id/subtext"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/dark_gray"
+        android:textSize="14dp" />
+
 </com.missionhub.ui.widget.ContactSurveyItemView>

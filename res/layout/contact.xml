@@ -1,10 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="fill_parent" android:layout_height="fill_parent" android:background="@drawable/mh_background" android:id="@+id/contact">
-	<ListView android:descendantFocusability="beforeDescendants" android:layout_width="fill_parent" android:fadeScrollbars="true" android:layout_alignParentLeft="true" android:layout_height="fill_parent" android:id="@+id/listview" android:layout_marginBottom="32dp" android:background="@color/white" android:cacheColorHint="@color/white"></ListView>
-     <LinearLayout android:layout_width="fill_parent" android:layout_height="34dp" android:layout_alignParentBottom="true">
-         <ToggleButton android:background="@drawable/bottom_bar_left" android:layout_width="wrap_content" android:layout_height="fill_parent" android:id="@+id/bottom_button_left" android:textOn="@string/contact_tab_status" android:textOff="@string/contact_tab_status" android:textColor="@color/white"  android:onClick="clickContact" android:layout_weight="1"></ToggleButton>
-         <ToggleButton android:background="@drawable/bottom_bar_center" android:layout_width="wrap_content" android:layout_height="fill_parent" android:id="@+id/bottom_button_center" android:textOn="@string/contact_tab_about" android:textOff="@string/contact_tab_about" android:textColor="@color/white" android:onClick="clickMoreInfo" android:layout_weight="1"></ToggleButton>
-         <ToggleButton android:background="@drawable/bottom_bar_right" android:layout_width="wrap_content" android:layout_height="fill_parent" android:id="@+id/bottom_button_right" android:textOn="@string/contact_tab_surveys" android:textOff="@string/contact_tab_surveys" android:textColor="@color/white" android:onClick="clickSurveys" android:layout_weight="1"></ToggleButton>
-     </LinearLayout>
+    android:id="@+id/contact"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/mh_background" >
+
+    <ListView
+        android:id="@+id/listview"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_marginBottom="32dp"
+        android:background="@color/white"
+        android:cacheColorHint="@color/white"
+        android:descendantFocusability="beforeDescendants"
+        android:fadeScrollbars="true" >
+    </ListView>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="34dp"
+        android:layout_alignParentBottom="true" >
+
+        <ToggleButton
+            android:id="@+id/bottom_button_left"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:background="@drawable/bottom_bar_left"
+            android:onClick="clickContact"
+            android:textColor="@color/white"
+            android:textOff="@string/contact_tab_status"
+            android:textOn="@string/contact_tab_status" >
+        </ToggleButton>
+
+        <ToggleButton
+            android:id="@+id/bottom_button_center"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:background="@drawable/bottom_bar_center"
+            android:onClick="clickMoreInfo"
+            android:textColor="@color/white"
+            android:textOff="@string/contact_tab_about"
+            android:textOn="@string/contact_tab_about" >
+        </ToggleButton>
+
+        <ToggleButton
+            android:id="@+id/bottom_button_right"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:background="@drawable/bottom_bar_right"
+            android:onClick="clickSurveys"
+            android:textColor="@color/white"
+            android:textOff="@string/contact_tab_surveys"
+            android:textOn="@string/contact_tab_surveys" >
+        </ToggleButton>
+    </LinearLayout>
+
 </RelativeLayout>

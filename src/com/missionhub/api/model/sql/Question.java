@@ -11,6 +11,7 @@ import de.greenrobot.dao.DaoException;
 public class Question {
 
     private Integer _id;
+    private Integer keyword_id;
     private String label;
     private String kind;
     private String style;
@@ -23,6 +24,9 @@ public class Question {
     /** Used for active entity operations. */
     private QuestionDao myDao;
 
+    private Keyword keyword;
+    private Integer keyword__resolvedKey;
+
     private List<Question> question;
 
     public Question() {
@@ -32,8 +36,9 @@ public class Question {
         this._id = _id;
     }
 
-    public Question(Integer _id, String label, String kind, String style, Boolean required, Boolean active) {
+    public Question(Integer _id, Integer keyword_id, String label, String kind, String style, Boolean required, Boolean active) {
         this._id = _id;
+        this.keyword_id = keyword_id;
         this.label = label;
         this.kind = kind;
         this.style = style;
@@ -53,6 +58,14 @@ public class Question {
 
     public void set_id(Integer _id) {
         this._id = _id;
+    }
+
+    public Integer getKeyword_id() {
+        return keyword_id;
+    }
+
+    public void setKeyword_id(Integer keyword_id) {
+        this.keyword_id = keyword_id;
     }
 
     public String getLabel() {
@@ -93,6 +106,25 @@ public class Question {
 
     public void setActive(Boolean active) {
         this.active = active;
+    }
+
+    /** To-one relationship, resolved on first access. */
+    public Keyword getKeyword() {
+        if (keyword__resolvedKey == null || !keyword__resolvedKey.equals(keyword_id)) {
+            if (daoSession == null) {
+                throw new DaoException("Entity is detached from DAO context");
+            }
+            KeywordDao targetDao = daoSession.getKeywordDao();
+            keyword = targetDao.load(keyword_id);
+            keyword__resolvedKey = keyword_id;
+        }
+        return keyword;
+    }
+
+    public void setKeyword(Keyword keyword) {
+        this.keyword = keyword;
+        keyword_id = keyword == null ? null : keyword.get_id();
+        keyword__resolvedKey = keyword_id;
     }
 
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */

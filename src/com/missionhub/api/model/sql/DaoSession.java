@@ -20,7 +20,6 @@ import com.missionhub.api.model.sql.Rejoicable;
 import com.missionhub.api.model.sql.Organization;
 import com.missionhub.api.model.sql.Keyword;
 import com.missionhub.api.model.sql.Question;
-import com.missionhub.api.model.sql.KeywordQuestion;
 import com.missionhub.api.model.sql.Answer;
 import com.missionhub.api.model.sql.QuestionChoice;
 import com.missionhub.api.model.sql.ContactListCache;
@@ -36,7 +35,6 @@ import com.missionhub.api.model.sql.RejoicableDao;
 import com.missionhub.api.model.sql.OrganizationDao;
 import com.missionhub.api.model.sql.KeywordDao;
 import com.missionhub.api.model.sql.QuestionDao;
-import com.missionhub.api.model.sql.KeywordQuestionDao;
 import com.missionhub.api.model.sql.AnswerDao;
 import com.missionhub.api.model.sql.QuestionChoiceDao;
 import com.missionhub.api.model.sql.ContactListCacheDao;
@@ -61,7 +59,6 @@ public class DaoSession extends AbstractDaoSession {
     private final DaoConfig organizationDaoConfig;
     private final DaoConfig keywordDaoConfig;
     private final DaoConfig questionDaoConfig;
-    private final DaoConfig keywordQuestionDaoConfig;
     private final DaoConfig answerDaoConfig;
     private final DaoConfig questionChoiceDaoConfig;
     private final DaoConfig contactListCacheDaoConfig;
@@ -77,7 +74,6 @@ public class DaoSession extends AbstractDaoSession {
     private final OrganizationDao organizationDao;
     private final KeywordDao keywordDao;
     private final QuestionDao questionDao;
-    private final KeywordQuestionDao keywordQuestionDao;
     private final AnswerDao answerDao;
     private final QuestionChoiceDao questionChoiceDao;
     private final ContactListCacheDao contactListCacheDao;
@@ -119,9 +115,6 @@ public class DaoSession extends AbstractDaoSession {
         questionDaoConfig = daoConfigMap.get(QuestionDao.class).clone();
         questionDaoConfig.initIdentityScope(type);
 
-        keywordQuestionDaoConfig = daoConfigMap.get(KeywordQuestionDao.class).clone();
-        keywordQuestionDaoConfig.initIdentityScope(type);
-
         answerDaoConfig = daoConfigMap.get(AnswerDao.class).clone();
         answerDaoConfig.initIdentityScope(type);
 
@@ -142,7 +135,6 @@ public class DaoSession extends AbstractDaoSession {
         organizationDao = new OrganizationDao(organizationDaoConfig, this);
         keywordDao = new KeywordDao(keywordDaoConfig, this);
         questionDao = new QuestionDao(questionDaoConfig, this);
-        keywordQuestionDao = new KeywordQuestionDao(keywordQuestionDaoConfig, this);
         answerDao = new AnswerDao(answerDaoConfig, this);
         questionChoiceDao = new QuestionChoiceDao(questionChoiceDaoConfig, this);
         contactListCacheDao = new ContactListCacheDao(contactListCacheDaoConfig, this);
@@ -158,7 +150,6 @@ public class DaoSession extends AbstractDaoSession {
         registerDao(Organization.class, organizationDao);
         registerDao(Keyword.class, keywordDao);
         registerDao(Question.class, questionDao);
-        registerDao(KeywordQuestion.class, keywordQuestionDao);
         registerDao(Answer.class, answerDao);
         registerDao(QuestionChoice.class, questionChoiceDao);
         registerDao(ContactListCache.class, contactListCacheDao);
@@ -176,7 +167,6 @@ public class DaoSession extends AbstractDaoSession {
         organizationDaoConfig.getIdentityScope().clear();
         keywordDaoConfig.getIdentityScope().clear();
         questionDaoConfig.getIdentityScope().clear();
-        keywordQuestionDaoConfig.getIdentityScope().clear();
         answerDaoConfig.getIdentityScope().clear();
         questionChoiceDaoConfig.getIdentityScope().clear();
         contactListCacheDaoConfig.getIdentityScope().clear();
@@ -224,10 +214,6 @@ public class DaoSession extends AbstractDaoSession {
 
     public QuestionDao getQuestionDao() {
         return questionDao;
-    }
-
-    public KeywordQuestionDao getKeywordQuestionDao() {
-        return keywordQuestionDao;
     }
 
     public AnswerDao getAnswerDao() {

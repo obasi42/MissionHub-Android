@@ -1,6 +1,7 @@
 package com.missionhub.api.model.sql;
 
 import java.util.List;
+import java.util.ArrayList;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
@@ -8,6 +9,7 @@ import android.database.sqlite.SQLiteStatement;
 import de.greenrobot.dao.AbstractDao;
 import de.greenrobot.dao.DaoConfig;
 import de.greenrobot.dao.Property;
+import de.greenrobot.dao.SqlUtils;
 import de.greenrobot.dao.Query;
 import de.greenrobot.dao.QueryBuilder;
 
@@ -23,12 +25,13 @@ public class QuestionDao extends AbstractDao<Question, Integer> {
 
     public static class Properties {
         public final static Property _id = new Property(0, Integer.class, "_id", true, "_ID");
-        public final static Property Label = new Property(1, String.class, "label", false, "LABEL");
-        public final static Property Kind = new Property(2, String.class, "kind", false, "KIND");
-        public final static Property Style = new Property(3, String.class, "style", false, "STYLE");
-        public final static Property Required = new Property(4, Boolean.class, "required", false, "REQUIRED");
-        public final static Property Active = new Property(5, Boolean.class, "active", false, "ACTIVE");
-        public final static Property Question_id = new Property(6, Integer.class, "question_id", false, "QUESTION_ID");
+        public final static Property Keyword_id = new Property(1, Integer.class, "keyword_id", false, "KEYWORD_ID");
+        public final static Property Label = new Property(2, String.class, "label", false, "LABEL");
+        public final static Property Kind = new Property(3, String.class, "kind", false, "KIND");
+        public final static Property Style = new Property(4, String.class, "style", false, "STYLE");
+        public final static Property Required = new Property(5, Boolean.class, "required", false, "REQUIRED");
+        public final static Property Active = new Property(6, Boolean.class, "active", false, "ACTIVE");
+        public final static Property Question_id = new Property(7, Integer.class, "question_id", false, "QUESTION_ID");
     };
 
     private DaoSession daoSession;
@@ -48,12 +51,13 @@ public class QuestionDao extends AbstractDao<Question, Integer> {
     public static void createTable(SQLiteDatabase db, boolean ifNotExists) {
         String sql = "CREATE TABLE " + (ifNotExists? "IF NOT EXISTS ": "") + "'QUESTION' (" + //
                 "'_ID' INTEGER PRIMARY KEY ," + // 0: _id
-                "'LABEL' TEXT," + // 1: label
-                "'KIND' TEXT," + // 2: kind
-                "'STYLE' TEXT," + // 3: style
-                "'REQUIRED' INTEGER," + // 4: required
-                "'ACTIVE' INTEGER," + // 5: active
-                "'QUESTION_ID' INTEGER);"; // 6: question_id
+                "'KEYWORD_ID' INTEGER," + // 1: keyword_id
+                "'LABEL' TEXT," + // 2: label
+                "'KIND' TEXT," + // 3: kind
+                "'STYLE' TEXT," + // 4: style
+                "'REQUIRED' INTEGER," + // 5: required
+                "'ACTIVE' INTEGER," + // 6: active
+                "'QUESTION_ID' INTEGER);"; // 7: question_id
         db.execSQL(sql);
     }
 
@@ -73,29 +77,34 @@ public class QuestionDao extends AbstractDao<Question, Integer> {
             stmt.bindLong(1, _id);
         }
  
+        Integer keyword_id = entity.getKeyword_id();
+        if (keyword_id != null) {
+            stmt.bindLong(2, keyword_id);
+        }
+ 
         String label = entity.getLabel();
         if (label != null) {
-            stmt.bindString(2, label);
+            stmt.bindString(3, label);
         }
  
         String kind = entity.getKind();
         if (kind != null) {
-            stmt.bindString(3, kind);
+            stmt.bindString(4, kind);
         }
  
         String style = entity.getStyle();
         if (style != null) {
-            stmt.bindString(4, style);
+            stmt.bindString(5, style);
         }
  
         Boolean required = entity.getRequired();
         if (required != null) {
-            stmt.bindLong(5, required ? 1l: 0l);
+            stmt.bindLong(6, required ? 1l: 0l);
         }
  
         Boolean active = entity.getActive();
         if (active != null) {
-            stmt.bindLong(6, active ? 1l: 0l);
+            stmt.bindLong(7, active ? 1l: 0l);
         }
     }
 
@@ -116,11 +125,12 @@ public class QuestionDao extends AbstractDao<Question, Integer> {
     public Question readEntity(Cursor cursor, int offset) {
         Question entity = new Question( //
             cursor.isNull(offset + 0) ? null : cursor.getInt(offset + 0), // _id
-            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // label
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // kind
-            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // style
-            cursor.isNull(offset + 4) ? null : cursor.getShort(offset + 4) != 0, // required
-            cursor.isNull(offset + 5) ? null : cursor.getShort(offset + 5) != 0 // active
+            cursor.isNull(offset + 1) ? null : cursor.getInt(offset + 1), // keyword_id
+            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // label
+            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // kind
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // style
+            cursor.isNull(offset + 5) ? null : cursor.getShort(offset + 5) != 0, // required
+            cursor.isNull(offset + 6) ? null : cursor.getShort(offset + 6) != 0 // active
         );
         return entity;
     }
@@ -129,11 +139,12 @@ public class QuestionDao extends AbstractDao<Question, Integer> {
     @Override
     public void readEntity(Cursor cursor, Question entity, int offset) {
         entity.set_id(cursor.isNull(offset + 0) ? null : cursor.getInt(offset + 0));
-        entity.setLabel(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
-        entity.setKind(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
-        entity.setStyle(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
-        entity.setRequired(cursor.isNull(offset + 4) ? null : cursor.getShort(offset + 4) != 0);
-        entity.setActive(cursor.isNull(offset + 5) ? null : cursor.getShort(offset + 5) != 0);
+        entity.setKeyword_id(cursor.isNull(offset + 1) ? null : cursor.getInt(offset + 1));
+        entity.setLabel(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
+        entity.setKind(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
+        entity.setStyle(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
+        entity.setRequired(cursor.isNull(offset + 5) ? null : cursor.getShort(offset + 5) != 0);
+        entity.setActive(cursor.isNull(offset + 6) ? null : cursor.getShort(offset + 6) != 0);
      }
     
     @Override
@@ -170,4 +181,95 @@ public class QuestionDao extends AbstractDao<Question, Integer> {
         return question_QuestionQuery.list();
     }
 
+    private String selectDeep;
+
+    protected String getSelectDeep() {
+        if (selectDeep == null) {
+            StringBuilder builder = new StringBuilder("SELECT ");
+            SqlUtils.appendColumns(builder, "T", getAllColumns());
+            builder.append(',');
+            SqlUtils.appendColumns(builder, "T0", daoSession.getKeywordDao().getAllColumns());
+            builder.append(" FROM QUESTION T");
+            builder.append(" LEFT JOIN KEYWORD T0 ON T.'KEYWORD_ID'=T0.'_ID'");
+            builder.append(' ');
+            selectDeep = builder.toString();
+        }
+        return selectDeep;
+    }
+    
+    protected Question loadCurrentDeep(Cursor cursor, boolean lock) {
+        Question entity = loadCurrent(cursor, 0, lock);
+        int offset = getAllColumns().length;
+
+        Keyword keyword = loadCurrentOther(daoSession.getKeywordDao(), cursor, offset);
+        entity.setKeyword(keyword);
+
+        return entity;    
+    }
+
+    public Question loadDeep(Long key) {
+        assertSinglePk();
+        if (key == null) {
+            return null;
+        }
+
+        StringBuilder builder = new StringBuilder(getSelectDeep());
+        builder.append("WHERE ");
+        SqlUtils.appendColumnsEqValue(builder, "T", getPkColumns());
+        String sql = builder.toString();
+        
+        String[] keyArray = new String[] { key.toString() };
+        Cursor cursor = db.rawQuery(sql, keyArray);
+        
+        try {
+            boolean available = cursor.moveToFirst();
+            if (!available) {
+                return null;
+            } else if (!cursor.isLast()) {
+                throw new IllegalStateException("Expected unique result, but count was " + cursor.getCount());
+            }
+            return loadCurrentDeep(cursor, true);
+        } finally {
+            cursor.close();
+        }
+    }
+    
+    /** Reads all available rows from the given cursor and returns a list of new ImageTO objects. */
+    public List<Question> loadAllDeepFromCursor(Cursor cursor) {
+        int count = cursor.getCount();
+        List<Question> list = new ArrayList<Question>(count);
+        
+        if (cursor.moveToFirst()) {
+            if (identityScope != null) {
+                identityScope.lock();
+                identityScope.reserveRoom(count);
+            }
+            try {
+                do {
+                    list.add(loadCurrentDeep(cursor, false));
+                } while (cursor.moveToNext());
+            } finally {
+                if (identityScope != null) {
+                    identityScope.unlock();
+                }
+            }
+        }
+        return list;
+    }
+    
+    protected List<Question> loadDeepAllAndCloseCursor(Cursor cursor) {
+        try {
+            return loadAllDeepFromCursor(cursor);
+        } finally {
+            cursor.close();
+        }
+    }
+    
+
+    /** A raw-style query where you can pass any WHERE clause and arguments. */
+    public List<Question> queryDeep(String where, String... selectionArg) {
+        Cursor cursor = db.rawQuery(getSelectDeep() + where, selectionArg);
+        return loadDeepAllAndCloseCursor(cursor);
+    }
+ 
 }

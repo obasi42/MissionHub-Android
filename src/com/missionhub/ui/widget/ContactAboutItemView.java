@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+
 public class ContactAboutItemView extends LinearLayout implements ItemView {
 
 	private TextView mTextView;
@@ -54,7 +55,6 @@ public class ContactAboutItemView extends LinearLayout implements ItemView {
 		} else {
 			mImageView.setVisibility(View.GONE);
 		}
-		
 		// seemingly backward logic so that the itemview handles the click 
 		// rather than the listview as to not show a selection when pressed
 		if (item.action == null) {
@@ -62,5 +62,10 @@ public class ContactAboutItemView extends LinearLayout implements ItemView {
 		} else {
 			setClickable(false);
 		}
+	}
+	
+	@Override
+	public Class<? extends Item> getItemClass() {
+		return ContactAboutItem.class;
 	}
 }

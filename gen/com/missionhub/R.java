@@ -853,9 +853,9 @@ containing a value of this type.
         public static final int egg_picture=0x7f050043;
         public static final int email=0x7f05004a;
         public static final int empty=0x7f050002;
-        public static final int fragment_contact_about_header=0x7f05006f;
+        public static final int fragment_contact_about_header=0x7f050070;
         public static final int fragment_contact_status_header=0x7f050072;
-        public static final int fragment_contact_surveys_header=0x7f050073;
+        public static final int fragment_contact_surveys_header=0x7f050074;
         public static final int gd_action_bar=0x7f050012;
         public static final int gd_action_bar_content_view=0x7f050014;
         public static final int gd_action_bar_home_item=0x7f05004b;
@@ -890,9 +890,9 @@ containing a value of this type.
         public static final int left=0x7f050009;
         public static final int linearLayout1=0x7f050040;
         public static final int listview=0x7f050029;
-        public static final int listview_contact_about=0x7f050070;
+        public static final int listview_contact_about=0x7f05006f;
         public static final int listview_contact_status=0x7f050071;
-        public static final int listview_contact_surveys=0x7f050074;
+        public static final int listview_contact_surveys=0x7f050073;
         public static final int loggedin=0x7f050063;
         public static final int loggedout=0x7f050068;
         public static final int logo=0x7f050069;
@@ -974,14 +974,16 @@ containing a value of this type.
         public static final int rejoiceable_item=0x7f03002e;
         public static final int surveys=0x7f03002f;
         public static final int tab_contact_about=0x7f030030;
-        public static final int tab_contact_status=0x7f030031;
-        public static final int tab_contact_status_header=0x7f030032;
-        public static final int tab_contact_surveys=0x7f030033;
-        public static final int topbar=0x7f030034;
-        public static final int widget_contact_about_item=0x7f030035;
-        public static final int widget_contact_survey_header=0x7f030036;
-        public static final int widget_contact_survey_item=0x7f030037;
-        public static final int widget_tab=0x7f030038;
+        public static final int tab_contact_about_header=0x7f030031;
+        public static final int tab_contact_status=0x7f030032;
+        public static final int tab_contact_status_header=0x7f030033;
+        public static final int tab_contact_surveys=0x7f030034;
+        public static final int tab_contact_surveys_header=0x7f030035;
+        public static final int topbar=0x7f030036;
+        public static final int widget_contact_about_item=0x7f030037;
+        public static final int widget_contact_survey_header=0x7f030038;
+        public static final int widget_contact_survey_item=0x7f030039;
+        public static final int widget_tab=0x7f03003a;
     }
     public static final class menu {
         public static final int contacts_filter=0x7f0b0000;

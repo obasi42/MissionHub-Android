@@ -1,7 +1,8 @@
 package com.missionhub.ui.widget;
 
+import com.missionhub.ui.widget.item.ContactSurveyHeaderItem;
+
 import greendroid.widget.item.Item;
-import greendroid.widget.item.TextItem;
 import greendroid.widget.itemview.ItemView;
 import android.content.Context;
 import android.util.AttributeSet;
@@ -27,7 +28,12 @@ public class ContactSurveyHeaderView extends TextView implements ItemView {
 
     @Override
 	public void setObject(Item object) {
-        final TextItem item = (TextItem) object;
+        final ContactSurveyHeaderItem item = (ContactSurveyHeaderItem) object;
         setText(item.text);
     }
+    
+    @Override
+	public Class<? extends Item> getItemClass() {
+		return ContactSurveyHeaderItem.class;
+	}
 }

@@ -1,10 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="fill_parent" android:layout_height="fill_parent" android:background="@drawable/mh_background" android:id="@+id/contacts">
-    <LinearLayout android:id="@+id/linearLayout1" android:layout_width="fill_parent" android:layout_height="34dp" android:layout_alignParentBottom="true">
-        <ToggleButton android:background="@drawable/bottom_bar_left" android:layout_width="wrap_content" android:layout_height="fill_parent" android:id="@+id/bottom_button_left" android:textOn="@string/contacts_tab_my" android:textOff="@string/contacts_tab_my" android:textColor="@color/white" android:layout_weight="1" android:onClick="clickMyContacts"></ToggleButton>
-        <ToggleButton android:background="@drawable/bottom_bar_right" android:layout_width="wrap_content" android:layout_height="fill_parent" android:id="@+id/bottom_button_right" android:textOn="@string/contacts_tab_all" android:textOff="@string/contacts_tab_all" android:textColor="@color/white" android:layout_weight="1" android:onClick="clickAllContacts"></ToggleButton>
+    android:id="@+id/contacts"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/mh_background" >
+
+    <LinearLayout
+        android:id="@+id/linearLayout1"
+        android:layout_width="fill_parent"
+        android:layout_height="34dp"
+        android:layout_alignParentBottom="true" >
+
+        <ToggleButton
+            android:id="@+id/bottom_button_left"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:background="@drawable/bottom_bar_left"
+            android:onClick="clickMyContacts"
+            android:textColor="@color/white"
+            android:textOff="@string/contacts_tab_my"
+            android:textOn="@string/contacts_tab_my" >
+        </ToggleButton>
+
+        <ToggleButton
+            android:id="@+id/bottom_button_right"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:background="@drawable/bottom_bar_right"
+            android:onClick="clickAllContacts"
+            android:textColor="@color/white"
+            android:textOff="@string/contacts_tab_all"
+            android:textOn="@string/contacts_tab_all" >
+        </ToggleButton>
     </LinearLayout>
-    <ListView android:layout_width="fill_parent" android:layout_alignParentLeft="true" android:layout_height="fill_parent" android:layout_marginBottom="32dp" android:background="@color/white" android:id="@+id/contacts_list" android:cacheColorHint="@color/white"></ListView>
-    <TextView android:textAppearance="?android:attr/textAppearanceMedium" android:layout_height="wrap_content" android:layout_alignParentLeft="true" android:layout_width="fill_parent" android:textColor="@color/black" android:gravity="center" android:layout_marginTop="85dp" android:text="@string/contacts_no_data_my" android:visibility="gone" android:id="@+id/txt_contacts_no_data"></TextView>
+
+    <ListView
+        android:id="@+id/contacts_list"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_marginBottom="32dp"
+        android:background="@color/white"
+        android:cacheColorHint="@color/white" >
+    </ListView>
+
+    <TextView
+        android:id="@+id/txt_contacts_no_data"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_marginTop="85dp"
+        android:gravity="center"
+        android:text="@string/contacts_no_data_my"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/black"
+        android:visibility="gone" >
+    </TextView>
+
 </RelativeLayout>

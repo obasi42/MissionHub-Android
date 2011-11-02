@@ -3,6 +3,7 @@
     android:id="@+id/root_contact_header"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
+    android:background="@drawable/mh_gradient"
     android:orientation="horizontal"
     android:padding="8dp" >
 

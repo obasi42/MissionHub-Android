@@ -19,7 +19,6 @@ import com.missionhub.api.model.sql.RejoicableDao;
 import com.missionhub.api.model.sql.OrganizationDao;
 import com.missionhub.api.model.sql.KeywordDao;
 import com.missionhub.api.model.sql.QuestionDao;
-import com.missionhub.api.model.sql.KeywordQuestionDao;
 import com.missionhub.api.model.sql.AnswerDao;
 import com.missionhub.api.model.sql.QuestionChoiceDao;
 import com.missionhub.api.model.sql.ContactListCacheDao;
@@ -44,7 +43,6 @@ public class DaoMaster extends AbstractDaoMaster {
         OrganizationDao.createTable(db, ifNotExists);
         KeywordDao.createTable(db, ifNotExists);
         QuestionDao.createTable(db, ifNotExists);
-        KeywordQuestionDao.createTable(db, ifNotExists);
         AnswerDao.createTable(db, ifNotExists);
         QuestionChoiceDao.createTable(db, ifNotExists);
         ContactListCacheDao.createTable(db, ifNotExists);
@@ -63,7 +61,6 @@ public class DaoMaster extends AbstractDaoMaster {
         OrganizationDao.dropTable(db, ifExists);
         KeywordDao.dropTable(db, ifExists);
         QuestionDao.dropTable(db, ifExists);
-        KeywordQuestionDao.dropTable(db, ifExists);
         AnswerDao.dropTable(db, ifExists);
         QuestionChoiceDao.dropTable(db, ifExists);
         ContactListCacheDao.dropTable(db, ifExists);
@@ -109,7 +106,6 @@ public class DaoMaster extends AbstractDaoMaster {
         registerDaoClass(OrganizationDao.class);
         registerDaoClass(KeywordDao.class);
         registerDaoClass(QuestionDao.class);
-        registerDaoClass(KeywordQuestionDao.class);
         registerDaoClass(AnswerDao.class);
         registerDaoClass(QuestionChoiceDao.class);
         registerDaoClass(ContactListCacheDao.class);

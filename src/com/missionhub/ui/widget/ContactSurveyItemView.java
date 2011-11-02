@@ -43,4 +43,8 @@ public class ContactSurveyItemView extends LinearLayout implements ItemView {
         }
     }
 
+	@Override
+	public Class<? extends Item> getItemClass() {
+		return ContactSurveyItem.class;
+	}
 }

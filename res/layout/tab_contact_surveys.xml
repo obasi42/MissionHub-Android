@@ -1,18 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical"
-    >
-    
-    <fragment
-        android:id="@+id/fragment_contact_surveys_header"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:name="com.missionhub.ui.ContactHeaderSmallFragment" >
-
-        <!-- Preview: layout=@layout/fragment_contact_header_small -->
-    </fragment>
+    android:layout_height="fill_parent" >
 
     <ListView
         android:id="@+id/listview_contact_surveys"
@@ -20,6 +9,8 @@
         android:layout_height="fill_parent"
         android:background="@color/white"
         android:cacheColorHint="@color/white"
+        android:divider="#E2E2E2"
+        android:dividerHeight="1dp"
         android:fadeScrollbars="true" />
 
 </LinearLayout>

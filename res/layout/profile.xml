@@ -1,15 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="fill_parent" android:layout_height="fill_parent" android:background="@drawable/mh_background" android:id="@+id/profile">
+    android:id="@+id/profile"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/mh_background" >
+
     <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content" android:orientation="vertical"
+        android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:paddingLeft="10dp" android:paddingRight="10dp">
-        <LinearLayout android:layout_height="wrap_content" android:layout_width="fill_parent" >
-            <ImageView android:src="@drawable/default_contact" android:layout_width="110dp" android:layout_height="150dp" android:id="@+id/profile_picture"></ImageView>
-            <LinearLayout android:orientation="vertical" android:layout_width="wrap_content" android:layout_height="fill_parent" android:gravity="center_vertical">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="TextView" android:textAppearance="?android:attr/textAppearanceLarge" android:lines="2" android:layout_marginLeft="10dp" android:gravity="center|left" android:id="@+id/name"></TextView>
+        android:orientation="vertical"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp" >
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+
+            <ImageView
+                android:id="@+id/profile_picture"
+                android:layout_width="110dp"
+                android:layout_height="150dp"
+                android:src="@drawable/default_contact" >
+            </ImageView>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:gravity="center_vertical"
+                android:orientation="vertical" >
+
+                <TextView
+                    android:id="@+id/name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:gravity="center|left"
+                    android:lines="2"
+                    android:text="TextView"
+                    android:textAppearance="?android:attr/textAppearanceLarge" >
+                </TextView>
             </LinearLayout>
         </LinearLayout>
 
@@ -19,9 +49,34 @@
             android:orientation="vertical"
             android:paddingTop="5dp" >
 
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:textAppearance="?android:attr/textAppearanceMedium" android:text="@string/profile_change_current_organization" android:layout_marginLeft="3dp" android:textSize="14dp"></TextView>
-            <Spinner android:layout_height="wrap_content" android:layout_width="fill_parent" android:prompt="@string/profile_change_current_organization" android:id="@+id/spinner"></Spinner>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="3dp"
+                android:text="@string/profile_change_current_organization"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="14dp" >
+            </TextView>
+
+            <Spinner
+                android:id="@+id/spinner"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:prompt="@string/profile_change_current_organization" >
+            </Spinner>
         </LinearLayout>
     </LinearLayout>
-    <TextView android:layout_height="wrap_content" android:layout_alignParentBottom="true" android:layout_width="fill_parent" android:layout_marginBottom="5dp" android:gravity="center" android:clickable="true" android:onClick="clickVersion" android:textColor="@color/white" android:id="@+id/version"></TextView>
+
+    <TextView
+        android:id="@+id/version"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="5dp"
+        android:clickable="true"
+        android:gravity="center"
+        android:onClick="clickVersion"
+        android:textColor="@color/white" >
+    </TextView>
+
 </RelativeLayout>

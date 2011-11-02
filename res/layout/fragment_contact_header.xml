@@ -3,20 +3,20 @@
     android:id="@+id/root_contact_header"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
     android:background="@drawable/mh_gradient"
+    android:orientation="horizontal"
     android:padding="8dp" >
 
     <com.missionhub.ui.widget.RoundedImageView
         android:id="@+id/picture"
-        android:adjustViewBounds="true"
-        android:maxWidth="110dp"
-        android:maxHeight="150dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginRight="10dp"
+        android:adjustViewBounds="true"
         android:clickable="true"
+        android:maxHeight="150dp"
+        android:maxWidth="110dp"
         android:src="@drawable/facebook_question" >
     </com.missionhub.ui.widget.RoundedImageView>
 
@@ -33,9 +33,8 @@
             android:layout_marginBottom="10dp"
             android:ellipsize="end"
             android:maxLines="2"
-            android:textAppearance="?android:attr/textAppearanceMedium" 
-            android:textStyle="bold"
-            >
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textStyle="bold" >
         </TextView>
 
         <LinearLayout
@@ -70,4 +69,5 @@
             </Button>
         </LinearLayout>
     </LinearLayout>
+
 </LinearLayout>

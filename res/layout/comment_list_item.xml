@@ -1,29 +1,117 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:orientation="horizontal"
-	android:layout_height="wrap_content" 
-	android:layout_width="fill_parent" android:gravity="left|top" android:paddingLeft="5dp" android:paddingRight="5dp" android:minHeight="60dp">
-	
-	<ImageView
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:gravity="left|top"
+    android:minHeight="60dp"
+    android:orientation="horizontal"
+    android:paddingLeft="5dp"
+    android:paddingRight="5dp" >
+
+    <ImageView
+        android:id="@+id/comment_picture"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginBottom="5dp"
         android:layout_marginRight="7dp"
-        android:src="@drawable/default_contact" android:layout_width="50dp" android:layout_height="50dp" android:id="@+id/comment_picture" android:layout_marginTop="5dp" android:layout_marginBottom="5dp"/>
-    <LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="wrap_content" android:minHeight="50dp" android:layout_marginTop="2dp">
+        android:layout_marginTop="5dp"
+        android:src="@drawable/default_contact" />
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:minHeight="50dp"
+        android:orientation="vertical" >
+
         <RelativeLayout
             android:layout_width="wrap_content"
-            android:layout_height="16dp">
-            <TextView android:layout_width="wrap_content" android:maxLines="1" android:id="@+id/comment_status" android:gravity="right" android:layout_height="wrap_content" android:textColor="@color/comment_status" android:textSize="13dp" android:layout_alignParentRight="true" android:text="status"></TextView>
-            <TextView android:lines="1" android:id="@+id/comment_name" android:layout_height="wrap_content" android:textColor="@color/black" android:ellipsize="end" android:textSize="14dp" android:layout_alignParentLeft="true" android:layout_width="140dp" android:text="First Last"></TextView>
+            android:layout_height="16dp" >
+
+            <TextView
+                android:id="@+id/comment_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:gravity="right"
+                android:maxLines="1"
+                android:text="status"
+                android:textColor="@color/comment_status"
+                android:textSize="13dp" >
+            </TextView>
+
+            <TextView
+                android:id="@+id/comment_name"
+                android:layout_width="140dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:ellipsize="end"
+                android:lines="1"
+                android:text="First Last"
+                android:textColor="@color/black"
+                android:textSize="14dp" >
+            </TextView>
         </RelativeLayout>
-        <TextView android:id="@+id/comment_comment" android:layout_width="fill_parent" android:layout_height="wrap_content" android:textSize="13dp" android:text="comment" android:layout_weight="1" android:textColor="@color/black" android:layout_marginTop="1dp"></TextView>
-        <RelativeLayout android:layout_height="wrap_content" android:layout_width="fill_parent" android:layout_marginTop="2dp" android:layout_marginBottom="4dp">
-            <TextView android:layout_width="wrap_content" android:id="@+id/comment_time" android:gravity="bottom" android:textColor="@color/comment_time" android:textSize="12dp" android:layout_height="16dp" android:text="time" android:layout_marginTop="2dp" android:layout_marginBottom="5dp"></TextView>
+
+        <TextView
+            android:id="@+id/comment_comment"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="1dp"
+            android:layout_weight="1"
+            android:text="comment"
+            android:textColor="@color/black"
+            android:textSize="13dp" >
+        </TextView>
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:layout_marginTop="2dp" >
+
+            <TextView
+                android:id="@+id/comment_time"
+                android:layout_width="wrap_content"
+                android:layout_height="16dp"
+                android:layout_marginBottom="5dp"
+                android:layout_marginTop="2dp"
+                android:gravity="bottom"
+                android:text="time"
+                android:textColor="@color/comment_time"
+                android:textSize="12dp" >
+            </TextView>
+
             <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:layout_alignParentRight="true" android:orientation="horizontal">
-                <View android:background="@drawable/icon_g_present" android:layout_height="16dp" android:layout_width="16dp" android:id="@+id/comment_g_present"></View>
-                <View android:layout_height="16dp" android:layout_width="16dp" android:background="@drawable/icon_r_christ" android:id="@+id/comment_r_christ" android:layout_marginLeft="4dp"></View>
-                <View android:layout_width="16dp" android:layout_height="16dp" android:background="@drawable/icon_s_convo" android:id="@+id/comment_s_convo" android:layout_marginLeft="4dp"></View>
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:orientation="horizontal" >
+
+                <View
+                    android:id="@+id/comment_g_present"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:background="@drawable/icon_g_present" >
+                </View>
+
+                <View
+                    android:id="@+id/comment_r_christ"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_marginLeft="4dp"
+                    android:background="@drawable/icon_r_christ" >
+                </View>
+
+                <View
+                    android:id="@+id/comment_s_convo"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_marginLeft="4dp"
+                    android:background="@drawable/icon_s_convo" >
+                </View>
             </LinearLayout>
         </RelativeLayout>
     </LinearLayout>
+
 </LinearLayout>

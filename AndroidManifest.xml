@@ -55,6 +55,7 @@
         </activity>
         <activity
             android:name=".ContactActivity2"
+            android:configChanges="orientation|keyboardHidden"
             android:theme="@style/Theme.MHActionBar" >
         </activity>
         <activity

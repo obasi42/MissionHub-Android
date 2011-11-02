@@ -1,10 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/contact_fields" android:padding="8dp" android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="98dp" android:background="@drawable/mh_contact_rejoicables">
-            <EditText android:hint="@string/contact_comment_hint" android:layout_width="fill_parent" android:textSize="15dp" android:editable="true" android:gravity="top" android:id="@+id/contact_comment" android:inputType="textMultiLine" android:layout_height="52dp" android:lines="2">
-            </EditText>
-            <RelativeLayout android:layout_height="30dp" android:layout_width="fill_parent">
-                <Spinner android:layout_width="fill_parent" android:layout_height="wrap_content" android:background="@drawable/status_button" android:layout_marginLeft="45dp" android:id="@+id/contact_status" android:layout_marginRight="68dp"></Spinner>
-                <Button android:layout_width="37dp" android:background="@drawable/rejoicable_icon" android:layout_height="30dp" android:id="@+id/contact_rejoicable" android:onClick="clickRejoicables"></Button>
-                <Button android:textStyle="bold" android:layout_width="60dp" android:textSize="16dp" android:background="@drawable/button_save" android:text="@string/contact_comment_save" android:layout_height="30dp" android:textColor="@color/white" android:layout_alignParentRight="true" android:id="@+id/contact_save" android:onClick="clickSave"></Button>
-            </RelativeLayout>
-        </LinearLayout>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/contact_fields"
+    android:layout_width="fill_parent"
+    android:layout_height="98dp"
+    android:background="@drawable/mh_contact_rejoicables"
+    android:orientation="vertical"
+    android:padding="8dp" >
+
+    <EditText
+        android:id="@+id/contact_comment"
+        android:layout_width="fill_parent"
+        android:layout_height="52dp"
+        android:editable="true"
+        android:gravity="top"
+        android:hint="@string/contact_comment_hint"
+        android:inputType="textMultiLine"
+        android:lines="2"
+        android:textSize="15dp" >
+    </EditText>
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="30dp" >
+
+        <Spinner
+            android:id="@+id/contact_status"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="45dp"
+            android:layout_marginRight="68dp"
+            android:background="@drawable/status_button" >
+        </Spinner>
+
+        <Button
+            android:id="@+id/contact_rejoicable"
+            android:layout_width="37dp"
+            android:layout_height="30dp"
+            android:background="@drawable/rejoicable_icon"
+            android:onClick="clickRejoicables" >
+        </Button>
+
+        <Button
+            android:id="@+id/contact_save"
+            android:layout_width="60dp"
+            android:layout_height="30dp"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/button_save"
+            android:onClick="clickSave"
+            android:text="@string/contact_comment_save"
+            android:textColor="@color/white"
+            android:textSize="16dp"
+            android:textStyle="bold" >
+        </Button>
+    </RelativeLayout>
+
+</LinearLayout>

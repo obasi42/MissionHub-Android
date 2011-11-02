@@ -17,11 +17,11 @@ import android.os.Bundle;
 
 public class QuestionJsonSql {
 
-	public static void update(Context context, int organizationId, GQuestion[] questions) {
-		update(context, organizationId, questions, null);
+	public static void update(Context context, int keywordId, GQuestion[] questions) {
+		update(context, keywordId, questions, null);
 	}
 
-	public static void update(final Context context, final int organizationId, final GQuestion[] questions, final String tag) {
+	public static void update(final Context context, final int keywordId, final GQuestion[] questions, final String tag) {
 		if (questions == null)
 			return;
 
@@ -36,7 +36,8 @@ public class QuestionJsonSql {
 					if (q == null)
 						q = new Question();
 					q.set_id(question.getId());
-
+					q.setKeyword_id(keywordId);
+					
 					if (question.getLabel() != null)
 						q.setLabel(question.getLabel());
 
