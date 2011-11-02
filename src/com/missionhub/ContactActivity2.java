@@ -2,6 +2,7 @@ package com.missionhub;
 
 import com.missionhub.api.ApiNotifierHandler;
 import com.missionhub.api.Contacts;
+import com.missionhub.api.FollowupComments;
 import com.missionhub.api.ApiNotifier.Type;
 import com.missionhub.api.model.sql.Person;
 import com.missionhub.helper.TakePhotoHelper;
@@ -17,6 +18,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TabHost.TabSpec;
@@ -49,8 +53,6 @@ public class ContactActivity2 extends Activity {
 	private String contactTag = this.toString() + "person";
 	private String commentTag = this.toString() + "comment";
 
-	// STATE
-	private long contactLastRetrieved = -1;
 	private String tabTag = TAG_STATUS;
 
 	@Override
@@ -84,24 +86,28 @@ public class ContactActivity2 extends Activity {
 		setupTab(R.id.tab_contact_surveys, TAG_SURVEYS, R.string.contact_tab_surveys, R.drawable.gd_action_bar_slideshow);
 
 		restoreState(savedInstanceState);
-
+		
+		tabTag = getIntent().getStringExtra("tab");
+		if (tabTag == null) tabTag = TAG_STATUS;
+		
 		mTabHost.setCurrentTabByTag(tabTag);
 		mTabHost.setOnTabChangedListener(new OnTabChangeListener() {
 			@Override
 			public void onTabChanged(String tabId) {
 				tabTag = tabId;
+				ContactActivity2.this.getIntent().putExtra("tab", tabTag);
 			}
 		});
 
 		getApiNotifier().subscribe(this, personListener, Type.JSON_CONTACTS_ON_START, Type.JSON_CONTACTS_ON_FINISH, Type.JSON_CONTACTS_ON_FAILURE, 
 				Type.JSON_FOLLOWUP_COMMENTS_ON_START, Type.JSON_FOLLOWUP_COMMENTS_ON_FINISH, Type.JSON_FOLLOWUP_COMMENTS_ON_FAILURE,
-				Type.UPDATE_PERSON, Type.UPDATE_QUESTION, Type.UPDATE_KEYWORD);
+				Type.UPDATE_FOLLOWUP_COMMENTS, Type.UPDATE_PERSON, Type.UPDATE_QUESTION, Type.UPDATE_KEYWORD);
 
 		person = getApp().getDbSession().getPersonDao().load(personId);
 
 		updateTabPerson();
 
-		update();
+		update(false);
 	}
 
 	@Override
@@ -111,7 +117,6 @@ public class ContactActivity2 extends Activity {
 
 	@Override
 	public void onSaveInstanceState(Bundle savedInstanceState) {
-		savedInstanceState.putLong("contactLastRetrieved", contactLastRetrieved);
 		savedInstanceState.putString("tabTag", tabTag);
 	}
 
@@ -148,11 +153,29 @@ public class ContactActivity2 extends Activity {
 		if (requestCode == RESULT_TAKE_PHOTO)
 			hideProgress(PROGRESS_TAKE_PHOTO);
 	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.contact_activity_menu, menu);
+	    return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    // Handle item selection
+	    switch (item.getItemId()) {
+	    case R.id.refresh:
+	        update(true);
+	        return true;
+	    default:
+	        return super.onOptionsItemSelected(item);
+	    }
+	}
 
 	private void restoreState(Bundle savedInstanceState) {
 		if (savedInstanceState != null) {
 			tabTag = savedInstanceState.getString("tabTag");
-			contactLastRetrieved = savedInstanceState.getLong("contactLastRetrieved");
 		}
 	}
 
@@ -178,13 +201,14 @@ public class ContactActivity2 extends Activity {
 			case JSON_FOLLOWUP_COMMENTS_ON_FAILURE:
 				Log.e("THROWABLE", "THROWABLE", t);
 				break;
+			case UPDATE_FOLLOWUP_COMMENTS:
+				Log.w("UPDATE_FOLLOWUP_COMMENTS", tag);
+				break;
 			case UPDATE_PERSON:
 				if (personId == rowId) {
 					person = getApp().getDbSession().getPersonDao().load(personId);
 					updateTabPerson();
-					aboutTab.update(false);
-					surveysTab.update();
-					contactLastRetrieved = System.currentTimeMillis();
+					update(false);
 				}
 				break;
 			case UPDATE_QUESTION:
@@ -209,16 +233,19 @@ public class ContactActivity2 extends Activity {
 		surveysTab.setPerson(person);
 	}
 
-	private void update() {
-		updateContact();
-		aboutTab.update(true);
+	private void update(boolean force) {
+		updateContact(force);
 		surveysTab.update();
 	}
 
-	private void updateContact() {
-		if (contactLastRetrieved + 1000 * 60 * 5 < System.currentTimeMillis()) {
+	private void updateContact(boolean force) {
+		if (force || person.getRetrieved() == null || (person.getRetrieved().getTime() + 1000 * 60 * 5) < System.currentTimeMillis()) {
 			Contacts.get(this, personId, contactTag);
+			FollowupComments.get(this, personId, commentTag);
+			aboutTab.update(true);
 			showProgress(contactTag);
+		} else {
+			aboutTab.update(false);
 		}
 	}
 

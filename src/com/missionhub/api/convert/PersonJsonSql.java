@@ -78,6 +78,7 @@ public class PersonJsonSql {
 				if (person.getLocale() != null)
 					p.setLocale(person.getLocale());
 
+				if (p.getEmail_address() != null || p.getPhone_number() != null)
 				p.setRetrieved(new Date());
 
 				OrganizationRoleJsonSql.update(context, person.getId(), person.getOrganizational_roles(), tag);

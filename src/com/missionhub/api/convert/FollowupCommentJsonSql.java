@@ -33,13 +33,13 @@ public class FollowupCommentJsonSql {
 
 				for (GFCTop commentTop : comments) {
 					if (commentTop.getFollowup_comment() == null)
-						break;
+						continue;
 					final GComment comment = commentTop.getFollowup_comment().getComment();
 					if (comment == null)
-						break;
+						continue;
 					final GRejoicable[] rejoicables = commentTop.getFollowup_comment().getRejoicables();
 					if (rejoicables == null)
-						break;
+						continue;
 
 					FollowupComment c = fcd.load(comment.getId());
 					if (c == null)

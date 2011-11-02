@@ -82,6 +82,7 @@
     <string name="contact_role_admin">Admin</string>
     <string name="contact_promote">Promote to Leader?</string>
     <string name="contact_demote">Demote to contact?</string>
+    <string name="contact_refreshing_org">Refreshing Contact\'s Organization...</string>
     
     <string name="comment_actions">Comment Actions</string>
     <string name="comment_delete">Delete</string>
