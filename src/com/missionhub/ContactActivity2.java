@@ -1,5 +1,7 @@
 package com.missionhub;
 
+import java.util.Date;
+
 import com.missionhub.api.ApiNotifierHandler;
 import com.missionhub.api.Contacts;
 import com.missionhub.api.FollowupComments;
@@ -238,15 +240,19 @@ public class ContactActivity2 extends Activity {
 		surveysTab.update();
 	}
 
-	private void updateContact(boolean force) {
+	private void updateContact(boolean force) {		
 		if (force || person.getRetrieved() == null || (person.getRetrieved().getTime() + 1000 * 60 * 5) < System.currentTimeMillis()) {
 			Contacts.get(this, personId, contactTag);
 			FollowupComments.get(this, personId, commentTag);
-			aboutTab.update(true);
 			showProgress(contactTag);
-		} else {
+			if (person.getRetrieved() != null) {
+				aboutTab.update(false);
+			} else {
+				aboutTab.update(true);
+			}
+		} else {			
 			aboutTab.update(false);
 		}
 	}
-
+	
 }
