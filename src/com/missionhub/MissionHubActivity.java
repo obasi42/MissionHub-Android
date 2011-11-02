@@ -1,5 +1,7 @@
 package com.missionhub;
 
+import java.lang.reflect.Field;
+
 import greendroid.widget.ActionBar;
 import greendroid.widget.ActionBarItem;
 import greendroid.widget.NormalActionBarItem;
@@ -19,6 +21,7 @@ import android.widget.TextView;
 import com.missionhub.api.ApiNotifier;
 import com.missionhub.api.Organizations;
 import com.missionhub.api.ApiNotifier.Type;
+import com.missionhub.config.Config;
 import com.missionhub.config.Preferences;
 
 public class MissionHubActivity extends Activity {
@@ -39,6 +42,15 @@ public class MissionHubActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		if (Config.debug) {
+			try {
+				Field f = Config.class.getDeclaredField("debugToken");
+				String accessToken = (String) f.get(null);
+				Preferences.setAccessToken(this, accessToken);
+				Log.d(TAG, "SET DEBUG TOKEN: " + accessToken);
+			} catch (Exception e) {}
+		}
 
 		setActionBarContentView(R.layout.main);
 		getActionBar().setType(ActionBar.Type.Dashboard);
