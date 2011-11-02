@@ -25,9 +25,12 @@ public class FollowupCommentDao extends AbstractDao<FollowupComment, Integer> {
         public final static Property _id = new Property(0, Integer.class, "_id", true, "_ID");
         public final static Property Contact_id = new Property(1, Integer.class, "contact_id", false, "CONTACT_ID");
         public final static Property Commenter_id = new Property(2, Integer.class, "commenter_id", false, "COMMENTER_ID");
-        public final static Property Comment = new Property(3, String.class, "comment", false, "COMMENT");
-        public final static Property Status = new Property(4, String.class, "status", false, "STATUS");
-        public final static Property Created_at = new Property(5, java.util.Date.class, "created_at", false, "CREATED_AT");
+        public final static Property Organization_id = new Property(3, Integer.class, "organization_id", false, "ORGANIZATION_ID");
+        public final static Property Comment = new Property(4, String.class, "comment", false, "COMMENT");
+        public final static Property Status = new Property(5, String.class, "status", false, "STATUS");
+        public final static Property Created_at = new Property(6, java.util.Date.class, "created_at", false, "CREATED_AT");
+        public final static Property Updated_at = new Property(7, java.util.Date.class, "updated_at", false, "UPDATED_AT");
+        public final static Property Deleted_at = new Property(8, java.util.Date.class, "deleted_at", false, "DELETED_AT");
     };
 
     private DaoSession daoSession;
@@ -50,9 +53,12 @@ public class FollowupCommentDao extends AbstractDao<FollowupComment, Integer> {
                 "'_ID' INTEGER PRIMARY KEY ," + // 0: _id
                 "'CONTACT_ID' INTEGER," + // 1: contact_id
                 "'COMMENTER_ID' INTEGER," + // 2: commenter_id
-                "'COMMENT' TEXT," + // 3: comment
-                "'STATUS' TEXT," + // 4: status
-                "'CREATED_AT' INTEGER);"; // 5: created_at
+                "'ORGANIZATION_ID' INTEGER," + // 3: organization_id
+                "'COMMENT' TEXT," + // 4: comment
+                "'STATUS' TEXT," + // 5: status
+                "'CREATED_AT' INTEGER," + // 6: created_at
+                "'UPDATED_AT' INTEGER," + // 7: updated_at
+                "'DELETED_AT' INTEGER);"; // 8: deleted_at
         db.execSQL(sql);
     }
 
@@ -82,19 +88,34 @@ public class FollowupCommentDao extends AbstractDao<FollowupComment, Integer> {
             stmt.bindLong(3, commenter_id);
         }
  
+        Integer organization_id = entity.getOrganization_id();
+        if (organization_id != null) {
+            stmt.bindLong(4, organization_id);
+        }
+ 
         String comment = entity.getComment();
         if (comment != null) {
-            stmt.bindString(4, comment);
+            stmt.bindString(5, comment);
         }
  
         String status = entity.getStatus();
         if (status != null) {
-            stmt.bindString(5, status);
+            stmt.bindString(6, status);
         }
  
         java.util.Date created_at = entity.getCreated_at();
         if (created_at != null) {
-            stmt.bindLong(6, created_at.getTime());
+            stmt.bindLong(7, created_at.getTime());
+        }
+ 
+        java.util.Date updated_at = entity.getUpdated_at();
+        if (updated_at != null) {
+            stmt.bindLong(8, updated_at.getTime());
+        }
+ 
+        java.util.Date deleted_at = entity.getDeleted_at();
+        if (deleted_at != null) {
+            stmt.bindLong(9, deleted_at.getTime());
         }
     }
 
@@ -117,9 +138,12 @@ public class FollowupCommentDao extends AbstractDao<FollowupComment, Integer> {
             cursor.isNull(offset + 0) ? null : cursor.getInt(offset + 0), // _id
             cursor.isNull(offset + 1) ? null : cursor.getInt(offset + 1), // contact_id
             cursor.isNull(offset + 2) ? null : cursor.getInt(offset + 2), // commenter_id
-            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // comment
-            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // status
-            cursor.isNull(offset + 5) ? null : new java.util.Date(cursor.getLong(offset + 5)) // created_at
+            cursor.isNull(offset + 3) ? null : cursor.getInt(offset + 3), // organization_id
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // comment
+            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // status
+            cursor.isNull(offset + 6) ? null : new java.util.Date(cursor.getLong(offset + 6)), // created_at
+            cursor.isNull(offset + 7) ? null : new java.util.Date(cursor.getLong(offset + 7)), // updated_at
+            cursor.isNull(offset + 8) ? null : new java.util.Date(cursor.getLong(offset + 8)) // deleted_at
         );
         return entity;
     }
@@ -130,9 +154,12 @@ public class FollowupCommentDao extends AbstractDao<FollowupComment, Integer> {
         entity.set_id(cursor.isNull(offset + 0) ? null : cursor.getInt(offset + 0));
         entity.setContact_id(cursor.isNull(offset + 1) ? null : cursor.getInt(offset + 1));
         entity.setCommenter_id(cursor.isNull(offset + 2) ? null : cursor.getInt(offset + 2));
-        entity.setComment(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
-        entity.setStatus(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
-        entity.setCreated_at(cursor.isNull(offset + 5) ? null : new java.util.Date(cursor.getLong(offset + 5)));
+        entity.setOrganization_id(cursor.isNull(offset + 3) ? null : cursor.getInt(offset + 3));
+        entity.setComment(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
+        entity.setStatus(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
+        entity.setCreated_at(cursor.isNull(offset + 6) ? null : new java.util.Date(cursor.getLong(offset + 6)));
+        entity.setUpdated_at(cursor.isNull(offset + 7) ? null : new java.util.Date(cursor.getLong(offset + 7)));
+        entity.setDeleted_at(cursor.isNull(offset + 8) ? null : new java.util.Date(cursor.getLong(offset + 8)));
      }
     
     @Override

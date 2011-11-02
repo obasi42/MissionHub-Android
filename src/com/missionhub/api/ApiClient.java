@@ -12,13 +12,13 @@ import com.missionhub.config.Config;
 public class ApiClient extends AsyncHttpClient {
 
 	public static final String TAG = "ApiClient";
-	
-	private Context ctx;	
-	
-	public ApiClient (Context ctx) {
+
+	private Context ctx;
+
+	public ApiClient(Context ctx) {
 		super();
 		this.ctx = new ContextWrapper(ctx);
-		
+
 	}
 
 	/**
@@ -32,14 +32,15 @@ public class ApiClient extends AsyncHttpClient {
 	@Override
 	public void get(String url, AsyncHttpResponseHandler responseHandler) {
 		Log.d(TAG, "GET: " + url);
-		addHeader("Accept", "application/vnd.missionhub-v"+Config.apiVersion+"+json");
+		addHeader("Accept", "application/vnd.missionhub-v" + Config.apiVersion + "+json");
 		get(ctx, url, null, responseHandler);
 	}
 
 	/**
 	 * Perform a HTTP GET request with parameters.
 	 * 
-	 *            the URL to send the request to.
+	 * the URL to send the request to.
+	 * 
 	 * @param params
 	 *            additional GET parameters to send with the request.
 	 * @param responseHandler
@@ -48,7 +49,7 @@ public class ApiClient extends AsyncHttpClient {
 	@Override
 	public void get(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
 		Log.d(TAG, "GET: " + url + '?' + params.toString());
-		addHeader("Accept", "application/vnd.missionhub-v"+Config.apiVersion+"+json");
+		addHeader("Accept", "application/vnd.missionhub-v" + Config.apiVersion + "+json");
 		get(ctx, url, params, responseHandler);
 	}
 
@@ -63,7 +64,7 @@ public class ApiClient extends AsyncHttpClient {
 	@Override
 	public void post(String url, AsyncHttpResponseHandler responseHandler) {
 		Log.d(TAG, "POST: " + url);
-		addHeader("Accept", "application/vnd.missionhub-v"+Config.apiVersion+"+json");
+		addHeader("Accept", "application/vnd.missionhub-v" + Config.apiVersion + "+json");
 		post(ctx, url, null, responseHandler);
 	}
 
@@ -80,10 +81,10 @@ public class ApiClient extends AsyncHttpClient {
 	@Override
 	public void post(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
 		Log.d(TAG, "POST: " + url + "    PARAMS: " + params.toString());
-		addHeader("Accept", "application/vnd.missionhub-v"+Config.apiVersion+"+json");
+		addHeader("Accept", "application/vnd.missionhub-v" + Config.apiVersion + "+json");
 		post(ctx, url, params, responseHandler);
 	}
-	
+
 	public void cancel(boolean mayInterruptIfRunning) {
 		cancelRequests(ctx, mayInterruptIfRunning);
 	}

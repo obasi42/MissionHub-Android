@@ -14,16 +14,17 @@ import com.missionhub.api.model.sql.LocationDao;
 import com.missionhub.api.model.sql.LocationDao.Properties;
 
 public class LocationJsonSql {
-	
+
 	public static void update(Context context, int personId, GIdNameProvider location) {
 		update(context, personId, location, null);
 	}
-	
+
 	public static void update(final Context context, final int personId, final GIdNameProvider location, final String tag) {
-		if (location == null) return;
-		
+		if (location == null)
+			return;
+
 		Thread t = new Thread(new Runnable() {
-		    public void run() {
+			public void run() {
 				Application app = (Application) context.getApplicationContext();
 				LocationDao ld = app.getDbSession().getLocationDao();
 
@@ -55,7 +56,7 @@ public class LocationJsonSql {
 				if (tag != null)
 					b.putString("tag", tag);
 				app.getApiNotifier().postMessage(ApiNotifier.Type.UPDATE_LOCATION, b);
-		    }
+			}
 		});
 		t.setPriority(Thread.MIN_PRIORITY);
 		t.start();

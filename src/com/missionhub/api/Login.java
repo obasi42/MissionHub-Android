@@ -4,7 +4,7 @@ import com.loopj.android.http.RequestParams;
 import com.missionhub.config.Config;
 
 public class Login {
-	
+
 	public static String getUrl() {
 		String url = Config.oauthUrl + "/authorize";
 		RequestParams params = new RequestParams();
@@ -16,5 +16,5 @@ public class Login {
 		params.put("scope", Config.oauthScope);
 		return url + '?' + params.toString();
 	}
-	
+
 }

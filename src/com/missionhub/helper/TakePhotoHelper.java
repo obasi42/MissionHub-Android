@@ -11,9 +11,9 @@ import android.provider.MediaStore.Images.Media;
 import android.util.Log;
 
 public class TakePhotoHelper {
-	
+
 	public static final String TAG = TakePhotoHelper.class.getSimpleName();
-	
+
 	public static void onActivityResult(Context ctx, int code, Intent data) {
 		final File file = getTempFile(ctx);
 		try {
@@ -23,7 +23,7 @@ public class TakePhotoHelper {
 			Log.d(TAG, "ERROR GETTING PHOTO", e);
 		}
 	}
-	
+
 	public static File getTempFile(Context context) {
 		// it will return /sdcard/image.tmp
 		final File path = new File(Environment.getExternalStorageDirectory(), context.getPackageName());
@@ -32,5 +32,5 @@ public class TakePhotoHelper {
 		}
 		return new File(path, "image.tmp");
 	}
-	
+
 }

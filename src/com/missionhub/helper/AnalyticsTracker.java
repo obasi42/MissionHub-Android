@@ -31,7 +31,7 @@ public class AnalyticsTracker {
 			Log.w(TAG, e.getMessage(), e);
 		}
 	}
-	
+
 	public GoogleAnalyticsTracker getTracker() {
 		return tracker;
 	}
@@ -39,7 +39,7 @@ public class AnalyticsTracker {
 	private void setCustomVars() {
 		tracker.setCustomVar(1, "market", Config.market.name(), SCOPE_SESSION_LEVEL);
 	}
-	
+
 	public void setCustomVar(String name, String value, int scope) {
 		try {
 			tracker.setCustomVar(2, name, value, scope);
@@ -65,7 +65,7 @@ public class AnalyticsTracker {
 			Log.w(TAG, e.getMessage(), e);
 		}
 	}
-	
+
 	public void trackActivityView(Activity a) {
 		try {
 			trackPageView(a.getClass().getCanonicalName());

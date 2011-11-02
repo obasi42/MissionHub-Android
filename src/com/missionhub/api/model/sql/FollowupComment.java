@@ -13,9 +13,12 @@ public class FollowupComment {
     private Integer _id;
     private Integer contact_id;
     private Integer commenter_id;
+    private Integer organization_id;
     private String comment;
     private String status;
     private java.util.Date created_at;
+    private java.util.Date updated_at;
+    private java.util.Date deleted_at;
 
     /** Used to resolve relations */
     private DaoSession daoSession;
@@ -32,13 +35,16 @@ public class FollowupComment {
         this._id = _id;
     }
 
-    public FollowupComment(Integer _id, Integer contact_id, Integer commenter_id, String comment, String status, java.util.Date created_at) {
+    public FollowupComment(Integer _id, Integer contact_id, Integer commenter_id, Integer organization_id, String comment, String status, java.util.Date created_at, java.util.Date updated_at, java.util.Date deleted_at) {
         this._id = _id;
         this.contact_id = contact_id;
         this.commenter_id = commenter_id;
+        this.organization_id = organization_id;
         this.comment = comment;
         this.status = status;
         this.created_at = created_at;
+        this.updated_at = updated_at;
+        this.deleted_at = deleted_at;
     }
 
     /** called by internal mechanisms, do not call yourself. */
@@ -71,6 +77,14 @@ public class FollowupComment {
         this.commenter_id = commenter_id;
     }
 
+    public Integer getOrganization_id() {
+        return organization_id;
+    }
+
+    public void setOrganization_id(Integer organization_id) {
+        this.organization_id = organization_id;
+    }
+
     public String getComment() {
         return comment;
     }
@@ -93,6 +107,22 @@ public class FollowupComment {
 
     public void setCreated_at(java.util.Date created_at) {
         this.created_at = created_at;
+    }
+
+    public java.util.Date getUpdated_at() {
+        return updated_at;
+    }
+
+    public void setUpdated_at(java.util.Date updated_at) {
+        this.updated_at = updated_at;
+    }
+
+    public java.util.Date getDeleted_at() {
+        return deleted_at;
+    }
+
+    public void setDeleted_at(java.util.Date deleted_at) {
+        this.deleted_at = deleted_at;
     }
 
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */

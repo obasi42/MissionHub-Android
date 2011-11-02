@@ -47,10 +47,10 @@ public class ApiResponseHandler extends AsyncHttpResponseHandler {
 				onSuccess(gsonObject);
 			} catch (Exception e) {
 				onFailure(e);
+				return;
 			}
 			return;
 		}
-		
 		onSuccess();
 	}
 	

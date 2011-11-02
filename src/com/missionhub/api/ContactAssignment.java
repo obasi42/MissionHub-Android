@@ -9,6 +9,7 @@ public class ContactAssignment {
 
 	/**
 	 * Add a contact assignment
+	 * 
 	 * @param ctx
 	 * @param personId
 	 * @param assignToPersonId
@@ -25,9 +26,10 @@ public class ContactAssignment {
 		client.post(url, params, responseHandler);
 		return client;
 	}
-	
+
 	/**
 	 * Delete a contact assignment
+	 * 
 	 * @param ctx
 	 * @param personId
 	 * @param responseHandler

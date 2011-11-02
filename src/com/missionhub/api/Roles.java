@@ -5,9 +5,10 @@ import android.content.Context;
 import com.loopj.android.http.RequestParams;
 
 public class Roles {
-	
+
 	/**
 	 * Change a person's role
+	 * 
 	 * @param ctx
 	 * @param personId
 	 * @param role
@@ -23,5 +24,5 @@ public class Roles {
 		client.post(url, params, responseHandler);
 		return client;
 	}
-	
+
 }

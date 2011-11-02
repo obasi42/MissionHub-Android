@@ -4,8 +4,8 @@ import java.util.ArrayList;
 
 import com.missionhub.R;
 import com.missionhub.api.model.json.GComment;
-import com.missionhub.api.model.json.GCommenter;
 import com.missionhub.api.model.json.GFollowupComment;
+import com.missionhub.api.model.json.GPerson;
 import com.missionhub.api.model.json.GRejoicable;
 
 import android.app.Activity;
@@ -69,7 +69,7 @@ public class CommentItemAdapter extends ArrayAdapter<GFollowupComment> {
 		try {
 			final GFollowupComment commentMeta = comments.get(position);
 			final GComment comment = commentMeta.getComment();
-			final GCommenter commenter = comment.getCommenter();
+			final GPerson commenter = comment.getCommenter();
 			final GRejoicable[] rejoicables = commentMeta.getRejoicables();
 			final ArrayList<String> rejoice = new ArrayList<String>();
 			for (GRejoicable rejoicable : rejoicables) {

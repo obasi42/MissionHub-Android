@@ -16,9 +16,10 @@ import com.missionhub.api.model.json.GContact;
 import com.missionhub.api.model.json.GMetaContact;
 
 public class Contacts {
-	
+
 	/**
 	 * Get a list of basic hash contacts
+	 * 
 	 * @param ctx
 	 * @param options
 	 * @param tag
@@ -26,26 +27,27 @@ public class Contacts {
 	public static void list(Context ctx, Contacts.Options options, String tag) {
 		list(ctx, options, new ContactsListNotifierResponseHandler(ctx, GMetaContact.class, tag, "CONTACTS"));
 	}
-	
+
 	private static class ContactsListNotifierResponseHandler extends ApiNotifierResponseHandler {
 
 		public ContactsListNotifierResponseHandler(Context ctx, Type t, String tag, String type) {
 			super(ctx, t, tag, type);
 		}
-		
+
 		@Override
 		public void onSuccess(Object gMetaContact) {
 			GMetaContact contacts = (GMetaContact) gMetaContact;
 			for (GContact contact : contacts.getContacts()) {
-				PersonJsonSql.update(ctx, contact, tag);		
+				PersonJsonSql.update(ctx, contact, tag);
 			}
-			//TODO: handle questions and keywords
+			// TODO: handle questions and keywords
 			super.onSuccess(gMetaContact);
 		}
 	}
-	
+
 	/**
 	 * Get an individual full-hash contact
+	 * 
 	 * @param ctx
 	 * @param personId
 	 * @param tag
@@ -53,9 +55,10 @@ public class Contacts {
 	public static void get(Context ctx, int personId, String tag) {
 		get(ctx, personId, new ContactsNotifierResponseHandler(ctx, GMetaContact.class, tag, "CONTACTS"));
 	}
-	
+
 	/**
 	 * Get multiple full-hash contacts
+	 * 
 	 * @param ctx
 	 * @param personIds
 	 * @param tag
@@ -63,26 +66,27 @@ public class Contacts {
 	public static void get(Context ctx, List<Integer> personIds, String tag) {
 		get(ctx, personIds, new ContactsNotifierResponseHandler(ctx, GMetaContact.class, tag, "CONTACTS"));
 	}
-	
+
 	private static class ContactsNotifierResponseHandler extends ApiNotifierResponseHandler {
 
 		public ContactsNotifierResponseHandler(Context ctx, Type t, String tag, String type) {
 			super(ctx, t, tag, type);
 		}
-		
+
 		@Override
 		public void onSuccess(Object gContactAll) {
 			GMetaContact contacts = (GMetaContact) gContactAll;
 			for (GContact contact : contacts.getContacts()) {
-				PersonJsonSql.update(ctx, contact, tag);		
+				PersonJsonSql.update(ctx, contact, tag);
 			}
-			//TODO: handle questions and keywords
+			// TODO: handle questions and keywords
 			super.onSuccess(gContactAll);
 		}
 	}
-	
+
 	/**
 	 * Get a list of basic hash contacts
+	 * 
 	 * @param ctx
 	 * @param options
 	 * @param responseHandler
@@ -98,9 +102,10 @@ public class Contacts {
 		client.get(url, params, responseHandler);
 		return client;
 	}
-	
+
 	/**
 	 * Get an individual full-hash contact
+	 * 
 	 * @param ctx
 	 * @param personId
 	 * @param responseHandler
@@ -113,9 +118,10 @@ public class Contacts {
 		client.get(url, params, responseHandler);
 		return client;
 	}
-	
+
 	/**
 	 * Get multiple full-hash contacts
+	 * 
 	 * @param ctx
 	 * @param personIds
 	 * @param responseHandler
@@ -128,50 +134,51 @@ public class Contacts {
 		client.get(url, params, responseHandler);
 		return client;
 	}
-	
+
 	/**
 	 * Options for Contacts.getList
 	 */
 	public static class Options {
-		
+
 		private int start = 0;
 		private int limit = 20;
-		
+
 		private HashMultimap<String, String> filters = HashMultimap.<String, String> create();
 		private HashMap<String, String> orderBy = new HashMap<String, String>();
-		
-		public Options() {}
-		
+
+		public Options() {
+		}
+
 		public int getStart() {
 			return start;
 		}
-		
+
 		public void setStart(int start) {
 			this.start = start;
 		}
-		
+
 		public void incrementStart(int num) {
 			this.start += num;
 		}
-		
+
 		public int getLimit() {
 			return limit;
 		}
-		
+
 		public void setLimit(int limit) {
 			this.limit = limit;
 		}
-		
+
 		public RequestParams appendLimits(RequestParams params) {
 			params.put("start", String.valueOf(start));
 			params.put("limit", String.valueOf(limit));
 			return params;
 		}
-		
+
 		public HashMultimap<String, String> getFilters() {
 			return filters;
 		}
-		
+
 		public RequestParams appendFiltersParams(RequestParams params) {
 			Iterator<String> itr = filters.keySet().iterator();
 			while (itr.hasNext()) {
@@ -189,32 +196,32 @@ public class Contacts {
 			}
 			return params;
 		}
-		
+
 		public void addFilter(String filter, String value) {
 			filters.put(filter, value);
 		}
-		
+
 		public void setFilter(String filter, String value) {
 			removeFilter(filter);
 			addFilter(filter, value);
 		}
-		
+
 		public void removeFilter(String filter) {
 			filters.removeAll(filter);
 		}
-		
+
 		public void removeFilterValue(String filter, String value) {
 			filters.remove(filter, value);
 		}
-		
+
 		public boolean hasFilter(String filter) {
 			return filters.containsKey(filter);
 		}
-		
+
 		public boolean hasFilter(String filter, String value) {
 			return filters.containsEntry(filter, value);
 		}
-		
+
 		public String getFilterValue(String filter) {
 			Iterator<String> itr = filters.get(filter).iterator();
 			while (itr.hasNext()) {
@@ -222,19 +229,19 @@ public class Contacts {
 			}
 			return null;
 		}
-		
+
 		public Set<String> getFilterValues(String filter) {
 			return filters.get(filter);
 		}
-		
+
 		public void clearFilters() {
 			filters.clear();
 		}
-		
+
 		public HashMap<String, String> getOrderBy() {
 			return orderBy;
 		}
-		
+
 		public RequestParams appendOrderByParam(RequestParams params) {
 			StringBuffer sb = new StringBuffer();
 			Iterator<Entry<String, String>> itr = orderBy.entrySet().iterator();
@@ -245,36 +252,36 @@ public class Contacts {
 					sb.append("|");
 				}
 			}
-			
+
 			if (!orderBy.isEmpty())
 				params.put("order_by", sb.toString());
-			
+
 			return params;
 		}
-		
+
 		public void addOrderBy(String value) {
 			orderBy.put(value, "asc");
 		}
-		
+
 		public void addOrderBy(String value, String direction) {
 			orderBy.put(value, direction);
 		}
-		
+
 		public void removeOrderBy(String value) {
 			orderBy.remove(value);
 		}
-		
+
 		public void clearOrderBy() {
 			orderBy.clear();
 		}
-		
+
 		public String getTag() {
 			RequestParams params = new RequestParams();
 			this.appendFiltersParams(params);
 			this.appendOrderByParam(params);
 			return params.toString();
 		}
-		
+
 		@Override
 		public String toString() {
 			RequestParams params = new RequestParams();

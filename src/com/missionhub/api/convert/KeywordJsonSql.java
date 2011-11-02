@@ -33,7 +33,7 @@ public class KeywordJsonSql {
 					k.setKeyword(keyword.getKeyword());
 					k.setOrganization_id(organizationId);
 					k.setState(keyword.getState());
-					
+
 					if (keyword.getQuestions() != null) {
 						QuestionJsonSql.update(context, keyword.getId(), keyword.getQuestions(), tag);
 					}

@@ -1,5 +1,6 @@
 package com.missionhub.api.model.sql;
 
+import java.util.List;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
@@ -7,6 +8,8 @@ import android.database.sqlite.SQLiteStatement;
 import de.greenrobot.dao.AbstractDao;
 import de.greenrobot.dao.DaoConfig;
 import de.greenrobot.dao.Property;
+import de.greenrobot.dao.Query;
+import de.greenrobot.dao.QueryBuilder;
 
 import com.missionhub.api.model.sql.Organization;
 
@@ -22,10 +25,12 @@ public class OrganizationDao extends AbstractDao<Organization, Integer> {
         public final static Property _id = new Property(0, Integer.class, "_id", true, "_ID");
         public final static Property Name = new Property(1, String.class, "name", false, "NAME");
         public final static Property Ancestry = new Property(2, String.class, "ancestry", false, "ANCESTRY");
+        public final static Property Organization_id = new Property(3, Integer.class, "organization_id", false, "ORGANIZATION_ID");
     };
 
     private DaoSession daoSession;
 
+    private Query<Organization> organization_OrganizationQuery;
 
     public OrganizationDao(DaoConfig config) {
         super(config);
@@ -41,7 +46,8 @@ public class OrganizationDao extends AbstractDao<Organization, Integer> {
         String sql = "CREATE TABLE " + (ifNotExists? "IF NOT EXISTS ": "") + "'ORGANIZATION' (" + //
                 "'_ID' INTEGER PRIMARY KEY ," + // 0: _id
                 "'NAME' TEXT," + // 1: name
-                "'ANCESTRY' TEXT);"; // 2: ancestry
+                "'ANCESTRY' TEXT," + // 2: ancestry
+                "'ORGANIZATION_ID' INTEGER);"; // 3: organization_id
         db.execSQL(sql);
     }
 
@@ -125,4 +131,16 @@ public class OrganizationDao extends AbstractDao<Organization, Integer> {
         return true;
     }
     
+    /** Internal query to resolve the "organization" to-many relationship of Organization. */
+    public synchronized List<Organization> _queryOrganization_Organization(Integer organization_id) {
+        if (organization_OrganizationQuery == null) {
+            QueryBuilder<Organization> queryBuilder = queryBuilder();
+            queryBuilder.where(Properties.Organization_id.eq(organization_id));
+            organization_OrganizationQuery = queryBuilder.build();
+        } else {
+            organization_OrganizationQuery.setParameter(0, organization_id);
+        }
+        return organization_OrganizationQuery.list();
+    }
+
 }
