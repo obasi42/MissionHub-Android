@@ -1,7 +1,5 @@
 package com.missionhub;
 
-import java.util.Date;
-
 import com.missionhub.api.ApiNotifierHandler;
 import com.missionhub.api.Contacts;
 import com.missionhub.api.FollowupComments;
