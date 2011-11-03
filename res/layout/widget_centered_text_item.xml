@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.missionhub.ui.widget.CenteredTextItemView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/text"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:padding="5dp"
+    android:shadowColor="@color/black"
+    android:shadowDx="2"
+    android:shadowDy="2"
+    android:textColor="@color/dark_gray"
+    android:textStyle="bold"
+    android:gravity="center"
+    android:minHeight="60dp"
+    android:textSize="16dp" />

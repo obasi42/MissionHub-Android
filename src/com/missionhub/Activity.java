@@ -59,6 +59,10 @@ public class Activity extends GDActivity {
 		}
 	}
 	
+	public boolean hasProgress(String item) {
+		return progress.contains(item);
+	}
+	
 	public AnalyticsTracker getTracker() {
 		return tracker;
 	}

@@ -21,6 +21,7 @@ import com.missionhub.ui.widget.item.ContactAboutItem;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -30,6 +31,8 @@ import android.widget.AdapterView.OnItemClickListener;
 
 public class ContactAboutTab extends LinearLayout {
 
+	private static final String TAG = ContactAboutTab.class.getSimpleName();
+	
 	private Activity activity;
 
 	private ContactHeaderSmallFragment mHeader;
@@ -69,9 +72,13 @@ public class ContactAboutTab extends LinearLayout {
 		mListView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				final ContactAboutItem item = (ContactAboutItem) mListAdapter.getItem(position);
-				if (item.action != null) {
-					item.action.run();
+				try {
+					final ContactAboutItem item = (ContactAboutItem) mListAdapter.getItem(position-1);
+					if (item.action != null) {
+						item.action.run();
+					}
+				} catch (Exception e) {
+					Log.e(TAG, e.getMessage(), e);
 				}
 			}
 		});

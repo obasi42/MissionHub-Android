@@ -1,9 +1,12 @@
 package com.missionhub.helper;
 
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
+import com.google.common.collect.HashBiMap;
 import com.missionhub.R;
+import com.missionhub.ui.Rejoicable;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -17,14 +20,30 @@ import android.widget.Toast;
 public class Helper {
 
 	public static final String TAG = "HELPER";
-
-	public static final HashMap<String, Integer> statusMap = new HashMap<String, Integer>();
+	
+	public static final HashBiMap<String, Integer> statusMap = HashBiMap.create ();
 	static {
 		statusMap.put("attempted_contact", R.string.status_attempted_contact);
 		statusMap.put("uncontacted", R.string.status_uncontacted);
 		statusMap.put("do_not_contact", R.string.status_do_not_contact);
 		statusMap.put("contacted", R.string.status_contacted);
 		statusMap.put("completed", R.string.status_completed);
+	}
+	
+	public static final ArrayList<String> statusList = new ArrayList<String>();
+	static {
+		statusList.add("uncontacted");
+		statusList.add("attempted_contact");
+		statusList.add("contacted");
+		statusList.add("do_not_contact");
+		statusList.add("completed");
+	}
+	
+	public static final LinkedHashMap<String, Rejoicable> rejoicableMap = new LinkedHashMap<String, Rejoicable>();
+	static {
+		rejoicableMap.put("spiritual_conversation", new Rejoicable(R.string.rejoice_spiritual_conversation, R.drawable.rejoicable_s_convo, "spiritual_conversation"));
+		rejoicableMap.put("gospel_presentation", new Rejoicable(R.string.rejoice_gospel_presentation, R.drawable.rejoicable_g_present, "gospel_presentation"));
+		rejoicableMap.put("prayed_to_receive", new Rejoicable(R.string.rejoice_prayed_to_receive, R.drawable.rejoicable_r_christ, "prayed_to_receive"));
 	}
 
 	public static Date getDateFromUTCString(String s) {
@@ -61,10 +80,6 @@ public class Helper {
 		}
 
 		return fNum;
-	}
-
-	public static synchronized int getStatusResourceId(String s) {
-		return statusMap.get(s);
 	}
 
 	public static boolean hasPhoneAbility(Context ctx) {

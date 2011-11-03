@@ -6,18 +6,21 @@ import com.missionhub.api.FollowupComments;
 import com.missionhub.api.ApiNotifier.Type;
 import com.missionhub.api.model.sql.Person;
 import com.missionhub.helper.TakePhotoHelper;
+import com.missionhub.ui.DisplayError;
 import com.missionhub.ui.widget.ContactAboutTab;
 import com.missionhub.ui.widget.ContactStatusTab;
 import com.missionhub.ui.widget.ContactSurveysTab;
 import com.missionhub.ui.widget.Tab;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.DialogInterface.OnCancelListener;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -49,6 +52,7 @@ public class ContactActivity2 extends Activity {
 	private static final String PROGRESS_TAKE_PHOTO = "TAKE_PHOTO";
 
 	private static final int RESULT_TAKE_PHOTO = 0;
+	private static final int RESULT_EDIT = 1;
 
 	private String contactTag = this.toString() + "person";
 	private String commentTag = this.toString() + "comment";
@@ -101,13 +105,15 @@ public class ContactActivity2 extends Activity {
 
 		getApiNotifier().subscribe(this, personListener, Type.JSON_CONTACTS_ON_START, Type.JSON_CONTACTS_ON_FINISH, Type.JSON_CONTACTS_ON_FAILURE, 
 				Type.JSON_FOLLOWUP_COMMENTS_ON_START, Type.JSON_FOLLOWUP_COMMENTS_ON_FINISH, Type.JSON_FOLLOWUP_COMMENTS_ON_FAILURE,
-				Type.UPDATE_FOLLOWUP_COMMENTS, Type.UPDATE_PERSON, Type.UPDATE_QUESTION, Type.UPDATE_KEYWORD);
+				Type.UPDATE_FOLLOWUP_COMMENTS, Type.UPDATE_PERSON);
 
 		person = getApp().getDbSession().getPersonDao().load(personId);
 
 		updateTabPerson();
 
-		update(false);
+		updateContact(false);
+		updateStatus(false);
+		updateStatus(true);
 	}
 
 	@Override
@@ -133,6 +139,12 @@ public class ContactActivity2 extends Activity {
 			intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(TakePhotoHelper.getTempFile(this)));
 			startActivityForResult(intent, RESULT_TAKE_PHOTO);
 			showProgress(PROGRESS_TAKE_PHOTO);
+			break;			
+		case R.id.action_bar_edit:
+			Intent i = new Intent(this, ContactPostActivity.class);
+			i.putExtra("personId", personId);
+			i.putExtra("status", person.getStatus());
+			this.startActivityForResult(i, RESULT_EDIT);
 			break;
 		default:
 			return super.onHandleActionBarItemClick(item, position);
@@ -146,6 +158,12 @@ public class ContactActivity2 extends Activity {
 			switch (requestCode) {
 			case RESULT_TAKE_PHOTO:
 				TakePhotoHelper.onActivityResult(this, requestCode, data);
+				break;
+			case RESULT_EDIT:
+				person = getApp().getDbSession().getPersonDao().load(personId);
+				statusTab.setUpdating();
+				updateStatus(true);
+				mTabHost.setCurrentTabByTag(TAG_STATUS);
 				break;
 			}
 		}
@@ -166,7 +184,8 @@ public class ContactActivity2 extends Activity {
 	    // Handle item selection
 	    switch (item.getItemId()) {
 	    case R.id.refresh:
-	        update(true);
+	    	updateContact(true);
+			updateStatus(true);
 	        return true;
 	    default:
 	        return super.onOptionsItemSelected(item);
@@ -190,8 +209,12 @@ public class ContactActivity2 extends Activity {
 				hideProgress(contactTag);
 				break;
 			case JSON_CONTACTS_ON_FAILURE:
-				//TODO:
-				Log.e("THROWABLE", "THROWABLE", t);
+				DisplayError.displayWithRetry(ContactActivity2.this, t, new DisplayError.Retry() {
+					@Override
+					public void run() {
+						updateContact(true);
+					}
+				}).show();
 				break;
 			case JSON_FOLLOWUP_COMMENTS_ON_START:
 				showProgress(commentTag);
@@ -200,24 +223,30 @@ public class ContactActivity2 extends Activity {
 				hideProgress(commentTag);
 				break;
 			case JSON_FOLLOWUP_COMMENTS_ON_FAILURE:
-				//TODO:
-				Log.e("THROWABLE", "THROWABLE", t);
+				AlertDialog ad = DisplayError.displayWithRetry(ContactActivity2.this, t, new DisplayError.Retry() {
+					@Override
+					public void run() {
+						updateStatus(true);
+					}
+				});
+				ad.setOnCancelListener(new OnCancelListener(){
+					@Override
+					public void onCancel(DialogInterface arg0) {
+						statusTab.update(false);
+					}
+				});
+				ad.show();
 				break;
 			case UPDATE_FOLLOWUP_COMMENTS:
-				updateStatus(false);
+				statusTab.update(false);
 				break;
 			case UPDATE_PERSON:
 				if (personId == rowId) {
 					person = getApp().getDbSession().getPersonDao().load(personId);
 					updateTabPerson();
-					update(false);
+					updateContact(false);
+					surveysTab.update();
 				}
-				break;
-			case UPDATE_QUESTION:
-
-				break;
-			case UPDATE_KEYWORD:
-
 				break;
 			}
 		}
@@ -235,12 +264,6 @@ public class ContactActivity2 extends Activity {
 		surveysTab.setPerson(person);
 	}
 
-	private void update(boolean force) {
-		updateContact(force);
-		updateStatus(force);
-		surveysTab.update();
-	}
-
 	public void updateContact(boolean force) {		
 		if (force || person.getRetrieved() == null || (person.getRetrieved().getTime() + 1000 * 60 * 5) < System.currentTimeMillis()) {
 			Contacts.get(this, personId, contactTag);
@@ -252,14 +275,14 @@ public class ContactActivity2 extends Activity {
 		} else {			
 			aboutTab.update(false);
 		}
+		surveysTab.update();
 	}
 	
 	public void updateStatus(boolean reload) {
 		if (reload) {
 			FollowupComments.get(this, personId, commentTag);
 		} else {
-			statusTab.update();
+			statusTab.update(true);
 		}
 	}
-	
 }

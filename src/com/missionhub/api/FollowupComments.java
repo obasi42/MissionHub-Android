@@ -16,6 +16,7 @@ import android.util.Log;
 import com.loopj.android.http.RequestParams;
 import com.missionhub.api.convert.FollowupCommentJsonSql;
 import com.missionhub.api.model.json.GMetaGFCTop;
+import com.missionhub.ui.Rejoicable;
 
 public class FollowupComments {
 
@@ -171,13 +172,13 @@ public class FollowupComments {
 		private int organizationId;
 		private String status;
 		private String comment;
-		private List<String> rejoicables;
+		private List<Rejoicable> rejoicables;
 
 		public Comment(int personId, int commenterId, int organizationId, String status, String comment) {
-			this(personId, commenterId, organizationId, status, comment, new ArrayList<String>());
+			this(personId, commenterId, organizationId, status, comment, new ArrayList<Rejoicable>());
 		}
 
-		public Comment(int personId, int commenterId, int organizationId, String status, String comment, List<String> rejoicables) {
+		public Comment(int personId, int commenterId, int organizationId, String status, String comment, ArrayList<Rejoicable> rejoicables) {
 			this.personId = personId;
 			this.commenterId = commenterId;
 			this.organizationId = organizationId;
@@ -199,9 +200,9 @@ public class FollowupComments {
 			}
 
 			JSONArray jsonRejoicables = new JSONArray();
-			Iterator<String> itr = rejoicables.iterator();
+			Iterator<Rejoicable> itr = rejoicables.iterator();
 			while (itr.hasNext()) {
-				jsonRejoicables.put(itr.next());
+				jsonRejoicables.put(itr.next().tag);
 			}
 
 			JSONObject json = new JSONObject();

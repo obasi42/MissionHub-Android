@@ -55,10 +55,11 @@ public class ContactItemAdapter extends ArrayAdapter<GContact> {
 		final GPerson person = contact.getPerson();
 		if (person != null) {
 			holder.name.setText(person.getName());
-			if (person.getStatus() == null) {
+			if (person.getStatus() == null || !Helper.statusMap.containsKey(person.getStatus())) {
 				person.setStatus("uncontacted");
 			}
-			holder.status.setText(Helper.getStatusResourceId(person.getStatus()));
+			
+			holder.status.setText(Helper.statusMap.get(person.getStatus()));
 			holder.image.setTag(person.getPicture());
 			imageManager.displayImage(person.getPicture(), holder.image, R.drawable.default_contact);
 		}

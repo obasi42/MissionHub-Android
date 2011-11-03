@@ -62,7 +62,8 @@
     <string name="contact_open_url">Open link in browser?</string>
     <string name="contact_survey_no_answer">not answered</string>
     <string name="contact_survey_keyword">Keyword</string>
-    <string name="contact_no_comments">No Previous Comments</string>
+    <string name="contact_no_comments">No Comments</string>
+    <string name="contact_no_answers">No Survey Answers</string>
     <string name="contact_no_permissions">You can only perform actions on your own comments.</string>
     <string name="contact_info_facebook_header">Facebook</string>
     <string name="contact_info_facebook_link">Tap here to open Facebook profile</string>
@@ -113,7 +114,7 @@
     <string name="toast_no_browser">Could not find a web browser</string>
     
     <string name="error_no_network">No Network</string>
-    <string name="error_no_network_msg">The MissionHub server could not be contacted. Please make sure you are connect to the internet and try again.</string>
+    <string name="error_no_network_msg">The MissionHub server could not be contacted. Please make sure you are connected to the internet and try again.</string>
 	<string name="error_unexpected_response">Unexpected Response</string>
 	<string name="error_unexpected_response_msg">The MissionHub server returned unexpected data. Please try again later.</string>
 	
@@ -139,5 +140,6 @@
 	<string name="action_bar_search">Search</string>
 	<string name="action_bar_logout">Logout</string>
 	<string name="action_bar_profile">Profile</string>
+	<string name="action_bar_save">Save</string>
 	<string name="loading">Loading...</string>
 </resources>

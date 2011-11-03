@@ -20,6 +20,7 @@ import com.missionhub.api.model.sql.KeywordDao;
 import com.missionhub.api.model.sql.Person;
 import com.missionhub.api.model.sql.Question;
 import com.missionhub.ui.ContactHeaderSmallFragment;
+import com.missionhub.ui.widget.item.CenteredTextItem;
 import com.missionhub.ui.widget.item.ContactSurveyHeaderItem;
 import com.missionhub.ui.widget.item.ContactSurveyItem;
 
@@ -128,6 +129,10 @@ public class ContactSurveysTab extends LinearLayout {
 					while (itemsIterator.hasNext()) {
 						li.items.add(itemsIterator.next());
 					}
+				}
+				
+				if (li.items.isEmpty()) {
+					li.items.add(new CenteredTextItem(activity.getString(R.string.contact_no_answers)));
 				}
 
 				final Message msg = updateHandler.obtainMessage();

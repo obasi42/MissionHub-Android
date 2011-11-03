@@ -184,9 +184,9 @@ public class ContactActivity extends Activity {
 
 		/* contact_post.xml */
 		post = (LinearLayout) View.inflate(this, R.layout.contact_post, null);
-		comment = (EditText) post.findViewById(R.id.contact_comment);
-		save = (Button) post.findViewById(R.id.contact_save);
-		status = (Spinner) post.findViewById(R.id.contact_status);
+		//comment = (EditText) post.findViewById(R.id.contact_comment);
+		//save = (Button) post.findViewById(R.id.contact_save);
+		//status = (Spinner) post.findViewById(R.id.contact_status);
 		statusList.add(getString(R.string.status_uncontacted));
 		statusListRes.add(R.string.status_uncontacted);
 		statusListTag.add("uncontacted");
@@ -872,8 +872,8 @@ public class ContactActivity extends Activity {
 		
 		if (canSave) {
 			String status = statusListTag.get(statusPos);
-			FollowupComments.Comment comment = new FollowupComments.Comment(contact.getPerson().getId(), getUser().getId(), getUser().getOrganizationID(), statusListTag.get(statusPos), commentStr, rejoicables);
-			FollowupComments.post(this, comment, new SaveResponseHandler(status));
+			//FollowupComments.Comment comment = new FollowupComments.Comment(contact.getPerson().getId(), getUser().getId(), getUser().getOrganizationID(), statusListTag.get(statusPos), commentStr, rejoicables);
+			//FollowupComments.post(this, comment, new SaveResponseHandler(status));
 		} else {
 			Toast.makeText(this, R.string.contact_cant_save, Toast.LENGTH_LONG).show();
 		}

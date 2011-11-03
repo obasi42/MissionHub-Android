@@ -20,6 +20,7 @@ import com.missionhub.api.model.sql.FollowupCommentDao.Properties;
 import com.missionhub.api.model.sql.Person;
 import com.missionhub.ui.ContactHeaderFragment;
 import com.missionhub.ui.DisplayError;
+import com.missionhub.ui.widget.item.CenteredTextItem;
 import com.missionhub.ui.widget.item.ContactStatusItem;
 
 import de.greenrobot.dao.QueryBuilder;
@@ -51,6 +52,7 @@ public class ContactStatusTab extends LinearLayout {
 	private ItemAdapter mListAdapter;
 
 	private ProgressItem progressItem;
+	private CenteredTextItem noStatusItem;
 
 	private Person person;
 
@@ -79,7 +81,8 @@ public class ContactStatusTab extends LinearLayout {
 		mHeader = (ContactHeaderFragment) activity.getSupportFragmentManager().findFragmentById(R.id.fragment_contact_status_header);
 
 		progressItem = new ProgressItem(activity.getString(R.string.loading), true);
-
+		noStatusItem = new CenteredTextItem(activity.getString(R.string.contact_no_comments));
+		
 		mListAdapter = new ItemAdapter(activity);
 		mListAdapter.add(progressItem);
 		mListView.setAdapter(mListAdapter);
@@ -97,9 +100,11 @@ public class ContactStatusTab extends LinearLayout {
 		mHeader.setPerson(person);
 	}
 
-	public void update() {
+	public void update(final boolean initial) {
 		if (person == null)
 			return;
+		
+		activity.showProgress(this.toString());
 
 		new Thread(new Runnable() {
 			@Override
@@ -115,8 +120,16 @@ public class ContactStatusTab extends LinearLayout {
 					final FollowupComment comment = itr.next();
 					li.items.add(new ContactStatusItem(comment, comment.getRejoicables()));
 				}
+				
+				if (li.items.isEmpty()) {
+					li.items.add(noStatusItem);
+				}
 
 				final Message msg = updateHandler.obtainMessage();
+				
+				if (initial)
+					msg.what = 0;
+				else msg.what = 1;
 				msg.obj = li;
 				updateHandler.sendMessage(msg);
 			}
@@ -130,12 +143,23 @@ public class ContactStatusTab extends LinearLayout {
 			Iterator<Item> itr = li.items.iterator();
 			mListAdapter.setNotifyOnChange(false);
 			mListAdapter.clear();
+			if (msg.what == 0) {
+				mListAdapter.add(progressItem);
+			}
 			while (itr.hasNext()) {
 				mListAdapter.add(itr.next());
-			}
+			}			
 			mListAdapter.notifyDataSetChanged();
+			activity.hideProgress(ContactStatusTab.this.toString());
 		}
 	};
+	
+	public void setUpdating() {
+		mListAdapter.setNotifyOnChange(false);
+		mListAdapter.remove(noStatusItem);
+		mListAdapter.insert(progressItem, 0);
+		mListAdapter.notifyDataSetChanged();
+	}
 
 	private class ListItems {
 		public ArrayList<Item> items = new ArrayList<Item>();

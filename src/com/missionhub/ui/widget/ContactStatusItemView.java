@@ -11,6 +11,7 @@ import com.missionhub.R;
 import com.missionhub.api.model.sql.FollowupComment;
 import com.missionhub.api.model.sql.Person;
 import com.missionhub.api.model.sql.Rejoicable;
+import com.missionhub.helper.Helper;
 import com.missionhub.helper.U;
 import com.missionhub.ui.ImageManager;
 import com.missionhub.ui.widget.item.ContactStatusItem;
@@ -94,7 +95,7 @@ public class ContactStatusItemView extends LinearLayout implements ItemView {
 		mPicture.setTag(commenter.getPicture() + "?type=square");
 		imageManager.displayImage(commenter.getPicture() + "?type=square", mPicture, R.drawable.default_contact);
 		mName.setText(commenter.getName());
-		mStatus.setText(comment.getStatus());
+		mStatus.setText(this.getContext().getString(Helper.statusMap.get(comment.getStatus())));
 
 		if (!U.nullOrEmpty(comment.getComment())) {
 			mComment.setText(comment.getComment());
