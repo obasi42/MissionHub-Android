@@ -10,8 +10,8 @@ import android.content.DialogInterface;
 import android.util.Log;
 import android.webkit.WebViewClient;
 
-public class DisplayError { 
-	
+public class DisplayError {
+
 	public static final AlertDialog display(Context ctx, Throwable t) {
 		String title = ctx.getString(R.string.alert_error);
 		String message = ctx.getString(R.string.alert_error_msg);
@@ -33,18 +33,32 @@ public class DisplayError {
 					title = ((MHException) t).getTitle();
 				}
 			}
-		} catch (Exception e) { Log.e("DisplayError", "Error Setup Failed", e); }
+		} catch (Exception e) {
+			Log.e("DisplayError", "Error Setup Failed", e);
+		}
 		AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
-		builder.setTitle(title)
-				.setIcon(R.drawable.ic_dialog_alert)
-				.setMessage(message)
-				.setNeutralButton(R.string.alert_close, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int id) {
-						dialog.cancel();
-					}
-				});
+		builder.setTitle(title).setIcon(R.drawable.ic_dialog_alert).setMessage(message).setNeutralButton(R.string.alert_close, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int id) {
+				dialog.cancel();
+			}
+		});
 		return builder.create();
+	}
+
+	public static final AlertDialog displayWithRetry(final Context ctx, final Throwable t, final Retry retry) {
+		AlertDialog ad = display(ctx, t);
+		ad.setButton(ad.getContext().getString(R.string.alert_retry), new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				dialog.dismiss();
+				retry.run();
+			}
+		});
+		return ad;
+	}
+
+	public abstract static class Retry {
+		public abstract void run();
 	}
 
 	public static AlertDialog display(Context ctx, int errorCode, String description, String failingUrl) {

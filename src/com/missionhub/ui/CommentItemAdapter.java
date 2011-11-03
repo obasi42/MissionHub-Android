@@ -51,16 +51,16 @@ public class CommentItemAdapter extends ArrayAdapter<GFollowupComment> {
 		ViewHolder holder;
 		if (v == null) {		
 			LayoutInflater vi = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			v = vi.inflate(R.layout.comment_list_item, null);
+			v = vi.inflate(R.layout.widget_contact_status_item, null);
 			holder = new ViewHolder();
-			holder.picture = (ImageView) v.findViewById(R.id.comment_picture);
-			holder.name = (TextView) v.findViewById(R.id.comment_name);
-			holder.status = (TextView) v.findViewById(R.id.comment_status);
-			holder.comment = (TextView) v.findViewById(R.id.comment_comment);
-			holder.time = (TextView) v.findViewById(R.id.comment_time);
-			holder.gospel = v.findViewById(R.id.comment_g_present);
-			holder.christ = v.findViewById(R.id.comment_r_christ);
-			holder.convo = v.findViewById(R.id.comment_s_convo);
+			holder.picture = (ImageView) v.findViewById(R.id.picture);
+			holder.name = (TextView) v.findViewById(R.id.name);
+			holder.status = (TextView) v.findViewById(R.id.status);
+			holder.comment = (TextView) v.findViewById(R.id.comment);
+			holder.time = (TextView) v.findViewById(R.id.time);
+			holder.gospel = v.findViewById(R.id.g_present);
+			holder.christ = v.findViewById(R.id.r_christ);
+			holder.convo = v.findViewById(R.id.s_convo);
 			v.setTag(holder);
 		}
 		else

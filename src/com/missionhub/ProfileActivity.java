@@ -8,7 +8,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
 
-import com.flurry.android.FlurryAgent;
 import com.google.common.collect.HashMultimap;
 import com.missionhub.api.model.sql.OrganizationalRole;
 import com.missionhub.config.Preferences;
@@ -116,7 +115,7 @@ public class ProfileActivity extends Activity {
 	    		try {
 	    			HashMap<String, String> params = new HashMap<String, String>();
 	    			params.put("orgID", spinnerOrgIDs.get(pos));
-	    			FlurryAgent.onEvent("Profile.ChangeOrg", params);
+	    			//FlurryAgent.onEvent("Profile.ChangeOrg", params);
 	    		} catch (Exception e) { Log.w(TAG, e.getMessage(), e); }
 	  	      Toast.makeText(parent.getContext(), "Your current organization is now " +
 	  		          parent.getItemAtPosition(pos).toString(), Toast.LENGTH_LONG).show();

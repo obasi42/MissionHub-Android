@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import com.flurry.android.FlurryAgent;
 import com.missionhub.api.ApiClient;
 import com.missionhub.api.ApiResponseHandler;
 import com.missionhub.api.Contacts;
@@ -97,7 +96,7 @@ public class ContactsActivity extends Activity {
         switch (item.getItemId()) {
             case R.id.action_bar_refresh:
             	try {
-    				FlurryAgent.onEvent("Contacts.Refresh");
+    				//FlurryAgent.onEvent("Contacts.Refresh");
     			} catch (Exception e) {
     				Log.w(TAG, e.getMessage(), e);
     			}
@@ -117,7 +116,7 @@ public class ContactsActivity extends Activity {
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == RESULT_CONTACTS_FILTER_ACTIVITY && resultCode == RESULT_CHANGED) {
 			try {
-				FlurryAgent.onEvent("Contacts.Refresh");
+				//FlurryAgent.onEvent("Contacts.Refresh");
 			} catch (Exception e) {
 				Log.w(TAG, e.getMessage(), e);
 			}
@@ -212,7 +211,7 @@ public class ContactsActivity extends Activity {
 				try {
 					HashMap<String, String> params = new HashMap<String, String>();
 					params.put("tab", "My");
-					FlurryAgent.onEvent("Contacts.ChangeTab", params);
+					//FlurryAgent.onEvent("Contacts.ChangeTab", params);
 				} catch (Exception e) {}
 				break;
 			case TAB_ALL:
@@ -222,7 +221,7 @@ public class ContactsActivity extends Activity {
 				try {
 					HashMap<String, String> params = new HashMap<String, String>();
 					params.put("tab", "AllContacts");
-					FlurryAgent.onEvent("Contacts.ChangeTab", params);
+					//FlurryAgent.onEvent("Contacts.ChangeTab", params);
 				} catch (Exception e) {}
 				break;
 			}

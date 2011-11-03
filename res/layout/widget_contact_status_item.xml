@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.missionhub.ui.widget.ContactStatusItemView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:gravity="left|top"
@@ -9,7 +9,7 @@
     android:paddingRight="5dp" >
 
     <ImageView
-        android:id="@+id/comment_picture"
+        android:id="@+id/picture"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_marginBottom="5dp"
@@ -29,7 +29,7 @@
             android:layout_height="16dp" >
 
             <TextView
-                android:id="@+id/comment_status"
+                android:id="@+id/status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
@@ -41,7 +41,7 @@
             </TextView>
 
             <TextView
-                android:id="@+id/comment_name"
+                android:id="@+id/name"
                 android:layout_width="140dp"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
@@ -54,7 +54,7 @@
         </RelativeLayout>
 
         <TextView
-            android:id="@+id/comment_comment"
+            android:id="@+id/comment"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="1dp"
@@ -71,7 +71,7 @@
             android:layout_marginTop="2dp" >
 
             <TextView
-                android:id="@+id/comment_time"
+                android:id="@+id/time"
                 android:layout_width="wrap_content"
                 android:layout_height="16dp"
                 android:layout_marginBottom="5dp"
@@ -89,14 +89,14 @@
                 android:orientation="horizontal" >
 
                 <View
-                    android:id="@+id/comment_g_present"
+                    android:id="@+id/g_present"
                     android:layout_width="16dp"
                     android:layout_height="16dp"
                     android:background="@drawable/icon_g_present" >
                 </View>
 
                 <View
-                    android:id="@+id/comment_r_christ"
+                    android:id="@+id/r_christ"
                     android:layout_width="16dp"
                     android:layout_height="16dp"
                     android:layout_marginLeft="4dp"
@@ -104,7 +104,7 @@
                 </View>
 
                 <View
-                    android:id="@+id/comment_s_convo"
+                    android:id="@+id/s_convo"
                     android:layout_width="16dp"
                     android:layout_height="16dp"
                     android:layout_marginLeft="4dp"
@@ -114,4 +114,4 @@
         </RelativeLayout>
     </LinearLayout>
 
-</LinearLayout>
+</com.missionhub.ui.widget.ContactStatusItemView>

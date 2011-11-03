@@ -184,12 +184,13 @@ public class ContactActivity2 extends Activity {
 		public void handleMessage(Type type, String tag, Bundle bundle, Throwable t, long rowId) {
 			switch (type) {
 			case JSON_CONTACTS_ON_START:
-				
+				showProgress(contactTag);
 				break;
 			case JSON_CONTACTS_ON_FINISH:
 				hideProgress(contactTag);
 				break;
 			case JSON_CONTACTS_ON_FAILURE:
+				//TODO:
 				Log.e("THROWABLE", "THROWABLE", t);
 				break;
 			case JSON_FOLLOWUP_COMMENTS_ON_START:
@@ -199,10 +200,11 @@ public class ContactActivity2 extends Activity {
 				hideProgress(commentTag);
 				break;
 			case JSON_FOLLOWUP_COMMENTS_ON_FAILURE:
+				//TODO:
 				Log.e("THROWABLE", "THROWABLE", t);
 				break;
 			case UPDATE_FOLLOWUP_COMMENTS:
-				Log.w("UPDATE_FOLLOWUP_COMMENTS", tag);
+				updateStatus(false);
 				break;
 			case UPDATE_PERSON:
 				if (personId == rowId) {
@@ -235,14 +237,13 @@ public class ContactActivity2 extends Activity {
 
 	private void update(boolean force) {
 		updateContact(force);
+		updateStatus(force);
 		surveysTab.update();
 	}
 
-	private void updateContact(boolean force) {		
+	public void updateContact(boolean force) {		
 		if (force || person.getRetrieved() == null || (person.getRetrieved().getTime() + 1000 * 60 * 5) < System.currentTimeMillis()) {
 			Contacts.get(this, personId, contactTag);
-			FollowupComments.get(this, personId, commentTag);
-			showProgress(contactTag);
 			if (person.getRetrieved() != null) {
 				aboutTab.update(false);
 			} else {
@@ -250,6 +251,14 @@ public class ContactActivity2 extends Activity {
 			}
 		} else {			
 			aboutTab.update(false);
+		}
+	}
+	
+	public void updateStatus(boolean reload) {
+		if (reload) {
+			FollowupComments.get(this, personId, commentTag);
+		} else {
+			statusTab.update();
 		}
 	}
 	

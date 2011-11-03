@@ -31,7 +31,7 @@ public class ApiNotifierHandler extends Handler {
 		final String tag = bundle.getString("tag");
 		final Throwable throwable = (Throwable) bundle.getSerializable("throwable");
 		final long id = bundle.getLong("id");
-		if (t.contains(tag)) {
+		if (t.contains(tag) || t.isEmpty()) {
 			handleMessage(type, tag, bundle, throwable, id);
 		}
 	}

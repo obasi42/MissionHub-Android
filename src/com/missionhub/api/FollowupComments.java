@@ -41,7 +41,7 @@ public class FollowupComments {
 		@Override
 		public void onSuccess(Object gMetaGFCTop) {
 			GMetaGFCTop metaGFCTop = (GMetaGFCTop) gMetaGFCTop;
-			FollowupCommentJsonSql.update(ctx, metaGFCTop.getFollowup_comments());
+			FollowupCommentJsonSql.update(ctx, metaGFCTop.getFollowup_comments(), tag);
 			super.onSuccess(gMetaGFCTop);
 		}
 	}

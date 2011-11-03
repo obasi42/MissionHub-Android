@@ -211,7 +211,7 @@ public class ContactActivity extends Activity {
 		validRejoicables.add(new Rejoicable(R.string.rejoice_gospel_presentation, R.drawable.rejoicable_g_present, "gospel_presentation"));
 
 		/* Set-Up Adapters */
-		commentAdapter = new CommentItemAdapter(this, R.layout.comment_list_item, comments, statusListTag, statusListRes);
+		commentAdapter = new CommentItemAdapter(this, R.layout.widget_contact_status_item, comments, statusListTag, statusListRes);
 		ArrayList<String> noComment = new ArrayList<String>();
 		noComment.add(getString(R.string.contact_no_comments));
 		noCommentAdapter =  new ArrayAdapter<String>(this, R.layout.no_comment_list_item, noComment);

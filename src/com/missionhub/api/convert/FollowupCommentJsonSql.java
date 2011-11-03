@@ -71,7 +71,7 @@ public class FollowupCommentJsonSql {
 					if (comment.getUpdated_at() != null)
 						c.setUpdated_at(Helper.getDateFromUTCString(comment.getUpdated_at()));
 
-					for (GRejoicable rejoicable : rejoicables) {
+					for (GRejoicable rejoicable : rejoicables) {						
 						Rejoicable r = new Rejoicable();
 						r.set_id(rejoicable.getId());
 						r.setComment_id(comment.getId());
