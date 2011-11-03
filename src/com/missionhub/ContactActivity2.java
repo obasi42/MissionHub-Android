@@ -265,9 +265,9 @@ public class ContactActivity2 extends Activity {
 	}
 
 	public void updateContact(boolean force) {		
-		if (force || person.getRetrieved() == null || (person.getRetrieved().getTime() + 1000 * 60 * 5) < System.currentTimeMillis()) {
+		if (force || person == null || person.getRetrieved() == null || (person.getRetrieved().getTime() + 1000 * 60 * 5) < System.currentTimeMillis()) {
 			Contacts.get(this, personId, contactTag);
-			if (person.getRetrieved() != null) {
+			if (person != null || person.getRetrieved() != null) {
 				aboutTab.update(false);
 			} else {
 				aboutTab.update(true);

@@ -82,7 +82,7 @@ public class ContactStatusTab extends LinearLayout {
 
 		progressItem = new ProgressItem(activity.getString(R.string.loading), true);
 		noStatusItem = new CenteredTextItem(activity.getString(R.string.contact_no_comments));
-		
+
 		mListAdapter = new ItemAdapter(activity);
 		mListAdapter.add(progressItem);
 		mListView.setAdapter(mListAdapter);
@@ -103,7 +103,7 @@ public class ContactStatusTab extends LinearLayout {
 	public void update(final boolean initial) {
 		if (person == null)
 			return;
-		
+
 		activity.showProgress(this.toString());
 
 		new Thread(new Runnable() {
@@ -120,16 +120,19 @@ public class ContactStatusTab extends LinearLayout {
 					final FollowupComment comment = itr.next();
 					li.items.add(new ContactStatusItem(comment, comment.getRejoicables()));
 				}
-				
-				if (li.items.isEmpty()) {
-					li.items.add(noStatusItem);
+
+				if (!initial) {
+					if (li.items.isEmpty()) {
+						li.items.add(noStatusItem);
+					}
 				}
 
 				final Message msg = updateHandler.obtainMessage();
-				
+
 				if (initial)
 					msg.what = 0;
-				else msg.what = 1;
+				else
+					msg.what = 1;
 				msg.obj = li;
 				updateHandler.sendMessage(msg);
 			}
@@ -148,12 +151,12 @@ public class ContactStatusTab extends LinearLayout {
 			}
 			while (itr.hasNext()) {
 				mListAdapter.add(itr.next());
-			}			
+			}
 			mListAdapter.notifyDataSetChanged();
 			activity.hideProgress(ContactStatusTab.this.toString());
 		}
 	};
-	
+
 	public void setUpdating() {
 		mListAdapter.setNotifyOnChange(false);
 		mListAdapter.remove(noStatusItem);
@@ -164,7 +167,7 @@ public class ContactStatusTab extends LinearLayout {
 	private class ListItems {
 		public ArrayList<Item> items = new ArrayList<Item>();
 	}
-	
+
 	private HashMap<String, Integer> deleteRequests = new HashMap<String, Integer>();
 
 	private OnItemLongClickListener itemLongClickListener = new OnItemLongClickListener() {
@@ -173,7 +176,7 @@ public class ContactStatusTab extends LinearLayout {
 			try {
 				final ContactStatusItem item = (ContactStatusItem) mListAdapter.getItem(position - 1);
 				final FollowupComment comment = item.comment;
-				
+
 				boolean canDelete = false;
 				if (activity.getUser().hasRole("admin")) {
 					canDelete = true;
