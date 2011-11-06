@@ -29,7 +29,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -62,7 +61,7 @@ public class ContactSurveysTab extends LinearLayout {
 
 	public void setup() {
 		activity.getApp().getApiNotifier()
-				.subscribe(tag, notifierHandler, Type.UPDATE_ORGANIZATION, Type.JSON_ORGANIZATIONS_ON_FAILURE, Type.JSON_ORGANIZATIONS_ON_FINISH, Type.JSON_ORGANIZATIONS_ON_START);
+				.subscribe(tag, notifierHandler, Type.UPDATE_ORGANIZATION, Type.JSON_ORGANIZATIONS_ON_FAILURE);
 
 		LayoutInflater.from(activity).inflate(R.layout.tab_contact_surveys, this);
 
@@ -181,22 +180,16 @@ public class ContactSurveysTab extends LinearLayout {
 
 		@Override
 		public void handleMessage(Type type, String tag, Bundle bundle, Throwable throwable, long rowId) {
-			Log.e("HERE0", rowId + "");
 			switch (type) {
 			case UPDATE_ORGANIZATION:
-				Log.e("HERE1", rowId + "");
+				activity.hideProgress(tag);
 				if (rowId == activity.getUser().getOrganizationID()) {
 					update();
-					Log.e("HERE2", rowId + "");
 				}
 				break;
-			case JSON_ORGANIZATIONS_ON_FINISH:
-				activity.hideProgress(tag);
-				Log.e("HERE3", rowId + "");
-				break;
 			case JSON_ORGANIZATIONS_ON_FAILURE:
+				activity.hideProgress(tag);
 				// TODO: Handle Error
-				Log.e("HERE4", rowId + "");
 				break;
 			}
 		}
