@@ -23,44 +23,38 @@ public class AnswerJsonSql {
 		if (form == null)
 			return;
 
-		Thread t = new Thread(new Runnable() {
-			public void run() {
-				Application app = (Application) context.getApplicationContext();
-				AnswerDao ad = app.getDbSession().getAnswerDao();
+		Application app = (Application) context.getApplicationContext();
+		AnswerDao ad = app.getDbSession().getAnswerDao();
 
-				// Delete current answers in org
-				List<Answer> currentAnswers = ad.queryBuilder().where(Properties.Person_id.eq(personId), Properties.Organization_id.eq(organizationId)).list();
-				Iterator<Answer> itr = currentAnswers.iterator();
-				while (itr.hasNext()) {
-					Answer a = itr.next();
-					ad.delete(a);
+		// Delete current answers in org
+		List<Answer> currentAnswers = ad.queryBuilder().where(Properties.Person_id.eq(personId), Properties.Organization_id.eq(organizationId)).list();
+		Iterator<Answer> itr = currentAnswers.iterator();
+		while (itr.hasNext()) {
+			Answer a = itr.next();
+			ad.delete(a);
 
-					Bundle b = new Bundle();
-					b.putLong("id", a.get_id());
-					b.putInt("personId", a.getPerson_id());
-					if (tag != null)
-						b.putString("tag", tag);
-					app.getApiNotifier().postMessage(ApiNotifier.Type.DELETE_ANSWER, b);
-				}
+			Bundle b = new Bundle();
+			b.putLong("id", a.get_id());
+			b.putInt("personId", a.getPerson_id());
+			if (tag != null)
+				b.putString("tag", tag);
+			app.getApiNotifier().postMessage(ApiNotifier.Type.DELETE_ANSWER, b);
+		}
 
-				for (GQA answer : form) {
-					Answer a = new Answer();
-					a.setOrganization_id(organizationId);
-					a.setPerson_id(personId);
-					a.setAnswer(answer.getA());
-					a.setQuestion_id(answer.getQ());
-					long id = ad.insert(a);
+		for (GQA answer : form) {
+			Answer a = new Answer();
+			a.setOrganization_id(organizationId);
+			a.setPerson_id(personId);
+			a.setAnswer(answer.getA());
+			a.setQuestion_id(answer.getQ());
+			long id = ad.insert(a);
 
-					Bundle b = new Bundle();
-					b.putLong("id", id);
-					b.putInt("personId", a.getPerson_id());
-					if (tag != null)
-						b.putString("tag", tag);
-					app.getApiNotifier().postMessage(ApiNotifier.Type.UPDATE_ANSWER, b);
-				}
-			}
-		});
-		t.setPriority(Thread.MIN_PRIORITY);
-		t.start();
+			Bundle b = new Bundle();
+			b.putLong("id", id);
+			b.putInt("personId", a.getPerson_id());
+			if (tag != null)
+				b.putString("tag", tag);
+			app.getApiNotifier().postMessage(ApiNotifier.Type.UPDATE_ANSWER, b);
+		}
 	}
 }

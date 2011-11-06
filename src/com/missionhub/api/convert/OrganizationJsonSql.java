@@ -20,38 +20,32 @@ public class OrganizationJsonSql {
 		if (organization == null)
 			return;
 
-		Thread t = new Thread(new Runnable() {
-			public void run() {
-				Application app = (Application) context.getApplicationContext();
-				OrganizationDao od = app.getDbSession().getOrganizationDao();
+		Application app = (Application) context.getApplicationContext();
+		OrganizationDao od = app.getDbSession().getOrganizationDao();
 
-				Organization org = od.load(organization.getId());
-				if (org == null)
-					org = new Organization();
-				org.set_id(organization.getId());
-				if (organization.getName() != null) {
-					org.setName(organization.getName());
-				}
-				if (organization.getAncestry() != null) {
-					org.setAncestry(organization.getAncestry());
-				}
+		Organization org = od.load(organization.getId());
+		if (org == null)
+			org = new Organization();
+		org.set_id(organization.getId());
+		if (organization.getName() != null) {
+			org.setName(organization.getName());
+		}
+		if (organization.getAncestry() != null) {
+			org.setAncestry(organization.getAncestry());
+		}
 
-				KeywordJsonSql.update(context, organization.getId(), organization.getKeywords(), tag);
+		KeywordJsonSql.update(context, organization.getId(), organization.getKeywords(), tag);
 
-				for (GPerson leader : organization.getLeaders()) {
-					PersonJsonSql.update(context, leader, tag);
-				}
+		for (GPerson leader : organization.getLeaders()) {
+			PersonJsonSql.update(context, leader, tag);
+		}
 
-				long id = od.insertOrReplace(org);
+		long id = od.insertOrReplace(org);
 
-				Bundle b = new Bundle();
-				b.putLong("id", id);
-				if (tag != null)
-					b.putString("tag", tag);
-				app.getApiNotifier().postMessage(ApiNotifier.Type.UPDATE_ORGANIZATION, b);
-			}
-		});
-		t.setPriority(Thread.MIN_PRIORITY);
-		t.start();
+		Bundle b = new Bundle();
+		b.putLong("id", id);
+		if (tag != null)
+			b.putString("tag", tag);
+		app.getApiNotifier().postMessage(ApiNotifier.Type.UPDATE_ORGANIZATION, b);
 	}
 }

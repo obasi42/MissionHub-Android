@@ -40,9 +40,14 @@ public class FollowupComments {
 		}
 
 		@Override
-		public void onSuccess(Object gMetaGFCTop) {
-			GMetaGFCTop metaGFCTop = (GMetaGFCTop) gMetaGFCTop;
-			FollowupCommentJsonSql.update(ctx, metaGFCTop.getFollowup_comments(), tag);
+		public void onSuccess(final Object gMetaGFCTop) {
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					GMetaGFCTop metaGFCTop = (GMetaGFCTop) gMetaGFCTop;
+					FollowupCommentJsonSql.update(ctx, metaGFCTop.getFollowup_comments(), tag);
+				}
+			}).start();
 			super.onSuccess(gMetaGFCTop);
 		}
 	}

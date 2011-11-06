@@ -25,85 +25,80 @@ public class PersonJsonSql {
 		if (person == null)
 			return;
 
-		Thread t = new Thread(new Runnable() {
-			public void run() {
-				Application app = (Application) context.getApplicationContext();
-				PersonDao pd = app.getDbSession().getPersonDao();
+		Application app = (Application) context.getApplicationContext();
+		PersonDao pd = app.getDbSession().getPersonDao();
 
-				Person p = pd.load(person.getId());
+		Person p = pd.load(person.getId());
 
-				if (p == null) {
-					p = new Person();
-				}
+		if (p == null) {
+			p = new Person();
+		}
 
-				if (person.getId() != null)
-					p.set_id(person.getId());
+		if (person.getId() != null)
+			p.set_id(person.getId());
 
-				if (person.getName() != null)
-					p.setName(person.getName());
+		if (person.getName() != null)
+			p.setName(person.getName());
 
-				if (person.getGender() != null)
-					p.setGender(person.getGender());
+		if (person.getGender() != null)
+			p.setGender(person.getGender());
 
-				if (person.getFb_id() != null)
-					p.setFb_id(person.getFb_id());
+		if (person.getFb_id() != null)
+			p.setFb_id(person.getFb_id());
 
-				if (person.getPicture() != null)
-					p.setPicture(person.getPicture());
+		if (person.getPicture() != null)
+			p.setPicture(person.getPicture());
 
-				if (person.getStatus() != null)
-					p.setStatus(person.getStatus());
+		if (person.getStatus() != null)
+			p.setStatus(person.getStatus());
 
-				if (!U.nullOrEmpty(person.getFirst_contact_date()))
-					p.setFirst_contact_date(Helper.getDateFromUTCString(person.getFirst_contact_date()));
+		if (!U.nullOrEmpty(person.getFirst_contact_date()))
+			p.setFirst_contact_date(Helper.getDateFromUTCString(person.getFirst_contact_date()));
 
-				if (!U.nullOrEmpty(person.getDate_surveyed()))
-					p.setDate_surveyed(Helper.getDateFromUTCString(person.getDate_surveyed()));
+		if (!U.nullOrEmpty(person.getDate_surveyed()))
+			p.setDate_surveyed(Helper.getDateFromUTCString(person.getDate_surveyed()));
 
-				if (person.getFirst_name() != null)
-					p.setFirst_name(person.getFirst_name());
+		if (person.getFirst_name() != null)
+			p.setFirst_name(person.getFirst_name());
 
-				if (person.getLast_name() != null)
-					p.setLast_name(person.getLast_name());
+		if (person.getLast_name() != null)
+			p.setLast_name(person.getLast_name());
 
-				if (person.getPhone_number() != null)
-					p.setPhone_number(person.getPhone_number());
+		if (person.getPhone_number() != null)
+			p.setPhone_number(person.getPhone_number());
 
-				if (person.getEmail_address() != null)
-					p.setEmail_address(person.getEmail_address());
+		if (person.getEmail_address() != null)
+			p.setEmail_address(person.getEmail_address());
 
-				if (person.getBirthday() != null)
-					p.setBirthday(person.getBirthday());
+		if (person.getBirthday() != null)
+			p.setBirthday(person.getBirthday());
 
-				if (person.getLocale() != null)
-					p.setLocale(person.getLocale());
+		if (person.getLocale() != null)
+			p.setLocale(person.getLocale());
 
-				if (p.getEmail_address() != null || p.getPhone_number() != null)
-				p.setRetrieved(new Date());
+		if (p.getEmail_address() != null || p.getPhone_number() != null)
+			p.setRetrieved(new Date());
 
-				OrganizationRoleJsonSql.update(context, person.getId(), person.getOrganizational_roles(), tag);
+		OrganizationRoleJsonSql.update(context, person.getId(), person.getOrganizational_roles(), tag);
 
-				if (person.getRequest_org_id() != null)
-					AssignmentJsonSql.update(context, person.getId(), Integer.parseInt(person.getRequest_org_id()), person.getAssignment(), tag);
+		if (person.getRequest_org_id() != null)
+			AssignmentJsonSql.update(context, person.getId(), Integer.parseInt(person.getRequest_org_id()), person.getAssignment(), tag);
 
-				InterestJsonSql.update(context, person.getId(), person.getInterests(), tag);
+		InterestJsonSql.update(context, person.getId(), person.getInterests(), tag);
 
-				EducationJsonSql.update(context, person.getId(), person.getEducation(), tag);
+		EducationJsonSql.update(context, person.getId(), person.getEducation(), tag);
 
-				LocationJsonSql.update(context, person.getId(), person.getLocation(), tag);
+		LocationJsonSql.update(context, person.getId(), person.getLocation(), tag);
 
-				long id = pd.insertOrReplace(p);
+		long id = pd.insertOrReplace(p);
 
-				Bundle b = new Bundle();
-				if (tag != null)
-					b.putString("tag", tag);
-				b.putLong("id", id);
-				b.putInt("personId", p.get_id());
-				app.getApiNotifier().postMessage(ApiNotifier.Type.UPDATE_PERSON, b);
-			}
-		});
-		t.setPriority(Thread.MIN_PRIORITY);
-		t.start();
+		Bundle b = new Bundle();
+		if (tag != null)
+			b.putString("tag", tag);
+		b.putLong("id", id);
+		b.putInt("personId", p.get_id());
+		app.getApiNotifier().postMessage(ApiNotifier.Type.UPDATE_PERSON, b);
+
 	}
 
 	public static void update(Context context, GContact contact) {

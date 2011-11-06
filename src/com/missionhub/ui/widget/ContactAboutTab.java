@@ -146,7 +146,7 @@ public class ContactAboutTab extends LinearLayout {
 							new ContactAboutItem.Action() {
 								@Override
 								public void run() {
-									// TODO:
+									// TODO: Implement
 								}
 							}));
 				} else if (contactRole.equals("leader")) {
@@ -154,7 +154,7 @@ public class ContactAboutTab extends LinearLayout {
 							new ContactAboutItem.Action() {
 								@Override
 								public void run() {
-									// TODO:
+									// TODO: Implement
 								}
 							}));
 				} else if (contactRole.equals("admin")) {
@@ -162,7 +162,7 @@ public class ContactAboutTab extends LinearLayout {
 							new ContactAboutItem.Action() {
 								@Override
 								public void run() {
-									// TODO:
+									// TODO: Implement
 								}
 							}));
 				}
@@ -175,7 +175,7 @@ public class ContactAboutTab extends LinearLayout {
 						.load(a.getAssigned_to_id()).getName(), null, new ContactAboutItem.Action() {
 					@Override
 					public void run() {
-						// TODO:
+						// TODO: Implement
 					}
 				}));
 			}

@@ -50,11 +50,16 @@ public class Organizations {
 		}
 
 		@Override
-		public void onSuccess(Object gMetaOrganization) {
-			GMetaOrganization metaOrgs = (GMetaOrganization) gMetaOrganization;
-			for (GOrganization org : metaOrgs.getOrganizations()) {
-				OrganizationJsonSql.update(ctx, org, tag);
-			}
+		public void onSuccess(final Object gMetaOrganization) {
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					GMetaOrganization metaOrgs = (GMetaOrganization) gMetaOrganization;
+					for (GOrganization org : metaOrgs.getOrganizations()) {
+						OrganizationJsonSql.update(ctx, org, tag);
+					}
+				}
+			}).start();
 			super.onSuccess(gMetaOrganization);
 		}
 	}

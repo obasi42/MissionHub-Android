@@ -235,7 +235,6 @@ public class ContactStatusTab extends LinearLayout {
 						}
 					}
 				}).show();
-				// TODO:
 				break;
 			}
 		}

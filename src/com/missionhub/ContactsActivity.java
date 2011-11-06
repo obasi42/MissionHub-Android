@@ -401,7 +401,7 @@ public class ContactsActivity extends Activity {
 				
 				options.setFilter(key, value.toString());
 			} else if (value instanceof Boolean) {
-				//TODO:
+				// TODO: Implement
 			}
 		}
 		return options;

@@ -25,11 +25,11 @@ import com.missionhub.ui.widget.item.ContactSurveyHeaderItem;
 import com.missionhub.ui.widget.item.ContactSurveyItem;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -89,21 +89,28 @@ public class ContactSurveysTab extends LinearLayout {
 
 		activity.showProgress(tag);
 
+		final Person p = this.person;
+		
 		new Thread(new Runnable() {
 			public void run() {
 				final ListItems li = new ListItems();
-
+				
+				Person person = activity.getApp().getDbSession().getPersonDao().load(p.get_id());
+				
 				KeywordDao kd = activity.getApp().getDbSession().getKeywordDao();
 
 				LinkedListMultimap<Integer, ContactSurveyItem> tempSurveys = LinkedListMultimap.<Integer, ContactSurveyItem> create();
+				
+				person.refresh();
+				
 				List<Answer> answers = person.getAnswer();
 				Iterator<Answer> itr = answers.iterator();
 				while (itr.hasNext()) {
 					Answer answer = itr.next();
-					
+
 					if (answer.getOrganization_id() != activity.getUser().getOrganizationID())
 						continue;
-					
+
 					Question question = answer.getQuestion();
 
 					if (question == null) {
@@ -117,12 +124,12 @@ public class ContactSurveysTab extends LinearLayout {
 				while (keys.hasNext()) {
 					int key = keys.next();
 					Keyword keyword = kd.load(key);
-					
+
 					if (keyword == null) {
 						updateHandler.sendEmptyMessage(UPDATE_ORGS);
 						return;
 					}
-					
+
 					li.items.add(new ContactSurveyHeaderItem(activity.getString(R.string.contact_survey_keyword) + ": " + keyword.getKeyword()));
 					List<ContactSurveyItem> items = tempSurveys.get(key);
 					Iterator<ContactSurveyItem> itemsIterator = items.iterator();
@@ -130,7 +137,7 @@ public class ContactSurveysTab extends LinearLayout {
 						li.items.add(itemsIterator.next());
 					}
 				}
-				
+
 				if (li.items.isEmpty()) {
 					li.items.add(new CenteredTextItem(activity.getString(R.string.contact_no_answers)));
 				}
@@ -142,14 +149,14 @@ public class ContactSurveysTab extends LinearLayout {
 			}
 		}).start();
 	}
-	
+
 	private static final int COMPLETE = 0;
 	private static final int UPDATE_ORGS = 1;
-	
 
 	private Handler updateHandler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
+			activity.hideProgress(tag);
 			switch (msg.what) {
 			case COMPLETE:
 				mListAdapter.setNotifyOnChange(false);
@@ -163,33 +170,33 @@ public class ContactSurveysTab extends LinearLayout {
 				break;
 			case UPDATE_ORGS:
 				activity.showProgress(tag);
+				Toast.makeText(getContext(), activity.getString(R.string.contact_refreshing_org), Toast.LENGTH_LONG).show();
 				Organizations.get(activity, activity.getUser().getOrganizationID(), ContactSurveysTab.this.toString());
 				break;
 			}
-			activity.hideProgress(tag);
 		}
 	};
-
-	private boolean orgUpdated = false;
 
 	private ApiNotifierHandler notifierHandler = new ApiNotifierHandler(tag) {
 
 		@Override
 		public void handleMessage(Type type, String tag, Bundle bundle, Throwable throwable, long rowId) {
+			Log.e("HERE0", rowId + "");
 			switch (type) {
 			case UPDATE_ORGANIZATION:
-				if (rowId == activity.getUser().getOrganizationID() && !orgUpdated) {
-					final Intent intent = activity.getIntent();
-					Toast.makeText(activity, R.string.contact_refreshing_org, Toast.LENGTH_LONG).show();
-					activity.startActivity(intent);
-					activity.finish();
+				Log.e("HERE1", rowId + "");
+				if (rowId == activity.getUser().getOrganizationID()) {
+					update();
+					Log.e("HERE2", rowId + "");
 				}
 				break;
 			case JSON_ORGANIZATIONS_ON_FINISH:
 				activity.hideProgress(tag);
+				Log.e("HERE3", rowId + "");
 				break;
 			case JSON_ORGANIZATIONS_ON_FAILURE:
-				// TODO:
+				// TODO: Handle Error
+				Log.e("HERE4", rowId + "");
 				break;
 			}
 		}

@@ -23,53 +23,46 @@ public class EducationJsonSql {
 		if (educations == null)
 			return;
 
-		Thread t = new Thread(new Runnable() {
-			public void run() {
-				Application app = (Application) context.getApplicationContext();
-				EducationDao ed = app.getDbSession().getEducationDao();
+		Application app = (Application) context.getApplicationContext();
+		EducationDao ed = app.getDbSession().getEducationDao();
 
-				// Delete all current stored educations for this person
-				List<Education> currentEducation = ed.queryBuilder().where(Properties.Person_id.eq(personId)).list();
-				Iterator<Education> itr = currentEducation.iterator();
-				while (itr.hasNext()) {
-					Education edu = itr.next();
-					ed.delete(edu);
+		// Delete all current stored educations for this person
+		List<Education> currentEducation = ed.queryBuilder().where(Properties.Person_id.eq(personId)).list();
+		Iterator<Education> itr = currentEducation.iterator();
+		while (itr.hasNext()) {
+			Education edu = itr.next();
+			ed.delete(edu);
 
-					Bundle b = new Bundle();
-					b.putLong("id", edu.get_id());
-					b.putInt("personId", edu.getPerson_id());
-					if (tag != null)
-						b.putString("tag", tag);
-					app.getApiNotifier().postMessage(ApiNotifier.Type.DELETE_EDUCATION, b);
-				}
+			Bundle b = new Bundle();
+			b.putLong("id", edu.get_id());
+			b.putInt("personId", edu.getPerson_id());
+			if (tag != null)
+				b.putString("tag", tag);
+			app.getApiNotifier().postMessage(ApiNotifier.Type.DELETE_EDUCATION, b);
+		}
 
-				// Insert educations
-				for (GEducation education : educations) {
-					Education edu = new Education();
-					edu.setPerson_id(personId);
-					edu.setProvider(education.getProvider());
-					edu.setType(education.getType());
-					if (education.getSchool() != null) {
-						edu.setSchool_id(education.getSchool().getId());
-						edu.setSchool_name(education.getSchool().getName());
-					}
-					if (education.getYear() != null) {
-						edu.setYear_id(education.getYear().getId());
-						edu.setYear_name(education.getYear().getName());
-					}
-					long id = ed.insert(edu);
-
-					Bundle b = new Bundle();
-					b.putLong("id", id);
-					b.putInt("personId", edu.getPerson_id());
-					if (tag != null)
-						b.putString("tag", tag);
-					app.getApiNotifier().postMessage(ApiNotifier.Type.DELETE_EDUCATION, b);
-				}
+		// Insert educations
+		for (GEducation education : educations) {
+			Education edu = new Education();
+			edu.setPerson_id(personId);
+			edu.setProvider(education.getProvider());
+			edu.setType(education.getType());
+			if (education.getSchool() != null) {
+				edu.setSchool_id(education.getSchool().getId());
+				edu.setSchool_name(education.getSchool().getName());
 			}
-		});
-		t.setPriority(Thread.MIN_PRIORITY);
-		t.start();
+			if (education.getYear() != null) {
+				edu.setYear_id(education.getYear().getId());
+				edu.setYear_name(education.getYear().getName());
+			}
+			long id = ed.insert(edu);
 
+			Bundle b = new Bundle();
+			b.putLong("id", id);
+			b.putInt("personId", edu.getPerson_id());
+			if (tag != null)
+				b.putString("tag", tag);
+			app.getApiNotifier().postMessage(ApiNotifier.Type.DELETE_EDUCATION, b);
+		}
 	}
 }

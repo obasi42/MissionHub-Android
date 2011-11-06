@@ -35,12 +35,18 @@ public class Contacts {
 		}
 
 		@Override
-		public void onSuccess(Object gMetaContact) {
-			GMetaContact contacts = (GMetaContact) gMetaContact;
-			for (GContact contact : contacts.getContacts()) {
-				PersonJsonSql.update(ctx, contact, tag);
-			}
-			// TODO: handle questions and keywords
+		public void onSuccess(final Object gMetaContact) {
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					GMetaContact contacts = (GMetaContact) gMetaContact;
+					for (GContact contact : contacts.getContacts()) {
+						PersonJsonSql.update(ctx, contact, tag);
+					}
+					// TODO: handle questions and keywords
+				}
+			}).start();
+
 			super.onSuccess(gMetaContact);
 		}
 	}
@@ -74,12 +80,18 @@ public class Contacts {
 		}
 
 		@Override
-		public void onSuccess(Object gContactAll) {
-			GMetaContact contacts = (GMetaContact) gContactAll;
-			for (GContact contact : contacts.getContacts()) {
-				PersonJsonSql.update(ctx, contact, tag);
-			}
-			// TODO: handle questions and keywords
+		public void onSuccess(final Object gContactAll) {
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					GMetaContact contacts = (GMetaContact) gContactAll;
+					for (GContact contact : contacts.getContacts()) {
+						PersonJsonSql.update(ctx, contact, tag);
+					}
+					// TODO: handle questions and keywords
+				}
+			}).start();
+
 			super.onSuccess(gContactAll);
 		}
 	}

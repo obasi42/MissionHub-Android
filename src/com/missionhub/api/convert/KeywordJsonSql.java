@@ -19,38 +19,32 @@ public class KeywordJsonSql {
 		if (keywords == null)
 			return;
 
-		Thread t = new Thread(new Runnable() {
-			public void run() {
-				Application app = (Application) context.getApplicationContext();
-				KeywordDao kd = app.getDbSession().getKeywordDao();
+		Application app = (Application) context.getApplicationContext();
+		KeywordDao kd = app.getDbSession().getKeywordDao();
 
-				for (GKeyword keyword : keywords) {
-					Keyword k = kd.load(keyword.getId());
-					if (k == null)
-						k = new Keyword();
+		for (GKeyword keyword : keywords) {
+			Keyword k = kd.load(keyword.getId());
+			if (k == null)
+				k = new Keyword();
 
-					k.set_id(keyword.getId());
-					k.setKeyword(keyword.getKeyword());
-					k.setOrganization_id(organizationId);
-					k.setState(keyword.getState());
+			k.set_id(keyword.getId());
+			k.setKeyword(keyword.getKeyword());
+			k.setOrganization_id(organizationId);
+			k.setState(keyword.getState());
 
-					if (keyword.getQuestions() != null) {
-						QuestionJsonSql.update(context, keyword.getId(), keyword.getQuestions(), tag);
-					}
-
-					long id = kd.insertOrReplace(k);
-
-					Bundle b = new Bundle();
-					b.putLong("id", id);
-					b.putInt("organizationId", k.getOrganization_id());
-					if (tag != null)
-						b.putString("tag", tag);
-					app.getApiNotifier().postMessage(ApiNotifier.Type.UPDATE_KEYWORD, b);
-				}
+			if (keyword.getQuestions() != null) {
+				QuestionJsonSql.update(context, keyword.getId(), keyword.getQuestions(), tag);
 			}
-		});
-		t.setPriority(Thread.MIN_PRIORITY);
-		t.start();
+
+			long id = kd.insertOrReplace(k);
+
+			Bundle b = new Bundle();
+			b.putLong("id", id);
+			b.putInt("organizationId", k.getOrganization_id());
+			if (tag != null)
+				b.putString("tag", tag);
+			app.getApiNotifier().postMessage(ApiNotifier.Type.UPDATE_KEYWORD, b);
+		}
 
 	}
 }

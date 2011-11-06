@@ -23,42 +23,36 @@ public class LocationJsonSql {
 		if (location == null)
 			return;
 
-		Thread t = new Thread(new Runnable() {
-			public void run() {
-				Application app = (Application) context.getApplicationContext();
-				LocationDao ld = app.getDbSession().getLocationDao();
+		Application app = (Application) context.getApplicationContext();
+		LocationDao ld = app.getDbSession().getLocationDao();
 
-				// Delete current location
-				List<Location> currentLocation = ld.queryBuilder().where(Properties.Person_id.eq(personId)).list();
-				Iterator<Location> itr = currentLocation.iterator();
-				while (itr.hasNext()) {
-					Location l = itr.next();
-					ld.delete(l);
+		// Delete current location
+		List<Location> currentLocation = ld.queryBuilder().where(Properties.Person_id.eq(personId)).list();
+		Iterator<Location> itr = currentLocation.iterator();
+		while (itr.hasNext()) {
+			Location l = itr.next();
+			ld.delete(l);
 
-					Bundle b = new Bundle();
-					b.putLong("id", l.get_id());
-					b.putInt("personId", l.getPerson_id());
-					if (tag != null)
-						b.putString("tag", tag);
-					app.getApiNotifier().postMessage(ApiNotifier.Type.DELETE_LOCATION, b);
-				}
+			Bundle b = new Bundle();
+			b.putLong("id", l.get_id());
+			b.putInt("personId", l.getPerson_id());
+			if (tag != null)
+				b.putString("tag", tag);
+			app.getApiNotifier().postMessage(ApiNotifier.Type.DELETE_LOCATION, b);
+		}
 
-				Location l = new Location();
-				l.setLocation_id(location.getId());
-				l.setName(location.getName());
-				l.setPerson_id(personId);
-				l.setProvider(location.getProvider());
-				long id = ld.insert(l);
+		Location l = new Location();
+		l.setLocation_id(location.getId());
+		l.setName(location.getName());
+		l.setPerson_id(personId);
+		l.setProvider(location.getProvider());
+		long id = ld.insert(l);
 
-				Bundle b = new Bundle();
-				b.putLong("id", id);
-				b.putInt("personId", l.getPerson_id());
-				if (tag != null)
-					b.putString("tag", tag);
-				app.getApiNotifier().postMessage(ApiNotifier.Type.UPDATE_LOCATION, b);
-			}
-		});
-		t.setPriority(Thread.MIN_PRIORITY);
-		t.start();
+		Bundle b = new Bundle();
+		b.putLong("id", id);
+		b.putInt("personId", l.getPerson_id());
+		if (tag != null)
+			b.putString("tag", tag);
+		app.getApiNotifier().postMessage(ApiNotifier.Type.UPDATE_LOCATION, b);
 	}
 }

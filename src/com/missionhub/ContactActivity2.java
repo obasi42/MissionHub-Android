@@ -62,6 +62,11 @@ public class ContactActivity2 extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		// TODO Remove Debugging
+		getApp().getDbSession().getOrganizationDao().deleteAll();
+		getApp().getDbSession().getQuestionDao().deleteAll();
+		getApp().getDbSession().getKeywordDao().deleteAll();
 
 		personId = getIntent().getIntExtra("personId", -1);
 		if (personId < 0) {

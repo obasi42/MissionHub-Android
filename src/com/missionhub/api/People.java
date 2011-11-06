@@ -55,11 +55,17 @@ public class People {
 		}
 
 		@Override
-		public void onSuccess(Object gMetaPerson) {
-			GMetaPerson people = (GMetaPerson) gMetaPerson;
-			for (GPerson person : people.getPeople()) {
-				PersonJsonSql.update(ctx, person, tag);
-			}
+		public void onSuccess(final Object gMetaPerson) {
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					GMetaPerson people = (GMetaPerson) gMetaPerson;
+					for (GPerson person : people.getPeople()) {
+						PersonJsonSql.update(ctx, person, tag);
+					}
+				}
+			}).start();
+
 			super.onSuccess(gMetaPerson);
 		}
 	}
