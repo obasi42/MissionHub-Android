@@ -169,8 +169,6 @@ public class ContactSurveysTab extends LinearLayout {
 				break;
 			case UPDATE_ORGS:
 				activity.showProgress(tag);
-				mListAdapter.add(new ProgressItem(activity.getString(R.string.loading), true));
-				mListAdapter.notifyDataSetChanged();
 				Toast.makeText(getContext(), activity.getString(R.string.contact_refreshing_org), Toast.LENGTH_LONG).show();
 				Organizations.get(activity, activity.getUser().getOrganizationID(), ContactSurveysTab.this.toString());
 				break;
