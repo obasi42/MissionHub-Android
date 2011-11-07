@@ -29,13 +29,13 @@
         </activity>
         <activity
             android:name=".LoginActivity"
-            android:configChanges="orientation"
+            android:configChanges="orientation|keyboardHidden"
             android:theme="@style/Theme.MHActionBar" >
         </activity>
         <activity
             android:name=".ContactsActivity"
-            android:screenOrientation="portrait"
             android:theme="@style/Theme.MHActionBar"
+            android:configChanges="orientation|keyboardHidden"
             android:windowSoftInputMode="stateHidden|adjustPan" >
         </activity>
         <activity
@@ -44,12 +44,11 @@
         </activity>
         <activity
             android:name=".SurveysActivity"
-            android:configChanges="orientation"
+            android:configChanges="orientation|keyboardHidden"
             android:theme="@style/Theme.MHActionBar" >
         </activity>
         <activity
             android:name=".ContactActivity"
-            android:screenOrientation="portrait"
             android:theme="@style/Theme.MHActionBar"
             android:windowSoftInputMode="adjustPan" >
         </activity>
@@ -68,11 +67,12 @@
         <activity
             android:name=".ProfileActivity"
             android:theme="@style/Theme.MHActionBar"
+            android:configChanges="orientation|keyboardHidden"
             android:windowSoftInputMode="stateHidden|adjustPan" >
         </activity>
         <activity
             android:name=".EggActivity"
-            android:screenOrientation="portrait"
+            android:configChanges="orientation|keyboardHidden"
             android:theme="@style/Theme.MHActionBar" >
         </activity>
     </application>
