@@ -60,9 +60,8 @@ public class ContactSurveysTab extends LinearLayout {
 	}
 
 	public void setup() {
-		activity.getApp().getApiNotifier()
-				.subscribe(tag, notifierHandler, Type.UPDATE_ORGANIZATION, Type.JSON_ORGANIZATIONS_ON_FAILURE);
-
+		activity.getApp().getApiNotifier().subscribe(this, notifierHandler, Type.UPDATE_PERSON, Type.UPDATE_ORGANIZATION, Type.JSON_ORGANIZATIONS_ON_FAILURE);
+		
 		LayoutInflater.from(activity).inflate(R.layout.tab_contact_surveys, this);
 
 		mListView = (ListView) ((LinearLayout) findViewById(R.id.tab_contact_surveys)).findViewById(R.id.listview_contact_surveys);
