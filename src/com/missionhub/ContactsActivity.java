@@ -424,7 +424,7 @@ public class ContactsActivity extends Activity {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 			GContact contact = (GContact) parent.getAdapter().getItem(position);
-			Intent i = new Intent(getApplicationContext(), ContactActivity2.class);
+			Intent i = new Intent(getApplicationContext(), ContactActivity.class);
 			i.putExtra("personId", contact.getPerson().getId());
 			startActivity(i);
 		}

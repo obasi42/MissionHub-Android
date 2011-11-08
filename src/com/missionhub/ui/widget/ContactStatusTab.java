@@ -9,7 +9,7 @@ import greendroid.widget.ItemAdapter;
 import greendroid.widget.item.Item;
 import greendroid.widget.item.ProgressItem;
 
-import com.missionhub.ContactActivity2;
+import com.missionhub.ContactActivity;
 import com.missionhub.R;
 import com.missionhub.api.ApiNotifierHandler;
 import com.missionhub.api.FollowupComments;
@@ -44,7 +44,7 @@ public class ContactStatusTab extends LinearLayout {
 
 	private static final String TAG = ContactStatusTab.class.getSimpleName();
 
-	private ContactActivity2 activity;
+	private ContactActivity activity;
 
 	private ContactHeaderFragment mHeader;
 
@@ -60,13 +60,13 @@ public class ContactStatusTab extends LinearLayout {
 
 	public ContactStatusTab(Context context) {
 		super(context);
-		activity = (ContactActivity2) context;
+		activity = (ContactActivity) context;
 		setup();
 	}
 
 	public ContactStatusTab(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		activity = (ContactActivity2) context;
+		activity = (ContactActivity) context;
 		setup();
 	}
 

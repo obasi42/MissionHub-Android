@@ -32,23 +32,32 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.Toast;
 
 public class ContactSurveysTab extends LinearLayout {
 
+	/* The activity the tab is running in */
 	private Activity activity;
 
+	/* The tab's header fragment */
 	private ContactHeaderSmallFragment mHeader;
 
+	/* The ListView */
 	private ListView mListView;
+
+	/* The list adapter */
 	private ItemAdapter mListAdapter;
 
+	/* The person this tab is for */
 	private Person person;
 
+	/* The api notifier tag */
 	private final String tag = ContactSurveysTab.this.toString();
-	
+
+	/* Handler Messages */
 	private static final int MSG_COMPLETE = 0;
 	private static final int MSG_UPDATE_ORGS = 1;
+
+	/* Number of times an org update has failed */
 	private int orgUpdateFailed = 0;
 
 	public ContactSurveysTab(Context context) {
@@ -63,9 +72,12 @@ public class ContactSurveysTab extends LinearLayout {
 		setup();
 	}
 
-	public void setup() {
+	/**
+	 * Initializes the tab
+	 */
+	private void setup() {
 		activity.getApp().getApiNotifier().subscribe(this, notifierHandler, Type.UPDATE_PERSON, Type.UPDATE_ORGANIZATION, Type.JSON_ORGANIZATIONS_ON_FAILURE);
-		
+
 		LayoutInflater.from(activity).inflate(R.layout.tab_contact_surveys, this);
 
 		mListView = (ListView) ((LinearLayout) findViewById(R.id.tab_contact_surveys)).findViewById(R.id.listview);
@@ -79,7 +91,10 @@ public class ContactSurveysTab extends LinearLayout {
 		mListAdapter.add(new ProgressItem(activity.getString(R.string.progress_loading), true));
 		mListView.setAdapter(mListAdapter);
 	}
-	
+
+	/**
+	 * Handles actions from the ApiNotifier
+	 */
 	private ApiNotifierHandler notifierHandler = new ApiNotifierHandler(tag) {
 
 		@Override
@@ -99,17 +114,24 @@ public class ContactSurveysTab extends LinearLayout {
 			case JSON_ORGANIZATIONS_ON_FAILURE:
 				orgUpdateFailed++;
 				activity.hideProgress(tag);
-				// TODO: Handle Error
 				break;
 			}
 		}
 	};
 
+	/**
+	 * Sets the person object
+	 * 
+	 * @param person
+	 */
 	public void setPerson(Person person) {
 		this.person = person;
 		mHeader.setPerson(person);
 	}
 
+	/**
+	 * Updates the tab
+	 */
 	public void update() {
 		if (person == null)
 			return;
@@ -117,17 +139,17 @@ public class ContactSurveysTab extends LinearLayout {
 		activity.showProgress(tag);
 
 		final Person p = this.person;
-		
+
 		new Thread(new Runnable() {
 			public void run() {
 				final ListItems li = new ListItems();
-				
+
 				Person person = activity.getApp().getDbSession().getPersonDao().load(p.get_id());
 				KeywordDao kd = activity.getApp().getDbSession().getKeywordDao();
 
 				LinkedListMultimap<Integer, ContactSurveyItem> tempSurveys = LinkedListMultimap.<Integer, ContactSurveyItem> create();
 				boolean updateOrg = false;
-				
+
 				List<Answer> answers = person.getAnswer();
 				Iterator<Answer> itr = answers.iterator();
 				while (itr.hasNext()) {
@@ -165,7 +187,8 @@ public class ContactSurveysTab extends LinearLayout {
 
 				if (updateOrg) {
 					li.items.add(new ProgressItem(activity.getString(R.string.progress_loading), true));
-				} if (orgUpdateFailed > 2) {
+				}
+				if (orgUpdateFailed > 2) {
 					li.items.add(new CenteredTextItem(activity.getString(R.string.contact_tab_surveys_not_available)));
 				} else if (li.items.isEmpty()) {
 					li.items.add(new CenteredTextItem(activity.getString(R.string.contact_tab_surveys_no_answers)));
@@ -176,13 +199,16 @@ public class ContactSurveysTab extends LinearLayout {
 					msg.what = MSG_UPDATE_ORGS;
 				} else {
 					msg.what = MSG_COMPLETE;
-				}	
+				}
 				msg.obj = li;
 				updateHandler.sendMessage(msg);
 			}
 		}).start();
 	}
-	
+
+	/**
+	 * Handles actions from update()
+	 */
 	private Handler updateHandler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
@@ -190,18 +216,25 @@ public class ContactSurveysTab extends LinearLayout {
 				activity.showProgress(tag);
 				Organizations.get(activity, activity.getUser().getOrganizationID(), tag);
 			}
+
 			activity.hideProgress(tag);
+
 			mListAdapter.setNotifyOnChange(false);
 			mListAdapter.clear();
+
 			ListItems items = (ListItems) msg.obj;
 			Iterator<Item> itr = items.items.iterator();
 			while (itr.hasNext()) {
 				mListAdapter.add(itr.next());
 			}
+
 			mListAdapter.notifyDataSetChanged();
 		}
 	};
 
+	/**
+	 * Class to hold handler items
+	 */
 	private class ListItems {
 		public ArrayList<Item> items = new ArrayList<Item>();
 	}

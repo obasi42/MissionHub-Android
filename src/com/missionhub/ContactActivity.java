@@ -31,9 +31,9 @@ import android.widget.Toast;
 import greendroid.widget.ActionBar;
 import greendroid.widget.ActionBarItem;
 
-public class ContactActivity2 extends Activity {
+public class ContactActivity extends Activity {
 
-	public static final String TAG = ContactActivity2.class.getSimpleName();
+	public static final String TAG = ContactActivity.class.getSimpleName();
 
 	private int personId = -1;
 	private Person person;
@@ -63,11 +63,6 @@ public class ContactActivity2 extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		// TODO Remove Debugging
-		getApp().getDbSession().getOrganizationDao().deleteAll();
-		getApp().getDbSession().getQuestionDao().deleteAll();
-		getApp().getDbSession().getKeywordDao().deleteAll();
-
 		personId = getIntent().getIntExtra("personId", -1);
 		if (personId < 0) {
 			Toast.makeText(getApplicationContext(), R.string.contact_invalid_person, Toast.LENGTH_LONG).show();
@@ -104,7 +99,7 @@ public class ContactActivity2 extends Activity {
 			@Override
 			public void onTabChanged(String tabId) {
 				tabTag = tabId;
-				ContactActivity2.this.getIntent().putExtra("tab", tabTag);
+				ContactActivity.this.getIntent().putExtra("tab", tabTag);
 			}
 		});
 
@@ -214,7 +209,7 @@ public class ContactActivity2 extends Activity {
 				hideProgress(contactTag);
 				break;
 			case JSON_CONTACTS_ON_FAILURE:
-				DisplayError.displayWithRetry(ContactActivity2.this, t, new DisplayError.Retry() {
+				DisplayError.displayWithRetry(ContactActivity.this, t, new DisplayError.Retry() {
 					@Override
 					public void run() {
 						updateContact(true);
@@ -228,7 +223,7 @@ public class ContactActivity2 extends Activity {
 				hideProgress(commentTag);
 				break;
 			case JSON_FOLLOWUP_COMMENTS_ON_FAILURE:
-				AlertDialog ad = DisplayError.displayWithRetry(ContactActivity2.this, t, new DisplayError.Retry() {
+				AlertDialog ad = DisplayError.displayWithRetry(ContactActivity.this, t, new DisplayError.Retry() {
 					@Override
 					public void run() {
 						updateStatus(true);

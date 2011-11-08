@@ -49,11 +49,6 @@
         </activity>
         <activity
             android:name=".ContactActivity"
-            android:theme="@style/Theme.MHActionBar"
-            android:windowSoftInputMode="adjustPan" >
-        </activity>
-        <activity
-            android:name=".ContactActivity2"
             android:configChanges="orientation|keyboardHidden"
             android:theme="@style/Theme.MHActionBar" >
         </activity>
