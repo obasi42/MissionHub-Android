@@ -52,15 +52,15 @@ public class MissionHubActivity extends Activity {
 			} catch (Exception e) {}
 		}
 
-		setActionBarContentView(R.layout.main);
+		setActionBarContentView(R.layout.activity_missionhub);
 		getActionBar().setType(ActionBar.Type.Dashboard);
 		getActionBar().setVisibility(View.GONE);
 
 		addActionBarItem(getActionBar().newActionBarItem(NormalActionBarItem.class).setDrawable(R.drawable.action_bar_user)
-				.setContentDescription(R.string.action_bar_profile), R.id.action_bar_profile);
+				.setContentDescription(R.string.action_profile), R.id.action_bar_profile);
 
 		addActionBarItem(getActionBar().newActionBarItem(NormalActionBarItem.class).setDrawable(R.drawable.action_bar_logout)
-				.setContentDescription(R.string.action_bar_logout), R.id.action_bar_logout);
+				.setContentDescription(R.string.action_logout), R.id.action_bar_logout);
 
 		
 		Preferences.setLastRunVersion(this, ((Application) getApplicationContext()).getVersion());
@@ -99,15 +99,15 @@ public class MissionHubActivity extends Activity {
 
 	public void clickAbout(View view) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(R.string.alert_learn_more).setIcon(R.drawable.ic_dialog_info).setMessage(R.string.alert_learn_more_msg)
-				.setPositiveButton(R.string.alert_ok, new DialogInterface.OnClickListener() {
+		builder.setTitle(R.string.missionhub_alert_about).setIcon(R.drawable.ic_dialog_info).setMessage(R.string.missionhub_alert_about_content)
+				.setPositiveButton(R.string.action_ok, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int id) {
 						getTracker().trackEvent(MissionHubActivity.class.getCanonicalName(), "Click", "About", 0);
 						Uri uri = Uri.parse("http://missionhub.com?mobile=0");
 						startActivity(new Intent(Intent.ACTION_VIEW, uri));
 					}
-				}).setNegativeButton(R.string.alert_cancel, new DialogInterface.OnClickListener() {
+				}).setNegativeButton(R.string.action_cancel, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int id) {
 						dialog.cancel();

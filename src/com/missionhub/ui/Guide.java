@@ -43,13 +43,13 @@ public class Guide {
 		builder.setTitle(title)
 				.setIcon(R.drawable.ic_dialog_info)
 				.setMessage(message)
-				.setPositiveButton(R.string.alert_hide, new DialogInterface.OnClickListener() {
+				.setPositiveButton(R.string.action_hide, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int id) {
 						dialog.cancel();
 					}
 				})
-				.setNegativeButton(R.string.alert_dont_show, new DialogInterface.OnClickListener() {
+				.setNegativeButton(R.string.action_dont_show_again, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int id) {
 						dialog.cancel();

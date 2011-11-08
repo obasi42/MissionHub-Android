@@ -42,13 +42,13 @@ public class ProfileActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
-		setTitle(R.string.profile_header);
-		setActionBarContentView(R.layout.profile);
+		setTitle(R.string.profile);
+		setActionBarContentView(R.layout.activity_profile);
 		
 		addActionBarItem(getActionBar()
                 .newActionBarItem(NormalActionBarItem.class)
                 .setDrawable(R.drawable.action_bar_logout)
-                .setContentDescription(R.string.action_bar_logout), R.id.action_bar_logout);
+                .setContentDescription(R.string.action_logout), R.id.action_bar_logout);
 
 		/* Spinner */
 		createSpinnerArrays();

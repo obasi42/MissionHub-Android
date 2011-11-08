@@ -180,7 +180,7 @@ public class ContactActivity2 extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 	    MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.contact_activity_menu, menu);
+	    inflater.inflate(R.menu.activity_contact, menu);
 	    return true;
 	}
 	

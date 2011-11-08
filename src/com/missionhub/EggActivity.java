@@ -14,9 +14,9 @@ public class EggActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		overridePendingTransition(R.anim.fadein, R.anim.fadeout);
-		setActionBarContentView(R.layout.egg);
+		setActionBarContentView(R.layout.activity_egg);
 		
-		setTitle(R.string.egg_title);
+		setTitle(R.string.egg);
 		iv = (ImageView) findViewById(R.id.egg_picture);
 		
 		getTracker().setCustomVar("personId", String.valueOf(getUser().getId()), AnalyticsTracker.SCOPE_PAGE_LEVEL);
@@ -28,7 +28,7 @@ public class EggActivity extends Activity {
 		clicks++;
 		if (clicks == 20) {
 			clicks = 0;
-			setTitle(R.string.egg_title_todd);
+			setTitle(R.string.egg_todd);
 			iv.setImageResource(R.drawable.todd);
 		}
 	}

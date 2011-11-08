@@ -46,6 +46,10 @@ public class ContactSurveysTab extends LinearLayout {
 	private Person person;
 
 	private final String tag = ContactSurveysTab.this.toString();
+	
+	private static final int MSG_COMPLETE = 0;
+	private static final int MSG_UPDATE_ORGS = 1;
+	private int orgUpdateFailed = 0;
 
 	public ContactSurveysTab(Context context) {
 		super(context);
@@ -64,7 +68,7 @@ public class ContactSurveysTab extends LinearLayout {
 		
 		LayoutInflater.from(activity).inflate(R.layout.tab_contact_surveys, this);
 
-		mListView = (ListView) ((LinearLayout) findViewById(R.id.tab_contact_surveys)).findViewById(R.id.listview_contact_surveys);
+		mListView = (ListView) ((LinearLayout) findViewById(R.id.tab_contact_surveys)).findViewById(R.id.listview);
 
 		final LinearLayout header = (LinearLayout) activity.getLayoutInflater().inflate(R.layout.tab_contact_surveys_header, null);
 		mListView.addHeaderView(header, null, false);
@@ -72,9 +76,34 @@ public class ContactSurveysTab extends LinearLayout {
 		mHeader = (ContactHeaderSmallFragment) activity.getSupportFragmentManager().findFragmentById(R.id.fragment_contact_surveys_header);
 
 		mListAdapter = new ItemAdapter(activity);
-		mListAdapter.add(new ProgressItem(activity.getString(R.string.loading), true));
+		mListAdapter.add(new ProgressItem(activity.getString(R.string.progress_loading), true));
 		mListView.setAdapter(mListAdapter);
 	}
+	
+	private ApiNotifierHandler notifierHandler = new ApiNotifierHandler(tag) {
+
+		@Override
+		public void handleMessage(Type type, String tag, Bundle bundle, Throwable throwable, long rowId) {
+			switch (type) {
+			case UPDATE_PERSON:
+				if (rowId == person.get_id()) {
+					update();
+				}
+				break;
+			case UPDATE_ORGANIZATION:
+				activity.hideProgress(tag);
+				if (rowId == activity.getUser().getOrganizationID()) {
+					update();
+				}
+				break;
+			case JSON_ORGANIZATIONS_ON_FAILURE:
+				orgUpdateFailed++;
+				activity.hideProgress(tag);
+				// TODO: Handle Error
+				break;
+			}
+		}
+	};
 
 	public void setPerson(Person person) {
 		this.person = person;
@@ -94,12 +123,10 @@ public class ContactSurveysTab extends LinearLayout {
 				final ListItems li = new ListItems();
 				
 				Person person = activity.getApp().getDbSession().getPersonDao().load(p.get_id());
-				
 				KeywordDao kd = activity.getApp().getDbSession().getKeywordDao();
 
 				LinkedListMultimap<Integer, ContactSurveyItem> tempSurveys = LinkedListMultimap.<Integer, ContactSurveyItem> create();
-				
-				person.refresh();
+				boolean updateOrg = false;
 				
 				List<Answer> answers = person.getAnswer();
 				Iterator<Answer> itr = answers.iterator();
@@ -112,8 +139,8 @@ public class ContactSurveysTab extends LinearLayout {
 					Question question = answer.getQuestion();
 
 					if (question == null) {
-						updateHandler.sendEmptyMessage(UPDATE_ORGS);
-						return;
+						updateOrg = true;
+						continue;
 					}
 
 					tempSurveys.put(question.getKeyword_id(), new ContactSurveyItem(question.getLabel(), answer.getAnswer()));
@@ -124,11 +151,11 @@ public class ContactSurveysTab extends LinearLayout {
 					Keyword keyword = kd.load(key);
 
 					if (keyword == null) {
-						updateHandler.sendEmptyMessage(UPDATE_ORGS);
-						return;
+						updateOrg = true;
+						continue;
 					}
 
-					li.items.add(new ContactSurveyHeaderItem(activity.getString(R.string.contact_survey_keyword) + ": " + keyword.getKeyword()));
+					li.items.add(new ContactSurveyHeaderItem(activity.getString(R.string.contact_tab_surveys_keyword) + " " + keyword.getKeyword()));
 					List<ContactSurveyItem> items = tempSurveys.get(key);
 					Iterator<ContactSurveyItem> itemsIterator = items.iterator();
 					while (itemsIterator.hasNext()) {
@@ -136,61 +163,42 @@ public class ContactSurveysTab extends LinearLayout {
 					}
 				}
 
-				if (li.items.isEmpty()) {
-					li.items.add(new CenteredTextItem(activity.getString(R.string.contact_no_answers)));
+				if (updateOrg) {
+					li.items.add(new ProgressItem(activity.getString(R.string.progress_loading), true));
+				} if (orgUpdateFailed > 2) {
+					li.items.add(new CenteredTextItem(activity.getString(R.string.contact_tab_surveys_not_available)));
+				} else if (li.items.isEmpty()) {
+					li.items.add(new CenteredTextItem(activity.getString(R.string.contact_tab_surveys_no_answers)));
 				}
 
 				final Message msg = updateHandler.obtainMessage();
-				msg.what = COMPLETE;
+				if (updateOrg) {
+					msg.what = MSG_UPDATE_ORGS;
+				} else {
+					msg.what = MSG_COMPLETE;
+				}	
 				msg.obj = li;
 				updateHandler.sendMessage(msg);
 			}
 		}).start();
 	}
-
-	private static final int COMPLETE = 0;
-	private static final int UPDATE_ORGS = 1;
-
+	
 	private Handler updateHandler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
-			activity.hideProgress(tag);
-			switch (msg.what) {
-			case COMPLETE:
-				mListAdapter.setNotifyOnChange(false);
-				mListAdapter.clear();
-				ListItems items = (ListItems) msg.obj;
-				Iterator<Item> itr = items.items.iterator();
-				while (itr.hasNext()) {
-					mListAdapter.add(itr.next());
-				}
-				mListAdapter.notifyDataSetChanged();
-				break;
-			case UPDATE_ORGS:
+			if (msg.what == MSG_UPDATE_ORGS) {
 				activity.showProgress(tag);
-				Toast.makeText(getContext(), activity.getString(R.string.contact_refreshing_org), Toast.LENGTH_LONG).show();
-				Organizations.get(activity, activity.getUser().getOrganizationID(), ContactSurveysTab.this.toString());
-				break;
+				Organizations.get(activity, activity.getUser().getOrganizationID(), tag);
 			}
-		}
-	};
-
-	private ApiNotifierHandler notifierHandler = new ApiNotifierHandler(tag) {
-
-		@Override
-		public void handleMessage(Type type, String tag, Bundle bundle, Throwable throwable, long rowId) {
-			switch (type) {
-			case UPDATE_ORGANIZATION:
-				activity.hideProgress(tag);
-				if (rowId == activity.getUser().getOrganizationID()) {
-					update();
-				}
-				break;
-			case JSON_ORGANIZATIONS_ON_FAILURE:
-				activity.hideProgress(tag);
-				// TODO: Handle Error
-				break;
+			activity.hideProgress(tag);
+			mListAdapter.setNotifyOnChange(false);
+			mListAdapter.clear();
+			ListItems items = (ListItems) msg.obj;
+			Iterator<Item> itr = items.items.iterator();
+			while (itr.hasNext()) {
+				mListAdapter.add(itr.next());
 			}
+			mListAdapter.notifyDataSetChanged();
 		}
 	};
 

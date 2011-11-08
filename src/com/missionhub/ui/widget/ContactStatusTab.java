@@ -73,15 +73,15 @@ public class ContactStatusTab extends LinearLayout {
 	public void setup() {
 		LayoutInflater.from(activity).inflate(R.layout.tab_contact_status, this);
 
-		mListView = (ListView) ((LinearLayout) findViewById(R.id.tab_contact_status)).findViewById(R.id.listview_contact_status);
+		mListView = (ListView) ((LinearLayout) findViewById(R.id.tab_contact_status)).findViewById(R.id.listview);
 
 		final LinearLayout header = (LinearLayout) activity.getLayoutInflater().inflate(R.layout.tab_contact_status_header, null);
 		mListView.addHeaderView(header, null, false);
 
 		mHeader = (ContactHeaderFragment) activity.getSupportFragmentManager().findFragmentById(R.id.fragment_contact_status_header);
 
-		progressItem = new ProgressItem(activity.getString(R.string.loading), true);
-		noStatusItem = new CenteredTextItem(activity.getString(R.string.contact_no_comments));
+		progressItem = new ProgressItem(activity.getString(R.string.progress_loading), true);
+		noStatusItem = new CenteredTextItem(activity.getString(R.string.contact_tab_status_no_comments));
 
 		mListAdapter = new ItemAdapter(activity);
 		mListAdapter.add(progressItem);
@@ -187,10 +187,10 @@ public class ContactStatusTab extends LinearLayout {
 				}
 
 				if (canDelete) {
-					final CharSequence[] items = { activity.getString(R.string.comment_delete) };
+					final CharSequence[] items = { activity.getString(R.string.action_delete) };
 					AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 					builder.setIcon(R.drawable.ic_menu_start_conversation);
-					builder.setTitle(R.string.comment_actions);
+					builder.setTitle(R.string.contact_tab_status_comment_actions);
 					builder.setItems(items, new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int item) {
@@ -203,7 +203,7 @@ public class ContactStatusTab extends LinearLayout {
 					AlertDialog alert = builder.create();
 					alert.show();
 				} else {
-					Toast.makeText(activity, R.string.contact_no_permissions, Toast.LENGTH_SHORT).show();
+					Toast.makeText(activity, R.string.contact_tab_status_no_permissions, Toast.LENGTH_SHORT).show();
 				}
 			} catch (Exception e) {
 				Log.w(TAG, e.getMessage(), e);

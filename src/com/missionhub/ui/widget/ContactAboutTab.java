@@ -59,7 +59,7 @@ public class ContactAboutTab extends LinearLayout {
 	public void setup() {
 		LayoutInflater.from(activity).inflate(R.layout.tab_contact_about, this);
 
-		mListView = (ListView) ((LinearLayout) findViewById(R.id.tab_contact_about)).findViewById(R.id.listview_contact_about);
+		mListView = (ListView) ((LinearLayout) findViewById(R.id.tab_contact_about)).findViewById(R.id.listview);
 		
 		final LinearLayout header = (LinearLayout) activity.getLayoutInflater().inflate(R.layout.tab_contact_about_header, null);
 		mListView.addHeaderView(header, null, false);
@@ -83,7 +83,7 @@ public class ContactAboutTab extends LinearLayout {
 			}
 		});
 
-		progressItem = new ProgressItem(activity.getString(R.string.loading), true);
+		progressItem = new ProgressItem(activity.getString(R.string.progress_loading), true);
 	}
 
 	public void setPerson(Person person) {
@@ -100,7 +100,7 @@ public class ContactAboutTab extends LinearLayout {
 
 		// Email
 		if (!U.nullOrEmpty(person.getEmail_address()))
-			mListAdapter.add(new ContactAboutItem(activity.getString(R.string.contact_info_email_address), person.getEmail_address(), getResources().getDrawable(
+			mListAdapter.add(new ContactAboutItem(activity.getString(R.string.contact_tab_about_email), person.getEmail_address(), getResources().getDrawable(
 					R.drawable.action_email), new ContactAboutItem.Action() {
 				@Override
 				public void run() {
@@ -110,7 +110,7 @@ public class ContactAboutTab extends LinearLayout {
 
 		// Phone
 		if (!U.nullOrEmpty(person.getPhone_number()))
-			mListAdapter.add(new ContactAboutItem(activity.getString(R.string.contact_info_phone_number), Helper.formatPhoneNumber(person.getPhone_number()), getResources()
+			mListAdapter.add(new ContactAboutItem(activity.getString(R.string.contact_tab_about_phone), Helper.formatPhoneNumber(person.getPhone_number()), getResources()
 					.getDrawable(R.drawable.action_call), new ContactAboutItem.Action() {
 				@Override
 				public void run() {
@@ -120,7 +120,7 @@ public class ContactAboutTab extends LinearLayout {
 
 		// Facebook
 		if (!U.nullOrEmpty(person.getFb_id()))
-			mListAdapter.add(new ContactAboutItem(activity.getString(R.string.contact_info_facebook_header), activity.getString(R.string.contact_info_facebook_link),
+			mListAdapter.add(new ContactAboutItem(activity.getString(R.string.contact_tab_about_facebook), activity.getString(R.string.contact_tab_about_facebook_sub),
 					getResources().getDrawable(R.drawable.action_facebook), new ContactAboutItem.Action() {
 						@Override
 						public void run() {
@@ -142,7 +142,7 @@ public class ContactAboutTab extends LinearLayout {
 					}
 				}
 				if (contactRole.equals("contact")) {
-					mListAdapter.add(new ContactAboutItem(activity.getString(R.string.contact_role), activity.getString(R.string.contact_role_promote), null,
+					mListAdapter.add(new ContactAboutItem(activity.getString(R.string.contact_tab_about_role), activity.getString(R.string.contact_tab_about_role_sub_promote), null,
 							new ContactAboutItem.Action() {
 								@Override
 								public void run() {
@@ -150,7 +150,7 @@ public class ContactAboutTab extends LinearLayout {
 								}
 							}));
 				} else if (contactRole.equals("leader")) {
-					mListAdapter.add(new ContactAboutItem(activity.getString(R.string.contact_role), activity.getString(R.string.contact_role_demote), null,
+					mListAdapter.add(new ContactAboutItem(activity.getString(R.string.contact_tab_about_role), activity.getString(R.string.contact_tab_about_role_sub_demote), null,
 							new ContactAboutItem.Action() {
 								@Override
 								public void run() {
@@ -158,7 +158,7 @@ public class ContactAboutTab extends LinearLayout {
 								}
 							}));
 				} else if (contactRole.equals("admin")) {
-					mListAdapter.add(new ContactAboutItem(activity.getString(R.string.contact_role), activity.getString(R.string.contact_role_admin), null,
+					mListAdapter.add(new ContactAboutItem(activity.getString(R.string.contact_tab_about_role), activity.getString(R.string.contact_tab_about_role_sub_admin), null,
 							new ContactAboutItem.Action() {
 								@Override
 								public void run() {
@@ -171,7 +171,7 @@ public class ContactAboutTab extends LinearLayout {
 			// Assignment
 			List<Assignment> assignedTo = person.getAssigned_to_contacts();
 			for (Assignment a : assignedTo) {
-				mListAdapter.add(new ContactAboutItem(activity.getString(R.string.contact_info_assigned_to), activity.getApp().getDbSession().getPersonDao()
+				mListAdapter.add(new ContactAboutItem(activity.getString(R.string.contact_tab_about_assigned_to), activity.getApp().getDbSession().getPersonDao()
 						.load(a.getAssigned_to_id()).getName(), null, new ContactAboutItem.Action() {
 					@Override
 					public void run() {
@@ -182,15 +182,15 @@ public class ContactAboutTab extends LinearLayout {
 
 			// First Contact Date
 			if (!U.nullOrEmpty(person.getFirst_contact_date()))
-				mListAdapter.add(new ContactAboutItem(activity.getString(R.string.contact_info_first_contact_date), person.getFirst_contact_date().toLocaleString()));
+				mListAdapter.add(new ContactAboutItem(activity.getString(R.string.contact_tab_about_first_contact_date), person.getFirst_contact_date().toLocaleString()));
 
 			// Surveyed Date
 			if (!U.nullOrEmpty(person.getDate_surveyed()))
-				mListAdapter.add(new ContactAboutItem(activity.getString(R.string.contact_info_surveyed_date), person.getDate_surveyed().toLocaleString()));
+				mListAdapter.add(new ContactAboutItem(activity.getString(R.string.contact_tab_about_last_survey_taken), person.getDate_surveyed().toLocaleString()));
 
 			// Birthday
 			if (!U.nullOrEmpty(person.getBirthday())) {
-				mListAdapter.add(new ContactAboutItem(activity.getString(R.string.contact_info_birthday), person.getBirthday()));
+				mListAdapter.add(new ContactAboutItem(activity.getString(R.string.contact_tab_about_birthday), person.getBirthday()));
 			}
 
 			// Interests
@@ -204,7 +204,7 @@ public class ContactAboutTab extends LinearLayout {
 				}
 			}
 			if (interests.length() > 0) {
-				mListAdapter.add(new ContactAboutItem(activity.getString(R.string.contact_info_interests), interests.toString()));
+				mListAdapter.add(new ContactAboutItem(activity.getString(R.string.contact_tab_about_interests), interests.toString()));
 			}
 
 			// Education
@@ -214,7 +214,7 @@ public class ContactAboutTab extends LinearLayout {
 
 				String title = edu.getType();
 				if (title == null)
-					title = activity.getString(R.string.contact_info_education);
+					title = activity.getString(R.string.contact_tab_about_education);
 
 				StringBuffer value = new StringBuffer();
 
@@ -224,7 +224,7 @@ public class ContactAboutTab extends LinearLayout {
 
 				if (edu.getYear_name() != null) {
 					if (value.length() > 0) {
-						value.append(" " + activity.getString(R.string.contact_info_class_of) + " ");
+						value.append(" " + activity.getString(R.string.contact_tab_about_education_class_of) + " ");
 					}
 					value.append(edu.getYear_name());
 				}
@@ -235,7 +235,7 @@ public class ContactAboutTab extends LinearLayout {
 			Iterator<Location> locationItr = person.getLocation().iterator();
 			while (locationItr.hasNext()) {
 				final Location loc = locationItr.next();
-				mListAdapter.add(new ContactAboutItem(activity.getString(R.string.contact_info_location), loc.getName()));
+				mListAdapter.add(new ContactAboutItem(activity.getString(R.string.contact_tab_about_location), loc.getName()));
 			}
 
 			// Progress

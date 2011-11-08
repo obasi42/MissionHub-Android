@@ -4,6 +4,6 @@
     <item
         android:id="@+id/refresh"
         android:icon="@drawable/ic_menu_refresh"
-        android:title="@string/contact_menu_refresh"/>
+        android:title="@string/action_refresh"/>
 
 </menu>

@@ -35,7 +35,7 @@ public class ContactSurveyItemView extends LinearLayout implements ItemView {
         mTextView.setText(item.text);
         
         if (item.subtext == null || item.subtext.equals("")) {
-        	mSubtextView.setText(getContext().getString(R.string.contact_survey_no_answer));
+        	mSubtextView.setText(getContext().getString(R.string.contact_tab_surveys_not_answered));
         	mSubtextView.setTextColor(getContext().getResources().getColor(R.color.medium_gray));
         } else {
         	mSubtextView.setText(item.subtext);

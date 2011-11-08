@@ -43,9 +43,9 @@ public class ContactItemAdapter extends ArrayAdapter<GContact> {
 			LayoutInflater vi = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			v = vi.inflate(R.layout.contact_list_item, null);
 			holder = new ViewHolder();
-			holder.name = (TextView) v.findViewById(R.id.contacts_list_contact_name);
-			holder.status = (TextView) v.findViewById(R.id.contacts_list_contact_status);
-			holder.image = (ImageView) v.findViewById(R.id.contacts_list_contact_image);
+			holder.name = (TextView) v.findViewById(R.id.name);
+			holder.status = (TextView) v.findViewById(R.id.status);
+			holder.image = (ImageView) v.findViewById(R.id.picture);
 			v.setTag(holder);
 		}
 		else

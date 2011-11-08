@@ -20,7 +20,7 @@
                 style="@style/dashboard_button"
                 android:drawableTop="@drawable/dashboard_contacts"
                 android:onClick="clickContacts"
-                android:text="@string/dashboard_contacts" />
+                android:text="@string/missionhub_dashboard_contacts" />
 
             <!--
                  <Button android:id="@+id/dashboard_groups" style="@style/DashboardButton" 
@@ -33,7 +33,7 @@
                 style="@style/dashboard_button"
                 android:drawableTop="@drawable/dashboard_surveys"
                 android:onClick="clickSurveys"
-                android:text="@string/dashboard_surveys" />
+                android:text="@string/missionhub_dashboard_surveys" />
         </com.missionhub.ui.DashboardLayout>
 
         <LinearLayout
@@ -61,8 +61,7 @@
                 style="@style/dashboard_name"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="Chris Roemmich" >
+                android:gravity="center" >
             </TextView>
 
             <TextView
@@ -70,8 +69,7 @@
                 style="@style/dashboard_organization"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="Cru" >
+                android:gravity="center">
             </TextView>
         </LinearLayout>
     </RelativeLayout>
@@ -103,7 +101,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="106dp"
                 android:onClick="clickAbout"
-                android:text="@string/main_about" >
+                android:text="@string/missionhub_btn_about" >
             </Button>
 
             <Button
@@ -111,7 +109,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="106dp"
                 android:onClick="clickLogin"
-                android:text="@string/main_login" >
+                android:text="@string/missionhub_btn_login" >
             </Button>
         </LinearLayout>
     </RelativeLayout>

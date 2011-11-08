@@ -57,15 +57,15 @@ public class ContactsFilterActivity extends PreferenceActivity implements OnShar
         rootView.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
         rootView.setOrientation(LinearLayout.VERTICAL);
         
-        RelativeLayout titleView = (RelativeLayout) View.inflate(this, R.layout.topbar, null);
-        notFilteredText = getString(R.string.contacts_filter_not_filtered);
-        
-        TextView title = (TextView) titleView.findViewById(R.id.title);
-        if (type.equalsIgnoreCase(TYPE_MY_CONTACTS)) {
-        	title.setText(R.string.contacts_filter_my);
-        } else if (type.equalsIgnoreCase(TYPE_ALL_CONTACTS)) {
-        	title.setText(R.string.contacts_filter_all);
-        }
+//        RelativeLayout titleView = (RelativeLayout) View.inflate(this, R.layout.topbar, null);
+//        notFilteredText = getString(R.string.contacts_filter_not_filtered);
+//        
+//        TextView title = (TextView) titleView.findViewById(R.id.title);
+//        if (type.equalsIgnoreCase(TYPE_MY_CONTACTS)) {
+//        	title.setText(R.string.contacts_filter_my);
+//        } else if (type.equalsIgnoreCase(TYPE_ALL_CONTACTS)) {
+//        	title.setText(R.string.contacts_filter_all);
+//        }
         
         preferenceView = new ListView(this);
         preferenceView.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
@@ -75,7 +75,7 @@ public class ContactsFilterActivity extends PreferenceActivity implements OnShar
         screen.bind(preferenceView);
         preferenceView.setAdapter(screen.getRootAdapter());
         
-        rootView.addView(titleView, new LayoutParams(LayoutParams.FILL_PARENT, 40)); // 40 - height of topbar
+        //rootView.addView(titleView, new LayoutParams(LayoutParams.FILL_PARENT, 40)); // 40 - height of topbar
         rootView.addView(preferenceView);
         
         this.setContentView(rootView);
@@ -91,7 +91,7 @@ public class ContactsFilterActivity extends PreferenceActivity implements OnShar
         
         // Category - Predefined
         PreferenceCategory predefined = new PreferenceCategory(this);
-        predefined.setTitle(R.string.contacts_filter_predefined);
+        //predefined.setTitle(R.string.contacts_filter_predefined);
         root.addPreference(predefined);
 
     	// Status
@@ -164,7 +164,7 @@ public class ContactsFilterActivity extends PreferenceActivity implements OnShar
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 	    MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.contacts_filter, menu);
+	    //inflater.inflate(R.menu.contacts_filter, menu);
 	    return true;
 	}
 	
@@ -172,12 +172,12 @@ public class ContactsFilterActivity extends PreferenceActivity implements OnShar
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    // Handle item selection
 	    switch (item.getItemId()) {
-	    case R.id.clear:
-	    	sharedPreferences.edit().clear().commit();
-	    	this.setResult(ContactsActivity.RESULT_CHANGED);
-	    	Toast.makeText(getApplicationContext(), "Filters Cleared", Toast.LENGTH_SHORT).show();
-	    	finish();
-	        return true;
+//	    case R.id.clear:
+//	    	sharedPreferences.edit().clear().commit();
+//	    	this.setResult(ContactsActivity.RESULT_CHANGED);
+//	    	Toast.makeText(getApplicationContext(), "Filters Cleared", Toast.LENGTH_SHORT).show();
+//	    	finish();
+//	        return true;
 	    default:
 	        return super.onOptionsItemSelected(item);
 	    }

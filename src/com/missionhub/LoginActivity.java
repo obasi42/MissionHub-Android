@@ -43,12 +43,12 @@ public class LoginActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		overridePendingTransition(R.anim.fadein, R.anim.fadeout);
-		setActionBarContentView(R.layout.login);
+		setActionBarContentView(R.layout.activity_login);
 		getActionBar().setVisibility(View.GONE);
 		
 		clearCookies();
 
-		mProgressDialog = ProgressDialog.show(LoginActivity.this, "", LoginActivity.this.getString(R.string.alert_loading), true);
+		mProgressDialog = ProgressDialog.show(LoginActivity.this, "", LoginActivity.this.getString(R.string.progress_loading), true);
 		mProgressDialog.setCancelable(true);
 		mProgressDialog.setOnCancelListener(new OnCancelListener() {
 			@Override
@@ -125,7 +125,7 @@ public class LoginActivity extends Activity {
 					GError error = gson.fromJson(description, GError.class);
 					description = error.getError().getMessage();	
 				} catch (Exception e) {
-					description = getString(R.string.alert_error_msg);
+					description = getString(R.string.error_msg);
 				}
 			}
 			
@@ -134,7 +134,7 @@ public class LoginActivity extends Activity {
 			}
 			mWebView.setVisibility(View.GONE);
 			AlertDialog ad = DisplayError.display(LoginActivity.this, errorCode, description, failingUrl);
-			ad.setButton(ad.getContext().getString(R.string.alert_retry), new DialogInterface.OnClickListener() {
+			ad.setButton(ad.getContext().getString(R.string.action_retry), new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int id) {
 					dialog.dismiss();
@@ -142,7 +142,7 @@ public class LoginActivity extends Activity {
 					mWebView.reload();
 				}
 			});
-			ad.setButton(DialogInterface.BUTTON_NEUTRAL, getString(R.string.alert_close), new DialogInterface.OnClickListener() {
+			ad.setButton(DialogInterface.BUTTON_NEUTRAL, getString(R.string.action_close), new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int id) {
 					dialog.dismiss();
@@ -238,7 +238,7 @@ public class LoginActivity extends Activity {
 			public void onFailure(Throwable e) {
 				Log.e(TAG, "Login Failed", e);
 				AlertDialog ad = DisplayError.display(LoginActivity.this, e);
-				ad.setButton(DialogInterface.BUTTON_NEUTRAL, getString(R.string.alert_close), new DialogInterface.OnClickListener() {
+				ad.setButton(DialogInterface.BUTTON_NEUTRAL, getString(R.string.action_close), new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int id) {
 						dialog.dismiss();

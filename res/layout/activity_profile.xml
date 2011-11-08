@@ -37,7 +37,6 @@
                     android:layout_marginLeft="10dp"
                     android:gravity="center|left"
                     android:lines="2"
-                    android:text="TextView"
                     android:textAppearance="?android:attr/textAppearanceLarge" >
                 </TextView>
             </LinearLayout>
@@ -53,7 +52,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="3dp"
-                android:text="@string/profile_change_current_organization"
+                android:text="@string/profile_change_organization"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textSize="14dp" >
             </TextView>
@@ -62,7 +61,7 @@
                 android:id="@+id/spinner"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:prompt="@string/profile_change_current_organization" >
+                android:prompt="@string/profile_change_organization" >
             </Spinner>
         </LinearLayout>
     </LinearLayout>

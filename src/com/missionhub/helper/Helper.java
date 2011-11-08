@@ -23,11 +23,11 @@ public class Helper {
 	
 	public static final HashBiMap<String, Integer> statusMap = HashBiMap.create ();
 	static {
-		statusMap.put("attempted_contact", R.string.status_attempted_contact);
-		statusMap.put("uncontacted", R.string.status_uncontacted);
-		statusMap.put("do_not_contact", R.string.status_do_not_contact);
-		statusMap.put("contacted", R.string.status_contacted);
-		statusMap.put("completed", R.string.status_completed);
+		statusMap.put("attempted_contact", R.string.helper_status_attempted_contact);
+		statusMap.put("uncontacted", R.string.helper_status_uncontacted);
+		statusMap.put("do_not_contact", R.string.helper_status_do_not_contact);
+		statusMap.put("contacted", R.string.helper_status_contacted);
+		statusMap.put("completed", R.string.helper_status_completed);
 	}
 	
 	public static final ArrayList<String> statusList = new ArrayList<String>();
@@ -41,9 +41,9 @@ public class Helper {
 	
 	public static final LinkedHashMap<String, Rejoicable> rejoicableMap = new LinkedHashMap<String, Rejoicable>();
 	static {
-		rejoicableMap.put("spiritual_conversation", new Rejoicable(R.string.rejoice_spiritual_conversation, R.drawable.rejoicable_s_convo, "spiritual_conversation"));
-		rejoicableMap.put("gospel_presentation", new Rejoicable(R.string.rejoice_gospel_presentation, R.drawable.rejoicable_g_present, "gospel_presentation"));
-		rejoicableMap.put("prayed_to_receive", new Rejoicable(R.string.rejoice_prayed_to_receive, R.drawable.rejoicable_r_christ, "prayed_to_receive"));
+		rejoicableMap.put("spiritual_conversation", new Rejoicable(R.string.helper_rejoice_spiritual_conversation, R.drawable.rejoicable_s_convo, "spiritual_conversation"));
+		rejoicableMap.put("gospel_presentation", new Rejoicable(R.string.helper_rejoice_gospel_presentation, R.drawable.rejoicable_g_present, "gospel_presentation"));
+		rejoicableMap.put("prayed_to_receive", new Rejoicable(R.string.helper_rejoice_prayed_to_receive, R.drawable.rejoicable_r_christ, "prayed_to_receive"));
 	}
 
 	public static Date getDateFromUTCString(String s) {
@@ -93,7 +93,7 @@ public class Helper {
 	public static void openFacebookProfile(final Context ctx, String uid) {
 		final String new_uid = uid;
 		AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
-		builder.setTitle(R.string.contact_open_profile).setCancelable(true).setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+		builder.setTitle(R.string.helper_open_profile).setCancelable(true).setPositiveButton(R.string.action_yes, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int id) {
 				try {
@@ -107,12 +107,12 @@ public class Helper {
 						i.setData(Uri.parse("http://www.facebook.com/profile.php?id=" + new_uid));
 						ctx.startActivity(i);
 					} catch (Exception f) {
-						Toast.makeText(ctx, R.string.contact_cant_open_profile, Toast.LENGTH_LONG).show();
+						Toast.makeText(ctx, R.string.helper_cant_open_profile, Toast.LENGTH_LONG).show();
 					}
 				}
 				dialog.dismiss();
 			}
-		}).setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+		}).setNegativeButton(R.string.action_no, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int id) {
 				dialog.cancel();
@@ -125,7 +125,7 @@ public class Helper {
 	public static void openURL(final Context ctx, String url) {
 		final String new_url = url;
 		AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
-		builder.setTitle(R.string.contact_open_url).setCancelable(true).setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+		builder.setTitle(R.string.helper_open_link).setCancelable(true).setPositiveButton(R.string.action_yes, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int id) {
 				try {
@@ -133,11 +133,11 @@ public class Helper {
 					i.setData(Uri.parse(new_url));
 					ctx.startActivity(i);
 				} catch (Exception e) {
-					Toast.makeText(ctx, R.string.contact_cant_open_profile, Toast.LENGTH_LONG).show();
+					Toast.makeText(ctx, R.string.helper_cant_open_link, Toast.LENGTH_LONG).show();
 				}
 				dialog.dismiss();
 			}
-		}).setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+		}).setNegativeButton(R.string.action_no, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int id) {
 				dialog.cancel();
@@ -153,7 +153,7 @@ public class Helper {
 			intent.setData(Uri.parse("tel:" + phoneNumber));
 			ctx.startActivity(intent);
 		} catch (Exception e) {
-			Toast.makeText(ctx, R.string.contact_cant_call, Toast.LENGTH_LONG).show();
+			Toast.makeText(ctx, R.string.helper_cant_call, Toast.LENGTH_LONG).show();
 		}
 	}
 
@@ -164,7 +164,7 @@ public class Helper {
 			intent.setType("vnd.android-dir/mms-sms");
 			ctx.startActivity(intent);
 		} catch (Exception e) {
-			Toast.makeText(ctx, R.string.contact_cant_sms, Toast.LENGTH_LONG).show();
+			Toast.makeText(ctx, R.string.helper_cant_sms, Toast.LENGTH_LONG).show();
 		}
 	}
 
@@ -173,9 +173,9 @@ public class Helper {
 			final Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
 			emailIntent.setType("plain/text");
 			emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[] { emailAddress });
-			ctx.startActivity(Intent.createChooser(emailIntent, ctx.getString(R.string.contact_send_email)));
+			ctx.startActivity(Intent.createChooser(emailIntent, ctx.getString(R.string.helper_send_email)));
 		} catch (Exception e) {
-			Toast.makeText(ctx, R.string.contact_cant_email, Toast.LENGTH_LONG).show();
+			Toast.makeText(ctx, R.string.helper_cant_email, Toast.LENGTH_LONG).show();
 		}
 	}
 }

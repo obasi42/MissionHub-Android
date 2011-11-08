@@ -340,7 +340,7 @@ public class ApplicationUser {
 			setApiClient(new ApiClient(ctx));
 			
 			if (!silent) {
-				setProgressDialog(ProgressDialog.show(ctx, "", ctx.getString(R.string.alert_logging_in), true));
+				setProgressDialog(ProgressDialog.show(ctx, "", ctx.getString(R.string.progress_logging_in), true));
 				getProgressDialog().setCancelable(true);
 				getProgressDialog().setOnCancelListener(new OnCancelListener(){
 					@Override
@@ -397,7 +397,7 @@ public class ApplicationUser {
 			
 			if (!silent) {
 				AlertDialog ad = DisplayError.display(ctx, e);
-				ad.setButton(ad.getContext().getString(R.string.alert_retry), new DialogInterface.OnClickListener() {
+				ad.setButton(ad.getContext().getString(R.string.action_retry), new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int id) {
 						dialog.dismiss();

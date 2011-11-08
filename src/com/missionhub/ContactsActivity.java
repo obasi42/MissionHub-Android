@@ -66,13 +66,13 @@ public class ContactsActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setActionBarContentView(R.layout.contacts);
+		setActionBarContentView(R.layout.activity_contacts);
 		
 		indicator = (LoaderActionBarItem) addActionBarItem(Type.Refresh, R.id.action_bar_refresh);
 		searchIcon = (NormalActionBarItem) addActionBarItem(getActionBar()
                 .newActionBarItem(NormalActionBarItem.class)
                 .setDrawable(R.drawable.action_bar_search)
-                .setContentDescription(R.string.action_bar_search), R.id.action_bar_search);
+                .setContentDescription(R.string.action_search), R.id.action_bar_search);
 
 		contactsList = (ListView) findViewById(R.id.contacts_list);
 		adapter = new ContactItemAdapter(this, R.layout.contact_list_item, data);
@@ -205,8 +205,8 @@ public class ContactsActivity extends Activity {
 			switch (tab) {
 			case TAB_MY:
 				bottom_button_left.setChecked(true); // First State
-				setTitle(R.string.contacts_my);
-				txtNoData.setText(R.string.contacts_no_data_my);
+				setTitle(R.string.contacts_tab_my);
+				txtNoData.setText(R.string.contacts_tab_my_none);
 				Guide.display(this, Guide.CONTACTS_MY_CONTACTS);
 				try {
 					HashMap<String, String> params = new HashMap<String, String>();
@@ -215,8 +215,8 @@ public class ContactsActivity extends Activity {
 				} catch (Exception e) {}
 				break;
 			case TAB_ALL:
-				setTitle(R.string.contacts_all);
-				txtNoData.setText(R.string.contacts_no_data_all);
+				setTitle(R.string.contacts_tab_all);
+				txtNoData.setText(R.string.contacts_tab_all_none);
 				Guide.display(this, Guide.CONTACTS_ALL);
 				try {
 					HashMap<String, String> params = new HashMap<String, String>();
@@ -325,7 +325,7 @@ public class ContactsActivity extends Activity {
 			
 			Log.e(TAG, "Contacts List Get More Failed", e);
 			AlertDialog ad = DisplayError.display(ContactsActivity.this, e);
-			ad.setButton(ad.getContext().getString(R.string.alert_retry), new DialogInterface.OnClickListener() {
+			ad.setButton(ad.getContext().getString(R.string.action_retry), new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int id) {
 					dialog.dismiss();
@@ -457,7 +457,7 @@ public class ContactsActivity extends Activity {
 		public void onFailure(Throwable e) {
 			Log.e(TAG, "Change Role Failed", e);
 			AlertDialog ad = DisplayError.display(ContactsActivity.this, e);
-			ad.setButton(ad.getContext().getString(R.string.alert_retry), new DialogInterface.OnClickListener() {
+			ad.setButton(ad.getContext().getString(R.string.action_retry), new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int id) {
 					dialog.dismiss();

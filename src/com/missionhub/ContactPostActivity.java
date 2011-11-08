@@ -56,16 +56,16 @@ public class ContactPostActivity extends Activity {
 		personId = getIntent().getIntExtra("personId", -1);
 		status = getIntent().getStringExtra("status");
 		if (personId < 0 || U.nullOrEmpty(status)) {
-			Toast.makeText(getApplicationContext(), R.string.contact_invalid_person, Toast.LENGTH_LONG).show();
+			Toast.makeText(getApplicationContext(), R.string.contact_post_invalid_person, Toast.LENGTH_LONG).show();
 			finish();
 		}
 
-		this.setTitle("Add Comment / Update Status");
+		this.setTitle("Add Comment / Update Status"); //TODO:
 
-		setActionBarContentView(R.layout.contact_post);
+		setActionBarContentView(R.layout.activity_contact_post);
 		getActionBar().setType(ActionBar.Type.Empty);
 
-		addActionBarItem(getActionBar().newActionBarItem(NormalActionBarItem.class).setDrawable(R.drawable.action_bar_save).setContentDescription(R.string.action_bar_save),
+		addActionBarItem(getActionBar().newActionBarItem(NormalActionBarItem.class).setDrawable(R.drawable.action_bar_save).setContentDescription(R.string.action_save),
 				R.id.action_bar_save);
 
 		mComment = (EditText) findViewById(R.id.comment);
@@ -130,8 +130,8 @@ public class ContactPostActivity extends Activity {
 			while (itr.hasNext()) {
 				validRejoicables.add(itr.next());
 			}
-			AlertDialog dialog = new AlertDialog.Builder(this).setIcon(R.drawable.rejoicable_icon).setTitle(R.string.contact_rejoicables)
-					.setAdapter(new RejoicableAdapter(this, android.R.layout.simple_spinner_dropdown_item, validRejoicables), null).setNeutralButton(R.string.alert_ok, null)
+			AlertDialog dialog = new AlertDialog.Builder(this).setIcon(R.drawable.rejoicable_icon).setTitle(R.string.contact_post_attach_rejoicables)
+					.setAdapter(new RejoicableAdapter(this, android.R.layout.simple_spinner_dropdown_item, validRejoicables), null).setNeutralButton(R.string.action_ok, null)
 					.create();
 			rejoicableListView = dialog.getListView();
 			rejoicableListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
@@ -197,7 +197,7 @@ public class ContactPostActivity extends Activity {
 			FollowupComments.Comment comment = new FollowupComments.Comment(personId, getUser().getId(), getUser().getOrganizationID(), status, commentStr, selectedRejoicables);
 			FollowupComments.post(this, comment, tag);
 		} else {
-			Toast.makeText(this, R.string.contact_cant_save, Toast.LENGTH_LONG).show();
+			Toast.makeText(this, R.string.contact_post_cant_save, Toast.LENGTH_LONG).show();
 		}
 	}
 

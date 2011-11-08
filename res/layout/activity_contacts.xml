@@ -53,7 +53,7 @@
         android:layout_alignParentLeft="true"
         android:layout_marginTop="85dp"
         android:gravity="center"
-        android:text="@string/contacts_no_data_my"
+        android:text="@string/contacts_tab_all_none"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@color/black"
         android:visibility="gone" >

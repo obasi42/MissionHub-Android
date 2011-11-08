@@ -31,9 +31,9 @@ public class SurveysActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setTitle(R.string.surveys_title);
+		setTitle(R.string.surveys);
 		
-		setActionBarContentView(R.layout.surveys);
+		setActionBarContentView(R.layout.activity_surveys);
 		getActionBar().setType(ActionBar.Type.Empty);
 		indicator = (LoaderActionBarItem) addActionBarItem(Type.Refresh, R.id.action_bar_refresh);
 		
@@ -75,14 +75,14 @@ public class SurveysActivity extends Activity {
 		@Override
 		public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
 			AlertDialog ad = DisplayError.display(SurveysActivity.this, errorCode, description, failingUrl);
-			ad.setButton(ad.getContext().getString(R.string.alert_retry), new DialogInterface.OnClickListener() {
+			ad.setButton(ad.getContext().getString(R.string.action_retry), new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int id) {
 					dialog.dismiss();
 					mWebView.reload();
 				}
 			});
-			ad.setButton(DialogInterface.BUTTON_NEUTRAL, getString(R.string.alert_close), new DialogInterface.OnClickListener() {
+			ad.setButton(DialogInterface.BUTTON_NEUTRAL, getString(R.string.action_close), new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int id) {
 					dialog.dismiss();
@@ -120,13 +120,13 @@ public class SurveysActivity extends Activity {
 			builder.setTitle(R.string.surveys_exit)
 				.setMessage(R.string.surveys_exit_msg)
 				.setCancelable(false)
-				.setPositiveButton(R.string.alert_ok, new DialogInterface.OnClickListener() {
+				.setPositiveButton(R.string.action_ok, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int id) {
 						dialog.dismiss();
 						SurveysActivity.this.finish();
 					}
-				}).setNegativeButton(R.string.alert_cancel, new DialogInterface.OnClickListener() {
+				}).setNegativeButton(R.string.action_cancel, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int id) {
 						dialog.cancel();
