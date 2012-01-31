@@ -6,54 +6,55 @@ import java.util.List;
 import android.content.Context;
 import android.os.Build;
 
-import com.loopj.android.http.RequestParams;
-import com.missionhub.Application;
+import com.cr_wd.android.network.HttpHeaders;
+import com.cr_wd.android.network.HttpParams;
+import com.missionhub.MissionHubApplication;
 import com.missionhub.config.Config;
-import com.missionhub.helper.U;
 
 public class ApiHelper {
 
-	public static RequestParams appendLogging(Context ctx, RequestParams params) {
+	public static HttpParams getDefaultParams(final Context context) {
+		final HttpParams params = new HttpParams();
+
+		// Logging
 		params.put("platform", "android");
 		params.put("platform_product", Build.PRODUCT);
 		params.put("platform_release", android.os.Build.VERSION.RELEASE);
-		params.put("app", ((Application) ctx.getApplicationContext()).getVersion());
+		params.put("app", ((MissionHubApplication) context.getApplicationContext()).getVersion());
+
+		// Access Token
+		// TODO:
+
+		// Organization Id
+		// TODO:
+
 		return params;
 	}
 
-	public static RequestParams appendAccessToken(Context ctx, RequestParams params) {
-		if (!U.nullOrEmpty(((Application) ctx.getApplicationContext()).getUser().getAccessToken()))
-			params.put("access_token", ((Application) ctx.getApplicationContext()).getUser().getAccessToken());
-		return params;
+	public static HttpHeaders getDefaultHeaders(final Context context) {
+		final HttpHeaders headers = new HttpHeaders();
+		headers.addHeader("Accept", "application/vnd.missionhub-v" + Config.apiVersion + "+json");
+
+		// Access Token
+		// TODO:
+		// headers.addHeader("Authorization", "OAuth: " + accessToken);
+
+		return headers;
 	}
 
-	public static RequestParams appendOrganizationId(Context ctx, RequestParams params) {
-		if (((Application) ctx.getApplicationContext()).getUser().getOrganizationID() >= 0)
-			params.put("org_id", String.valueOf(((Application) ctx.getApplicationContext()).getUser().getOrganizationID()));
-		return params;
-	}
-
-	public static RequestParams getDefaultRequestParams(Context ctx) {
-		RequestParams params = new RequestParams();
-		appendAccessToken(ctx, params);
-		appendOrganizationId(ctx, params);
-		appendLogging(ctx, params);
-		return params;
-	}
-
-	public static String getAbsoluteUrl(String... actions) {
-		StringBuffer sb = new StringBuffer(Config.apiUrl);
-		for (String action : actions) {
+	public static String getAbsoluteUrl(final String... actions) {
+		final StringBuffer sb = new StringBuffer(Config.apiUrl);
+		for (final String action : actions) {
 			sb.append("/" + action);
 		}
 		return sb.toString();
 	}
 
-	public static String toList(List<Integer> ids) {
-		StringBuffer idList = new StringBuffer();
-		Iterator<Integer> itr = ids.iterator();
+	public static String toList(final List<Integer> ids) {
+		final StringBuffer idList = new StringBuffer();
+		final Iterator<Integer> itr = ids.iterator();
 		while (itr.hasNext()) {
-			String element = String.valueOf(itr.next());
+			final String element = String.valueOf(itr.next());
 			idList.append(element);
 			if (itr.hasNext()) {
 				idList.append(",");
@@ -62,7 +63,7 @@ public class ApiHelper {
 		return idList.toString();
 	}
 
-	public static String stripUnsafeChars(String string) {
+	public static String stripUnsafeChars(final String string) {
 		return string.replaceAll("[\\]\\[|=?]", "");
 	}
 }

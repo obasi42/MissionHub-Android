@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-
-    <declare-styleable name="BezelImageView">
-        <attr format="reference" name="maskDrawable" />
-        <attr format="reference" name="borderDrawable" />
-    </declare-styleable>
-
-</resources>

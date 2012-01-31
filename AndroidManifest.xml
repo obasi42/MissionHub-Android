@@ -5,70 +5,27 @@
     android:versionName="1.2" >
 
     <uses-sdk android:minSdkVersion="7" />
-
+    
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
-    <uses-feature android:name="android.hardware.touchscreen" />
-
     <application
-        android:icon="@drawable/icon"
-        android:label="@string/app_name"
-        android:name=".Application" >
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name" 
+        android:name=".MissionHubApplication"
+        >
         <activity
             android:name=".MissionHubActivity"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.MHActionBar" >
-            <intent-filter >
+            android:label="@string/app_name" 
+            android:theme="@style/Theme.Sherlock"
+            >
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <activity
-            android:name=".LoginActivity"
-            android:configChanges="orientation|keyboardHidden"
-            android:theme="@style/Theme.MHActionBar" >
-        </activity>
-        <activity
-            android:name=".ContactsActivity"
-            android:theme="@style/Theme.MHActionBar"
-            android:configChanges="orientation|keyboardHidden"
-            android:windowSoftInputMode="stateHidden|adjustPan" >
-        </activity>
-        <activity
-            android:name=".ContactsFilterActivity"
-            android:theme="@android:style/Theme.NoTitleBar" >
-        </activity>
-        <activity
-            android:name=".SurveysActivity"
-            android:configChanges="orientation|keyboardHidden"
-            android:theme="@style/Theme.MHActionBar" >
-        </activity>
-        <activity
-            android:name=".ContactActivity"
-            android:configChanges="orientation|keyboardHidden"
-            android:theme="@style/Theme.MHActionBar" >
-        </activity>
-        <activity
-            android:name=".ContactPostActivity"
-            android:configChanges="orientation|keyboardHidden"
-            android:theme="@style/Theme.MHActionBar" 
-            android:windowSoftInputMode="stateHidden"
-            >
-        </activity>
-        <activity
-            android:name=".ProfileActivity"
-            android:theme="@style/Theme.MHActionBar"
-            android:configChanges="orientation|keyboardHidden"
-            android:windowSoftInputMode="stateHidden|adjustPan" >
-        </activity>
-        <activity
-            android:name=".EggActivity"
-            android:configChanges="orientation|keyboardHidden"
-            android:theme="@style/Theme.MHActionBar" >
         </activity>
     </application>
 
