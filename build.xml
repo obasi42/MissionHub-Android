@@ -50,7 +50,7 @@
 		in between standard targets -->
 	<target name="-pre-build">
 		<antcall target="increment-manifest-version"></antcall>
-		<!-- antcall target="config"></antcall -->
+		<antcall target="config"></antcall>
 	</target>
 	<!--
 		<target name="-pre-compile">
@@ -61,7 +61,7 @@
 		If this is not done in place, override ${out.dex.input.absolute.dir} */
 	-->
 	<target name="-post-compile">
-		<!-- antcall target="findbugs"></antcall -->
+		<antcall target="findbugs"></antcall>
 	</target>
 
 	<!-- Import the actual build file.
