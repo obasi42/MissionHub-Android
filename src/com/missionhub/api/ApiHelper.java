@@ -10,6 +10,7 @@ import com.cr_wd.android.network.HttpHeaders;
 import com.cr_wd.android.network.HttpParams;
 import com.missionhub.MissionHubApplication;
 import com.missionhub.config.Config;
+import com.missionhub.config.Preferences;
 
 public class ApiHelper {
 
@@ -23,11 +24,13 @@ public class ApiHelper {
 		params.put("app", ((MissionHubApplication) context.getApplicationContext()).getVersion());
 
 		// Access Token
-		// TODO:
-
+		params.put("access_token", ((MissionHubApplication) context.getApplicationContext()).getSession().getAccessToken());
+		
 		// Organization Id
-		// TODO:
-
+		final int organizationId = ((MissionHubApplication) context.getApplicationContext()).getSession().getOrganizationId();
+		if (organizationId >= 0)
+			params.put("org_id", organizationId);
+		
 		return params;
 	}
 
@@ -36,8 +39,7 @@ public class ApiHelper {
 		headers.addHeader("Accept", "application/vnd.missionhub-v" + Config.apiVersion + "+json");
 
 		// Access Token
-		// TODO:
-		// headers.addHeader("Authorization", "OAuth: " + accessToken);
+		headers.addHeader("Authorization", "OAuth: " + ((MissionHubApplication) context.getApplicationContext()).getSession().getAccessToken());
 
 		return headers;
 	}
@@ -65,5 +67,10 @@ public class ApiHelper {
 
 	public static String stripUnsafeChars(final String string) {
 		return string.replaceAll("[\\]\\[|=?]", "");
+	}
+
+	public static void configAutoLogin(Context context) {
+		if (Config.autoLoginToken != null && !Config.autoLoginToken.trim().equals(""))
+			Preferences.setAccessToken(context, Config.autoLoginToken);
 	}
 }

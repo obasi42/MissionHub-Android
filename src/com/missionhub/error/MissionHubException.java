@@ -9,6 +9,10 @@ public class MissionHubException extends Exception{
 	private String code;
 	private String title;
 	
+	public MissionHubException(String message) {
+		super(message);
+	}
+	
 	public MissionHubException(String title, String message, String code) {
 		super(message);
 		this.setTitle(title);

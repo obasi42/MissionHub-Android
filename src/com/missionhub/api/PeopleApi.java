@@ -6,6 +6,11 @@ import android.content.Context;
 
 import com.cr_wd.android.network.HttpHeaders;
 import com.cr_wd.android.network.HttpParams;
+import com.cr_wd.android.network.HttpResponse;
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import com.missionhub.api.model.GMetaLeaders;
+import com.missionhub.api.model.GMetaPeople;
 
 /**
  * People Api Helper
@@ -60,6 +65,16 @@ public class PeopleApi {
 		final HttpParams params = ApiHelper.getDefaultParams(context);
 		return new ApiRequest(client, client.get(url, headers, params, apiHandler));
 	}
+	
+	/**
+	 * Returns the GMetaPeople object from an HttpResponse
+	 * @return
+	 */
+	public static GMetaPeople parsePeopleReponse(HttpResponse response) throws JsonSyntaxException {
+		Gson gson = new Gson();
+		GMetaPeople people = gson.fromJson(response.responseBody, GMetaPeople.class);
+		return people;
+	}
 
 	/**
 	 * Get a list of leaders for the current organization
@@ -91,5 +106,15 @@ public class PeopleApi {
 		final HttpParams params = ApiHelper.getDefaultParams(context);
 		params.put("org_id", organizationId);
 		return new ApiRequest(client, client.get(url, headers, params, apiHandler));
+	}
+	
+	/**
+	 * Returns the GMetaLeaders object from an HttpResponse
+	 * @return
+	 */
+	public static GMetaLeaders parseLeadersReponse(HttpResponse response) throws JsonSyntaxException {
+		Gson gson = new Gson();
+		GMetaLeaders leaders = gson.fromJson(response.responseBody, GMetaLeaders.class);
+		return leaders;
 	}
 }
