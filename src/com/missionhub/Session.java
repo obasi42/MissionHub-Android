@@ -3,10 +3,10 @@ package com.missionhub;
 import com.missionhub.api.ApiHandler;
 import com.missionhub.api.PeopleApi;
 import com.missionhub.api.model.GMetaPeople;
+import com.missionhub.api.model.GPerson;
 import com.missionhub.broadcast.SessionBroadcast;
 import com.missionhub.config.Preferences;
 import com.missionhub.error.ApiException;
-import com.missionhub.api.model.GPerson;
 
 /**
  * Stores state and user data for the application session
@@ -71,11 +71,14 @@ public class Session {
 
 	/**
 	 * Attempts to resume a previous user session
-	 * @param verifySession if the session should connect to the missionhub server to verify the session
+	 * 
+	 * @param verifySession
+	 *            if the session should connect to the missionhub server to
+	 *            verify the session
 	 * 
 	 * @return true if resume data is available
 	 */
-	public synchronized boolean resumeSession(boolean verifySession) {
+	public synchronized boolean resumeSession(final boolean verifySession) {
 		final int userId = Preferences.getUserID(application);
 		final int organizationId = Preferences.getOrganizationID(application);
 		final String accessToken = Preferences.getAccessToken(application);
@@ -85,28 +88,29 @@ public class Session {
 			setOrganizationId(organizationId);
 			setAccessToken(accessToken);
 			setUser(new User(application, userId));
-			if (verifySession)
+			if (verifySession) {
 				verifySession();
+			}
 			return true;
 		}
 		return false;
 	}
-	
+
 	public synchronized void verifySession() {
 		SessionBroadcast.broadcastVerifyStart(application);
-		
+
 		PeopleApi.getMe(application, new ApiHandler(GMetaPeople.class) {
-			@Override
-			public void onSuccess(Object gsonObject) {
+			@Override public void onSuccess(final Object gsonObject) {
 				super.onSuccess(gsonObject);
-				
+
 				final GMetaPeople metaPeople = (GMetaPeople) gsonObject;
 				final GPerson[] people = metaPeople.getPeople();
-				
+
 				if (people.length > 0) {
 					final GPerson person = people[0];
-					if ((getOrganizationId() < 0 || getPersonId() != person.getId()) && metaPeople.getMeta().getRequest_organization() != null)
+					if ((getOrganizationId() < 0 || getPersonId() != person.getId()) && metaPeople.getMeta().getRequest_organization() != null) {
 						setOrganizationId(Integer.parseInt(metaPeople.getMeta().getRequest_organization()));
+					}
 					setPersonId(person.getId());
 					setUser(new User(application, getPersonId()));
 					SessionBroadcast.broadcastVerifyPass(application);
@@ -137,8 +141,9 @@ public class Session {
 	 * @param accessToken
 	 */
 	public synchronized void setAccessToken(String accessToken) {
-		if (accessToken == null)
+		if (accessToken == null) {
 			accessToken = "";
+		}
 		this.accessToken = accessToken;
 	}
 
@@ -184,8 +189,9 @@ public class Session {
 	 * @return
 	 */
 	public synchronized User getUser() {
-		if (user == null)
+		if (user == null) {
 			setUser(null);
+		}
 		return user;
 	}
 

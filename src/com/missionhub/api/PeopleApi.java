@@ -65,14 +65,15 @@ public class PeopleApi {
 		final HttpParams params = ApiHelper.getDefaultParams(context);
 		return new ApiRequest(client, client.get(url, headers, params, apiHandler));
 	}
-	
+
 	/**
 	 * Returns the GMetaPeople object from an HttpResponse
+	 * 
 	 * @return
 	 */
-	public static GMetaPeople parsePeopleReponse(HttpResponse response) throws JsonSyntaxException {
-		Gson gson = new Gson();
-		GMetaPeople people = gson.fromJson(response.responseBody, GMetaPeople.class);
+	public static GMetaPeople parsePeopleReponse(final HttpResponse response) throws JsonSyntaxException {
+		final Gson gson = new Gson();
+		final GMetaPeople people = gson.fromJson(response.responseBody, GMetaPeople.class);
 		return people;
 	}
 
@@ -107,14 +108,15 @@ public class PeopleApi {
 		params.put("org_id", organizationId);
 		return new ApiRequest(client, client.get(url, headers, params, apiHandler));
 	}
-	
+
 	/**
 	 * Returns the GMetaLeaders object from an HttpResponse
+	 * 
 	 * @return
 	 */
-	public static GMetaLeaders parseLeadersReponse(HttpResponse response) throws JsonSyntaxException {
-		Gson gson = new Gson();
-		GMetaLeaders leaders = gson.fromJson(response.responseBody, GMetaLeaders.class);
+	public static GMetaLeaders parseLeadersReponse(final HttpResponse response) throws JsonSyntaxException {
+		final Gson gson = new Gson();
+		final GMetaLeaders leaders = gson.fromJson(response.responseBody, GMetaLeaders.class);
 		return leaders;
 	}
 }

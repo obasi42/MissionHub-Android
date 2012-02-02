@@ -7,5 +7,5 @@ public class MissionHubBaseActivity extends RoboFragmentActivity {
 	public Session getSession() {
 		return ((MissionHubApplication) getApplicationContext()).getSession();
 	}
-	
+
 }

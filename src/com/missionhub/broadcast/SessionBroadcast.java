@@ -21,17 +21,17 @@ public class SessionBroadcast extends MissionHubBroadcast {
 		final Intent intent = new Intent(ACTION_LOGOUT);
 		sendBroadcast(context, intent);
 	}
-	
+
 	public static void broadcastVerifyStart(final Context context) {
 		final Intent intent = new Intent(ACTION_VERIFY_START);
 		sendBroadcast(context, intent);
 	}
-	
+
 	public static void broadcastVerifyPass(final Context context) {
 		final Intent intent = new Intent(ACTION_VERIFY_PASS);
 		sendBroadcast(context, intent);
 	}
-	
+
 	public static void broadcastVerifyFail(final Context context, final Throwable throwable) {
 		final Intent intent = new Intent(ACTION_VERIFY_FAIL);
 		intent.putExtra("throwable", throwable);

@@ -12,10 +12,10 @@ import com.missionhub.error.ApiException;
 public abstract class ApiHandler extends HttpHandler {
 
 	private Type type;
-	
+
 	public ApiHandler() {}
-	
-	public ApiHandler(Class<GMetaPeople> type) {
+
+	public ApiHandler(final Class<GMetaPeople> type) {
 		this.type = type;
 	}
 
@@ -27,7 +27,7 @@ public abstract class ApiHandler extends HttpHandler {
 			onError(response);
 			return;
 		} catch (final Exception e) { /* not a mh error */}
-		
+
 		if (type != null) {
 			try {
 				final Object object = gson.fromJson(response.responseBody, type);
@@ -38,17 +38,17 @@ public abstract class ApiHandler extends HttpHandler {
 			}
 		}
 	}
-	
-	public void onSuccess(Object gsonObject) {
-		
+
+	public void onSuccess(final Object gsonObject) {
+
 	}
 
 	@Override public void onError(final HttpResponse response) {
 		onError(response.throwable);
 	}
-	
+
 	public void onError(final Throwable throwable) {
-		
+
 	}
 
 	@Override public void onCancel(final HttpResponse response) {

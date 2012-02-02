@@ -4,15 +4,15 @@ import com.missionhub.api.model.GError;
 
 public class ApiException extends MissionHubException {
 
-	public ApiException(GError error) {
+	public ApiException(final GError error) {
 		super(error);
 	}
-	
-	public ApiException(Throwable t) {
+
+	public ApiException(final Throwable t) {
 		super(t);
 	}
 
-	public ApiException(String string) {		
+	public ApiException(final String string) {
 		super(string);
 	}
 

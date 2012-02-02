@@ -104,9 +104,9 @@ public class GPerson {
 		return education;
 	}
 
-	 public String getNum_contacts() {
-		 return num_contacts;
-	 }
+	public String getNum_contacts() {
+		return num_contacts;
+	}
 
 	public void setFirst_name(final String s) {
 		first_name = s;
@@ -188,7 +188,7 @@ public class GPerson {
 		education = g;
 	}
 
-	 public void setNum_contacts(String s) {
-		 num_contacts = s;
-	 }
+	public void setNum_contacts(final String s) {
+		num_contacts = s;
+	}
 }

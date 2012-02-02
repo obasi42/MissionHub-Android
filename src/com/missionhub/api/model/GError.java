@@ -18,15 +18,15 @@ public class GError {
 			return title;
 		}
 
-		public void setMessage(String s) {
+		public void setMessage(final String s) {
 			message = s;
 		}
 
-		public void setCode(String s) {
+		public void setCode(final String s) {
 			code = s;
 		}
 
-		public void setTitle(String t) {
+		public void setTitle(final String t) {
 			title = t;
 		}
 	}
@@ -37,7 +37,7 @@ public class GError {
 		return error;
 	}
 
-	public void setError(InnerError e) {
+	public void setError(final InnerError e) {
 		error = e;
 	}
 
