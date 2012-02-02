@@ -22,6 +22,7 @@ public class Person {
     private String email_address;
     private String birthday;
     private String locale;
+    private String num_contacts;
 
     /** Used to resolve relations */
     private DaoSession daoSession;
@@ -46,7 +47,7 @@ public class Person {
         this._id = _id;
     }
 
-    public Person(int _id, String name, String gender, String fb_id, String picture, String status, String first_name, String last_name, String phone_number, String email_address, String birthday, String locale) {
+    public Person(int _id, String name, String gender, String fb_id, String picture, String status, String first_name, String last_name, String phone_number, String email_address, String birthday, String locale, String num_contacts) {
         this._id = _id;
         this.name = name;
         this.gender = gender;
@@ -59,6 +60,7 @@ public class Person {
         this.email_address = email_address;
         this.birthday = birthday;
         this.locale = locale;
+        this.num_contacts = num_contacts;
     }
 
     /** called by internal mechanisms, do not call yourself. */
@@ -161,6 +163,14 @@ public class Person {
 
     public void setLocale(String locale) {
         this.locale = locale;
+    }
+
+    public String getNum_contacts() {
+        return num_contacts;
+    }
+
+    public void setNum_contacts(String num_contacts) {
+        this.num_contacts = num_contacts;
     }
 
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */

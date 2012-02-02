@@ -10,9 +10,9 @@ public class SessionReceiver extends MissionHubReceiver {
 	}
 
 	@Override public String[] getAllActions() {
-		final String[] actions = { SessionBroadcast.ACTION_LOGIN, SessionBroadcast.ACTION_LOGOUT, SessionBroadcast.ACTION_VERIFY_START, SessionBroadcast.ACTION_VERIFY_PASS,
-				SessionBroadcast.ACTION_VERIFY_FAIL };
-		return actions;
+		final String[] NOTIFYs = { SessionBroadcast.NOTIFY_LOGIN, SessionBroadcast.NOTIFY_LOGOUT, SessionBroadcast.NOTIFY_VERIFY_START, SessionBroadcast.NOTIFY_VERIFY_PASS,
+				SessionBroadcast.NOTIFY_VERIFY_FAIL };
+		return NOTIFYs;
 	}
 
 	public void onLogin(final String accessToken) {}
@@ -26,16 +26,16 @@ public class SessionReceiver extends MissionHubReceiver {
 	public void onVerifyFail(final Throwable throwable) {}
 
 	@Override public void onReceive(final Context context, final Intent intent) {
-		if (intent.getAction().equals(SessionBroadcast.ACTION_LOGIN)) {
-			onLogin(intent.getStringExtra("accessToken"));
-		} else if (intent.getAction().equals(SessionBroadcast.ACTION_LOGOUT)) {
+		if (intent.getAction().equals(SessionBroadcast.NOTIFY_LOGIN)) {
+			onLogin(intent.getStringExtra(MissionHubBroadcast.PREFIX + "accessToken"));
+		} else if (intent.getAction().equals(SessionBroadcast.NOTIFY_LOGOUT)) {
 			onLogout();
-		} else if (intent.getAction().equals(SessionBroadcast.ACTION_VERIFY_START)) {
+		} else if (intent.getAction().equals(SessionBroadcast.NOTIFY_VERIFY_START)) {
 			onVerifyStart();
-		} else if (intent.getAction().equals(SessionBroadcast.ACTION_VERIFY_PASS)) {
+		} else if (intent.getAction().equals(SessionBroadcast.NOTIFY_VERIFY_PASS)) {
 			onVerifyPass();
-		} else if (intent.getAction().equals(SessionBroadcast.ACTION_VERIFY_FAIL)) {
-			onVerifyFail((Throwable) intent.getSerializableExtra("throwable"));
+		} else if (intent.getAction().equals(SessionBroadcast.NOTIFY_VERIFY_FAIL)) {
+			onVerifyFail((Throwable) intent.getSerializableExtra(MissionHubBroadcast.PREFIX + "throwable"));
 		}
 	}
 }

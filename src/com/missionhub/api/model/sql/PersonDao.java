@@ -31,6 +31,7 @@ public class PersonDao extends AbstractDao<Person, Integer> {
         public final static Property Email_address = new Property(9, String.class, "email_address", false, "EMAIL_ADDRESS");
         public final static Property Birthday = new Property(10, String.class, "birthday", false, "BIRTHDAY");
         public final static Property Locale = new Property(11, String.class, "locale", false, "LOCALE");
+        public final static Property Num_contacts = new Property(12, String.class, "num_contacts", false, "NUM_CONTACTS");
     };
 
     private DaoSession daoSession;
@@ -59,7 +60,8 @@ public class PersonDao extends AbstractDao<Person, Integer> {
                 "'PHONE_NUMBER' TEXT," + // 8: phone_number
                 "'EMAIL_ADDRESS' TEXT," + // 9: email_address
                 "'BIRTHDAY' TEXT," + // 10: birthday
-                "'LOCALE' TEXT);"; // 11: locale
+                "'LOCALE' TEXT," + // 11: locale
+                "'NUM_CONTACTS' TEXT);"; // 12: num_contacts
         db.execSQL(sql);
     }
 
@@ -129,6 +131,11 @@ public class PersonDao extends AbstractDao<Person, Integer> {
         if (locale != null) {
             stmt.bindString(12, locale);
         }
+ 
+        String num_contacts = entity.getNum_contacts();
+        if (num_contacts != null) {
+            stmt.bindString(13, num_contacts);
+        }
     }
 
     @Override
@@ -158,7 +165,8 @@ public class PersonDao extends AbstractDao<Person, Integer> {
             cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // phone_number
             cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // email_address
             cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // birthday
-            cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11) // locale
+            cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11), // locale
+            cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12) // num_contacts
         );
         return entity;
     }
@@ -178,6 +186,7 @@ public class PersonDao extends AbstractDao<Person, Integer> {
         entity.setEmail_address(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
         entity.setBirthday(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
         entity.setLocale(cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11));
+        entity.setNum_contacts(cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12));
      }
     
     @Override

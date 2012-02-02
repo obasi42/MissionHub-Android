@@ -90,6 +90,8 @@ public class Session {
 			setUser(new User(application, userId));
 			if (verifySession) {
 				verifySession();
+			} else {
+				SessionBroadcast.broadcastLogin(application, application.getSession().getAccessToken());
 			}
 			return true;
 		}
@@ -113,7 +115,11 @@ public class Session {
 					}
 					setPersonId(person.getId());
 					setUser(new User(application, getPersonId()));
+					
+					
+					
 					SessionBroadcast.broadcastVerifyPass(application);
+					SessionBroadcast.broadcastLogin(application, application.getSession().getAccessToken());
 				} else {
 					onError(new ApiException("VerifySession did not return any people"));
 				}
