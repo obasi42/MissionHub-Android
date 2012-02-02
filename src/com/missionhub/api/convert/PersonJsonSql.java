@@ -40,13 +40,15 @@ public class PersonJsonSql {
 
 		final MissionHubApplication app = (MissionHubApplication) context.getApplicationContext();
 		final PersonDao pd = app.getDbSession().getPersonDao();
-
+		
 		Person p = pd.load(person.getId());
-
+		
 		boolean createPerson = false;
 		if (p == null) {
 			p = new Person();
 			createPerson = true;
+		} else {
+			p.refresh();
 		}
 
 		if (person.getId() != null) {
