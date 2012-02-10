@@ -6,7 +6,6 @@ import com.cr_wd.android.network.HttpHandler;
 import com.cr_wd.android.network.HttpResponse;
 import com.google.gson.Gson;
 import com.missionhub.api.model.GError;
-import com.missionhub.api.model.GMetaPeople;
 import com.missionhub.error.ApiException;
 
 public abstract class ApiHandler extends HttpHandler {
@@ -15,7 +14,7 @@ public abstract class ApiHandler extends HttpHandler {
 
 	public ApiHandler() {}
 
-	public ApiHandler(final Class<GMetaPeople> type) {
+	public ApiHandler(final Class<?> type) {
 		this.type = type;
 	}
 
@@ -48,11 +47,11 @@ public abstract class ApiHandler extends HttpHandler {
 	}
 
 	public void onError(final Throwable throwable) {
-
+		
 	}
 
 	@Override public void onCancel(final HttpResponse response) {
-
+		
 	}
 
 	@Override public void onRetry(final HttpResponse response) {

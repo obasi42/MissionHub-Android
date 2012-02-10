@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+    <resources>
+        <style name="Widget.MissionHub.ActionBar" parent="Widget.Sherlock.ActionBar">
+	        <item name="background">@drawable/actionbar_background</item>
+	    </style>
+    </resources>

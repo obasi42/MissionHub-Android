@@ -3,13 +3,21 @@ package com.missionhub;
 import roboguice.inject.InjectView;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Button;
 
 import com.missionhub.api.ApiHelper;
-import com.missionhub.broadcast.SessionReceiver;
+import com.missionhub.config.Preferences;
 
+/**
+ * The main MissionHub Activity.
+ */
 public class MissionHubActivity extends MissionHubBaseActivity {
+	
+	public static final String TAG = MissionHubActivity.class.getSimpleName();
+	
+	public final int RESULT_LOGIN_ACTIVITY = 0;
 
 	@InjectView(R.id.btn_login) Button btnLogin;
 	@InjectView(R.id.btn_about) Button btnAbout;
@@ -18,40 +26,40 @@ public class MissionHubActivity extends MissionHubBaseActivity {
 	@Override public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		ApiHelper.configAutoLogin(this);
-
-		final SessionReceiver receiver = new SessionReceiver(this) {
-			@Override public void onVerifyStart() {
-				Log.e("RECEIVER", "VERIFY START");
-			}
-
-			@Override public void onVerifyPass() {
-				Log.e("RECEIVER", "VERIFY PASS");
-			}
-
-			@Override public void onVerifyFail(final Throwable t) {
-				Log.e("RECEIVER", t.getMessage(), t);
-			}
-
-			@Override public void onLogin(final String accessToken) {
-				Log.e("RECEIVER", "LOGIN: " + accessToken);
-			}
-
-			@Override public void onLogout() {
-				Log.e("RECEIVER", "LOGOUT");
-			}
-		};
-		receiver.register();
-
-		// make user log in if session can't be resumed
-		if (!getSession().resumeSession(true)) {
-			final Intent intent = new Intent(this, Login.class);
-			startActivity(intent);
+		//ApiHelper.configAutoLogin(this);
+		
+		Preferences.removeAccessToken(this);
+		
+		// redirect to Dashboard if session can be resumed
+		if (getSession().resumeSession(true)) {
+			startActivity(new Intent(this, DashboardActivity.class));
 			finish();
 		}
-
+		
+		// show content
 		setContentView(R.layout.activity_missionhub);
-
-		this.getSupportActionBar().hide();
+		
+		btnLogin.setOnClickListener(new OnClickListener() {
+			@Override public void onClick(View v) {
+				startActivityForResult(new Intent(MissionHubActivity.this, LoginActivity.class), 0);
+			}
+		});
+		
+		btnAbout.setOnClickListener(new OnClickListener() {
+			@Override public void onClick(View v) {
+				// TODO Auto-generated method stub
+			}
+		});
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == RESULT_LOGIN_ACTIVITY && resultCode == RESULT_OK) {
+			startActivity(new Intent(this, DashboardActivity.class));
+			finish();
+		}
+		if (requestCode == RESULT_LOGIN_ACTIVITY && resultCode == RESULT_FIRST_USER) {
+			startActivityForResult(new Intent(MissionHubActivity.this, LoginActivity.class), 0);
+		}
 	}
 }

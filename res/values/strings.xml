@@ -1,7 +1,132 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="hello">Hello World, MissionHub!</string>
-    <string name="app_name">MissionHub-Android</string>
+    <!-- Application -->
+    <string name="app_name">MissionHub</string>
+
+    <!-- Actions -->
+    <string name="action_cancel">Cancel</string>
+    <string name="action_close">Close</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_dont_show_again">Don\'t Show Again</string>
+    <string name="action_hide">Hide</string>
+    <string name="action_logout">Logout</string>
+    <string name="action_no">No</string>
+    <string name="action_ok">OK</string>
+    <string name="action_profile">Profile</string>
+    <string name="action_refresh">Refresh</string>
+    <string name="action_retry">Retry</string>
+    <string name="action_save">Save</string>
+    <string name="action_search">Search</string>
+    <string name="action_yes">Yes</string>
+
+    <!-- Contact Level -->
+    <string name="contact_invalid_person">Invalid Person Id</string>
+    <string name="contact_tab_about">About</string>
+    <string name="contact_tab_about_assigned_to">Assigned To</string>
+    <string name="contact_tab_about_birthday">Birthday</string>
+    <string name="contact_tab_about_education">Education</string>
+    <string name="contact_tab_about_education_class_of">Class of</string>
+    <string name="contact_tab_about_email">E-mail Address</string>
+    <string name="contact_tab_about_facebook">Facebook</string>
+    <string name="contact_tab_about_facebook_sub">Tap here to open Facebook profile</string>
+    <string name="contact_tab_about_first_contact_date">First Contact Date</string>
+    <string name="contact_tab_about_interests">Interests</string>
+    <string name="contact_tab_about_last_survey_taken">Last Survey Taken</string>
+    <string name="contact_tab_about_location">Location</string>
+    <string name="contact_tab_about_phone">Phone Number</string>
+    <string name="contact_tab_about_role">Organization Role</string>
+    <string name="contact_tab_about_role_sub_admin">Admin</string>
+    <string name="contact_tab_about_role_sub_demote">Leader - Tap here to demote to contact</string>
+    <string name="contact_tab_about_role_sub_promote">Contact - Tap here to promote to leader</string>
+    <string name="contact_tab_status">Status</string>
+    <string name="contact_tab_status_comment_actions">Comment Actions</string>
+    <string name="contact_tab_status_no_comments">No Comments</string>
+    <string name="contact_tab_status_no_permissions">You can only perform actions on your own comments.</string>
+    <string name="contact_tab_surveys">Surveys</string>
+    <string name="contact_tab_surveys_keyword">Keyword:</string>
+    <string name="contact_tab_surveys_no_answers">No Answers</string>
+    <string name="contact_tab_surveys_not_answered">not answered</string>
+    <string name="contact_tab_surveys_not_available">Not Available</string>
+
+    <!-- Contact Assignment Activity -->
+    <string name="contact_assignment">Change Contact Assignment</string>
+    <string name="contact_assignment_invalid_person">Invalid Person Id</string>
+
+    <!-- Contact Post Activity -->
+    <string name="contact_post">Add Comment / Update Status</string>
+    <string name="contact_post_attach_rejoicables">Attach Rejoicables</string>
+    <string name="contact_post_cant_save">You must provide a message, change contact status, or add a rejoicable before saving!</string>
+    <string name="contact_post_comment_hint">Add comment here...</string>
+    <string name="contact_post_invalid_person">Invalid Person Id</string>
+
+    <!-- Contacts Activity -->
+    <string name="contacts_actions">Contact Actions</string>
+    <string name="contacts_actions_promote">Promote to Leader</string>
+    <string name="contacts_actions_demote">Demote to Contact</string>
+    <string name="contacts_tab_all">All Contacts</string>
+    <string name="contacts_tab_all_none">No Contacts</string>
+    <string name="contacts_tab_my">My Contacts</string>
+    <string name="contacts_tab_my_none">No Assigned Contacts</string>
+
+    <!-- Egg Activity -->
+    <string name="egg">Rejoicables 4TW</string>
+    <string name="egg_todd">For You Todd...</string>
+
+    <!-- Error Messages -->
+    <string name="error">Error</string>
+    <string name="error_msg">An unknown error has occurred. Please try again or contact support.</string>
+    <string name="error_no_network">No Network</string>
+    <string name="error_no_network_msg">The MissionHub server could not be contacted. Please make sure you are connected to the internet and try again.</string>
+    <string name="error_unexpected_response">Unexpected Response</string>
+    <string name="error_unexpected_response_msg">The MissionHub server returned unexpected data. Please try again later.</string>
+
+    <!-- Guide -->
+    <string name="guide_contacts">My Contacts</string>
+    <string name="guide_contacts_msg">This view shows all contacts that have been assigned to you for follow-up. If the list is empty, you need your leader to assign contacts to you or go to ‘All Contacts’ in the lower right corner and assign contacts to yourself.</string>
+    <string name="guide_contacts_all">All Contacts</string>
+    <string name="guide_contacts_all_msg">This view shows all contacts that have been collected. All designated leaders can access this page and can self-assign contacts. If you tap ‘Assign to me’, this contact will move to ‘My Contacts’. Use filters to narrow your results by clicking on the arrows by the search box.</string>
+    <string name="guide_contact">Contact Information</string>
+    <string name="guide_contact_msg">You can learn about a contact and record your interactions with that person on this page. Tap the rejoicing icon to add Rejoicables to your interaction.</string>
+
+    <!-- Helper -->
+    <string name="helper_cant_call">Could not place call.</string>
+    <string name="helper_cant_email">Could not send email.</string>
+    <string name="helper_cant_open_link">Could not open link in browser.</string>
+    <string name="helper_cant_open_profile">Could not open Facebook profile.</string>
+    <string name="helper_cant_sms">Could not send SMS message.</string>
+    <string name="helper_open_link">Open link in browser?</string>
+    <string name="helper_open_profile">Open Facebook profile?</string>
+    <string name="helper_send_email">Send Email...</string>
+    <string name="helper_rejoice_spiritual_conversation">Spiritual Conversation</string>
+    <string name="helper_rejoice_prayed_to_receive">Prayed To Receive Christ</string>
+    <string name="helper_rejoice_gospel_presentation">Gospel Presentation</string>
+    <string name="helper_status_uncontacted">Uncontacted</string>
+    <string name="helper_status_attempted_contact">Attempted Contact</string>
+    <string name="helper_status_contacted">Contacted</string>
+    <string name="helper_status_completed">Completed</string>
+    <string name="helper_status_do_not_contact">Do Not Contact</string>
+
+    <!-- MissionHub Activity (Main) -->
+    <string name="missionhub_alert_about">Learn More</string>
+    <string name="missionhub_alert_about_content">Clicking OK will take you to www.missionhub.com to learn more.</string>
+    <string name="missionhub_btn_about">About</string>
+    <string name="missionhub_btn_login">Login</string>
+    <string name="missionhub_dashboard_contacts">Contacts</string>
+    <string name="missionhub_dashboard_surveys">Survey Mode</string>
+
+    <!-- Profile Activity -->
+    <string name="profile">Profile</string>
+    <string name="profile_change_organization">Change Current Organization:</string>
+    <string name="profile_version">Version</string>
+
+    <!-- Progress Indicators -->
+    <string name="progress_loading">Loading...</string>
+    <string name="progress_logging_in">Logging In. Please wait...</string>
+
+    <!-- Surveys Activity -->
+    <string name="surveys">Survey Mode</string>
+    <string name="surveys_exit">Exit Survey Mode?</string>
+    <string name="surveys_exit_msg">Clicking OK will exit survey mode.</string>
 
 </resources>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+    <resources>
+        <style name="Theme.MissionHub" parent="Theme.Sherlock">
+            <item name="actionBarStyle">@style/Widget.MissionHub.ActionBar</item>
+        </style>
+        
+        <style name="Theme.MissionHub.NoActionBar" parent="Theme.Sherlock.NoActionBar"></style>
+    </resources>
