@@ -115,9 +115,7 @@ public class Session {
 					}
 					setPersonId(person.getId());
 					setUser(new User(application, getPersonId()));
-					
-					
-					
+
 					SessionBroadcast.broadcastVerifyPass(application);
 					SessionBroadcast.broadcastLogin(application, application.getSession().getAccessToken());
 				} else {

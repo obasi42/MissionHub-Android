@@ -19,6 +19,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_weight="0.24"
+        android:onClick="clickAbout"
         android:src="@android:drawable/btn_default"
         android:text="About" />
 
@@ -28,6 +29,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_weight="0.24"
+        android:onClick="clickLogin"
         android:src="@android:drawable/btn_default"
         android:text="Login" />
 

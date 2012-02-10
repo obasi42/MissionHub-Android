@@ -5,5 +5,7 @@
             <item name="actionBarStyle">@style/Widget.MissionHub.ActionBar</item>
         </style>
         
-        <style name="Theme.MissionHub.NoActionBar" parent="Theme.Sherlock.NoActionBar"></style>
+        <style name="Theme.MissionHub.NoActionBar" parent="Theme.Sherlock.NoActionBar">
+            <item name="android:windowNoTitle">true</item>
+        </style>
     </resources>
