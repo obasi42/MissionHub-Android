@@ -96,11 +96,11 @@ public class LoginActivity extends MissionHubBaseActivity {
 	private class ProgressChromeClient extends WebChromeClient {
 		@Override public void onProgressChanged(final WebView view, final int progress) {
 			if (progress < 100) {
-				setProgressBarIndeterminateVisibility(true);
+				showProgress();
 			}
 			if (progress == 100) {
 				if (!gettingToken) {
-					setProgressBarIndeterminateVisibility(false);
+					hideProgress();
 				}
 			}
 		}
@@ -112,7 +112,6 @@ public class LoginActivity extends MissionHubBaseActivity {
 	 */
 	private class InternalWebViewClient extends WebViewClient {
 		@Override public boolean shouldOverrideUrlLoading(final WebView view, final String url) {
-			setProgressBarIndeterminateVisibility(true);
 			view.loadUrl(url);
 			return true;
 		}
@@ -205,7 +204,7 @@ public class LoginActivity extends MissionHubBaseActivity {
 		}
 
 		gettingToken = true;
-		setProgressBarIndeterminateVisibility(true);
+		showProgress();
 		mProgressBar.setVisibility(View.VISIBLE);
 
 		final HttpClient client = new HttpClient();
@@ -263,7 +262,7 @@ public class LoginActivity extends MissionHubBaseActivity {
 				});
 				ad.show();
 
-				setProgressBarIndeterminateVisibility(false);
+				hideProgress();
 				mProgressBar.setVisibility(View.INVISIBLE);
 			}
 		});
