@@ -3,6 +3,7 @@
     <resources>
         <style name="Theme.MissionHub" parent="Theme.Sherlock">
             <item name="actionBarStyle">@style/Widget.MissionHub.ActionBar</item>
+            <item name="android:actionBarStyle">?actionBarStyle</item>
         </style>
         
         <style name="Theme.MissionHub.NoActionBar" parent="Theme.Sherlock.NoActionBar">
