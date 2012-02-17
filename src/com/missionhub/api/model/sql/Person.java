@@ -32,13 +32,13 @@ public class Person {
 
     private List<Assignment> assigned_contacts;
     private List<Assignment> assigned_to_contacts;
-    private List<Interest> interest;
-    private List<Education> education;
-    private List<Location> location;
-    private List<OrganizationalRole> organizationalRole;
+    private List<Interest> interestList;
+    private List<Education> educationList;
+    private List<Location> locationList;
+    private List<OrganizationalRole> organizationalRoleList;
     private List<FollowupComment> followup_comments;
     private List<FollowupComment> posted_comments;
-    private List<Answer> answer;
+    private List<Answer> answerList;
 
     public Person() {
     }
@@ -208,71 +208,71 @@ public class Person {
     }
 
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
-    public synchronized List<Interest> getInterest() {
-        if (interest == null) {
+    public synchronized List<Interest> getInterestList() {
+        if (interestList == null) {
             if (daoSession == null) {
                 throw new DaoException("Entity is detached from DAO context");
             }
             InterestDao targetDao = daoSession.getInterestDao();
-            interest = targetDao._queryPerson_Interest(_id);
+            interestList = targetDao._queryPerson_InterestList(_id);
         }
-        return interest;
+        return interestList;
     }
 
     /** Resets a to-many relationship, making the next get call to query for a fresh result. */
-    public synchronized void resetInterest() {
-        interest = null;
+    public synchronized void resetInterestList() {
+        interestList = null;
     }
 
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
-    public synchronized List<Education> getEducation() {
-        if (education == null) {
+    public synchronized List<Education> getEducationList() {
+        if (educationList == null) {
             if (daoSession == null) {
                 throw new DaoException("Entity is detached from DAO context");
             }
             EducationDao targetDao = daoSession.getEducationDao();
-            education = targetDao._queryPerson_Education(_id);
+            educationList = targetDao._queryPerson_EducationList(_id);
         }
-        return education;
+        return educationList;
     }
 
     /** Resets a to-many relationship, making the next get call to query for a fresh result. */
-    public synchronized void resetEducation() {
-        education = null;
+    public synchronized void resetEducationList() {
+        educationList = null;
     }
 
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
-    public synchronized List<Location> getLocation() {
-        if (location == null) {
+    public synchronized List<Location> getLocationList() {
+        if (locationList == null) {
             if (daoSession == null) {
                 throw new DaoException("Entity is detached from DAO context");
             }
             LocationDao targetDao = daoSession.getLocationDao();
-            location = targetDao._queryPerson_Location(_id);
+            locationList = targetDao._queryPerson_LocationList(_id);
         }
-        return location;
+        return locationList;
     }
 
     /** Resets a to-many relationship, making the next get call to query for a fresh result. */
-    public synchronized void resetLocation() {
-        location = null;
+    public synchronized void resetLocationList() {
+        locationList = null;
     }
 
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
-    public synchronized List<OrganizationalRole> getOrganizationalRole() {
-        if (organizationalRole == null) {
+    public synchronized List<OrganizationalRole> getOrganizationalRoleList() {
+        if (organizationalRoleList == null) {
             if (daoSession == null) {
                 throw new DaoException("Entity is detached from DAO context");
             }
             OrganizationalRoleDao targetDao = daoSession.getOrganizationalRoleDao();
-            organizationalRole = targetDao._queryPerson_OrganizationalRole(_id);
+            organizationalRoleList = targetDao._queryPerson_OrganizationalRoleList(_id);
         }
-        return organizationalRole;
+        return organizationalRoleList;
     }
 
     /** Resets a to-many relationship, making the next get call to query for a fresh result. */
-    public synchronized void resetOrganizationalRole() {
-        organizationalRole = null;
+    public synchronized void resetOrganizationalRoleList() {
+        organizationalRoleList = null;
     }
 
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
@@ -310,20 +310,20 @@ public class Person {
     }
 
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
-    public synchronized List<Answer> getAnswer() {
-        if (answer == null) {
+    public synchronized List<Answer> getAnswerList() {
+        if (answerList == null) {
             if (daoSession == null) {
                 throw new DaoException("Entity is detached from DAO context");
             }
             AnswerDao targetDao = daoSession.getAnswerDao();
-            answer = targetDao._queryPerson_Answer(_id);
+            answerList = targetDao._queryPerson_AnswerList(_id);
         }
-        return answer;
+        return answerList;
     }
 
     /** Resets a to-many relationship, making the next get call to query for a fresh result. */
-    public synchronized void resetAnswer() {
-        answer = null;
+    public synchronized void resetAnswerList() {
+        answerList = null;
     }
 
     /** Convenient call for {@link AbstractDao#delete(Object)}. Entity must attached to an entity context. */

@@ -32,7 +32,7 @@ public class EducationDao extends AbstractDao<Education, Integer> {
         public final static Property Provider = new Property(7, String.class, "provider", false, "PROVIDER");
     };
 
-    private Query<Education> person_EducationQuery;
+    private Query<Education> person_EducationListQuery;
 
     public EducationDao(DaoConfig config) {
         super(config);
@@ -165,16 +165,16 @@ public class EducationDao extends AbstractDao<Education, Integer> {
         return true;
     }
     
-    /** Internal query to resolve the "education" to-many relationship of Person. */
-    public synchronized List<Education> _queryPerson_Education(Integer person_id) {
-        if (person_EducationQuery == null) {
+    /** Internal query to resolve the "educationList" to-many relationship of Person. */
+    public synchronized List<Education> _queryPerson_EducationList(Integer person_id) {
+        if (person_EducationListQuery == null) {
             QueryBuilder<Education> queryBuilder = queryBuilder();
             queryBuilder.where(Properties.Person_id.eq(person_id));
-            person_EducationQuery = queryBuilder.build();
+            person_EducationListQuery = queryBuilder.build();
         } else {
-            person_EducationQuery.setParameter(0, person_id);
+            person_EducationListQuery.setParameter(0, person_id);
         }
-        return person_EducationQuery.list();
+        return person_EducationListQuery.list();
     }
 
 }

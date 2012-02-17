@@ -27,7 +27,7 @@ public class Question {
     private Keyword keyword;
     private Integer keyword__resolvedKey;
 
-    private List<Question> question;
+    private List<Question> questionList;
 
     public Question() {
     }
@@ -128,20 +128,20 @@ public class Question {
     }
 
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
-    public synchronized List<Question> getQuestion() {
-        if (question == null) {
+    public synchronized List<Question> getQuestionList() {
+        if (questionList == null) {
             if (daoSession == null) {
                 throw new DaoException("Entity is detached from DAO context");
             }
             QuestionDao targetDao = daoSession.getQuestionDao();
-            question = targetDao._queryQuestion_Question(_id);
+            questionList = targetDao._queryQuestion_QuestionList(_id);
         }
-        return question;
+        return questionList;
     }
 
     /** Resets a to-many relationship, making the next get call to query for a fresh result. */
-    public synchronized void resetQuestion() {
-        question = null;
+    public synchronized void resetQuestionList() {
+        questionList = null;
     }
 
     /** Convenient call for {@link AbstractDao#delete(Object)}. Entity must attached to an entity context. */

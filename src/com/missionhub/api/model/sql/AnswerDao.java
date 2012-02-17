@@ -33,8 +33,8 @@ public class AnswerDao extends AbstractDao<Answer, Integer> {
 
     private DaoSession daoSession;
 
-    private Query<Answer> person_AnswerQuery;
-    private Query<Answer> organization_AnswerQuery;
+    private Query<Answer> person_AnswerListQuery;
+    private Query<Answer> organization_AnswerListQuery;
 
     public AnswerDao(DaoConfig config) {
         super(config);
@@ -150,28 +150,28 @@ public class AnswerDao extends AbstractDao<Answer, Integer> {
         return true;
     }
     
-    /** Internal query to resolve the "answer" to-many relationship of Person. */
-    public synchronized List<Answer> _queryPerson_Answer(Integer person_id) {
-        if (person_AnswerQuery == null) {
+    /** Internal query to resolve the "answerList" to-many relationship of Person. */
+    public synchronized List<Answer> _queryPerson_AnswerList(Integer person_id) {
+        if (person_AnswerListQuery == null) {
             QueryBuilder<Answer> queryBuilder = queryBuilder();
             queryBuilder.where(Properties.Person_id.eq(person_id));
-            person_AnswerQuery = queryBuilder.build();
+            person_AnswerListQuery = queryBuilder.build();
         } else {
-            person_AnswerQuery.setParameter(0, person_id);
+            person_AnswerListQuery.setParameter(0, person_id);
         }
-        return person_AnswerQuery.list();
+        return person_AnswerListQuery.list();
     }
 
-    /** Internal query to resolve the "answer" to-many relationship of Organization. */
-    public synchronized List<Answer> _queryOrganization_Answer(Integer organization_id) {
-        if (organization_AnswerQuery == null) {
+    /** Internal query to resolve the "answerList" to-many relationship of Organization. */
+    public synchronized List<Answer> _queryOrganization_AnswerList(Integer organization_id) {
+        if (organization_AnswerListQuery == null) {
             QueryBuilder<Answer> queryBuilder = queryBuilder();
             queryBuilder.where(Properties.Organization_id.eq(organization_id));
-            organization_AnswerQuery = queryBuilder.build();
+            organization_AnswerListQuery = queryBuilder.build();
         } else {
-            organization_AnswerQuery.setParameter(0, organization_id);
+            organization_AnswerListQuery.setParameter(0, organization_id);
         }
-        return organization_AnswerQuery.list();
+        return organization_AnswerListQuery.list();
     }
 
     private String selectDeep;

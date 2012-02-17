@@ -128,5 +128,8 @@
     <string name="surveys">Survey Mode</string>
     <string name="surveys_exit">Exit Survey Mode?</string>
     <string name="surveys_exit_msg">Clicking OK will exit survey mode.</string>
+    
+    <!-- User Model -->
+    <string name="user_toast_invalid_organization">Your organization roles have changed. Using your primary organization.</string>
 
 </resources>

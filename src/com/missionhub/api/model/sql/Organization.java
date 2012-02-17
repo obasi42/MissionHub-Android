@@ -20,9 +20,9 @@ public class Organization {
     /** Used for active entity operations. */
     private OrganizationDao myDao;
 
-    private List<Organization> organization;
-    private List<Keyword> keyword;
-    private List<Answer> answer;
+    private List<Organization> organizationList;
+    private List<Keyword> keywordList;
+    private List<Answer> answerList;
 
     public Organization() {
     }
@@ -68,54 +68,54 @@ public class Organization {
     }
 
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
-    public synchronized List<Organization> getOrganization() {
-        if (organization == null) {
+    public synchronized List<Organization> getOrganizationList() {
+        if (organizationList == null) {
             if (daoSession == null) {
                 throw new DaoException("Entity is detached from DAO context");
             }
             OrganizationDao targetDao = daoSession.getOrganizationDao();
-            organization = targetDao._queryOrganization_Organization(_id);
+            organizationList = targetDao._queryOrganization_OrganizationList(_id);
         }
-        return organization;
+        return organizationList;
     }
 
     /** Resets a to-many relationship, making the next get call to query for a fresh result. */
-    public synchronized void resetOrganization() {
-        organization = null;
+    public synchronized void resetOrganizationList() {
+        organizationList = null;
     }
 
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
-    public synchronized List<Keyword> getKeyword() {
-        if (keyword == null) {
+    public synchronized List<Keyword> getKeywordList() {
+        if (keywordList == null) {
             if (daoSession == null) {
                 throw new DaoException("Entity is detached from DAO context");
             }
             KeywordDao targetDao = daoSession.getKeywordDao();
-            keyword = targetDao._queryOrganization_Keyword(_id);
+            keywordList = targetDao._queryOrganization_KeywordList(_id);
         }
-        return keyword;
+        return keywordList;
     }
 
     /** Resets a to-many relationship, making the next get call to query for a fresh result. */
-    public synchronized void resetKeyword() {
-        keyword = null;
+    public synchronized void resetKeywordList() {
+        keywordList = null;
     }
 
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
-    public synchronized List<Answer> getAnswer() {
-        if (answer == null) {
+    public synchronized List<Answer> getAnswerList() {
+        if (answerList == null) {
             if (daoSession == null) {
                 throw new DaoException("Entity is detached from DAO context");
             }
             AnswerDao targetDao = daoSession.getAnswerDao();
-            answer = targetDao._queryOrganization_Answer(_id);
+            answerList = targetDao._queryOrganization_AnswerList(_id);
         }
-        return answer;
+        return answerList;
     }
 
     /** Resets a to-many relationship, making the next get call to query for a fresh result. */
-    public synchronized void resetAnswer() {
-        answer = null;
+    public synchronized void resetAnswerList() {
+        answerList = null;
     }
 
     /** Convenient call for {@link AbstractDao#delete(Object)}. Entity must attached to an entity context. */

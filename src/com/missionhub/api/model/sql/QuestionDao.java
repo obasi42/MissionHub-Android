@@ -37,7 +37,7 @@ public class QuestionDao extends AbstractDao<Question, Integer> {
     private DaoSession daoSession;
 
     private Query<Question> keyword_QuestionsQuery;
-    private Query<Question> question_QuestionQuery;
+    private Query<Question> question_QuestionListQuery;
 
     public QuestionDao(DaoConfig config) {
         super(config);
@@ -182,16 +182,16 @@ public class QuestionDao extends AbstractDao<Question, Integer> {
         return keyword_QuestionsQuery.list();
     }
 
-    /** Internal query to resolve the "question" to-many relationship of Question. */
-    public synchronized List<Question> _queryQuestion_Question(Integer question_id) {
-        if (question_QuestionQuery == null) {
+    /** Internal query to resolve the "questionList" to-many relationship of Question. */
+    public synchronized List<Question> _queryQuestion_QuestionList(Integer question_id) {
+        if (question_QuestionListQuery == null) {
             QueryBuilder<Question> queryBuilder = queryBuilder();
             queryBuilder.where(Properties.Question_id.eq(question_id));
-            question_QuestionQuery = queryBuilder.build();
+            question_QuestionListQuery = queryBuilder.build();
         } else {
-            question_QuestionQuery.setParameter(0, question_id);
+            question_QuestionListQuery.setParameter(0, question_id);
         }
-        return question_QuestionQuery.list();
+        return question_QuestionListQuery.list();
     }
 
     private String selectDeep;

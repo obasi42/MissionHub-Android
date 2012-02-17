@@ -30,8 +30,6 @@ public class MissionHubActivity extends MissionHubBaseActivity {
 		super.onCreate(savedInstanceState);
 
 		ApiHelper.configAutoLogin(this); // setup debug auto-login
-
-		getSession().logout();
 		
 		// redirect to Dashboard if session can be resumed
 		if (getSession().resumeSession(true)) {
@@ -61,8 +59,7 @@ public class MissionHubActivity extends MissionHubBaseActivity {
 				.setPositiveButton(R.string.action_ok, new DialogInterface.OnClickListener() {
 					@Override public void onClick(final DialogInterface dialog, final int id) {
 						// TODO:
-						// getTracker().trackEvent(MissionHubActivity.class.getCanonicalName(),
-						// "Click", "About", 0);
+						// getTracker().trackEvent(MissionHubActivity.class.getCanonicalName(), "Click", "About", 0);
 						final Uri uri = Uri.parse("http://missionhub.com?mobile=0");
 						startActivity(new Intent(Intent.ACTION_VIEW, uri));
 					}

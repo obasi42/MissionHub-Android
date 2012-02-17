@@ -30,7 +30,7 @@ public class OrganizationalRoleDao extends AbstractDao<OrganizationalRole, Integ
         public final static Property Primary = new Property(5, Boolean.class, "primary", false, "PRIMARY");
     };
 
-    private Query<OrganizationalRole> person_OrganizationalRoleQuery;
+    private Query<OrganizationalRole> person_OrganizationalRoleListQuery;
 
     public OrganizationalRoleDao(DaoConfig config) {
         super(config);
@@ -147,16 +147,16 @@ public class OrganizationalRoleDao extends AbstractDao<OrganizationalRole, Integ
         return true;
     }
     
-    /** Internal query to resolve the "organizationalRole" to-many relationship of Person. */
-    public synchronized List<OrganizationalRole> _queryPerson_OrganizationalRole(Integer person_id) {
-        if (person_OrganizationalRoleQuery == null) {
+    /** Internal query to resolve the "organizationalRoleList" to-many relationship of Person. */
+    public synchronized List<OrganizationalRole> _queryPerson_OrganizationalRoleList(Integer person_id) {
+        if (person_OrganizationalRoleListQuery == null) {
             QueryBuilder<OrganizationalRole> queryBuilder = queryBuilder();
             queryBuilder.where(Properties.Person_id.eq(person_id));
-            person_OrganizationalRoleQuery = queryBuilder.build();
+            person_OrganizationalRoleListQuery = queryBuilder.build();
         } else {
-            person_OrganizationalRoleQuery.setParameter(0, person_id);
+            person_OrganizationalRoleListQuery.setParameter(0, person_id);
         }
-        return person_OrganizationalRoleQuery.list();
+        return person_OrganizationalRoleListQuery.list();
     }
 
 }

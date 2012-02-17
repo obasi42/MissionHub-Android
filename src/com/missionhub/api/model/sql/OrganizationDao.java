@@ -30,7 +30,7 @@ public class OrganizationDao extends AbstractDao<Organization, Integer> {
 
     private DaoSession daoSession;
 
-    private Query<Organization> organization_OrganizationQuery;
+    private Query<Organization> organization_OrganizationListQuery;
 
     public OrganizationDao(DaoConfig config) {
         super(config);
@@ -131,16 +131,16 @@ public class OrganizationDao extends AbstractDao<Organization, Integer> {
         return true;
     }
     
-    /** Internal query to resolve the "organization" to-many relationship of Organization. */
-    public synchronized List<Organization> _queryOrganization_Organization(Integer organization_id) {
-        if (organization_OrganizationQuery == null) {
+    /** Internal query to resolve the "organizationList" to-many relationship of Organization. */
+    public synchronized List<Organization> _queryOrganization_OrganizationList(Integer organization_id) {
+        if (organization_OrganizationListQuery == null) {
             QueryBuilder<Organization> queryBuilder = queryBuilder();
             queryBuilder.where(Properties.Organization_id.eq(organization_id));
-            organization_OrganizationQuery = queryBuilder.build();
+            organization_OrganizationListQuery = queryBuilder.build();
         } else {
-            organization_OrganizationQuery.setParameter(0, organization_id);
+            organization_OrganizationListQuery.setParameter(0, organization_id);
         }
-        return organization_OrganizationQuery.list();
+        return organization_OrganizationListQuery.list();
     }
 
 }

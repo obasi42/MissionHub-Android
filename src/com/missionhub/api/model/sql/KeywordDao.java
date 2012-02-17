@@ -30,7 +30,7 @@ public class KeywordDao extends AbstractDao<Keyword, Integer> {
 
     private DaoSession daoSession;
 
-    private Query<Keyword> organization_KeywordQuery;
+    private Query<Keyword> organization_KeywordListQuery;
 
     public KeywordDao(DaoConfig config) {
         super(config);
@@ -138,16 +138,16 @@ public class KeywordDao extends AbstractDao<Keyword, Integer> {
         return true;
     }
     
-    /** Internal query to resolve the "keyword" to-many relationship of Organization. */
-    public synchronized List<Keyword> _queryOrganization_Keyword(Integer organization_id) {
-        if (organization_KeywordQuery == null) {
+    /** Internal query to resolve the "keywordList" to-many relationship of Organization. */
+    public synchronized List<Keyword> _queryOrganization_KeywordList(Integer organization_id) {
+        if (organization_KeywordListQuery == null) {
             QueryBuilder<Keyword> queryBuilder = queryBuilder();
             queryBuilder.where(Properties.Organization_id.eq(organization_id));
-            organization_KeywordQuery = queryBuilder.build();
+            organization_KeywordListQuery = queryBuilder.build();
         } else {
-            organization_KeywordQuery.setParameter(0, organization_id);
+            organization_KeywordListQuery.setParameter(0, organization_id);
         }
-        return organization_KeywordQuery.list();
+        return organization_KeywordListQuery.list();
     }
 
 }

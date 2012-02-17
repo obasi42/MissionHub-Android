@@ -29,7 +29,7 @@ public class LocationDao extends AbstractDao<Location, Integer> {
         public final static Property Provider = new Property(4, String.class, "provider", false, "PROVIDER");
     };
 
-    private Query<Location> person_LocationQuery;
+    private Query<Location> person_LocationListQuery;
 
     public LocationDao(DaoConfig config) {
         super(config);
@@ -138,16 +138,16 @@ public class LocationDao extends AbstractDao<Location, Integer> {
         return true;
     }
     
-    /** Internal query to resolve the "location" to-many relationship of Person. */
-    public synchronized List<Location> _queryPerson_Location(Integer person_id) {
-        if (person_LocationQuery == null) {
+    /** Internal query to resolve the "locationList" to-many relationship of Person. */
+    public synchronized List<Location> _queryPerson_LocationList(Integer person_id) {
+        if (person_LocationListQuery == null) {
             QueryBuilder<Location> queryBuilder = queryBuilder();
             queryBuilder.where(Properties.Person_id.eq(person_id));
-            person_LocationQuery = queryBuilder.build();
+            person_LocationListQuery = queryBuilder.build();
         } else {
-            person_LocationQuery.setParameter(0, person_id);
+            person_LocationListQuery.setParameter(0, person_id);
         }
-        return person_LocationQuery.list();
+        return person_LocationListQuery.list();
     }
 
 }

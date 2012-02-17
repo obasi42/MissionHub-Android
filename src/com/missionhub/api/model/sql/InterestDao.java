@@ -30,7 +30,7 @@ public class InterestDao extends AbstractDao<Interest, Integer> {
         public final static Property Provider = new Property(5, String.class, "provider", false, "PROVIDER");
     };
 
-    private Query<Interest> person_InterestQuery;
+    private Query<Interest> person_InterestListQuery;
 
     public InterestDao(DaoConfig config) {
         super(config);
@@ -147,16 +147,16 @@ public class InterestDao extends AbstractDao<Interest, Integer> {
         return true;
     }
     
-    /** Internal query to resolve the "interest" to-many relationship of Person. */
-    public synchronized List<Interest> _queryPerson_Interest(Integer person_id) {
-        if (person_InterestQuery == null) {
+    /** Internal query to resolve the "interestList" to-many relationship of Person. */
+    public synchronized List<Interest> _queryPerson_InterestList(Integer person_id) {
+        if (person_InterestListQuery == null) {
             QueryBuilder<Interest> queryBuilder = queryBuilder();
             queryBuilder.where(Properties.Person_id.eq(person_id));
-            person_InterestQuery = queryBuilder.build();
+            person_InterestListQuery = queryBuilder.build();
         } else {
-            person_InterestQuery.setParameter(0, person_id);
+            person_InterestListQuery.setParameter(0, person_id);
         }
-        return person_InterestQuery.list();
+        return person_InterestListQuery.list();
     }
 
 }
