@@ -5,11 +5,11 @@ import android.content.Intent;
 
 public class SessionBroadcast extends MissionHubBroadcast {
 
-	public static String NOTIFY_LOGIN = MissionHubBroadcast.PREFIX + "NOTIFY_LOGIN";
-	public static String NOTIFY_LOGOUT = MissionHubBroadcast.PREFIX + "NOTIFY_LOGOUT";
-	public static String NOTIFY_VERIFY_START = MissionHubBroadcast.PREFIX + "NOTIFY_VERIFY_START";
-	public static String NOTIFY_VERIFY_PASS = MissionHubBroadcast.PREFIX + "NOTIFY_VERIFY_PASS";
-	public static String NOTIFY_VERIFY_FAIL = MissionHubBroadcast.PREFIX + "NOTIFY_VERIFY_FAIL";
+	public static final String NOTIFY_LOGIN = MissionHubBroadcast.PREFIX + "NOTIFY_LOGIN";
+	public static final String NOTIFY_LOGOUT = MissionHubBroadcast.PREFIX + "NOTIFY_LOGOUT";
+	public static final String NOTIFY_VERIFY_START = MissionHubBroadcast.PREFIX + "NOTIFY_VERIFY_START";
+	public static final String NOTIFY_VERIFY_PASS = MissionHubBroadcast.PREFIX + "NOTIFY_VERIFY_PASS";
+	public static final String NOTIFY_VERIFY_FAIL = MissionHubBroadcast.PREFIX + "NOTIFY_VERIFY_FAIL";
 
 	public static void broadcastLogin(final Context context, final String accessToken) {
 		final Intent intent = new Intent(NOTIFY_LOGIN);

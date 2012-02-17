@@ -5,10 +5,10 @@ import android.content.Intent;
 
 public class PersonJsonSqlBroadcast extends MissionHubBroadcast {
 	
-	public static String NOTIFY_PERSON_CREATE = MissionHubBroadcast.PREFIX + "NOTIFY_PERSON_CREATE";
-	public static String NOTIFY_PERSON_UPDATE = MissionHubBroadcast.PREFIX + "NOTIFY_PERSON_UPDATE";
-	public static String NOTIFY_PERSON_DELETE = MissionHubBroadcast.PREFIX + "NOTIFY_PERSON_DELETE";
-	public static String NOTIFY_PERSON_ERROR  = MissionHubBroadcast.PREFIX + "NOTIFY_PERSON_ERROR";
+	public static final String NOTIFY_PERSON_CREATE = MissionHubBroadcast.PREFIX + "NOTIFY_PERSON_CREATE";
+	public static final String NOTIFY_PERSON_UPDATE = MissionHubBroadcast.PREFIX + "NOTIFY_PERSON_UPDATE";
+	public static final String NOTIFY_PERSON_DELETE = MissionHubBroadcast.PREFIX + "NOTIFY_PERSON_DELETE";
+	public static final String NOTIFY_PERSON_ERROR  = MissionHubBroadcast.PREFIX + "NOTIFY_PERSON_ERROR";
 
 	public static void broadcastCreate(Context context, int personId, String ... categories) {
 		final Intent intent = new Intent(NOTIFY_PERSON_CREATE);

@@ -2,7 +2,6 @@ package com.missionhub;
 
 import java.util.List;
 
-import android.util.Log;
 import android.widget.Toast;
 
 import com.google.common.collect.HashMultimap;
@@ -37,10 +36,10 @@ public class User {
 
 	/** user's primary */
 	private int primaryOrganization = -1;
-	
+
 	/** user's contact */
 	private Person person;
-	
+
 	/**
 	 * Creates a new user object
 	 * 
@@ -50,9 +49,12 @@ public class User {
 	public User(final MissionHubApplication application, final int id) {
 		this.application = application;
 		this.id = id;
-		
-		if (id < 0) return; //don't bother making a user with a negative id
-		
+
+		// don't bother setting up a user with a negative id
+		if (id < 0) {
+			return;
+		}
+
 		person = application.getDbSession().getPersonDao().load(id);
 		person.refresh();
 
@@ -65,8 +67,8 @@ public class User {
 	 */
 	private synchronized void updateLabels() {
 		final SetMultimap<Integer, String> labelsTemp = Multimaps.synchronizedSetMultimap(HashMultimap.<Integer, String> create()); // organizationId,
-		List<OrganizationalRole> roles = person.getOrganizationalRoleList();
-		for (OrganizationalRole role : roles) {
+		final List<OrganizationalRole> roles = person.getOrganizationalRoleList();
+		for (final OrganizationalRole role : roles) {
 			labels.put(role.getOrg_id(), role.getName());
 			if (role.getPrimary() || primaryOrganization < 0) {
 				primaryOrganization = role.getOrg_id();
@@ -74,7 +76,7 @@ public class User {
 		}
 		labels = labelsTemp;
 	}
-	
+
 	/**
 	 * Makes sure the organization set in the session is valid
 	 */
@@ -84,43 +86,48 @@ public class User {
 			Toast.makeText(application, R.string.user_toast_invalid_organization, Toast.LENGTH_LONG).show();
 		}
 	}
-	
+
 	/**
 	 * Checks if a user has a label (role)
+	 * 
 	 * @param label
 	 * @return true if they have the label
 	 */
-	public synchronized boolean hasLabel(String label) {
+	public synchronized boolean hasLabel(final String label) {
 		return hasLabel(application.getSession().getOrganizationId(), label);
 	}
-	
+
 	/**
 	 * Checks if a user has a label (role)
+	 * 
 	 * @param label
 	 * @return true if they have the label
 	 */
-	public synchronized boolean hasLabel(int organizationId, String label) {
+	public synchronized boolean hasLabel(final int organizationId, final String label) {
 		return labels.containsEntry(organizationId, label);
 	}
-	
+
 	/**
 	 * Returns a multimap of all of the user's roles
+	 * 
 	 * @return
 	 */
 	public synchronized SetMultimap<Integer, String> getLabels() {
-		return  Multimaps.unmodifiableSetMultimap(labels);
+		return Multimaps.unmodifiableSetMultimap(labels);
 	}
-	
+
 	/**
 	 * Gets the user's person from sql
+	 * 
 	 * @return
 	 */
 	public synchronized Person getPerson() {
 		return person;
 	}
-	
+
 	/**
 	 * Returns the user's primary organization
+	 * 
 	 * @return
 	 */
 	public synchronized int getPrimaryOrganization() {
