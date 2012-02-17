@@ -29,13 +29,13 @@ public class User {
 	private final MissionHubApplication application;
 
 	/** user's id */
-	public final int id;
+	public final long id;
 
 	/** user's labels */
-	private SetMultimap<Integer, String> labels; // organizationId, label
+	private SetMultimap<Long, String> labels; // organizationId, label
 
 	/** user's primary */
-	private int primaryOrganization = -1;
+	private long primaryOrganization = -1l;
 
 	/** user's contact */
 	private Person person;
@@ -46,7 +46,7 @@ public class User {
 	 * @param application
 	 * @param id
 	 */
-	public User(final MissionHubApplication application, final int id) {
+	public User(final MissionHubApplication application, final long id) {
 		this.application = application;
 		this.id = id;
 
@@ -66,7 +66,7 @@ public class User {
 	 * Updates the labels multimap from sql
 	 */
 	private synchronized void updateLabels() {
-		final SetMultimap<Integer, String> labelsTemp = Multimaps.synchronizedSetMultimap(HashMultimap.<Integer, String> create()); // organizationId,
+		final SetMultimap<Long, String> labelsTemp = Multimaps.synchronizedSetMultimap(HashMultimap.<Long, String> create()); // organizationId,
 		final List<OrganizationalRole> roles = person.getOrganizationalRoleList();
 		for (final OrganizationalRole role : roles) {
 			labels.put(role.getOrg_id(), role.getName());
@@ -103,7 +103,7 @@ public class User {
 	 * @param label
 	 * @return true if they have the label
 	 */
-	public synchronized boolean hasLabel(final int organizationId, final String label) {
+	public synchronized boolean hasLabel(final long organizationId, final String label) {
 		return labels.containsEntry(organizationId, label);
 	}
 
@@ -112,7 +112,7 @@ public class User {
 	 * 
 	 * @return
 	 */
-	public synchronized SetMultimap<Integer, String> getLabels() {
+	public synchronized SetMultimap<Long, String> getLabels() {
 		return Multimaps.unmodifiableSetMultimap(labels);
 	}
 
@@ -130,7 +130,7 @@ public class User {
 	 * 
 	 * @return
 	 */
-	public synchronized int getPrimaryOrganization() {
+	public synchronized long getPrimaryOrganization() {
 		return primaryOrganization;
 	}
 }

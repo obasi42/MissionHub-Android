@@ -34,7 +34,7 @@ public class ApiHelper {
 		params.put("access_token", ((MissionHubApplication) context.getApplicationContext()).getSession().getAccessToken());
 
 		// Organization Id
-		final int organizationId = ((MissionHubApplication) context.getApplicationContext()).getSession().getOrganizationId();
+		final long organizationId = ((MissionHubApplication) context.getApplicationContext()).getSession().getOrganizationId();
 		if (organizationId >= 0) {
 			params.put("org_id", organizationId);
 		}
@@ -75,14 +75,14 @@ public class ApiHelper {
 	}
 
 	/**
-	 * Convert a list of integers to a comma separated string
+	 * Convert a list of longs to a comma separated string
 	 * 
 	 * @param ids
 	 * @return
 	 */
-	public static String toList(final List<Integer> ids) {
+	public static String toList(final List<Long> ids) {
 		final StringBuffer idList = new StringBuffer();
-		final Iterator<Integer> itr = ids.iterator();
+		final Iterator<Long> itr = ids.iterator();
 		while (itr.hasNext()) {
 			final String element = String.valueOf(itr.next());
 			idList.append(element);

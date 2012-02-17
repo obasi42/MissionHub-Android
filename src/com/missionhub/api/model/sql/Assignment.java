@@ -6,54 +6,54 @@ package com.missionhub.api.model.sql;
  */
 public class Assignment {
 
-    private Integer _id;
-    private Integer assigned_to_id;
-    private Integer person_id;
-    private Integer organization_id;
+    private Long id;
+    private Long assigned_to_id;
+    private Long person_id;
+    private Long organization_id;
 
     public Assignment() {
     }
 
-    public Assignment(Integer _id) {
-        this._id = _id;
+    public Assignment(Long id) {
+        this.id = id;
     }
 
-    public Assignment(Integer _id, Integer assigned_to_id, Integer person_id, Integer organization_id) {
-        this._id = _id;
+    public Assignment(Long id, Long assigned_to_id, Long person_id, Long organization_id) {
+        this.id = id;
         this.assigned_to_id = assigned_to_id;
         this.person_id = person_id;
         this.organization_id = organization_id;
     }
 
-    public Integer get_id() {
-        return _id;
+    public Long getId() {
+        return id;
     }
 
-    public void set_id(Integer _id) {
-        this._id = _id;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public Integer getAssigned_to_id() {
+    public Long getAssigned_to_id() {
         return assigned_to_id;
     }
 
-    public void setAssigned_to_id(Integer assigned_to_id) {
+    public void setAssigned_to_id(Long assigned_to_id) {
         this.assigned_to_id = assigned_to_id;
     }
 
-    public Integer getPerson_id() {
+    public Long getPerson_id() {
         return person_id;
     }
 
-    public void setPerson_id(Integer person_id) {
+    public void setPerson_id(Long person_id) {
         this.person_id = person_id;
     }
 
-    public Integer getOrganization_id() {
+    public Long getOrganization_id() {
         return organization_id;
     }
 
-    public void setOrganization_id(Integer organization_id) {
+    public void setOrganization_id(Long organization_id) {
         this.organization_id = organization_id;
     }
 

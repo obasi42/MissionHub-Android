@@ -53,7 +53,7 @@ public class OrganizationsApi {
 	 * @param responseHandler
 	 * @return
 	 */
-	public static ApiRequest get(final Context context, final List<Integer> organizationIds, final ApiHandler apiHandler) {
+	public static ApiRequest get(final Context context, final List<Long> organizationIds, final ApiHandler apiHandler) {
 		final ApiClient client = new ApiClient();
 		final String url = ApiHelper.getAbsoluteUrl("organizations", ApiHelper.toList(organizationIds));
 		final HttpHeaders headers = ApiHelper.getDefaultHeaders(context);

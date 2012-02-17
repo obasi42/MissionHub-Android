@@ -134,6 +134,7 @@ public class LoginActivity extends MissionHubBaseActivity {
 				} catch (final Exception e) {
 					description = getString(R.string.error_msg);
 				}
+				exception = new MissionHubException(description);
 			}
 
 			final AlertDialog ad = DisplayError.display(LoginActivity.this, exception);

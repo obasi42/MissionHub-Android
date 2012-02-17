@@ -6,36 +6,36 @@ package com.missionhub.api.model.sql;
  */
 public class Rejoicable {
 
-    private Integer _id;
-    private Integer comment_id;
+    private Long id;
+    private Long comment_id;
     private String what;
 
     public Rejoicable() {
     }
 
-    public Rejoicable(Integer _id) {
-        this._id = _id;
+    public Rejoicable(Long id) {
+        this.id = id;
     }
 
-    public Rejoicable(Integer _id, Integer comment_id, String what) {
-        this._id = _id;
+    public Rejoicable(Long id, Long comment_id, String what) {
+        this.id = id;
         this.comment_id = comment_id;
         this.what = what;
     }
 
-    public Integer get_id() {
-        return _id;
+    public Long getId() {
+        return id;
     }
 
-    public void set_id(Integer _id) {
-        this._id = _id;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public Integer getComment_id() {
+    public Long getComment_id() {
         return comment_id;
     }
 
-    public void setComment_id(Integer comment_id) {
+    public void setComment_id(Long comment_id) {
         this.comment_id = comment_id;
     }
 

@@ -6,36 +6,36 @@ package com.missionhub.api.model.sql;
  */
 public class QuestionChoice {
 
-    private Integer _id;
-    private Integer question_id;
+    private Long id;
+    private Long question_id;
     private String choice;
 
     public QuestionChoice() {
     }
 
-    public QuestionChoice(Integer _id) {
-        this._id = _id;
+    public QuestionChoice(Long id) {
+        this.id = id;
     }
 
-    public QuestionChoice(Integer _id, Integer question_id, String choice) {
-        this._id = _id;
+    public QuestionChoice(Long id, Long question_id, String choice) {
+        this.id = id;
         this.question_id = question_id;
         this.choice = choice;
     }
 
-    public Integer get_id() {
-        return _id;
+    public Long getId() {
+        return id;
     }
 
-    public void set_id(Integer _id) {
-        this._id = _id;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public Integer getQuestion_id() {
+    public Long getQuestion_id() {
         return question_id;
     }
 
-    public void setQuestion_id(Integer question_id) {
+    public void setQuestion_id(Long question_id) {
         this.question_id = question_id;
     }
 

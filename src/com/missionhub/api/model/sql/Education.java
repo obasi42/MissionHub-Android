@@ -6,8 +6,8 @@ package com.missionhub.api.model.sql;
  */
 public class Education {
 
-    private Integer _id;
-    private Integer person_id;
+    private Long id;
+    private Long person_id;
     private String school_name;
     private String school_id;
     private String year_name;
@@ -18,12 +18,12 @@ public class Education {
     public Education() {
     }
 
-    public Education(Integer _id) {
-        this._id = _id;
+    public Education(Long id) {
+        this.id = id;
     }
 
-    public Education(Integer _id, Integer person_id, String school_name, String school_id, String year_name, String year_id, String type, String provider) {
-        this._id = _id;
+    public Education(Long id, Long person_id, String school_name, String school_id, String year_name, String year_id, String type, String provider) {
+        this.id = id;
         this.person_id = person_id;
         this.school_name = school_name;
         this.school_id = school_id;
@@ -33,19 +33,19 @@ public class Education {
         this.provider = provider;
     }
 
-    public Integer get_id() {
-        return _id;
+    public Long getId() {
+        return id;
     }
 
-    public void set_id(Integer _id) {
-        this._id = _id;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public Integer getPerson_id() {
+    public Long getPerson_id() {
         return person_id;
     }
 
-    public void setPerson_id(Integer person_id) {
+    public void setPerson_id(Long person_id) {
         this.person_id = person_id;
     }
 

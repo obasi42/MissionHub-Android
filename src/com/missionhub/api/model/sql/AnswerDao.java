@@ -19,15 +19,15 @@ import com.missionhub.api.model.sql.Answer;
 /** 
  * DAO for table ANSWER.
 */
-public class AnswerDao extends AbstractDao<Answer, Integer> {
+public class AnswerDao extends AbstractDao<Answer, Long> {
 
     public static final String TABLENAME = "ANSWER";
 
     public static class Properties {
-        public final static Property _id = new Property(0, Integer.class, "_id", true, "_ID");
-        public final static Property Person_id = new Property(1, Integer.class, "person_id", false, "PERSON_ID");
-        public final static Property Organization_id = new Property(2, Integer.class, "organization_id", false, "ORGANIZATION_ID");
-        public final static Property Question_id = new Property(3, Integer.class, "question_id", false, "QUESTION_ID");
+        public final static Property Id = new Property(0, Long.class, "id", true, "_id");
+        public final static Property Person_id = new Property(1, Long.class, "person_id", false, "PERSON_ID");
+        public final static Property Organization_id = new Property(2, Long.class, "organization_id", false, "ORGANIZATION_ID");
+        public final static Property Question_id = new Property(3, Long.class, "question_id", false, "QUESTION_ID");
         public final static Property Answer = new Property(4, String.class, "answer", false, "ANSWER");
     };
 
@@ -48,7 +48,7 @@ public class AnswerDao extends AbstractDao<Answer, Integer> {
     /** Creates the underlying database table. */
     public static void createTable(SQLiteDatabase db, boolean ifNotExists) {
         String sql = "CREATE TABLE " + (ifNotExists? "IF NOT EXISTS ": "") + "'ANSWER' (" + //
-                "'_ID' INTEGER PRIMARY KEY ," + // 0: _id
+                "'_id' INTEGER PRIMARY KEY ," + // 0: id
                 "'PERSON_ID' INTEGER," + // 1: person_id
                 "'ORGANIZATION_ID' INTEGER," + // 2: organization_id
                 "'QUESTION_ID' INTEGER," + // 3: question_id
@@ -67,22 +67,22 @@ public class AnswerDao extends AbstractDao<Answer, Integer> {
     protected void bindValues(SQLiteStatement stmt, Answer entity) {
         stmt.clearBindings();
  
-        Integer _id = entity.get_id();
-        if (_id != null) {
-            stmt.bindLong(1, _id);
+        Long id = entity.getId();
+        if (id != null) {
+            stmt.bindLong(1, id);
         }
  
-        Integer person_id = entity.getPerson_id();
+        Long person_id = entity.getPerson_id();
         if (person_id != null) {
             stmt.bindLong(2, person_id);
         }
  
-        Integer organization_id = entity.getOrganization_id();
+        Long organization_id = entity.getOrganization_id();
         if (organization_id != null) {
             stmt.bindLong(3, organization_id);
         }
  
-        Integer question_id = entity.getQuestion_id();
+        Long question_id = entity.getQuestion_id();
         if (question_id != null) {
             stmt.bindLong(4, question_id);
         }
@@ -101,18 +101,18 @@ public class AnswerDao extends AbstractDao<Answer, Integer> {
 
     /** @inheritdoc */
     @Override
-    public Integer readKey(Cursor cursor, int offset) {
-        return cursor.isNull(offset + 0) ? null : cursor.getInt(offset + 0);
+    public Long readKey(Cursor cursor, int offset) {
+        return cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0);
     }    
 
     /** @inheritdoc */
     @Override
     public Answer readEntity(Cursor cursor, int offset) {
         Answer entity = new Answer( //
-            cursor.isNull(offset + 0) ? null : cursor.getInt(offset + 0), // _id
-            cursor.isNull(offset + 1) ? null : cursor.getInt(offset + 1), // person_id
-            cursor.isNull(offset + 2) ? null : cursor.getInt(offset + 2), // organization_id
-            cursor.isNull(offset + 3) ? null : cursor.getInt(offset + 3), // question_id
+            cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
+            cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1), // person_id
+            cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2), // organization_id
+            cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3), // question_id
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4) // answer
         );
         return entity;
@@ -121,24 +121,24 @@ public class AnswerDao extends AbstractDao<Answer, Integer> {
     /** @inheritdoc */
     @Override
     public void readEntity(Cursor cursor, Answer entity, int offset) {
-        entity.set_id(cursor.isNull(offset + 0) ? null : cursor.getInt(offset + 0));
-        entity.setPerson_id(cursor.isNull(offset + 1) ? null : cursor.getInt(offset + 1));
-        entity.setOrganization_id(cursor.isNull(offset + 2) ? null : cursor.getInt(offset + 2));
-        entity.setQuestion_id(cursor.isNull(offset + 3) ? null : cursor.getInt(offset + 3));
+        entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
+        entity.setPerson_id(cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1));
+        entity.setOrganization_id(cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2));
+        entity.setQuestion_id(cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3));
         entity.setAnswer(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
      }
     
     @Override
-    protected Integer updateKeyAfterInsert(Answer entity, long rowId) {
-        // TODO XXX Only Long PKs are supported currently
-        return null;
+    protected Long updateKeyAfterInsert(Answer entity, long rowId) {
+        entity.setId(rowId);
+        return rowId;
     }
     
     /** @inheritdoc */
     @Override
-    public Integer getKey(Answer entity) {
+    public Long getKey(Answer entity) {
         if(entity != null) {
-            return entity.get_id();
+            return entity.getId();
         } else {
             return null;
         }
@@ -151,7 +151,7 @@ public class AnswerDao extends AbstractDao<Answer, Integer> {
     }
     
     /** Internal query to resolve the "answerList" to-many relationship of Person. */
-    public synchronized List<Answer> _queryPerson_AnswerList(Integer person_id) {
+    public synchronized List<Answer> _queryPerson_AnswerList(Long person_id) {
         if (person_AnswerListQuery == null) {
             QueryBuilder<Answer> queryBuilder = queryBuilder();
             queryBuilder.where(Properties.Person_id.eq(person_id));
@@ -163,7 +163,7 @@ public class AnswerDao extends AbstractDao<Answer, Integer> {
     }
 
     /** Internal query to resolve the "answerList" to-many relationship of Organization. */
-    public synchronized List<Answer> _queryOrganization_AnswerList(Integer organization_id) {
+    public synchronized List<Answer> _queryOrganization_AnswerList(Long organization_id) {
         if (organization_AnswerListQuery == null) {
             QueryBuilder<Answer> queryBuilder = queryBuilder();
             queryBuilder.where(Properties.Organization_id.eq(organization_id));
@@ -183,7 +183,7 @@ public class AnswerDao extends AbstractDao<Answer, Integer> {
             builder.append(',');
             SqlUtils.appendColumns(builder, "T0", daoSession.getQuestionDao().getAllColumns());
             builder.append(" FROM ANSWER T");
-            builder.append(" LEFT JOIN QUESTION T0 ON T.'QUESTION_ID'=T0.'_ID'");
+            builder.append(" LEFT JOIN QUESTION T0 ON T.'QUESTION_ID'=T0.'_id'");
             builder.append(' ');
             selectDeep = builder.toString();
         }

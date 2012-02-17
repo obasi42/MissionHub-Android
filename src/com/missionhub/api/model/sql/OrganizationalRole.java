@@ -6,9 +6,9 @@ package com.missionhub.api.model.sql;
  */
 public class OrganizationalRole {
 
-    private Integer _id;
-    private Integer person_id;
-    private Integer org_id;
+    private Long id;
+    private Long person_id;
+    private Long org_id;
     private String role;
     private String name;
     private Boolean primary;
@@ -16,12 +16,12 @@ public class OrganizationalRole {
     public OrganizationalRole() {
     }
 
-    public OrganizationalRole(Integer _id) {
-        this._id = _id;
+    public OrganizationalRole(Long id) {
+        this.id = id;
     }
 
-    public OrganizationalRole(Integer _id, Integer person_id, Integer org_id, String role, String name, Boolean primary) {
-        this._id = _id;
+    public OrganizationalRole(Long id, Long person_id, Long org_id, String role, String name, Boolean primary) {
+        this.id = id;
         this.person_id = person_id;
         this.org_id = org_id;
         this.role = role;
@@ -29,27 +29,27 @@ public class OrganizationalRole {
         this.primary = primary;
     }
 
-    public Integer get_id() {
-        return _id;
+    public Long getId() {
+        return id;
     }
 
-    public void set_id(Integer _id) {
-        this._id = _id;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public Integer getPerson_id() {
+    public Long getPerson_id() {
         return person_id;
     }
 
-    public void setPerson_id(Integer person_id) {
+    public void setPerson_id(Long person_id) {
         this.person_id = person_id;
     }
 
-    public Integer getOrg_id() {
+    public Long getOrg_id() {
         return org_id;
     }
 
-    public void setOrg_id(Integer org_id) {
+    public void setOrg_id(Long org_id) {
         this.org_id = org_id;
     }
 

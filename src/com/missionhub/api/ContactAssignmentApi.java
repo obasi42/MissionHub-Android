@@ -35,7 +35,7 @@ public class ContactAssignmentApi {
 	 * @param apiHandler
 	 * @return
 	 */
-	public static ApiRequest assignToLeader(final Context context, final int personId, final int leaderId, final int currentLeaderId, final ApiHandler apiHandler) {
+	public static ApiRequest assignToLeader(final Context context, final long personId, final int leaderId, final int currentLeaderId, final ApiHandler apiHandler) {
 		return create(context, Type.leader, personId, leaderId, currentLeaderId, apiHandler);
 	}
 
@@ -49,7 +49,7 @@ public class ContactAssignmentApi {
 	 * @param apiHandler
 	 * @return
 	 */
-	public static ApiRequest assignToOrganization(final Context context, final int personId, final int organizationId, final ApiHandler apiHandler) {
+	public static ApiRequest assignToOrganization(final Context context, final long personId, final int organizationId, final ApiHandler apiHandler) {
 		return create(context, Type.organization, personId, organizationId, UNKNOWN, apiHandler);
 	}
 
@@ -64,7 +64,7 @@ public class ContactAssignmentApi {
 	 * @param apiHandler
 	 * @return
 	 */
-	public static ApiRequest unassignFromLeader(final Context context, final int personId, final int currentLeaderId, final ApiHandler apiHandler) {
+	public static ApiRequest unassignFromLeader(final Context context, final long personId, final int currentLeaderId, final ApiHandler apiHandler) {
 		return create(context, Type.leader, personId, NONE, currentLeaderId, apiHandler);
 	}
 
@@ -79,7 +79,7 @@ public class ContactAssignmentApi {
 	 * @param apiHandler
 	 * @return
 	 */
-	public static ApiRequest create(final Context context, final Type type, final int personId, final int assignToId, final int currentLeaderId, final ApiHandler apiHandler) {
+	public static ApiRequest create(final Context context, final Type type, final long personId, final int assignToId, final int currentLeaderId, final ApiHandler apiHandler) {
 		final ApiClient client = new ApiClient();
 		final String url = ApiHelper.getAbsoluteUrl("contact_assignments");
 		final HttpHeaders headers = ApiHelper.getDefaultHeaders(context);

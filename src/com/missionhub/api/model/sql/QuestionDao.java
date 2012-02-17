@@ -19,19 +19,19 @@ import com.missionhub.api.model.sql.Question;
 /** 
  * DAO for table QUESTION.
 */
-public class QuestionDao extends AbstractDao<Question, Integer> {
+public class QuestionDao extends AbstractDao<Question, Long> {
 
     public static final String TABLENAME = "QUESTION";
 
     public static class Properties {
-        public final static Property _id = new Property(0, Integer.class, "_id", true, "_ID");
-        public final static Property Keyword_id = new Property(1, Integer.class, "keyword_id", false, "KEYWORD_ID");
+        public final static Property Id = new Property(0, Long.class, "id", true, "_id");
+        public final static Property Keyword_id = new Property(1, Long.class, "keyword_id", false, "KEYWORD_ID");
         public final static Property Label = new Property(2, String.class, "label", false, "LABEL");
         public final static Property Kind = new Property(3, String.class, "kind", false, "KIND");
         public final static Property Style = new Property(4, String.class, "style", false, "STYLE");
         public final static Property Required = new Property(5, Boolean.class, "required", false, "REQUIRED");
         public final static Property Active = new Property(6, Boolean.class, "active", false, "ACTIVE");
-        public final static Property Question_id = new Property(7, Integer.class, "question_id", false, "QUESTION_ID");
+        public final static Property Question_id = new Property(7, Long.class, "question_id", false, "QUESTION_ID");
     };
 
     private DaoSession daoSession;
@@ -51,7 +51,7 @@ public class QuestionDao extends AbstractDao<Question, Integer> {
     /** Creates the underlying database table. */
     public static void createTable(SQLiteDatabase db, boolean ifNotExists) {
         String sql = "CREATE TABLE " + (ifNotExists? "IF NOT EXISTS ": "") + "'QUESTION' (" + //
-                "'_ID' INTEGER PRIMARY KEY ," + // 0: _id
+                "'_id' INTEGER PRIMARY KEY ," + // 0: id
                 "'KEYWORD_ID' INTEGER," + // 1: keyword_id
                 "'LABEL' TEXT," + // 2: label
                 "'KIND' TEXT," + // 3: kind
@@ -73,12 +73,12 @@ public class QuestionDao extends AbstractDao<Question, Integer> {
     protected void bindValues(SQLiteStatement stmt, Question entity) {
         stmt.clearBindings();
  
-        Integer _id = entity.get_id();
-        if (_id != null) {
-            stmt.bindLong(1, _id);
+        Long id = entity.getId();
+        if (id != null) {
+            stmt.bindLong(1, id);
         }
  
-        Integer keyword_id = entity.getKeyword_id();
+        Long keyword_id = entity.getKeyword_id();
         if (keyword_id != null) {
             stmt.bindLong(2, keyword_id);
         }
@@ -117,16 +117,16 @@ public class QuestionDao extends AbstractDao<Question, Integer> {
 
     /** @inheritdoc */
     @Override
-    public Integer readKey(Cursor cursor, int offset) {
-        return cursor.isNull(offset + 0) ? null : cursor.getInt(offset + 0);
+    public Long readKey(Cursor cursor, int offset) {
+        return cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0);
     }    
 
     /** @inheritdoc */
     @Override
     public Question readEntity(Cursor cursor, int offset) {
         Question entity = new Question( //
-            cursor.isNull(offset + 0) ? null : cursor.getInt(offset + 0), // _id
-            cursor.isNull(offset + 1) ? null : cursor.getInt(offset + 1), // keyword_id
+            cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
+            cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1), // keyword_id
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // label
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // kind
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // style
@@ -139,8 +139,8 @@ public class QuestionDao extends AbstractDao<Question, Integer> {
     /** @inheritdoc */
     @Override
     public void readEntity(Cursor cursor, Question entity, int offset) {
-        entity.set_id(cursor.isNull(offset + 0) ? null : cursor.getInt(offset + 0));
-        entity.setKeyword_id(cursor.isNull(offset + 1) ? null : cursor.getInt(offset + 1));
+        entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
+        entity.setKeyword_id(cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1));
         entity.setLabel(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setKind(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
         entity.setStyle(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
@@ -149,16 +149,16 @@ public class QuestionDao extends AbstractDao<Question, Integer> {
      }
     
     @Override
-    protected Integer updateKeyAfterInsert(Question entity, long rowId) {
-        // TODO XXX Only Long PKs are supported currently
-        return null;
+    protected Long updateKeyAfterInsert(Question entity, long rowId) {
+        entity.setId(rowId);
+        return rowId;
     }
     
     /** @inheritdoc */
     @Override
-    public Integer getKey(Question entity) {
+    public Long getKey(Question entity) {
         if(entity != null) {
-            return entity.get_id();
+            return entity.getId();
         } else {
             return null;
         }
@@ -171,7 +171,7 @@ public class QuestionDao extends AbstractDao<Question, Integer> {
     }
     
     /** Internal query to resolve the "questions" to-many relationship of Keyword. */
-    public synchronized List<Question> _queryKeyword_Questions(Integer keyword_id) {
+    public synchronized List<Question> _queryKeyword_Questions(Long keyword_id) {
         if (keyword_QuestionsQuery == null) {
             QueryBuilder<Question> queryBuilder = queryBuilder();
             queryBuilder.where(Properties.Keyword_id.eq(keyword_id));
@@ -183,7 +183,7 @@ public class QuestionDao extends AbstractDao<Question, Integer> {
     }
 
     /** Internal query to resolve the "questionList" to-many relationship of Question. */
-    public synchronized List<Question> _queryQuestion_QuestionList(Integer question_id) {
+    public synchronized List<Question> _queryQuestion_QuestionList(Long question_id) {
         if (question_QuestionListQuery == null) {
             QueryBuilder<Question> queryBuilder = queryBuilder();
             queryBuilder.where(Properties.Question_id.eq(question_id));
@@ -203,7 +203,7 @@ public class QuestionDao extends AbstractDao<Question, Integer> {
             builder.append(',');
             SqlUtils.appendColumns(builder, "T0", daoSession.getKeywordDao().getAllColumns());
             builder.append(" FROM QUESTION T");
-            builder.append(" LEFT JOIN KEYWORD T0 ON T.'KEYWORD_ID'=T0.'_ID'");
+            builder.append(" LEFT JOIN KEYWORD T0 ON T.'KEYWORD_ID'=T0.'_id'");
             builder.append(' ');
             selectDeep = builder.toString();
         }

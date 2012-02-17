@@ -10,10 +10,10 @@ import de.greenrobot.dao.DaoException;
  */
 public class FollowupComment {
 
-    private Integer _id;
-    private Integer contact_id;
-    private Integer commenter_id;
-    private Integer organization_id;
+    private Long id;
+    private Long contact_id;
+    private Long commenter_id;
+    private Long organization_id;
     private String comment;
     private String status;
     private java.util.Date created_at;
@@ -31,12 +31,12 @@ public class FollowupComment {
     public FollowupComment() {
     }
 
-    public FollowupComment(Integer _id) {
-        this._id = _id;
+    public FollowupComment(Long id) {
+        this.id = id;
     }
 
-    public FollowupComment(Integer _id, Integer contact_id, Integer commenter_id, Integer organization_id, String comment, String status, java.util.Date created_at, java.util.Date updated_at, java.util.Date deleted_at) {
-        this._id = _id;
+    public FollowupComment(Long id, Long contact_id, Long commenter_id, Long organization_id, String comment, String status, java.util.Date created_at, java.util.Date updated_at, java.util.Date deleted_at) {
+        this.id = id;
         this.contact_id = contact_id;
         this.commenter_id = commenter_id;
         this.organization_id = organization_id;
@@ -53,35 +53,35 @@ public class FollowupComment {
         myDao = daoSession != null ? daoSession.getFollowupCommentDao() : null;
     }
 
-    public Integer get_id() {
-        return _id;
+    public Long getId() {
+        return id;
     }
 
-    public void set_id(Integer _id) {
-        this._id = _id;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public Integer getContact_id() {
+    public Long getContact_id() {
         return contact_id;
     }
 
-    public void setContact_id(Integer contact_id) {
+    public void setContact_id(Long contact_id) {
         this.contact_id = contact_id;
     }
 
-    public Integer getCommenter_id() {
+    public Long getCommenter_id() {
         return commenter_id;
     }
 
-    public void setCommenter_id(Integer commenter_id) {
+    public void setCommenter_id(Long commenter_id) {
         this.commenter_id = commenter_id;
     }
 
-    public Integer getOrganization_id() {
+    public Long getOrganization_id() {
         return organization_id;
     }
 
-    public void setOrganization_id(Integer organization_id) {
+    public void setOrganization_id(Long organization_id) {
         this.organization_id = organization_id;
     }
 
@@ -132,7 +132,7 @@ public class FollowupComment {
                 throw new DaoException("Entity is detached from DAO context");
             }
             RejoicableDao targetDao = daoSession.getRejoicableDao();
-            rejoicables = targetDao._queryFollowupComment_Rejoicables(_id);
+            rejoicables = targetDao._queryFollowupComment_Rejoicables(id);
         }
         return rejoicables;
     }

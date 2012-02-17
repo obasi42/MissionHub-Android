@@ -18,7 +18,7 @@ public class PersonJsonSql {
 		try {
 			privateUpdate(context, person, threaded, notify, categories);
 		} catch (final Exception e) {
-			int personId = -1;
+			long personId = -1;
 			if (person != null) {
 				personId = person.getId();
 			}
@@ -52,7 +52,7 @@ public class PersonJsonSql {
 		}
 
 		if (person.getId() != null) {
-			p.set_id(person.getId());
+			p.setId(person.getId());
 		}
 
 		if (person.getName() != null) {
@@ -123,9 +123,9 @@ public class PersonJsonSql {
 		pd.insertOrReplace(p);
 
 		if (createPerson) {
-			PersonJsonSqlBroadcast.broadcastCreate(context, p.get_id(), categories);
+			PersonJsonSqlBroadcast.broadcastCreate(context, p.getId(), categories);
 		} else {
-			PersonJsonSqlBroadcast.broadcastUpdate(context, p.get_id(), categories);
+			PersonJsonSqlBroadcast.broadcastUpdate(context, p.getId(), categories);
 		}
 	}
 	//

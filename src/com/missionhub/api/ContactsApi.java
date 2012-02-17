@@ -81,7 +81,7 @@ public class ContactsApi {
 	 * @param apiHandler
 	 * @return
 	 */
-	public static ApiRequest get(final Context context, final int personId, final ApiHandler apiHandler) {
+	public static ApiRequest get(final Context context, final long personId, final ApiHandler apiHandler) {
 		final ApiClient client = new ApiClient();
 		final String url = ApiHelper.getAbsoluteUrl("contacts", String.valueOf(personId));
 		final HttpHeaders headers = ApiHelper.getDefaultHeaders(context);
@@ -97,7 +97,7 @@ public class ContactsApi {
 	 * @param apiHandler
 	 * @return
 	 */
-	public static ApiRequest get(final Context context, final List<Integer> personIds, final ApiHandler apiHandler) {
+	public static ApiRequest get(final Context context, final List<Long> personIds, final ApiHandler apiHandler) {
 		final ApiClient client = new ApiClient();
 		final String url = ApiHelper.getAbsoluteUrl("contacts", ApiHelper.toList(personIds));
 		final HttpHeaders headers = ApiHelper.getDefaultHeaders(context);

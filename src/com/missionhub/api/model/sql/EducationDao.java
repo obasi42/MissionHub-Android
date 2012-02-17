@@ -17,13 +17,13 @@ import com.missionhub.api.model.sql.Education;
 /** 
  * DAO for table EDUCATION.
 */
-public class EducationDao extends AbstractDao<Education, Integer> {
+public class EducationDao extends AbstractDao<Education, Long> {
 
     public static final String TABLENAME = "EDUCATION";
 
     public static class Properties {
-        public final static Property _id = new Property(0, Integer.class, "_id", true, "_ID");
-        public final static Property Person_id = new Property(1, Integer.class, "person_id", false, "PERSON_ID");
+        public final static Property Id = new Property(0, Long.class, "id", true, "_id");
+        public final static Property Person_id = new Property(1, Long.class, "person_id", false, "PERSON_ID");
         public final static Property School_name = new Property(2, String.class, "school_name", false, "SCHOOL_NAME");
         public final static Property School_id = new Property(3, String.class, "school_id", false, "SCHOOL_ID");
         public final static Property Year_name = new Property(4, String.class, "year_name", false, "YEAR_NAME");
@@ -45,7 +45,7 @@ public class EducationDao extends AbstractDao<Education, Integer> {
     /** Creates the underlying database table. */
     public static void createTable(SQLiteDatabase db, boolean ifNotExists) {
         String sql = "CREATE TABLE " + (ifNotExists? "IF NOT EXISTS ": "") + "'EDUCATION' (" + //
-                "'_ID' INTEGER PRIMARY KEY ," + // 0: _id
+                "'_id' INTEGER PRIMARY KEY ," + // 0: id
                 "'PERSON_ID' INTEGER," + // 1: person_id
                 "'SCHOOL_NAME' TEXT," + // 2: school_name
                 "'SCHOOL_ID' TEXT," + // 3: school_id
@@ -67,12 +67,12 @@ public class EducationDao extends AbstractDao<Education, Integer> {
     protected void bindValues(SQLiteStatement stmt, Education entity) {
         stmt.clearBindings();
  
-        Integer _id = entity.get_id();
-        if (_id != null) {
-            stmt.bindLong(1, _id);
+        Long id = entity.getId();
+        if (id != null) {
+            stmt.bindLong(1, id);
         }
  
-        Integer person_id = entity.getPerson_id();
+        Long person_id = entity.getPerson_id();
         if (person_id != null) {
             stmt.bindLong(2, person_id);
         }
@@ -110,16 +110,16 @@ public class EducationDao extends AbstractDao<Education, Integer> {
 
     /** @inheritdoc */
     @Override
-    public Integer readKey(Cursor cursor, int offset) {
-        return cursor.isNull(offset + 0) ? null : cursor.getInt(offset + 0);
+    public Long readKey(Cursor cursor, int offset) {
+        return cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0);
     }    
 
     /** @inheritdoc */
     @Override
     public Education readEntity(Cursor cursor, int offset) {
         Education entity = new Education( //
-            cursor.isNull(offset + 0) ? null : cursor.getInt(offset + 0), // _id
-            cursor.isNull(offset + 1) ? null : cursor.getInt(offset + 1), // person_id
+            cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
+            cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1), // person_id
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // school_name
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // school_id
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // year_name
@@ -133,8 +133,8 @@ public class EducationDao extends AbstractDao<Education, Integer> {
     /** @inheritdoc */
     @Override
     public void readEntity(Cursor cursor, Education entity, int offset) {
-        entity.set_id(cursor.isNull(offset + 0) ? null : cursor.getInt(offset + 0));
-        entity.setPerson_id(cursor.isNull(offset + 1) ? null : cursor.getInt(offset + 1));
+        entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
+        entity.setPerson_id(cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1));
         entity.setSchool_name(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setSchool_id(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
         entity.setYear_name(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
@@ -144,16 +144,16 @@ public class EducationDao extends AbstractDao<Education, Integer> {
      }
     
     @Override
-    protected Integer updateKeyAfterInsert(Education entity, long rowId) {
-        // TODO XXX Only Long PKs are supported currently
-        return null;
+    protected Long updateKeyAfterInsert(Education entity, long rowId) {
+        entity.setId(rowId);
+        return rowId;
     }
     
     /** @inheritdoc */
     @Override
-    public Integer getKey(Education entity) {
+    public Long getKey(Education entity) {
         if(entity != null) {
-            return entity.get_id();
+            return entity.getId();
         } else {
             return null;
         }
@@ -166,7 +166,7 @@ public class EducationDao extends AbstractDao<Education, Integer> {
     }
     
     /** Internal query to resolve the "educationList" to-many relationship of Person. */
-    public synchronized List<Education> _queryPerson_EducationList(Integer person_id) {
+    public synchronized List<Education> _queryPerson_EducationList(Long person_id) {
         if (person_EducationListQuery == null) {
             QueryBuilder<Education> queryBuilder = queryBuilder();
             queryBuilder.where(Properties.Person_id.eq(person_id));

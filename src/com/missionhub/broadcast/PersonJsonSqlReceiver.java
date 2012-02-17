@@ -14,31 +14,31 @@ public class PersonJsonSqlReceiver extends MissionHubReceiver {
 		return NOTIFYs;
 	}
 	
-	public void onCreate(int personId) {
+	public void onCreate(long personId) {
 		
 	}
 	
-	public void onUpdate(int personId) {
+	public void onUpdate(long personId) {
 		
 	}
 	
-	public void onDelete(int personId) {
+	public void onDelete(long personId) {
 		
 	}
 	
-	public void onError(int personId, Throwable t) {
+	public void onError(long personId, Throwable t) {
 		
 	}
 
 	@Override public void onReceive(final Context context, final Intent intent) {
 		if (intent.getAction().equals(PersonJsonSqlBroadcast.NOTIFY_PERSON_CREATE)) {
-			onCreate(intent.getIntExtra(MissionHubBroadcast.PREFIX + "personId", -1));
+			onCreate(intent.getLongExtra(MissionHubBroadcast.PREFIX + "personId", -1));
 		} else if (intent.getAction().equals(PersonJsonSqlBroadcast.NOTIFY_PERSON_UPDATE)) {
-			onUpdate(intent.getIntExtra(MissionHubBroadcast.PREFIX + "personId", -1));
+			onUpdate(intent.getLongExtra(MissionHubBroadcast.PREFIX + "personId", -1));
 		} else if (intent.getAction().equals(PersonJsonSqlBroadcast.NOTIFY_PERSON_DELETE)) {
-			onDelete(intent.getIntExtra(MissionHubBroadcast.PREFIX + "personId", -1));
+			onDelete(intent.getLongExtra(MissionHubBroadcast.PREFIX + "personId", -1));
 		} else if (intent.getAction().equals(PersonJsonSqlBroadcast.NOTIFY_PERSON_ERROR)) {
-			onError(intent.getIntExtra(MissionHubBroadcast.PREFIX + "personId", -1), (Throwable) intent.getSerializableExtra(MissionHubBroadcast.PREFIX + "throwable"));
+			onError(intent.getLongExtra(MissionHubBroadcast.PREFIX + "personId", -1), (Throwable) intent.getSerializableExtra(MissionHubBroadcast.PREFIX + "throwable"));
 		}
 	}
 }

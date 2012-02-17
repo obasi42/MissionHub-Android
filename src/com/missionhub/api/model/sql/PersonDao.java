@@ -14,12 +14,12 @@ import com.missionhub.api.model.sql.Person;
 /** 
  * DAO for table PERSON.
 */
-public class PersonDao extends AbstractDao<Person, Integer> {
+public class PersonDao extends AbstractDao<Person, Long> {
 
     public static final String TABLENAME = "PERSON";
 
     public static class Properties {
-        public final static Property _id = new Property(0, int.class, "_id", true, "_ID");
+        public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property Name = new Property(1, String.class, "name", false, "NAME");
         public final static Property Gender = new Property(2, String.class, "gender", false, "GENDER");
         public final static Property Fb_id = new Property(3, String.class, "fb_id", false, "FB_ID");
@@ -49,7 +49,7 @@ public class PersonDao extends AbstractDao<Person, Integer> {
     /** Creates the underlying database table. */
     public static void createTable(SQLiteDatabase db, boolean ifNotExists) {
         String sql = "CREATE TABLE " + (ifNotExists? "IF NOT EXISTS ": "") + "'PERSON' (" + //
-                "'_ID' INTEGER PRIMARY KEY NOT NULL ," + // 0: _id
+                "'_id' INTEGER PRIMARY KEY ," + // 0: id
                 "'NAME' TEXT," + // 1: name
                 "'GENDER' TEXT," + // 2: gender
                 "'FB_ID' TEXT," + // 3: fb_id
@@ -75,7 +75,11 @@ public class PersonDao extends AbstractDao<Person, Integer> {
     @Override
     protected void bindValues(SQLiteStatement stmt, Person entity) {
         stmt.clearBindings();
-        stmt.bindLong(1, entity.get_id());
+ 
+        Long id = entity.getId();
+        if (id != null) {
+            stmt.bindLong(1, id);
+        }
  
         String name = entity.getName();
         if (name != null) {
@@ -146,15 +150,15 @@ public class PersonDao extends AbstractDao<Person, Integer> {
 
     /** @inheritdoc */
     @Override
-    public Integer readKey(Cursor cursor, int offset) {
-        return cursor.getInt(offset + 0);
+    public Long readKey(Cursor cursor, int offset) {
+        return cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0);
     }    
 
     /** @inheritdoc */
     @Override
     public Person readEntity(Cursor cursor, int offset) {
         Person entity = new Person( //
-            cursor.getInt(offset + 0), // _id
+            cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // name
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // gender
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // fb_id
@@ -174,7 +178,7 @@ public class PersonDao extends AbstractDao<Person, Integer> {
     /** @inheritdoc */
     @Override
     public void readEntity(Cursor cursor, Person entity, int offset) {
-        entity.set_id(cursor.getInt(offset + 0));
+        entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setName(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setGender(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setFb_id(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
@@ -190,16 +194,16 @@ public class PersonDao extends AbstractDao<Person, Integer> {
      }
     
     @Override
-    protected Integer updateKeyAfterInsert(Person entity, long rowId) {
-        // TODO XXX Only Long PKs are supported currently
-        return null;
+    protected Long updateKeyAfterInsert(Person entity, long rowId) {
+        entity.setId(rowId);
+        return rowId;
     }
     
     /** @inheritdoc */
     @Override
-    public Integer getKey(Person entity) {
+    public Long getKey(Person entity) {
         if(entity != null) {
-            return entity.get_id();
+            return entity.getId();
         } else {
             return null;
         }

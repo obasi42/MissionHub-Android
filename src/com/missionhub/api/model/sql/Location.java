@@ -6,8 +6,8 @@ package com.missionhub.api.model.sql;
  */
 public class Location {
 
-    private Integer _id;
-    private Integer person_id;
+    private Long id;
+    private Long person_id;
     private String name;
     private String location_id;
     private String provider;
@@ -15,31 +15,31 @@ public class Location {
     public Location() {
     }
 
-    public Location(Integer _id) {
-        this._id = _id;
+    public Location(Long id) {
+        this.id = id;
     }
 
-    public Location(Integer _id, Integer person_id, String name, String location_id, String provider) {
-        this._id = _id;
+    public Location(Long id, Long person_id, String name, String location_id, String provider) {
+        this.id = id;
         this.person_id = person_id;
         this.name = name;
         this.location_id = location_id;
         this.provider = provider;
     }
 
-    public Integer get_id() {
-        return _id;
+    public Long getId() {
+        return id;
     }
 
-    public void set_id(Integer _id) {
-        this._id = _id;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public Integer getPerson_id() {
+    public Long getPerson_id() {
         return person_id;
     }
 
-    public void setPerson_id(Integer person_id) {
+    public void setPerson_id(Long person_id) {
         this.person_id = person_id;
     }
 

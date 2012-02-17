@@ -9,10 +9,10 @@ import de.greenrobot.dao.DaoException;
  */
 public class Answer {
 
-    private Integer _id;
-    private Integer person_id;
-    private Integer organization_id;
-    private Integer question_id;
+    private Long id;
+    private Long person_id;
+    private Long organization_id;
+    private Long question_id;
     private String answer;
 
     /** Used to resolve relations */
@@ -22,18 +22,18 @@ public class Answer {
     private AnswerDao myDao;
 
     private Question question;
-    private Integer question__resolvedKey;
+    private Long question__resolvedKey;
 
 
     public Answer() {
     }
 
-    public Answer(Integer _id) {
-        this._id = _id;
+    public Answer(Long id) {
+        this.id = id;
     }
 
-    public Answer(Integer _id, Integer person_id, Integer organization_id, Integer question_id, String answer) {
-        this._id = _id;
+    public Answer(Long id, Long person_id, Long organization_id, Long question_id, String answer) {
+        this.id = id;
         this.person_id = person_id;
         this.organization_id = organization_id;
         this.question_id = question_id;
@@ -46,35 +46,35 @@ public class Answer {
         myDao = daoSession != null ? daoSession.getAnswerDao() : null;
     }
 
-    public Integer get_id() {
-        return _id;
+    public Long getId() {
+        return id;
     }
 
-    public void set_id(Integer _id) {
-        this._id = _id;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public Integer getPerson_id() {
+    public Long getPerson_id() {
         return person_id;
     }
 
-    public void setPerson_id(Integer person_id) {
+    public void setPerson_id(Long person_id) {
         this.person_id = person_id;
     }
 
-    public Integer getOrganization_id() {
+    public Long getOrganization_id() {
         return organization_id;
     }
 
-    public void setOrganization_id(Integer organization_id) {
+    public void setOrganization_id(Long organization_id) {
         this.organization_id = organization_id;
     }
 
-    public Integer getQuestion_id() {
+    public Long getQuestion_id() {
         return question_id;
     }
 
-    public void setQuestion_id(Integer question_id) {
+    public void setQuestion_id(Long question_id) {
         this.question_id = question_id;
     }
 
@@ -101,7 +101,7 @@ public class Answer {
 
     public void setQuestion(Question question) {
         this.question = question;
-        question_id = question == null ? null : question.get_id();
+        question_id = question == null ? null : question.getId();
         question__resolvedKey = question_id;
     }
 

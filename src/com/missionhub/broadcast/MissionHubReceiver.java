@@ -82,5 +82,11 @@ abstract class MissionHubReceiver extends BroadcastReceiver {
 		}
 		register(intent);
 	}
-
+	
+	/**
+	 * Unregisters the MissionHubReceiver with the LocalBroadcastManager
+	 */
+	public void unregister() {
+		LocalBroadcastManager.getInstance(context).unregisterReceiver(this);
+	}
 }

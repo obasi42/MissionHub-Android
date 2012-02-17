@@ -10,8 +10,8 @@ import de.greenrobot.dao.DaoException;
  */
 public class Question {
 
-    private Integer _id;
-    private Integer keyword_id;
+    private Long id;
+    private Long keyword_id;
     private String label;
     private String kind;
     private String style;
@@ -25,19 +25,19 @@ public class Question {
     private QuestionDao myDao;
 
     private Keyword keyword;
-    private Integer keyword__resolvedKey;
+    private Long keyword__resolvedKey;
 
     private List<Question> questionList;
 
     public Question() {
     }
 
-    public Question(Integer _id) {
-        this._id = _id;
+    public Question(Long id) {
+        this.id = id;
     }
 
-    public Question(Integer _id, Integer keyword_id, String label, String kind, String style, Boolean required, Boolean active) {
-        this._id = _id;
+    public Question(Long id, Long keyword_id, String label, String kind, String style, Boolean required, Boolean active) {
+        this.id = id;
         this.keyword_id = keyword_id;
         this.label = label;
         this.kind = kind;
@@ -52,19 +52,19 @@ public class Question {
         myDao = daoSession != null ? daoSession.getQuestionDao() : null;
     }
 
-    public Integer get_id() {
-        return _id;
+    public Long getId() {
+        return id;
     }
 
-    public void set_id(Integer _id) {
-        this._id = _id;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public Integer getKeyword_id() {
+    public Long getKeyword_id() {
         return keyword_id;
     }
 
-    public void setKeyword_id(Integer keyword_id) {
+    public void setKeyword_id(Long keyword_id) {
         this.keyword_id = keyword_id;
     }
 
@@ -123,7 +123,7 @@ public class Question {
 
     public void setKeyword(Keyword keyword) {
         this.keyword = keyword;
-        keyword_id = keyword == null ? null : keyword.get_id();
+        keyword_id = keyword == null ? null : keyword.getId();
         keyword__resolvedKey = keyword_id;
     }
 
@@ -134,7 +134,7 @@ public class Question {
                 throw new DaoException("Entity is detached from DAO context");
             }
             QuestionDao targetDao = daoSession.getQuestionDao();
-            questionList = targetDao._queryQuestion_QuestionList(_id);
+            questionList = targetDao._queryQuestion_QuestionList(id);
         }
         return questionList;
     }

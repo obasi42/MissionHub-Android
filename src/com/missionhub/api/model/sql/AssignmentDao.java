@@ -17,15 +17,15 @@ import com.missionhub.api.model.sql.Assignment;
 /** 
  * DAO for table ASSIGNMENT.
 */
-public class AssignmentDao extends AbstractDao<Assignment, Integer> {
+public class AssignmentDao extends AbstractDao<Assignment, Long> {
 
     public static final String TABLENAME = "ASSIGNMENT";
 
     public static class Properties {
-        public final static Property _id = new Property(0, Integer.class, "_id", true, "_ID");
-        public final static Property Assigned_to_id = new Property(1, Integer.class, "assigned_to_id", false, "ASSIGNED_TO_ID");
-        public final static Property Person_id = new Property(2, Integer.class, "person_id", false, "PERSON_ID");
-        public final static Property Organization_id = new Property(3, Integer.class, "organization_id", false, "ORGANIZATION_ID");
+        public final static Property Id = new Property(0, Long.class, "id", true, "_id");
+        public final static Property Assigned_to_id = new Property(1, Long.class, "assigned_to_id", false, "ASSIGNED_TO_ID");
+        public final static Property Person_id = new Property(2, Long.class, "person_id", false, "PERSON_ID");
+        public final static Property Organization_id = new Property(3, Long.class, "organization_id", false, "ORGANIZATION_ID");
     };
 
     private Query<Assignment> person_Assigned_contactsQuery;
@@ -42,7 +42,7 @@ public class AssignmentDao extends AbstractDao<Assignment, Integer> {
     /** Creates the underlying database table. */
     public static void createTable(SQLiteDatabase db, boolean ifNotExists) {
         String sql = "CREATE TABLE " + (ifNotExists? "IF NOT EXISTS ": "") + "'ASSIGNMENT' (" + //
-                "'_ID' INTEGER PRIMARY KEY ," + // 0: _id
+                "'_id' INTEGER PRIMARY KEY ," + // 0: id
                 "'ASSIGNED_TO_ID' INTEGER," + // 1: assigned_to_id
                 "'PERSON_ID' INTEGER," + // 2: person_id
                 "'ORGANIZATION_ID' INTEGER);"; // 3: organization_id
@@ -60,22 +60,22 @@ public class AssignmentDao extends AbstractDao<Assignment, Integer> {
     protected void bindValues(SQLiteStatement stmt, Assignment entity) {
         stmt.clearBindings();
  
-        Integer _id = entity.get_id();
-        if (_id != null) {
-            stmt.bindLong(1, _id);
+        Long id = entity.getId();
+        if (id != null) {
+            stmt.bindLong(1, id);
         }
  
-        Integer assigned_to_id = entity.getAssigned_to_id();
+        Long assigned_to_id = entity.getAssigned_to_id();
         if (assigned_to_id != null) {
             stmt.bindLong(2, assigned_to_id);
         }
  
-        Integer person_id = entity.getPerson_id();
+        Long person_id = entity.getPerson_id();
         if (person_id != null) {
             stmt.bindLong(3, person_id);
         }
  
-        Integer organization_id = entity.getOrganization_id();
+        Long organization_id = entity.getOrganization_id();
         if (organization_id != null) {
             stmt.bindLong(4, organization_id);
         }
@@ -83,18 +83,18 @@ public class AssignmentDao extends AbstractDao<Assignment, Integer> {
 
     /** @inheritdoc */
     @Override
-    public Integer readKey(Cursor cursor, int offset) {
-        return cursor.isNull(offset + 0) ? null : cursor.getInt(offset + 0);
+    public Long readKey(Cursor cursor, int offset) {
+        return cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0);
     }    
 
     /** @inheritdoc */
     @Override
     public Assignment readEntity(Cursor cursor, int offset) {
         Assignment entity = new Assignment( //
-            cursor.isNull(offset + 0) ? null : cursor.getInt(offset + 0), // _id
-            cursor.isNull(offset + 1) ? null : cursor.getInt(offset + 1), // assigned_to_id
-            cursor.isNull(offset + 2) ? null : cursor.getInt(offset + 2), // person_id
-            cursor.isNull(offset + 3) ? null : cursor.getInt(offset + 3) // organization_id
+            cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
+            cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1), // assigned_to_id
+            cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2), // person_id
+            cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3) // organization_id
         );
         return entity;
     }
@@ -102,23 +102,23 @@ public class AssignmentDao extends AbstractDao<Assignment, Integer> {
     /** @inheritdoc */
     @Override
     public void readEntity(Cursor cursor, Assignment entity, int offset) {
-        entity.set_id(cursor.isNull(offset + 0) ? null : cursor.getInt(offset + 0));
-        entity.setAssigned_to_id(cursor.isNull(offset + 1) ? null : cursor.getInt(offset + 1));
-        entity.setPerson_id(cursor.isNull(offset + 2) ? null : cursor.getInt(offset + 2));
-        entity.setOrganization_id(cursor.isNull(offset + 3) ? null : cursor.getInt(offset + 3));
+        entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
+        entity.setAssigned_to_id(cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1));
+        entity.setPerson_id(cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2));
+        entity.setOrganization_id(cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3));
      }
     
     @Override
-    protected Integer updateKeyAfterInsert(Assignment entity, long rowId) {
-        // TODO XXX Only Long PKs are supported currently
-        return null;
+    protected Long updateKeyAfterInsert(Assignment entity, long rowId) {
+        entity.setId(rowId);
+        return rowId;
     }
     
     /** @inheritdoc */
     @Override
-    public Integer getKey(Assignment entity) {
+    public Long getKey(Assignment entity) {
         if(entity != null) {
-            return entity.get_id();
+            return entity.getId();
         } else {
             return null;
         }
@@ -131,7 +131,7 @@ public class AssignmentDao extends AbstractDao<Assignment, Integer> {
     }
     
     /** Internal query to resolve the "assigned_contacts" to-many relationship of Person. */
-    public synchronized List<Assignment> _queryPerson_Assigned_contacts(Integer assigned_to_id) {
+    public synchronized List<Assignment> _queryPerson_Assigned_contacts(Long assigned_to_id) {
         if (person_Assigned_contactsQuery == null) {
             QueryBuilder<Assignment> queryBuilder = queryBuilder();
             queryBuilder.where(Properties.Assigned_to_id.eq(assigned_to_id));
@@ -143,7 +143,7 @@ public class AssignmentDao extends AbstractDao<Assignment, Integer> {
     }
 
     /** Internal query to resolve the "assigned_to_contacts" to-many relationship of Person. */
-    public synchronized List<Assignment> _queryPerson_Assigned_to_contacts(Integer person_id) {
+    public synchronized List<Assignment> _queryPerson_Assigned_to_contacts(Long person_id) {
         if (person_Assigned_to_contactsQuery == null) {
             QueryBuilder<Assignment> queryBuilder = queryBuilder();
             queryBuilder.where(Properties.Person_id.eq(person_id));

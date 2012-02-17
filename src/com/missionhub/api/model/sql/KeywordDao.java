@@ -17,13 +17,13 @@ import com.missionhub.api.model.sql.Keyword;
 /** 
  * DAO for table KEYWORD.
 */
-public class KeywordDao extends AbstractDao<Keyword, Integer> {
+public class KeywordDao extends AbstractDao<Keyword, Long> {
 
     public static final String TABLENAME = "KEYWORD";
 
     public static class Properties {
-        public final static Property _id = new Property(0, Integer.class, "_id", true, "_ID");
-        public final static Property Organization_id = new Property(1, Integer.class, "organization_id", false, "ORGANIZATION_ID");
+        public final static Property Id = new Property(0, Long.class, "id", true, "_id");
+        public final static Property Organization_id = new Property(1, Long.class, "organization_id", false, "ORGANIZATION_ID");
         public final static Property Keyword = new Property(2, String.class, "keyword", false, "KEYWORD");
         public final static Property State = new Property(3, String.class, "state", false, "STATE");
     };
@@ -44,7 +44,7 @@ public class KeywordDao extends AbstractDao<Keyword, Integer> {
     /** Creates the underlying database table. */
     public static void createTable(SQLiteDatabase db, boolean ifNotExists) {
         String sql = "CREATE TABLE " + (ifNotExists? "IF NOT EXISTS ": "") + "'KEYWORD' (" + //
-                "'_ID' INTEGER PRIMARY KEY ," + // 0: _id
+                "'_id' INTEGER PRIMARY KEY ," + // 0: id
                 "'ORGANIZATION_ID' INTEGER," + // 1: organization_id
                 "'KEYWORD' TEXT," + // 2: keyword
                 "'STATE' TEXT);"; // 3: state
@@ -62,12 +62,12 @@ public class KeywordDao extends AbstractDao<Keyword, Integer> {
     protected void bindValues(SQLiteStatement stmt, Keyword entity) {
         stmt.clearBindings();
  
-        Integer _id = entity.get_id();
-        if (_id != null) {
-            stmt.bindLong(1, _id);
+        Long id = entity.getId();
+        if (id != null) {
+            stmt.bindLong(1, id);
         }
  
-        Integer organization_id = entity.getOrganization_id();
+        Long organization_id = entity.getOrganization_id();
         if (organization_id != null) {
             stmt.bindLong(2, organization_id);
         }
@@ -91,16 +91,16 @@ public class KeywordDao extends AbstractDao<Keyword, Integer> {
 
     /** @inheritdoc */
     @Override
-    public Integer readKey(Cursor cursor, int offset) {
-        return cursor.isNull(offset + 0) ? null : cursor.getInt(offset + 0);
+    public Long readKey(Cursor cursor, int offset) {
+        return cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0);
     }    
 
     /** @inheritdoc */
     @Override
     public Keyword readEntity(Cursor cursor, int offset) {
         Keyword entity = new Keyword( //
-            cursor.isNull(offset + 0) ? null : cursor.getInt(offset + 0), // _id
-            cursor.isNull(offset + 1) ? null : cursor.getInt(offset + 1), // organization_id
+            cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
+            cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1), // organization_id
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // keyword
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3) // state
         );
@@ -110,23 +110,23 @@ public class KeywordDao extends AbstractDao<Keyword, Integer> {
     /** @inheritdoc */
     @Override
     public void readEntity(Cursor cursor, Keyword entity, int offset) {
-        entity.set_id(cursor.isNull(offset + 0) ? null : cursor.getInt(offset + 0));
-        entity.setOrganization_id(cursor.isNull(offset + 1) ? null : cursor.getInt(offset + 1));
+        entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
+        entity.setOrganization_id(cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1));
         entity.setKeyword(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setState(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
      }
     
     @Override
-    protected Integer updateKeyAfterInsert(Keyword entity, long rowId) {
-        // TODO XXX Only Long PKs are supported currently
-        return null;
+    protected Long updateKeyAfterInsert(Keyword entity, long rowId) {
+        entity.setId(rowId);
+        return rowId;
     }
     
     /** @inheritdoc */
     @Override
-    public Integer getKey(Keyword entity) {
+    public Long getKey(Keyword entity) {
         if(entity != null) {
-            return entity.get_id();
+            return entity.getId();
         } else {
             return null;
         }
@@ -139,7 +139,7 @@ public class KeywordDao extends AbstractDao<Keyword, Integer> {
     }
     
     /** Internal query to resolve the "keywordList" to-many relationship of Organization. */
-    public synchronized List<Keyword> _queryOrganization_KeywordList(Integer organization_id) {
+    public synchronized List<Keyword> _queryOrganization_KeywordList(Long organization_id) {
         if (organization_KeywordListQuery == null) {
             QueryBuilder<Keyword> queryBuilder = queryBuilder();
             queryBuilder.where(Properties.Organization_id.eq(organization_id));

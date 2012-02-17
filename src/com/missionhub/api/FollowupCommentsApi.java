@@ -32,7 +32,7 @@ public class FollowupCommentsApi {
 	 * @param apiHandler
 	 * @return
 	 */
-	public static ApiRequest get(final Context context, final int personId, final ApiHandler apiHandler) {
+	public static ApiRequest get(final Context context, final long personId, final ApiHandler apiHandler) {
 		return get(context, personId, -1, -1, apiHandler);
 	}
 
@@ -46,7 +46,7 @@ public class FollowupCommentsApi {
 	 * @param apiHandler
 	 * @return
 	 */
-	public static ApiRequest get(final Context context, final int personId, final int since, final int until, final ApiHandler apiHandler) {
+	public static ApiRequest get(final Context context, final long personId, final int since, final int until, final ApiHandler apiHandler) {
 		final ApiClient client = new ApiClient();
 		final String url = ApiHelper.getAbsoluteUrl("followup_comments", String.valueOf(personId));
 		final HttpHeaders headers = ApiHelper.getDefaultHeaders(context);
@@ -102,7 +102,7 @@ public class FollowupCommentsApi {
 	 * @param apiHandler
 	 * @return
 	 */
-	public static ApiRequest delete(final Context context, final List<Integer> commentIds, final ApiHandler apiHandler) {
+	public static ApiRequest delete(final Context context, final List<Long> commentIds, final ApiHandler apiHandler) {
 		final ApiClient client = new ApiClient();
 		final String url = ApiHelper.getAbsoluteUrl("followup_comments", ApiHelper.toList(commentIds));
 		final HttpHeaders headers = ApiHelper.getDefaultHeaders(context);
@@ -116,18 +116,18 @@ public class FollowupCommentsApi {
 	 */
 	public static class Comment {
 
-		private final int personId;
+		private final long personId;
 		private final int commenterId;
 		private final int organizationId;
 		private final String status;
 		private final String comment;
 		private final List<Rejoicable> rejoicables;
 
-		public Comment(final int personId, final int commenterId, final int organizationId, final String status, final String comment) {
+		public Comment(final long personId, final int commenterId, final int organizationId, final String status, final String comment) {
 			this(personId, commenterId, organizationId, status, comment, new ArrayList<Rejoicable>());
 		}
 
-		public Comment(final int personId, final int commenterId, final int organizationId, final String status, final String comment, final ArrayList<Rejoicable> rejoicables) {
+		public Comment(final long personId, final int commenterId, final int organizationId, final String status, final String comment, final ArrayList<Rejoicable> rejoicables) {
 			this.personId = personId;
 			this.commenterId = commenterId;
 			this.organizationId = organizationId;

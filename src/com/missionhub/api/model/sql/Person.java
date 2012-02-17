@@ -10,7 +10,7 @@ import de.greenrobot.dao.DaoException;
  */
 public class Person {
 
-    private int _id;
+    private Long id;
     private String name;
     private String gender;
     private String fb_id;
@@ -43,12 +43,12 @@ public class Person {
     public Person() {
     }
 
-    public Person(int _id) {
-        this._id = _id;
+    public Person(Long id) {
+        this.id = id;
     }
 
-    public Person(int _id, String name, String gender, String fb_id, String picture, String status, String first_name, String last_name, String phone_number, String email_address, String birthday, String locale, String num_contacts) {
-        this._id = _id;
+    public Person(Long id, String name, String gender, String fb_id, String picture, String status, String first_name, String last_name, String phone_number, String email_address, String birthday, String locale, String num_contacts) {
+        this.id = id;
         this.name = name;
         this.gender = gender;
         this.fb_id = fb_id;
@@ -69,12 +69,12 @@ public class Person {
         myDao = daoSession != null ? daoSession.getPersonDao() : null;
     }
 
-    public int get_id() {
-        return _id;
+    public Long getId() {
+        return id;
     }
 
-    public void set_id(int _id) {
-        this._id = _id;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -180,7 +180,7 @@ public class Person {
                 throw new DaoException("Entity is detached from DAO context");
             }
             AssignmentDao targetDao = daoSession.getAssignmentDao();
-            assigned_contacts = targetDao._queryPerson_Assigned_contacts(_id);
+            assigned_contacts = targetDao._queryPerson_Assigned_contacts(id);
         }
         return assigned_contacts;
     }
@@ -197,7 +197,7 @@ public class Person {
                 throw new DaoException("Entity is detached from DAO context");
             }
             AssignmentDao targetDao = daoSession.getAssignmentDao();
-            assigned_to_contacts = targetDao._queryPerson_Assigned_to_contacts(_id);
+            assigned_to_contacts = targetDao._queryPerson_Assigned_to_contacts(id);
         }
         return assigned_to_contacts;
     }
@@ -214,7 +214,7 @@ public class Person {
                 throw new DaoException("Entity is detached from DAO context");
             }
             InterestDao targetDao = daoSession.getInterestDao();
-            interestList = targetDao._queryPerson_InterestList(_id);
+            interestList = targetDao._queryPerson_InterestList(id);
         }
         return interestList;
     }
@@ -231,7 +231,7 @@ public class Person {
                 throw new DaoException("Entity is detached from DAO context");
             }
             EducationDao targetDao = daoSession.getEducationDao();
-            educationList = targetDao._queryPerson_EducationList(_id);
+            educationList = targetDao._queryPerson_EducationList(id);
         }
         return educationList;
     }
@@ -248,7 +248,7 @@ public class Person {
                 throw new DaoException("Entity is detached from DAO context");
             }
             LocationDao targetDao = daoSession.getLocationDao();
-            locationList = targetDao._queryPerson_LocationList(_id);
+            locationList = targetDao._queryPerson_LocationList(id);
         }
         return locationList;
     }
@@ -265,7 +265,7 @@ public class Person {
                 throw new DaoException("Entity is detached from DAO context");
             }
             OrganizationalRoleDao targetDao = daoSession.getOrganizationalRoleDao();
-            organizationalRoleList = targetDao._queryPerson_OrganizationalRoleList(_id);
+            organizationalRoleList = targetDao._queryPerson_OrganizationalRoleList(id);
         }
         return organizationalRoleList;
     }
@@ -282,7 +282,7 @@ public class Person {
                 throw new DaoException("Entity is detached from DAO context");
             }
             FollowupCommentDao targetDao = daoSession.getFollowupCommentDao();
-            followup_comments = targetDao._queryPerson_Followup_comments(_id);
+            followup_comments = targetDao._queryPerson_Followup_comments(id);
         }
         return followup_comments;
     }
@@ -299,7 +299,7 @@ public class Person {
                 throw new DaoException("Entity is detached from DAO context");
             }
             FollowupCommentDao targetDao = daoSession.getFollowupCommentDao();
-            posted_comments = targetDao._queryPerson_Posted_comments(_id);
+            posted_comments = targetDao._queryPerson_Posted_comments(id);
         }
         return posted_comments;
     }
@@ -316,7 +316,7 @@ public class Person {
                 throw new DaoException("Entity is detached from DAO context");
             }
             AnswerDao targetDao = daoSession.getAnswerDao();
-            answerList = targetDao._queryPerson_AnswerList(_id);
+            answerList = targetDao._queryPerson_AnswerList(id);
         }
         return answerList;
     }

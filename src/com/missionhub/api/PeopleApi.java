@@ -27,7 +27,7 @@ public class PeopleApi {
 	 * @param apiHandler
 	 * @return
 	 */
-	public static ApiRequest get(final Context context, final int personId, final ApiHandler apiHandler) {
+	public static ApiRequest get(final Context context, final long personId, final ApiHandler apiHandler) {
 		final ApiClient client = new ApiClient();
 		final String url = ApiHelper.getAbsoluteUrl("people", String.valueOf(personId));
 		final HttpHeaders headers = ApiHelper.getDefaultHeaders(context);
@@ -43,7 +43,7 @@ public class PeopleApi {
 	 * @param apiHandler
 	 * @return
 	 */
-	public static ApiRequest get(final Context context, final List<Integer> personIds, final ApiHandler apiHandler) {
+	public static ApiRequest get(final Context context, final List<Long> personIds, final ApiHandler apiHandler) {
 		final ApiClient client = new ApiClient();
 		final String url = ApiHelper.getAbsoluteUrl("people", ApiHelper.toList(personIds));
 		final HttpHeaders headers = ApiHelper.getDefaultHeaders(context);

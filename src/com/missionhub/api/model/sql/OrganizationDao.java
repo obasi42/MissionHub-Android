@@ -17,15 +17,15 @@ import com.missionhub.api.model.sql.Organization;
 /** 
  * DAO for table ORGANIZATION.
 */
-public class OrganizationDao extends AbstractDao<Organization, Integer> {
+public class OrganizationDao extends AbstractDao<Organization, Long> {
 
     public static final String TABLENAME = "ORGANIZATION";
 
     public static class Properties {
-        public final static Property _id = new Property(0, Integer.class, "_id", true, "_ID");
+        public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property Name = new Property(1, String.class, "name", false, "NAME");
         public final static Property Ancestry = new Property(2, String.class, "ancestry", false, "ANCESTRY");
-        public final static Property Organization_id = new Property(3, Integer.class, "organization_id", false, "ORGANIZATION_ID");
+        public final static Property Organization_id = new Property(3, Long.class, "organization_id", false, "ORGANIZATION_ID");
     };
 
     private DaoSession daoSession;
@@ -44,7 +44,7 @@ public class OrganizationDao extends AbstractDao<Organization, Integer> {
     /** Creates the underlying database table. */
     public static void createTable(SQLiteDatabase db, boolean ifNotExists) {
         String sql = "CREATE TABLE " + (ifNotExists? "IF NOT EXISTS ": "") + "'ORGANIZATION' (" + //
-                "'_ID' INTEGER PRIMARY KEY ," + // 0: _id
+                "'_id' INTEGER PRIMARY KEY ," + // 0: id
                 "'NAME' TEXT," + // 1: name
                 "'ANCESTRY' TEXT," + // 2: ancestry
                 "'ORGANIZATION_ID' INTEGER);"; // 3: organization_id
@@ -62,9 +62,9 @@ public class OrganizationDao extends AbstractDao<Organization, Integer> {
     protected void bindValues(SQLiteStatement stmt, Organization entity) {
         stmt.clearBindings();
  
-        Integer _id = entity.get_id();
-        if (_id != null) {
-            stmt.bindLong(1, _id);
+        Long id = entity.getId();
+        if (id != null) {
+            stmt.bindLong(1, id);
         }
  
         String name = entity.getName();
@@ -86,15 +86,15 @@ public class OrganizationDao extends AbstractDao<Organization, Integer> {
 
     /** @inheritdoc */
     @Override
-    public Integer readKey(Cursor cursor, int offset) {
-        return cursor.isNull(offset + 0) ? null : cursor.getInt(offset + 0);
+    public Long readKey(Cursor cursor, int offset) {
+        return cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0);
     }    
 
     /** @inheritdoc */
     @Override
     public Organization readEntity(Cursor cursor, int offset) {
         Organization entity = new Organization( //
-            cursor.isNull(offset + 0) ? null : cursor.getInt(offset + 0), // _id
+            cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // name
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2) // ancestry
         );
@@ -104,22 +104,22 @@ public class OrganizationDao extends AbstractDao<Organization, Integer> {
     /** @inheritdoc */
     @Override
     public void readEntity(Cursor cursor, Organization entity, int offset) {
-        entity.set_id(cursor.isNull(offset + 0) ? null : cursor.getInt(offset + 0));
+        entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setName(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setAncestry(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
      }
     
     @Override
-    protected Integer updateKeyAfterInsert(Organization entity, long rowId) {
-        // TODO XXX Only Long PKs are supported currently
-        return null;
+    protected Long updateKeyAfterInsert(Organization entity, long rowId) {
+        entity.setId(rowId);
+        return rowId;
     }
     
     /** @inheritdoc */
     @Override
-    public Integer getKey(Organization entity) {
+    public Long getKey(Organization entity) {
         if(entity != null) {
-            return entity.get_id();
+            return entity.getId();
         } else {
             return null;
         }
@@ -132,7 +132,7 @@ public class OrganizationDao extends AbstractDao<Organization, Integer> {
     }
     
     /** Internal query to resolve the "organizationList" to-many relationship of Organization. */
-    public synchronized List<Organization> _queryOrganization_OrganizationList(Integer organization_id) {
+    public synchronized List<Organization> _queryOrganization_OrganizationList(Long organization_id) {
         if (organization_OrganizationListQuery == null) {
             QueryBuilder<Organization> queryBuilder = queryBuilder();
             queryBuilder.where(Properties.Organization_id.eq(organization_id));

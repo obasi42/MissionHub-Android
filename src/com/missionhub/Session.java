@@ -23,10 +23,10 @@ public class Session {
 	private String accessToken = "";
 
 	/** users's person id */
-	private int personId = -1;
+	private long personId = -1l;
 
 	/** user's current organization */
-	private int organizationId = -1;
+	private long organizationId = -1l;
 
 	/** current user */
 	private User user;
@@ -79,8 +79,8 @@ public class Session {
 	 * @return true if resume data is available
 	 */
 	public synchronized boolean resumeSession(final boolean verifySession) {
-		final int userId = Preferences.getUserID(application);
-		final int organizationId = Preferences.getOrganizationID(application);
+		final long userId = Preferences.getUserID(application);
+		final long organizationId = Preferences.getOrganizationID(application);
 		final String accessToken = Preferences.getAccessToken(application);
 
 		if (accessToken != null && accessToken.trim().length() > 0) {
@@ -156,7 +156,7 @@ public class Session {
 	 * 
 	 * @return
 	 */
-	public synchronized int getPersonId() {
+	public synchronized long getPersonId() {
 		return personId;
 	}
 
@@ -165,7 +165,7 @@ public class Session {
 	 * 
 	 * @param personId
 	 */
-	public synchronized void setPersonId(final int personId) {
+	public synchronized void setPersonId(final long personId) {
 		this.personId = personId;
 	}
 
@@ -174,7 +174,7 @@ public class Session {
 	 * 
 	 * @return
 	 */
-	public synchronized int getOrganizationId() {
+	public synchronized long getOrganizationId() {
 		return organizationId;
 	}
 
@@ -183,7 +183,7 @@ public class Session {
 	 * 
 	 * @param organizationId
 	 */
-	public synchronized void setOrganizationId(final int organizationId) {
+	public synchronized void setOrganizationId(final long organizationId) {
 		this.organizationId = organizationId;
 	}
 

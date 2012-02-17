@@ -1,12 +1,12 @@
 package com.missionhub.api.model;
 
 public class GOrgGeneric {
-	private int org_id;
+	private Long org_id;
 	private String name;
 	private String primary;
 	private String role;
 
-	public int getOrg_id() {
+	public Long getOrg_id() {
 		return org_id;
 	}
 
@@ -22,7 +22,7 @@ public class GOrgGeneric {
 		return role;
 	}
 
-	public void setOrg_id(final int i) {
+	public void setOrg_id(final Long i) {
 		org_id = i;
 	}
 

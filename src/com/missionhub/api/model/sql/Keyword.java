@@ -10,8 +10,8 @@ import de.greenrobot.dao.DaoException;
  */
 public class Keyword {
 
-    private Integer _id;
-    private Integer organization_id;
+    private Long id;
+    private Long organization_id;
     private String keyword;
     private String state;
 
@@ -26,12 +26,12 @@ public class Keyword {
     public Keyword() {
     }
 
-    public Keyword(Integer _id) {
-        this._id = _id;
+    public Keyword(Long id) {
+        this.id = id;
     }
 
-    public Keyword(Integer _id, Integer organization_id, String keyword, String state) {
-        this._id = _id;
+    public Keyword(Long id, Long organization_id, String keyword, String state) {
+        this.id = id;
         this.organization_id = organization_id;
         this.keyword = keyword;
         this.state = state;
@@ -43,19 +43,19 @@ public class Keyword {
         myDao = daoSession != null ? daoSession.getKeywordDao() : null;
     }
 
-    public Integer get_id() {
-        return _id;
+    public Long getId() {
+        return id;
     }
 
-    public void set_id(Integer _id) {
-        this._id = _id;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public Integer getOrganization_id() {
+    public Long getOrganization_id() {
         return organization_id;
     }
 
-    public void setOrganization_id(Integer organization_id) {
+    public void setOrganization_id(Long organization_id) {
         this.organization_id = organization_id;
     }
 
@@ -82,7 +82,7 @@ public class Keyword {
                 throw new DaoException("Entity is detached from DAO context");
             }
             QuestionDao targetDao = daoSession.getQuestionDao();
-            questions = targetDao._queryKeyword_Questions(_id);
+            questions = targetDao._queryKeyword_Questions(id);
         }
         return questions;
     }

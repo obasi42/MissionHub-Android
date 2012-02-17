@@ -14,13 +14,13 @@ import com.missionhub.api.model.sql.QuestionChoice;
 /** 
  * DAO for table QUESTION_CHOICE.
 */
-public class QuestionChoiceDao extends AbstractDao<QuestionChoice, Integer> {
+public class QuestionChoiceDao extends AbstractDao<QuestionChoice, Long> {
 
     public static final String TABLENAME = "QUESTION_CHOICE";
 
     public static class Properties {
-        public final static Property _id = new Property(0, Integer.class, "_id", true, "_ID");
-        public final static Property Question_id = new Property(1, Integer.class, "question_id", false, "QUESTION_ID");
+        public final static Property Id = new Property(0, Long.class, "id", true, "_id");
+        public final static Property Question_id = new Property(1, Long.class, "question_id", false, "QUESTION_ID");
         public final static Property Choice = new Property(2, String.class, "choice", false, "CHOICE");
     };
 
@@ -36,7 +36,7 @@ public class QuestionChoiceDao extends AbstractDao<QuestionChoice, Integer> {
     /** Creates the underlying database table. */
     public static void createTable(SQLiteDatabase db, boolean ifNotExists) {
         String sql = "CREATE TABLE " + (ifNotExists? "IF NOT EXISTS ": "") + "'QUESTION_CHOICE' (" + //
-                "'_ID' INTEGER PRIMARY KEY ," + // 0: _id
+                "'_id' INTEGER PRIMARY KEY ," + // 0: id
                 "'QUESTION_ID' INTEGER," + // 1: question_id
                 "'CHOICE' TEXT);"; // 2: choice
         db.execSQL(sql);
@@ -53,12 +53,12 @@ public class QuestionChoiceDao extends AbstractDao<QuestionChoice, Integer> {
     protected void bindValues(SQLiteStatement stmt, QuestionChoice entity) {
         stmt.clearBindings();
  
-        Integer _id = entity.get_id();
-        if (_id != null) {
-            stmt.bindLong(1, _id);
+        Long id = entity.getId();
+        if (id != null) {
+            stmt.bindLong(1, id);
         }
  
-        Integer question_id = entity.getQuestion_id();
+        Long question_id = entity.getQuestion_id();
         if (question_id != null) {
             stmt.bindLong(2, question_id);
         }
@@ -71,16 +71,16 @@ public class QuestionChoiceDao extends AbstractDao<QuestionChoice, Integer> {
 
     /** @inheritdoc */
     @Override
-    public Integer readKey(Cursor cursor, int offset) {
-        return cursor.isNull(offset + 0) ? null : cursor.getInt(offset + 0);
+    public Long readKey(Cursor cursor, int offset) {
+        return cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0);
     }    
 
     /** @inheritdoc */
     @Override
     public QuestionChoice readEntity(Cursor cursor, int offset) {
         QuestionChoice entity = new QuestionChoice( //
-            cursor.isNull(offset + 0) ? null : cursor.getInt(offset + 0), // _id
-            cursor.isNull(offset + 1) ? null : cursor.getInt(offset + 1), // question_id
+            cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
+            cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1), // question_id
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2) // choice
         );
         return entity;
@@ -89,22 +89,22 @@ public class QuestionChoiceDao extends AbstractDao<QuestionChoice, Integer> {
     /** @inheritdoc */
     @Override
     public void readEntity(Cursor cursor, QuestionChoice entity, int offset) {
-        entity.set_id(cursor.isNull(offset + 0) ? null : cursor.getInt(offset + 0));
-        entity.setQuestion_id(cursor.isNull(offset + 1) ? null : cursor.getInt(offset + 1));
+        entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
+        entity.setQuestion_id(cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1));
         entity.setChoice(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
      }
     
     @Override
-    protected Integer updateKeyAfterInsert(QuestionChoice entity, long rowId) {
-        // TODO XXX Only Long PKs are supported currently
-        return null;
+    protected Long updateKeyAfterInsert(QuestionChoice entity, long rowId) {
+        entity.setId(rowId);
+        return rowId;
     }
     
     /** @inheritdoc */
     @Override
-    public Integer getKey(QuestionChoice entity) {
+    public Long getKey(QuestionChoice entity) {
         if(entity != null) {
-            return entity.get_id();
+            return entity.getId();
         } else {
             return null;
         }

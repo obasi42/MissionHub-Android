@@ -17,15 +17,15 @@ import com.missionhub.api.model.sql.FollowupComment;
 /** 
  * DAO for table FOLLOWUP_COMMENT.
 */
-public class FollowupCommentDao extends AbstractDao<FollowupComment, Integer> {
+public class FollowupCommentDao extends AbstractDao<FollowupComment, Long> {
 
     public static final String TABLENAME = "FOLLOWUP_COMMENT";
 
     public static class Properties {
-        public final static Property _id = new Property(0, Integer.class, "_id", true, "_ID");
-        public final static Property Contact_id = new Property(1, Integer.class, "contact_id", false, "CONTACT_ID");
-        public final static Property Commenter_id = new Property(2, Integer.class, "commenter_id", false, "COMMENTER_ID");
-        public final static Property Organization_id = new Property(3, Integer.class, "organization_id", false, "ORGANIZATION_ID");
+        public final static Property Id = new Property(0, Long.class, "id", true, "_id");
+        public final static Property Contact_id = new Property(1, Long.class, "contact_id", false, "CONTACT_ID");
+        public final static Property Commenter_id = new Property(2, Long.class, "commenter_id", false, "COMMENTER_ID");
+        public final static Property Organization_id = new Property(3, Long.class, "organization_id", false, "ORGANIZATION_ID");
         public final static Property Comment = new Property(4, String.class, "comment", false, "COMMENT");
         public final static Property Status = new Property(5, String.class, "status", false, "STATUS");
         public final static Property Created_at = new Property(6, java.util.Date.class, "created_at", false, "CREATED_AT");
@@ -50,7 +50,7 @@ public class FollowupCommentDao extends AbstractDao<FollowupComment, Integer> {
     /** Creates the underlying database table. */
     public static void createTable(SQLiteDatabase db, boolean ifNotExists) {
         String sql = "CREATE TABLE " + (ifNotExists? "IF NOT EXISTS ": "") + "'FOLLOWUP_COMMENT' (" + //
-                "'_ID' INTEGER PRIMARY KEY ," + // 0: _id
+                "'_id' INTEGER PRIMARY KEY ," + // 0: id
                 "'CONTACT_ID' INTEGER," + // 1: contact_id
                 "'COMMENTER_ID' INTEGER," + // 2: commenter_id
                 "'ORGANIZATION_ID' INTEGER," + // 3: organization_id
@@ -73,22 +73,22 @@ public class FollowupCommentDao extends AbstractDao<FollowupComment, Integer> {
     protected void bindValues(SQLiteStatement stmt, FollowupComment entity) {
         stmt.clearBindings();
  
-        Integer _id = entity.get_id();
-        if (_id != null) {
-            stmt.bindLong(1, _id);
+        Long id = entity.getId();
+        if (id != null) {
+            stmt.bindLong(1, id);
         }
  
-        Integer contact_id = entity.getContact_id();
+        Long contact_id = entity.getContact_id();
         if (contact_id != null) {
             stmt.bindLong(2, contact_id);
         }
  
-        Integer commenter_id = entity.getCommenter_id();
+        Long commenter_id = entity.getCommenter_id();
         if (commenter_id != null) {
             stmt.bindLong(3, commenter_id);
         }
  
-        Integer organization_id = entity.getOrganization_id();
+        Long organization_id = entity.getOrganization_id();
         if (organization_id != null) {
             stmt.bindLong(4, organization_id);
         }
@@ -127,18 +127,18 @@ public class FollowupCommentDao extends AbstractDao<FollowupComment, Integer> {
 
     /** @inheritdoc */
     @Override
-    public Integer readKey(Cursor cursor, int offset) {
-        return cursor.isNull(offset + 0) ? null : cursor.getInt(offset + 0);
+    public Long readKey(Cursor cursor, int offset) {
+        return cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0);
     }    
 
     /** @inheritdoc */
     @Override
     public FollowupComment readEntity(Cursor cursor, int offset) {
         FollowupComment entity = new FollowupComment( //
-            cursor.isNull(offset + 0) ? null : cursor.getInt(offset + 0), // _id
-            cursor.isNull(offset + 1) ? null : cursor.getInt(offset + 1), // contact_id
-            cursor.isNull(offset + 2) ? null : cursor.getInt(offset + 2), // commenter_id
-            cursor.isNull(offset + 3) ? null : cursor.getInt(offset + 3), // organization_id
+            cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
+            cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1), // contact_id
+            cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2), // commenter_id
+            cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3), // organization_id
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // comment
             cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // status
             cursor.isNull(offset + 6) ? null : new java.util.Date(cursor.getLong(offset + 6)), // created_at
@@ -151,10 +151,10 @@ public class FollowupCommentDao extends AbstractDao<FollowupComment, Integer> {
     /** @inheritdoc */
     @Override
     public void readEntity(Cursor cursor, FollowupComment entity, int offset) {
-        entity.set_id(cursor.isNull(offset + 0) ? null : cursor.getInt(offset + 0));
-        entity.setContact_id(cursor.isNull(offset + 1) ? null : cursor.getInt(offset + 1));
-        entity.setCommenter_id(cursor.isNull(offset + 2) ? null : cursor.getInt(offset + 2));
-        entity.setOrganization_id(cursor.isNull(offset + 3) ? null : cursor.getInt(offset + 3));
+        entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
+        entity.setContact_id(cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1));
+        entity.setCommenter_id(cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2));
+        entity.setOrganization_id(cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3));
         entity.setComment(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
         entity.setStatus(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
         entity.setCreated_at(cursor.isNull(offset + 6) ? null : new java.util.Date(cursor.getLong(offset + 6)));
@@ -163,16 +163,16 @@ public class FollowupCommentDao extends AbstractDao<FollowupComment, Integer> {
      }
     
     @Override
-    protected Integer updateKeyAfterInsert(FollowupComment entity, long rowId) {
-        // TODO XXX Only Long PKs are supported currently
-        return null;
+    protected Long updateKeyAfterInsert(FollowupComment entity, long rowId) {
+        entity.setId(rowId);
+        return rowId;
     }
     
     /** @inheritdoc */
     @Override
-    public Integer getKey(FollowupComment entity) {
+    public Long getKey(FollowupComment entity) {
         if(entity != null) {
-            return entity.get_id();
+            return entity.getId();
         } else {
             return null;
         }
@@ -185,7 +185,7 @@ public class FollowupCommentDao extends AbstractDao<FollowupComment, Integer> {
     }
     
     /** Internal query to resolve the "followup_comments" to-many relationship of Person. */
-    public synchronized List<FollowupComment> _queryPerson_Followup_comments(Integer contact_id) {
+    public synchronized List<FollowupComment> _queryPerson_Followup_comments(Long contact_id) {
         if (person_Followup_commentsQuery == null) {
             QueryBuilder<FollowupComment> queryBuilder = queryBuilder();
             queryBuilder.where(Properties.Contact_id.eq(contact_id));
@@ -197,7 +197,7 @@ public class FollowupCommentDao extends AbstractDao<FollowupComment, Integer> {
     }
 
     /** Internal query to resolve the "posted_comments" to-many relationship of Person. */
-    public synchronized List<FollowupComment> _queryPerson_Posted_comments(Integer commenter_id) {
+    public synchronized List<FollowupComment> _queryPerson_Posted_comments(Long commenter_id) {
         if (person_Posted_commentsQuery == null) {
             QueryBuilder<FollowupComment> queryBuilder = queryBuilder();
             queryBuilder.where(Properties.Commenter_id.eq(commenter_id));

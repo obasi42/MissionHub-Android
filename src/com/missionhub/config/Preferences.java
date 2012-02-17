@@ -49,9 +49,9 @@ public class Preferences {
 	 * @param context
 	 * @return the org id or -1
 	 */
-	public static synchronized int getOrganizationID(final Context context) {
+	public static synchronized long getOrganizationID(final Context context) {
 		final SharedPreferences settings = context.getSharedPreferences(PREFS_NAME, 0);
-		return settings.getInt("organizationID", -1);
+		return settings.getLong("organizationID", -1);
 	}
 
 	/**
@@ -60,10 +60,10 @@ public class Preferences {
 	 * @param context
 	 * @param organizationID
 	 */
-	public static synchronized void setOrganizationID(final Context context, final int organizationID) {
+	public static synchronized void setOrganizationID(final Context context, final long organizationID) {
 		final SharedPreferences settings = context.getSharedPreferences(PREFS_NAME, 0);
 		final SharedPreferences.Editor editor = settings.edit();
-		editor.putInt("organizationID", organizationID);
+		editor.putLong("organizationID", organizationID);
 		editor.commit();
 	}
 
@@ -85,9 +85,9 @@ public class Preferences {
 	 * @param context
 	 * @return the org id or -1
 	 */
-	public static synchronized int getUserID(final Context context) {
+	public static synchronized long getUserID(final Context context) {
 		final SharedPreferences settings = context.getSharedPreferences(PREFS_NAME, 0);
-		return settings.getInt("userID", -1);
+		return settings.getLong("userID", -1);
 	}
 
 	/**
@@ -96,10 +96,10 @@ public class Preferences {
 	 * @param context
 	 * @param organizationID
 	 */
-	public static synchronized void setUserID(final Context context, final int organizationID) {
+	public static synchronized void setUserID(final Context context, final long organizationID) {
 		final SharedPreferences settings = context.getSharedPreferences(PREFS_NAME, 0);
 		final SharedPreferences.Editor editor = settings.edit();
-		editor.putInt("userID", organizationID);
+		editor.putLong("userID", organizationID);
 		editor.commit();
 	}
 

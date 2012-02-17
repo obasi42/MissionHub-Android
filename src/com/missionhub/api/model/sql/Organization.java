@@ -10,7 +10,7 @@ import de.greenrobot.dao.DaoException;
  */
 public class Organization {
 
-    private Integer _id;
+    private Long id;
     private String name;
     private String ancestry;
 
@@ -27,12 +27,12 @@ public class Organization {
     public Organization() {
     }
 
-    public Organization(Integer _id) {
-        this._id = _id;
+    public Organization(Long id) {
+        this.id = id;
     }
 
-    public Organization(Integer _id, String name, String ancestry) {
-        this._id = _id;
+    public Organization(Long id, String name, String ancestry) {
+        this.id = id;
         this.name = name;
         this.ancestry = ancestry;
     }
@@ -43,12 +43,12 @@ public class Organization {
         myDao = daoSession != null ? daoSession.getOrganizationDao() : null;
     }
 
-    public Integer get_id() {
-        return _id;
+    public Long getId() {
+        return id;
     }
 
-    public void set_id(Integer _id) {
-        this._id = _id;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -74,7 +74,7 @@ public class Organization {
                 throw new DaoException("Entity is detached from DAO context");
             }
             OrganizationDao targetDao = daoSession.getOrganizationDao();
-            organizationList = targetDao._queryOrganization_OrganizationList(_id);
+            organizationList = targetDao._queryOrganization_OrganizationList(id);
         }
         return organizationList;
     }
@@ -91,7 +91,7 @@ public class Organization {
                 throw new DaoException("Entity is detached from DAO context");
             }
             KeywordDao targetDao = daoSession.getKeywordDao();
-            keywordList = targetDao._queryOrganization_KeywordList(_id);
+            keywordList = targetDao._queryOrganization_KeywordList(id);
         }
         return keywordList;
     }
@@ -108,7 +108,7 @@ public class Organization {
                 throw new DaoException("Entity is detached from DAO context");
             }
             AnswerDao targetDao = daoSession.getAnswerDao();
-            answerList = targetDao._queryOrganization_AnswerList(_id);
+            answerList = targetDao._queryOrganization_AnswerList(id);
         }
         return answerList;
     }

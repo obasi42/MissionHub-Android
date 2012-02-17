@@ -22,7 +22,7 @@ public class RolesApi {
 	 * @param responseHandler
 	 * @return
 	 */
-	public static ApiRequest update(final Context context, final int personId, final int organizationId, final String role, final ApiHandler apiHandler) {
+	public static ApiRequest update(final Context context, final long personId, final int organizationId, final String role, final ApiHandler apiHandler) {
 		final ApiClient client = new ApiClient();
 		final String url = ApiHelper.getAbsoluteUrl("roles", String.valueOf(personId));
 		final HttpHeaders headers = ApiHelper.getDefaultHeaders(context);
