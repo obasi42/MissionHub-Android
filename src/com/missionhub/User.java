@@ -51,6 +51,8 @@ public class User {
 		this.application = application;
 		this.id = id;
 		
+		if (id < 0) return; //don't bother making a user with a negative id
+		
 		person = application.getDbSession().getPersonDao().load(id);
 		person.refresh();
 
