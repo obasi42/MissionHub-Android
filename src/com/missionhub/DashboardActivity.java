@@ -3,6 +3,7 @@ package com.missionhub;
 import roboguice.inject.InjectView;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -75,5 +76,13 @@ public class DashboardActivity extends MissionHubBaseActivity {
 		try {
 			mOrganization.setText(getDbSession().getOrganizationDao().load(getSession().getOrganizationId()).getName());
 		} catch (final Exception e) {}
+	}
+	
+	public void clickContacts(View v) {
+		Toast.makeText(this, "Contacts", Toast.LENGTH_SHORT).show();
+	}
+	
+	public void clickSurveys(View v) {
+		Toast.makeText(this, "Surveys", Toast.LENGTH_SHORT).show();
 	}
 }
