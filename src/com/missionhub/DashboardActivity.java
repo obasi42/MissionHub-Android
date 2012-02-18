@@ -43,8 +43,8 @@ public class DashboardActivity extends MissionHubBaseActivity {
 	}
 
 	@Override public boolean onCreateOptionsMenu(final Menu menu) {
-		menu.add(R.string.action_profile).setOnMenuItemClickListener(new ProfileOnMenuItemClickListener()).setIcon(R.drawable.ic_action_user).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
-		menu.add(R.string.action_logout).setOnMenuItemClickListener(new LogoutOnMenuItemClickListener()).setIcon(R.drawable.ic_action_power).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+		menu.add(R.string.profile).setOnMenuItemClickListener(new ProfileOnMenuItemClickListener()).setIcon(R.drawable.ic_action_contact).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+		menu.add(R.string.action_logout).setOnMenuItemClickListener(new LogoutOnMenuItemClickListener()).setIcon(R.drawable.ic_action_logout).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 
 		return super.onCreateOptionsMenu(menu);
 	}

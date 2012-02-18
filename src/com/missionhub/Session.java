@@ -112,6 +112,10 @@ public class Session {
 		PeopleApi.getMe(application, new ApiHandler(GMetaPeople.class) {
 			@Override public void onSuccess(final Object gsonObject) {
 				super.onSuccess(gsonObject);
+				
+				// if user logged out before verify finished
+				if (getAccessToken().equalsIgnoreCase("") || getAccessToken() == null)
+					return;
 
 				final GMetaPeople metaPeople = (GMetaPeople) gsonObject;
 				final GPerson[] people = metaPeople.getPeople();
