@@ -95,5 +95,15 @@ public class MissionHubApplication extends GDApplication {
 		}
 		return daoSession;
 	}
-
+	
+	/**
+	 * Deletes the mh-db
+	 * @return
+	 */
+	public boolean deleteDatabase() {
+		getDb().close();
+		daoSession = null;
+		db = null;
+		return deleteDatabase("mh-db");
+	}
 }

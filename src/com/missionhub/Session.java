@@ -70,6 +70,8 @@ public class Session {
 		Preferences.removeAccessToken(application);
 		Preferences.removeOrganizationID(application);
 		Preferences.removeUserID(application);
+		
+		application.deleteDatabase();
 
 		// Tell the application we logged out
 		SessionBroadcast.broadcastLogout(application);
