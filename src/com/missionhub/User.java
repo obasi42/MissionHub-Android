@@ -70,7 +70,7 @@ public class User {
 		final SetMultimap<Long, String> labelsTemp = Multimaps.synchronizedSetMultimap(HashMultimap.<Long, String> create()); // organizationId,
 		final List<OrganizationalRole> roles = person.getOrganizationalRoleList();
 		for (final OrganizationalRole role : roles) {
-			labelsTemp.put(role.getOrganization_id(), role.getName());
+			labelsTemp.put(role.getOrganization_id(), role.getOrganization().getName());
 			if (role.getPrimary() || primaryOrganization < 0) {
 				primaryOrganization = role.getOrganization_id();
 			}

@@ -20,7 +20,7 @@ public class Organization {
     /** Used for active entity operations. */
     private OrganizationDao myDao;
 
-    private List<Organization> organizationList;
+    private List<FollowupComment> followupCommentList;
     private List<Keyword> keywordList;
     private List<Answer> answerList;
 
@@ -68,20 +68,20 @@ public class Organization {
     }
 
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
-    public synchronized List<Organization> getOrganizationList() {
-        if (organizationList == null) {
+    public synchronized List<FollowupComment> getFollowupCommentList() {
+        if (followupCommentList == null) {
             if (daoSession == null) {
                 throw new DaoException("Entity is detached from DAO context");
             }
-            OrganizationDao targetDao = daoSession.getOrganizationDao();
-            organizationList = targetDao._queryOrganization_OrganizationList(id);
+            FollowupCommentDao targetDao = daoSession.getFollowupCommentDao();
+            followupCommentList = targetDao._queryOrganization_FollowupCommentList(id);
         }
-        return organizationList;
+        return followupCommentList;
     }
 
     /** Resets a to-many relationship, making the next get call to query for a fresh result. */
-    public synchronized void resetOrganizationList() {
-        organizationList = null;
+    public synchronized void resetFollowupCommentList() {
+        followupCommentList = null;
     }
 
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */

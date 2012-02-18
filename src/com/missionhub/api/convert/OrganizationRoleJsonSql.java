@@ -63,7 +63,6 @@ public class OrganizationRoleJsonSql {
 		// Insert new roles
 		for (final GOrgGeneric role : roles) {
 			final OrganizationalRole or = new OrganizationalRole();
-			or.setName(role.getName());
 			or.setOrganization_id(role.getOrg_id());
 			or.setPerson_id(personId);
 			if (role.getPrimary() != null) {
@@ -83,10 +82,13 @@ public class OrganizationRoleJsonSql {
 			org.setId(role.getOrg_id());
 			org.setName(role.getName());
 			final long id2 = od.insertOrReplace(org);
-			if (newOrg) {
-				OrganizationBroadcast.broadcastCreate(context, id2, categories);
+			
+			if (notify) {
+				if (newOrg) {
+					OrganizationBroadcast.broadcastCreate(context, id2, categories);
+				}
+				OrganizationBroadcast.broadcastUpdate(context, id2, categories);
 			}
-			OrganizationBroadcast.broadcastUpdate(context, id2, categories);
 		}
 	}
 }

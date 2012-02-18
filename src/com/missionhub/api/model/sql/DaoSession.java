@@ -14,8 +14,8 @@ import com.missionhub.api.model.sql.Assignment;
 import com.missionhub.api.model.sql.Interest;
 import com.missionhub.api.model.sql.Education;
 import com.missionhub.api.model.sql.Location;
-import com.missionhub.api.model.sql.OrganizationalRole;
 import com.missionhub.api.model.sql.Organization;
+import com.missionhub.api.model.sql.OrganizationalRole;
 import com.missionhub.api.model.sql.FollowupComment;
 import com.missionhub.api.model.sql.Rejoicable;
 import com.missionhub.api.model.sql.Keyword;
@@ -28,8 +28,8 @@ import com.missionhub.api.model.sql.AssignmentDao;
 import com.missionhub.api.model.sql.InterestDao;
 import com.missionhub.api.model.sql.EducationDao;
 import com.missionhub.api.model.sql.LocationDao;
-import com.missionhub.api.model.sql.OrganizationalRoleDao;
 import com.missionhub.api.model.sql.OrganizationDao;
+import com.missionhub.api.model.sql.OrganizationalRoleDao;
 import com.missionhub.api.model.sql.FollowupCommentDao;
 import com.missionhub.api.model.sql.RejoicableDao;
 import com.missionhub.api.model.sql.KeywordDao;
@@ -51,8 +51,8 @@ public class DaoSession extends AbstractDaoSession {
     private final DaoConfig interestDaoConfig;
     private final DaoConfig educationDaoConfig;
     private final DaoConfig locationDaoConfig;
-    private final DaoConfig organizationalRoleDaoConfig;
     private final DaoConfig organizationDaoConfig;
+    private final DaoConfig organizationalRoleDaoConfig;
     private final DaoConfig followupCommentDaoConfig;
     private final DaoConfig rejoicableDaoConfig;
     private final DaoConfig keywordDaoConfig;
@@ -65,8 +65,8 @@ public class DaoSession extends AbstractDaoSession {
     private final InterestDao interestDao;
     private final EducationDao educationDao;
     private final LocationDao locationDao;
-    private final OrganizationalRoleDao organizationalRoleDao;
     private final OrganizationDao organizationDao;
+    private final OrganizationalRoleDao organizationalRoleDao;
     private final FollowupCommentDao followupCommentDao;
     private final RejoicableDao rejoicableDao;
     private final KeywordDao keywordDao;
@@ -93,11 +93,11 @@ public class DaoSession extends AbstractDaoSession {
         locationDaoConfig = daoConfigMap.get(LocationDao.class).clone();
         locationDaoConfig.initIdentityScope(type);
 
-        organizationalRoleDaoConfig = daoConfigMap.get(OrganizationalRoleDao.class).clone();
-        organizationalRoleDaoConfig.initIdentityScope(type);
-
         organizationDaoConfig = daoConfigMap.get(OrganizationDao.class).clone();
         organizationDaoConfig.initIdentityScope(type);
+
+        organizationalRoleDaoConfig = daoConfigMap.get(OrganizationalRoleDao.class).clone();
+        organizationalRoleDaoConfig.initIdentityScope(type);
 
         followupCommentDaoConfig = daoConfigMap.get(FollowupCommentDao.class).clone();
         followupCommentDaoConfig.initIdentityScope(type);
@@ -122,8 +122,8 @@ public class DaoSession extends AbstractDaoSession {
         interestDao = new InterestDao(interestDaoConfig, this);
         educationDao = new EducationDao(educationDaoConfig, this);
         locationDao = new LocationDao(locationDaoConfig, this);
-        organizationalRoleDao = new OrganizationalRoleDao(organizationalRoleDaoConfig, this);
         organizationDao = new OrganizationDao(organizationDaoConfig, this);
+        organizationalRoleDao = new OrganizationalRoleDao(organizationalRoleDaoConfig, this);
         followupCommentDao = new FollowupCommentDao(followupCommentDaoConfig, this);
         rejoicableDao = new RejoicableDao(rejoicableDaoConfig, this);
         keywordDao = new KeywordDao(keywordDaoConfig, this);
@@ -136,8 +136,8 @@ public class DaoSession extends AbstractDaoSession {
         registerDao(Interest.class, interestDao);
         registerDao(Education.class, educationDao);
         registerDao(Location.class, locationDao);
-        registerDao(OrganizationalRole.class, organizationalRoleDao);
         registerDao(Organization.class, organizationDao);
+        registerDao(OrganizationalRole.class, organizationalRoleDao);
         registerDao(FollowupComment.class, followupCommentDao);
         registerDao(Rejoicable.class, rejoicableDao);
         registerDao(Keyword.class, keywordDao);
@@ -152,8 +152,8 @@ public class DaoSession extends AbstractDaoSession {
         interestDaoConfig.getIdentityScope().clear();
         educationDaoConfig.getIdentityScope().clear();
         locationDaoConfig.getIdentityScope().clear();
-        organizationalRoleDaoConfig.getIdentityScope().clear();
         organizationDaoConfig.getIdentityScope().clear();
+        organizationalRoleDaoConfig.getIdentityScope().clear();
         followupCommentDaoConfig.getIdentityScope().clear();
         rejoicableDaoConfig.getIdentityScope().clear();
         keywordDaoConfig.getIdentityScope().clear();
@@ -182,12 +182,12 @@ public class DaoSession extends AbstractDaoSession {
         return locationDao;
     }
 
-    public OrganizationalRoleDao getOrganizationalRoleDao() {
-        return organizationalRoleDao;
-    }
-
     public OrganizationDao getOrganizationDao() {
         return organizationDao;
+    }
+
+    public OrganizationalRoleDao getOrganizationalRoleDao() {
+        return organizationalRoleDao;
     }
 
     public FollowupCommentDao getFollowupCommentDao() {

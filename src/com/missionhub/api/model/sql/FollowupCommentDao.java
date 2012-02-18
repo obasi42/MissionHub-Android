@@ -37,6 +37,7 @@ public class FollowupCommentDao extends AbstractDao<FollowupComment, Long> {
 
     private Query<FollowupComment> person_Followup_commentsQuery;
     private Query<FollowupComment> person_Posted_commentsQuery;
+    private Query<FollowupComment> organization_FollowupCommentListQuery;
 
     public FollowupCommentDao(DaoConfig config) {
         super(config);
@@ -206,6 +207,18 @@ public class FollowupCommentDao extends AbstractDao<FollowupComment, Long> {
             person_Posted_commentsQuery.setParameter(0, commenter_id);
         }
         return person_Posted_commentsQuery.list();
+    }
+
+    /** Internal query to resolve the "followupCommentList" to-many relationship of Organization. */
+    public synchronized List<FollowupComment> _queryOrganization_FollowupCommentList(Long organization_id) {
+        if (organization_FollowupCommentListQuery == null) {
+            QueryBuilder<FollowupComment> queryBuilder = queryBuilder();
+            queryBuilder.where(Properties.Organization_id.eq(organization_id));
+            organization_FollowupCommentListQuery = queryBuilder.build();
+        } else {
+            organization_FollowupCommentListQuery.setParameter(0, organization_id);
+        }
+        return organization_FollowupCommentListQuery.list();
     }
 
 }

@@ -1,6 +1,7 @@
 package com.missionhub.api.model.sql;
 
 import java.util.List;
+import java.util.ArrayList;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
@@ -8,6 +9,7 @@ import android.database.sqlite.SQLiteStatement;
 import de.greenrobot.dao.AbstractDao;
 import de.greenrobot.dao.DaoConfig;
 import de.greenrobot.dao.Property;
+import de.greenrobot.dao.SqlUtils;
 import de.greenrobot.dao.Query;
 import de.greenrobot.dao.QueryBuilder;
 
@@ -26,9 +28,10 @@ public class OrganizationalRoleDao extends AbstractDao<OrganizationalRole, Long>
         public final static Property Person_id = new Property(1, Long.class, "person_id", false, "PERSON_ID");
         public final static Property Organization_id = new Property(2, Long.class, "organization_id", false, "ORGANIZATION_ID");
         public final static Property Role = new Property(3, String.class, "role", false, "ROLE");
-        public final static Property Name = new Property(4, String.class, "name", false, "NAME");
-        public final static Property Primary = new Property(5, Boolean.class, "primary", false, "PRIMARY");
+        public final static Property Primary = new Property(4, Boolean.class, "primary", false, "PRIMARY");
     };
+
+    private DaoSession daoSession;
 
     private Query<OrganizationalRole> person_OrganizationalRoleListQuery;
 
@@ -38,6 +41,7 @@ public class OrganizationalRoleDao extends AbstractDao<OrganizationalRole, Long>
     
     public OrganizationalRoleDao(DaoConfig config, DaoSession daoSession) {
         super(config, daoSession);
+        this.daoSession = daoSession;
     }
 
     /** Creates the underlying database table. */
@@ -47,8 +51,7 @@ public class OrganizationalRoleDao extends AbstractDao<OrganizationalRole, Long>
                 "'PERSON_ID' INTEGER," + // 1: person_id
                 "'ORGANIZATION_ID' INTEGER," + // 2: organization_id
                 "'ROLE' TEXT," + // 3: role
-                "'NAME' TEXT," + // 4: name
-                "'PRIMARY' INTEGER);"; // 5: primary
+                "'PRIMARY' INTEGER);"; // 4: primary
         db.execSQL(sql);
     }
 
@@ -83,15 +86,16 @@ public class OrganizationalRoleDao extends AbstractDao<OrganizationalRole, Long>
             stmt.bindString(4, role);
         }
  
-        String name = entity.getName();
-        if (name != null) {
-            stmt.bindString(5, name);
-        }
- 
         Boolean primary = entity.getPrimary();
         if (primary != null) {
-            stmt.bindLong(6, primary ? 1l: 0l);
+            stmt.bindLong(5, primary ? 1l: 0l);
         }
+    }
+
+    @Override
+    protected void attachEntity(OrganizationalRole entity) {
+        super.attachEntity(entity);
+        entity.__setDaoSession(daoSession);
     }
 
     /** @inheritdoc */
@@ -108,8 +112,7 @@ public class OrganizationalRoleDao extends AbstractDao<OrganizationalRole, Long>
             cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1), // person_id
             cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2), // organization_id
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // role
-            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // name
-            cursor.isNull(offset + 5) ? null : cursor.getShort(offset + 5) != 0 // primary
+            cursor.isNull(offset + 4) ? null : cursor.getShort(offset + 4) != 0 // primary
         );
         return entity;
     }
@@ -121,8 +124,7 @@ public class OrganizationalRoleDao extends AbstractDao<OrganizationalRole, Long>
         entity.setPerson_id(cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1));
         entity.setOrganization_id(cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2));
         entity.setRole(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
-        entity.setName(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
-        entity.setPrimary(cursor.isNull(offset + 5) ? null : cursor.getShort(offset + 5) != 0);
+        entity.setPrimary(cursor.isNull(offset + 4) ? null : cursor.getShort(offset + 4) != 0);
      }
     
     @Override
@@ -159,4 +161,95 @@ public class OrganizationalRoleDao extends AbstractDao<OrganizationalRole, Long>
         return person_OrganizationalRoleListQuery.list();
     }
 
+    private String selectDeep;
+
+    protected String getSelectDeep() {
+        if (selectDeep == null) {
+            StringBuilder builder = new StringBuilder("SELECT ");
+            SqlUtils.appendColumns(builder, "T", getAllColumns());
+            builder.append(',');
+            SqlUtils.appendColumns(builder, "T0", daoSession.getOrganizationDao().getAllColumns());
+            builder.append(" FROM ORGANIZATIONAL_ROLE T");
+            builder.append(" LEFT JOIN ORGANIZATION T0 ON T.'ORGANIZATION_ID'=T0.'_id'");
+            builder.append(' ');
+            selectDeep = builder.toString();
+        }
+        return selectDeep;
+    }
+    
+    protected OrganizationalRole loadCurrentDeep(Cursor cursor, boolean lock) {
+        OrganizationalRole entity = loadCurrent(cursor, 0, lock);
+        int offset = getAllColumns().length;
+
+        Organization organization = loadCurrentOther(daoSession.getOrganizationDao(), cursor, offset);
+        entity.setOrganization(organization);
+
+        return entity;    
+    }
+
+    public OrganizationalRole loadDeep(Long key) {
+        assertSinglePk();
+        if (key == null) {
+            return null;
+        }
+
+        StringBuilder builder = new StringBuilder(getSelectDeep());
+        builder.append("WHERE ");
+        SqlUtils.appendColumnsEqValue(builder, "T", getPkColumns());
+        String sql = builder.toString();
+        
+        String[] keyArray = new String[] { key.toString() };
+        Cursor cursor = db.rawQuery(sql, keyArray);
+        
+        try {
+            boolean available = cursor.moveToFirst();
+            if (!available) {
+                return null;
+            } else if (!cursor.isLast()) {
+                throw new IllegalStateException("Expected unique result, but count was " + cursor.getCount());
+            }
+            return loadCurrentDeep(cursor, true);
+        } finally {
+            cursor.close();
+        }
+    }
+    
+    /** Reads all available rows from the given cursor and returns a list of new ImageTO objects. */
+    public List<OrganizationalRole> loadAllDeepFromCursor(Cursor cursor) {
+        int count = cursor.getCount();
+        List<OrganizationalRole> list = new ArrayList<OrganizationalRole>(count);
+        
+        if (cursor.moveToFirst()) {
+            if (identityScope != null) {
+                identityScope.lock();
+                identityScope.reserveRoom(count);
+            }
+            try {
+                do {
+                    list.add(loadCurrentDeep(cursor, false));
+                } while (cursor.moveToNext());
+            } finally {
+                if (identityScope != null) {
+                    identityScope.unlock();
+                }
+            }
+        }
+        return list;
+    }
+    
+    protected List<OrganizationalRole> loadDeepAllAndCloseCursor(Cursor cursor) {
+        try {
+            return loadAllDeepFromCursor(cursor);
+        } finally {
+            cursor.close();
+        }
+    }
+    
+
+    /** A raw-style query where you can pass any WHERE clause and arguments. */
+    public List<OrganizationalRole> queryDeep(String where, String... selectionArg) {
+        Cursor cursor = db.rawQuery(getSelectDeep() + where, selectionArg);
+        return loadDeepAllAndCloseCursor(cursor);
+    }
+ 
 }

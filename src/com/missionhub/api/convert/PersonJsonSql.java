@@ -18,6 +18,7 @@ public class PersonJsonSql {
 		try {
 			privateUpdate(context, person, threaded, notify, categories);
 		} catch (final Exception e) {
+			if (!notify) return;
 			long personId = -1;
 			if (person != null) {
 				personId = person.getId();
@@ -40,9 +41,9 @@ public class PersonJsonSql {
 
 		final MissionHubApplication app = (MissionHubApplication) context.getApplicationContext();
 		final PersonDao pd = app.getDbSession().getPersonDao();
-		
+
 		Person p = pd.load(person.getId());
-		
+
 		boolean createPerson = false;
 		if (p == null) {
 			p = new Person();
@@ -102,30 +103,24 @@ public class PersonJsonSql {
 		if (person.getNum_contacts() != null) {
 			p.setNum_contacts(person.getNum_contacts());
 		}
-		
+
 		// update organizational roles
 		OrganizationRoleJsonSql.update(context, person.getId(), person.getOrganizational_roles(), threaded, notify, categories);
-		
-		// if (person.getRequest_org_id() != null)
-		// AssignmentJsonSql.update(context, person.getId(),
-		// Integer.parseInt(person.getRequest_org_id()),
-		// person.getAssignment(), tag);
-		//
-		// InterestJsonSql.update(context, person.getId(),
-		// person.getInterests(), tag);
-		//
-		// EducationJsonSql.update(context, person.getId(),
-		// person.getEducation(), tag);
-		//
-		// LocationJsonSql.update(context, person.getId(),
-		// person.getLocation(), tag);
+
+		InterestJsonSql.update(context, person.getId(), person.getInterests(), threaded, notify, categories);
+
+		EducationJsonSql.update(context, person.getId(), person.getEducation(), threaded, notify, categories);
+
+		LocationJsonSql.update(context, person.getId(), person.getLocation(), threaded, notify, categories);
 
 		pd.insertOrReplace(p);
 
-		if (createPerson) {
-			PersonBroadcast.broadcastCreate(context, p.getId(), categories);
+		if (notify) {
+			if (createPerson) {
+				PersonBroadcast.broadcastCreate(context, p.getId(), categories);
+			}
+			PersonBroadcast.broadcastUpdate(context, p.getId(), categories);
 		}
-		PersonBroadcast.broadcastUpdate(context, p.getId(), categories);
 	}
 	//
 	// public static void update(Context context, GContact contact) {

@@ -1,6 +1,5 @@
 package com.missionhub.api.model.sql;
 
-import java.util.List;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
@@ -8,8 +7,6 @@ import android.database.sqlite.SQLiteStatement;
 import de.greenrobot.dao.AbstractDao;
 import de.greenrobot.dao.DaoConfig;
 import de.greenrobot.dao.Property;
-import de.greenrobot.dao.Query;
-import de.greenrobot.dao.QueryBuilder;
 
 import com.missionhub.api.model.sql.Organization;
 
@@ -25,12 +22,10 @@ public class OrganizationDao extends AbstractDao<Organization, Long> {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property Name = new Property(1, String.class, "name", false, "NAME");
         public final static Property Ancestry = new Property(2, String.class, "ancestry", false, "ANCESTRY");
-        public final static Property Organization_id = new Property(3, Long.class, "organization_id", false, "ORGANIZATION_ID");
     };
 
     private DaoSession daoSession;
 
-    private Query<Organization> organization_OrganizationListQuery;
 
     public OrganizationDao(DaoConfig config) {
         super(config);
@@ -46,8 +41,7 @@ public class OrganizationDao extends AbstractDao<Organization, Long> {
         String sql = "CREATE TABLE " + (ifNotExists? "IF NOT EXISTS ": "") + "'ORGANIZATION' (" + //
                 "'_id' INTEGER PRIMARY KEY ," + // 0: id
                 "'NAME' TEXT," + // 1: name
-                "'ANCESTRY' TEXT," + // 2: ancestry
-                "'ORGANIZATION_ID' INTEGER);"; // 3: organization_id
+                "'ANCESTRY' TEXT);"; // 2: ancestry
         db.execSQL(sql);
     }
 
@@ -131,16 +125,4 @@ public class OrganizationDao extends AbstractDao<Organization, Long> {
         return true;
     }
     
-    /** Internal query to resolve the "organizationList" to-many relationship of Organization. */
-    public synchronized List<Organization> _queryOrganization_OrganizationList(Long organization_id) {
-        if (organization_OrganizationListQuery == null) {
-            QueryBuilder<Organization> queryBuilder = queryBuilder();
-            queryBuilder.where(Properties.Organization_id.eq(organization_id));
-            organization_OrganizationListQuery = queryBuilder.build();
-        } else {
-            organization_OrganizationListQuery.setParameter(0, organization_id);
-        }
-        return organization_OrganizationListQuery.list();
-    }
-
 }

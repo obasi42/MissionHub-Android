@@ -27,8 +27,8 @@ public class DashboardActivity extends MissionHubBaseActivity {
 				updateBottomBar();
 			}
 		};
-		
 		sr.register(SessionBroadcast.NOTIFY_VERIFY_PASS);
+		
 		updateBottomBar();
 	}
 	
