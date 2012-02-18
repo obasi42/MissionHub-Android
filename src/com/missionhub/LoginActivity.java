@@ -1,6 +1,8 @@
 package com.missionhub;
 
 import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.List;
 
 import roboguice.inject.InjectView;
 import android.app.Activity;
@@ -28,6 +30,8 @@ import com.missionhub.api.ApiHandler;
 import com.missionhub.api.convert.PersonJsonSql;
 import com.missionhub.api.model.GError;
 import com.missionhub.api.model.GLoginDone;
+import com.missionhub.broadcast.PersonBroadcast;
+import com.missionhub.broadcast.PersonReceiver;
 import com.missionhub.broadcast.SessionBroadcast;
 import com.missionhub.config.Config;
 import com.missionhub.config.Preferences;
@@ -228,16 +232,31 @@ public class LoginActivity extends MissionHubBaseActivity {
 
 			@Override public void onSuccess(final Object gsonObject) {
 				final GLoginDone loginDone = (GLoginDone) gsonObject;
-
-				PersonJsonSql.update(getApplicationContext(), loginDone.getPerson());
+				
 				Preferences.setAccessToken(LoginActivity.this, loginDone.getAccess_token());
 				Preferences.setUserID(LoginActivity.this, loginDone.getPerson().getId());
+				
+				final PersonReceiver pr = new PersonReceiver(getApplicationContext()) {
+					@Override public void onUpdate(final long personId) {
+						if (personId != loginDone.getPerson().getId())
+							return;
+						
+						getSession().setAccessToken(loginDone.getAccess_token());
+						getSession().setPersonId(loginDone.getPerson().getId());
+						getSession().setUser(new User((MissionHubApplication) getApplicationContext(), loginDone.getPerson().getId()));
 
-				getSession().setAccessToken(loginDone.getAccess_token());
-				getSession().setPersonId(loginDone.getPerson().getId());
-				getSession().setUser(new User((MissionHubApplication) getApplicationContext(), loginDone.getPerson().getId()));
+						unregister();
+						
+						finishOK();
+					}
+				};
 
-				finishOK();
+				final List<String> cats = new ArrayList<String>();
+				cats.add("getTokenFromCode");
+
+				pr.register(PersonBroadcast.NOTIFY_PERSON_UPDATE, cats);
+				
+				PersonJsonSql.update(getApplicationContext(), loginDone.getPerson(), "getTokenFromCode");
 			}
 
 			@Override public void onError(final Throwable throwable) {

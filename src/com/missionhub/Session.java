@@ -1,9 +1,15 @@
 package com.missionhub;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.missionhub.api.ApiHandler;
 import com.missionhub.api.PeopleApi;
+import com.missionhub.api.convert.PersonJsonSql;
 import com.missionhub.api.model.GMetaPeople;
 import com.missionhub.api.model.GPerson;
+import com.missionhub.broadcast.PersonBroadcast;
+import com.missionhub.broadcast.PersonReceiver;
 import com.missionhub.broadcast.SessionBroadcast;
 import com.missionhub.config.Preferences;
 import com.missionhub.error.ApiException;
@@ -23,10 +29,10 @@ public class Session {
 	private String accessToken = "";
 
 	/** users's person id */
-	private long personId = -1l;
+	private long personId = -1;
 
 	/** user's current organization */
-	private long organizationId = -1l;
+	private long organizationId = -1;
 
 	/** current user */
 	private User user;
@@ -110,14 +116,34 @@ public class Session {
 
 				if (people.length > 0) {
 					final GPerson person = people[0];
-					if ((getOrganizationId() < 0 || getPersonId() != person.getId()) && metaPeople.getMeta().getRequest_organization() != null) {
-						setOrganizationId(Integer.parseInt(metaPeople.getMeta().getRequest_organization()));
-					}
-					setPersonId(person.getId());
-					setUser(new User(application, getPersonId()));
 
-					SessionBroadcast.broadcastVerifyPass(application);
-					SessionBroadcast.broadcastLogin(application, application.getSession().getAccessToken());
+					final PersonReceiver pr = new PersonReceiver(application) {
+						@Override public void onUpdate(final long personId) {
+							if (personId != person.getId())
+								return;
+							
+							if ((getOrganizationId() < 0 || getPersonId() != person.getId()) && metaPeople.getMeta().getRequest_organization() != null) {
+								setOrganizationId(Integer.parseInt(metaPeople.getMeta().getRequest_organization()));
+							}
+							
+							setPersonId(person.getId());
+							Preferences.setUserID(application, getPersonId());
+							
+							setUser(new User(application, getPersonId()));
+
+							SessionBroadcast.broadcastVerifyPass(application);
+							SessionBroadcast.broadcastLogin(application, application.getSession().getAccessToken());
+
+							unregister();
+						}
+					};
+
+					final List<String> cats = new ArrayList<String>();
+					cats.add("verifySession");
+
+					pr.register(PersonBroadcast.NOTIFY_PERSON_UPDATE, cats);
+
+					PersonJsonSql.update(application, person, "verifySession");
 				} else {
 					onError(new ApiException("VerifySession did not return any people"));
 				}

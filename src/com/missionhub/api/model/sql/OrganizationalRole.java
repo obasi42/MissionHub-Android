@@ -8,7 +8,7 @@ public class OrganizationalRole {
 
     private Long id;
     private Long person_id;
-    private Long org_id;
+    private Long organization_id;
     private String role;
     private String name;
     private Boolean primary;
@@ -20,10 +20,10 @@ public class OrganizationalRole {
         this.id = id;
     }
 
-    public OrganizationalRole(Long id, Long person_id, Long org_id, String role, String name, Boolean primary) {
+    public OrganizationalRole(Long id, Long person_id, Long organization_id, String role, String name, Boolean primary) {
         this.id = id;
         this.person_id = person_id;
-        this.org_id = org_id;
+        this.organization_id = organization_id;
         this.role = role;
         this.name = name;
         this.primary = primary;
@@ -45,12 +45,12 @@ public class OrganizationalRole {
         this.person_id = person_id;
     }
 
-    public Long getOrg_id() {
-        return org_id;
+    public Long getOrganization_id() {
+        return organization_id;
     }
 
-    public void setOrg_id(Long org_id) {
-        this.org_id = org_id;
+    public void setOrganization_id(Long organization_id) {
+        this.organization_id = organization_id;
     }
 
     public String getRole() {

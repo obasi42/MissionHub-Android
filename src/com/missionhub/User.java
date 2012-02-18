@@ -2,6 +2,7 @@ package com.missionhub;
 
 import java.util.List;
 
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.common.collect.HashMultimap;
@@ -49,13 +50,13 @@ public class User {
 	public User(final MissionHubApplication application, final long id) {
 		this.application = application;
 		this.id = id;
-
-		// don't bother setting up a user with a negative id
-		if (id < 0) {
-			return;
-		}
+		
+		Log.e("NEW USER", "" + id);
 
 		person = application.getDbSession().getPersonDao().load(id);
+		if (person == null)
+			return;
+			
 		person.refresh();
 
 		updateLabels();
@@ -69,9 +70,9 @@ public class User {
 		final SetMultimap<Long, String> labelsTemp = Multimaps.synchronizedSetMultimap(HashMultimap.<Long, String> create()); // organizationId,
 		final List<OrganizationalRole> roles = person.getOrganizationalRoleList();
 		for (final OrganizationalRole role : roles) {
-			labels.put(role.getOrg_id(), role.getName());
+			labelsTemp.put(role.getOrganization_id(), role.getName());
 			if (role.getPrimary() || primaryOrganization < 0) {
-				primaryOrganization = role.getOrg_id();
+				primaryOrganization = role.getOrganization_id();
 			}
 		}
 		labels = labelsTemp;

@@ -1,5 +1,7 @@
 package com.missionhub.broadcast;
 
+import java.util.List;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -75,7 +77,7 @@ abstract class MissionHubReceiver extends BroadcastReceiver {
 	 * @param action
 	 * @param categories
 	 */
-	public void register(final String action, final String... categories) {
+	public void register(final String action, List<String> categories) {
 		final IntentFilter intent = buildIntentFilter(action);
 		for (final String category : categories) {
 			intent.addCategory(category);

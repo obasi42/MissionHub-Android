@@ -3,7 +3,7 @@ package com.missionhub.broadcast;
 import android.content.Context;
 import android.content.Intent;
 
-public class PersonJsonSqlBroadcast extends MissionHubBroadcast {
+public class PersonBroadcast extends MissionHubBroadcast {
 	
 	public static final String NOTIFY_PERSON_CREATE = MissionHubBroadcast.PREFIX + "NOTIFY_PERSON_CREATE";
 	public static final String NOTIFY_PERSON_UPDATE = MissionHubBroadcast.PREFIX + "NOTIFY_PERSON_UPDATE";

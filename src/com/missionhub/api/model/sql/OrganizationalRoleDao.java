@@ -24,7 +24,7 @@ public class OrganizationalRoleDao extends AbstractDao<OrganizationalRole, Long>
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property Person_id = new Property(1, Long.class, "person_id", false, "PERSON_ID");
-        public final static Property Org_id = new Property(2, Long.class, "org_id", false, "ORG_ID");
+        public final static Property Organization_id = new Property(2, Long.class, "organization_id", false, "ORGANIZATION_ID");
         public final static Property Role = new Property(3, String.class, "role", false, "ROLE");
         public final static Property Name = new Property(4, String.class, "name", false, "NAME");
         public final static Property Primary = new Property(5, Boolean.class, "primary", false, "PRIMARY");
@@ -45,7 +45,7 @@ public class OrganizationalRoleDao extends AbstractDao<OrganizationalRole, Long>
         String sql = "CREATE TABLE " + (ifNotExists? "IF NOT EXISTS ": "") + "'ORGANIZATIONAL_ROLE' (" + //
                 "'_id' INTEGER PRIMARY KEY ," + // 0: id
                 "'PERSON_ID' INTEGER," + // 1: person_id
-                "'ORG_ID' INTEGER," + // 2: org_id
+                "'ORGANIZATION_ID' INTEGER," + // 2: organization_id
                 "'ROLE' TEXT," + // 3: role
                 "'NAME' TEXT," + // 4: name
                 "'PRIMARY' INTEGER);"; // 5: primary
@@ -73,9 +73,9 @@ public class OrganizationalRoleDao extends AbstractDao<OrganizationalRole, Long>
             stmt.bindLong(2, person_id);
         }
  
-        Long org_id = entity.getOrg_id();
-        if (org_id != null) {
-            stmt.bindLong(3, org_id);
+        Long organization_id = entity.getOrganization_id();
+        if (organization_id != null) {
+            stmt.bindLong(3, organization_id);
         }
  
         String role = entity.getRole();
@@ -106,7 +106,7 @@ public class OrganizationalRoleDao extends AbstractDao<OrganizationalRole, Long>
         OrganizationalRole entity = new OrganizationalRole( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1), // person_id
-            cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2), // org_id
+            cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2), // organization_id
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // role
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // name
             cursor.isNull(offset + 5) ? null : cursor.getShort(offset + 5) != 0 // primary
@@ -119,7 +119,7 @@ public class OrganizationalRoleDao extends AbstractDao<OrganizationalRole, Long>
     public void readEntity(Cursor cursor, OrganizationalRole entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setPerson_id(cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1));
-        entity.setOrg_id(cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2));
+        entity.setOrganization_id(cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2));
         entity.setRole(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
         entity.setName(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
         entity.setPrimary(cursor.isNull(offset + 5) ? null : cursor.getShort(offset + 5) != 0);

@@ -6,7 +6,7 @@ import com.missionhub.MissionHubApplication;
 import com.missionhub.api.model.GPerson;
 import com.missionhub.api.model.sql.Person;
 import com.missionhub.api.model.sql.PersonDao;
-import com.missionhub.broadcast.PersonJsonSqlBroadcast;
+import com.missionhub.broadcast.PersonBroadcast;
 
 public class PersonJsonSql {
 
@@ -22,7 +22,7 @@ public class PersonJsonSql {
 			if (person != null) {
 				personId = person.getId();
 			}
-			PersonJsonSqlBroadcast.broadcastError(context, personId, e, categories);
+			PersonBroadcast.broadcastError(context, personId, e, categories);
 		}
 	}
 
@@ -102,10 +102,10 @@ public class PersonJsonSql {
 		if (person.getNum_contacts() != null) {
 			p.setNum_contacts(person.getNum_contacts());
 		}
-
-		// OrganizationRoleJsonSql.update(context, person.getId(),
-		// person.getOrganizational_roles(), tag);
-		//
+		
+		// update organizational roles
+		OrganizationRoleJsonSql.update(context, person.getId(), person.getOrganizational_roles(), threaded, notify, categories);
+		
 		// if (person.getRequest_org_id() != null)
 		// AssignmentJsonSql.update(context, person.getId(),
 		// Integer.parseInt(person.getRequest_org_id()),
@@ -123,10 +123,9 @@ public class PersonJsonSql {
 		pd.insertOrReplace(p);
 
 		if (createPerson) {
-			PersonJsonSqlBroadcast.broadcastCreate(context, p.getId(), categories);
-		} else {
-			PersonJsonSqlBroadcast.broadcastUpdate(context, p.getId(), categories);
+			PersonBroadcast.broadcastCreate(context, p.getId(), categories);
 		}
+		PersonBroadcast.broadcastUpdate(context, p.getId(), categories);
 	}
 	//
 	// public static void update(Context context, GContact contact) {
