@@ -124,6 +124,7 @@ public class Session {
 							
 							if ((getOrganizationId() < 0 || getPersonId() != person.getId()) && metaPeople.getMeta().getRequest_organization() != null) {
 								setOrganizationId(Integer.parseInt(metaPeople.getMeta().getRequest_organization()));
+								Preferences.setOrganizationID(application, getOrganizationId());
 							}
 							setPersonId(person.getId());
 							
