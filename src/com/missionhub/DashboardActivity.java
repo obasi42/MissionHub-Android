@@ -33,16 +33,18 @@ public class DashboardActivity extends MissionHubBaseActivity {
 		getSupportActionBar().setDisplayShowTitleEnabled(false);
 
 		final SessionReceiver sr = new SessionReceiver(getApplicationContext()) {
-			@Override public void onVerifyPass() {
+			@Override public void onUpdatePersonSuccess() {
 				updateBottomBar();
 			}
 			
 			@Override public void onLogout() {
+				Intent intent = new Intent(getApplicationContext(), MissionHubActivity.class);
+				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				startActivity(new Intent(getApplicationContext(), MissionHubActivity.class));
 				finish();
 			}
 		};
-		sr.register(SessionBroadcast.NOTIFY_VERIFY_PASS, SessionBroadcast.NOTIFY_LOGOUT);
+		sr.register(SessionBroadcast.NOTIFY_UPDATE_PERSON_SUCCESS, SessionBroadcast.NOTIFY_LOGOUT);
 
 		updateBottomBar();
 	}

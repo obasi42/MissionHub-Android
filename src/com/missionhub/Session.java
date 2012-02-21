@@ -70,7 +70,7 @@ public class Session {
 		Preferences.removeAccessToken(application);
 		Preferences.removeOrganizationID(application);
 		Preferences.removeUserID(application);
-		
+
 		application.deleteDatabase();
 
 		// Tell the application we logged out
@@ -93,82 +93,82 @@ public class Session {
 			setAccessToken(accessToken);
 			setUser(new User(application, userId));
 			SessionBroadcast.broadcastLogin(application, application.getSession().getAccessToken());
+			if (userId < 0) {
+				updatePerson();
+			}
 			return true;
 		}
 		return false;
 	}
-	
+
 	public synchronized void updatePerson() {
-		
+		SessionBroadcast.broadcastUpdatePersonStart(application);
+
+		PeopleApi.getMe(application, new ApiHandler(GMetaPeople.class) {
+			@Override public void onSuccess(final Object gsonObject) {
+				super.onSuccess(gsonObject);
+
+				// if user logged out before verify finished
+				if (getAccessToken().equalsIgnoreCase("") || getAccessToken() == null) {
+					return;
+				}
+
+				final GMetaPeople metaPeople = (GMetaPeople) gsonObject;
+				final GPerson[] people = metaPeople.getPeople();
+
+				if (people.length > 0) {
+					final GPerson person = people[0];
+
+					final PersonReceiver pr = new PersonReceiver(application) {
+						@Override public void onUpdate(final long personId) {
+							if (personId != person.getId()) {
+								return;
+							}
+
+							if ((getOrganizationId() < 0 || getPersonId() != person.getId()) && metaPeople.getMeta().getRequest_organization() != null) {
+								setOrganizationId(Integer.parseInt(metaPeople.getMeta().getRequest_organization()));
+								Preferences.setOrganizationID(application, getOrganizationId());
+							}
+							setPersonId(person.getId());
+
+							Preferences.setAccessToken(application, getAccessToken());
+							Preferences.setUserID(application, getPersonId());
+
+							setUser(new User(application, getPersonId()));
+
+							SessionBroadcast.broadcastUpdatePersonSuccess(application);
+
+							unregister();
+						}
+					};
+
+					final List<String> cats = new ArrayList<String>();
+					cats.add("updatePerson");
+
+					pr.register(PersonBroadcast.NOTIFY_PERSON_UPDATE, cats);
+
+					PersonJsonSql.update(application, person, "updatePerson");
+				} else {
+					onError(new ApiException("Session.updatePerson did not return any people"));
+				}
+			}
+
+			@Override public void onError(final Throwable throwable) {
+				super.onError(throwable);
+				SessionBroadcast.broadcastUpdatePersonError(application, throwable);
+			}
+		});
 	}
-	
+
 	public synchronized void updateOrganizations() {
 		updateOrganizations(null);
 	}
-	
-	public synchronized void updateOrganizations(long ... organizations) {
+
+	public synchronized void updateOrganizations(final long... organizations) {
 		if (organizations != null) {
-			
+
 		}
 	}
-
-//	public synchronized void verifySession() {
-//		SessionBroadcast.broadcastVerifyStart(application);
-//
-//		PeopleApi.getMe(application, new ApiHandler(GMetaPeople.class) {
-//			@Override public void onSuccess(final Object gsonObject) {
-//				super.onSuccess(gsonObject);
-//				
-//				// if user logged out before verify finished
-//				if (getAccessToken().equalsIgnoreCase("") || getAccessToken() == null)
-//					return;
-//
-//				final GMetaPeople metaPeople = (GMetaPeople) gsonObject;
-//				final GPerson[] people = metaPeople.getPeople();
-//
-//				if (people.length > 0) {
-//					final GPerson person = people[0];
-//
-//					final PersonReceiver pr = new PersonReceiver(application) {
-//						@Override public void onUpdate(final long personId) {
-//							if (personId != person.getId())
-//								return;
-//							
-//							if ((getOrganizationId() < 0 || getPersonId() != person.getId()) && metaPeople.getMeta().getRequest_organization() != null) {
-//								setOrganizationId(Integer.parseInt(metaPeople.getMeta().getRequest_organization()));
-//								Preferences.setOrganizationID(application, getOrganizationId());
-//							}
-//							setPersonId(person.getId());
-//							
-//							Preferences.setAccessToken(application, getAccessToken());
-//							Preferences.setUserID(application, getPersonId());
-//							
-//							setUser(new User(application, getPersonId()));
-//
-//							SessionBroadcast.broadcastVerifyPass(application);
-//							SessionBroadcast.broadcastLogin(application, application.getSession().getAccessToken());
-//
-//							unregister();
-//						}
-//					};
-//
-//					final List<String> cats = new ArrayList<String>();
-//					cats.add("verifySession");
-//
-//					pr.register(PersonBroadcast.NOTIFY_PERSON_UPDATE, cats);
-//
-//					PersonJsonSql.update(application, person, "verifySession");
-//				} else {
-//					onError(new ApiException("VerifySession did not return any people"));
-//				}
-//			}
-//
-//			@Override public void onError(final Throwable throwable) {
-//				super.onError(throwable);
-//				SessionBroadcast.broadcastVerifyFail(application, throwable);
-//			}
-//		});
-//	}
 
 	/**
 	 * Gets the session access token
