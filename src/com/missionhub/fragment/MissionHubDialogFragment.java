@@ -1,14 +1,15 @@
 package com.missionhub.fragment;
 
+import com.actionbarsherlock.app.SherlockDialogFragment;
+
 import roboguice.RoboGuice;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.view.View;
 
 /**
  * Allows for use of RoboGuice with ActionBarSherlock
  */
-public class MissionHubDialogFragment extends DialogFragment {
+public class MissionHubDialogFragment extends SherlockDialogFragment {
 
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {

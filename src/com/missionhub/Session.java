@@ -80,13 +80,9 @@ public class Session {
 	/**
 	 * Attempts to resume a previous user session
 	 * 
-	 * @param verifySession
-	 *            if the session should connect to the missionhub server to
-	 *            verify the session
-	 * 
 	 * @return true if resume data is available
 	 */
-	public synchronized boolean resumeSession(final boolean verifySession) {
+	public synchronized boolean resumeSession() {
 		final long userId = Preferences.getUserID(application);
 		final long organizationId = Preferences.getOrganizationID(application);
 		final String accessToken = Preferences.getAccessToken(application);
@@ -96,73 +92,83 @@ public class Session {
 			setOrganizationId(organizationId);
 			setAccessToken(accessToken);
 			setUser(new User(application, userId));
-			if (verifySession) {
-				verifySession();
-			} else {
-				SessionBroadcast.broadcastLogin(application, application.getSession().getAccessToken());
-			}
+			SessionBroadcast.broadcastLogin(application, application.getSession().getAccessToken());
 			return true;
 		}
 		return false;
 	}
-
-	public synchronized void verifySession() {
-		SessionBroadcast.broadcastVerifyStart(application);
-
-		PeopleApi.getMe(application, new ApiHandler(GMetaPeople.class) {
-			@Override public void onSuccess(final Object gsonObject) {
-				super.onSuccess(gsonObject);
-				
-				// if user logged out before verify finished
-				if (getAccessToken().equalsIgnoreCase("") || getAccessToken() == null)
-					return;
-
-				final GMetaPeople metaPeople = (GMetaPeople) gsonObject;
-				final GPerson[] people = metaPeople.getPeople();
-
-				if (people.length > 0) {
-					final GPerson person = people[0];
-
-					final PersonReceiver pr = new PersonReceiver(application) {
-						@Override public void onUpdate(final long personId) {
-							if (personId != person.getId())
-								return;
-							
-							if ((getOrganizationId() < 0 || getPersonId() != person.getId()) && metaPeople.getMeta().getRequest_organization() != null) {
-								setOrganizationId(Integer.parseInt(metaPeople.getMeta().getRequest_organization()));
-								Preferences.setOrganizationID(application, getOrganizationId());
-							}
-							setPersonId(person.getId());
-							
-							Preferences.setAccessToken(application, getAccessToken());
-							Preferences.setUserID(application, getPersonId());
-							
-							setUser(new User(application, getPersonId()));
-
-							SessionBroadcast.broadcastVerifyPass(application);
-							SessionBroadcast.broadcastLogin(application, application.getSession().getAccessToken());
-
-							unregister();
-						}
-					};
-
-					final List<String> cats = new ArrayList<String>();
-					cats.add("verifySession");
-
-					pr.register(PersonBroadcast.NOTIFY_PERSON_UPDATE, cats);
-
-					PersonJsonSql.update(application, person, "verifySession");
-				} else {
-					onError(new ApiException("VerifySession did not return any people"));
-				}
-			}
-
-			@Override public void onError(final Throwable throwable) {
-				super.onError(throwable);
-				SessionBroadcast.broadcastVerifyFail(application, throwable);
-			}
-		});
+	
+	public synchronized void updatePerson() {
+		
 	}
+	
+	public synchronized void updateOrganizations() {
+		updateOrganizations(null);
+	}
+	
+	public synchronized void updateOrganizations(long ... organizations) {
+		if (organizations != null) {
+			
+		}
+	}
+
+//	public synchronized void verifySession() {
+//		SessionBroadcast.broadcastVerifyStart(application);
+//
+//		PeopleApi.getMe(application, new ApiHandler(GMetaPeople.class) {
+//			@Override public void onSuccess(final Object gsonObject) {
+//				super.onSuccess(gsonObject);
+//				
+//				// if user logged out before verify finished
+//				if (getAccessToken().equalsIgnoreCase("") || getAccessToken() == null)
+//					return;
+//
+//				final GMetaPeople metaPeople = (GMetaPeople) gsonObject;
+//				final GPerson[] people = metaPeople.getPeople();
+//
+//				if (people.length > 0) {
+//					final GPerson person = people[0];
+//
+//					final PersonReceiver pr = new PersonReceiver(application) {
+//						@Override public void onUpdate(final long personId) {
+//							if (personId != person.getId())
+//								return;
+//							
+//							if ((getOrganizationId() < 0 || getPersonId() != person.getId()) && metaPeople.getMeta().getRequest_organization() != null) {
+//								setOrganizationId(Integer.parseInt(metaPeople.getMeta().getRequest_organization()));
+//								Preferences.setOrganizationID(application, getOrganizationId());
+//							}
+//							setPersonId(person.getId());
+//							
+//							Preferences.setAccessToken(application, getAccessToken());
+//							Preferences.setUserID(application, getPersonId());
+//							
+//							setUser(new User(application, getPersonId()));
+//
+//							SessionBroadcast.broadcastVerifyPass(application);
+//							SessionBroadcast.broadcastLogin(application, application.getSession().getAccessToken());
+//
+//							unregister();
+//						}
+//					};
+//
+//					final List<String> cats = new ArrayList<String>();
+//					cats.add("verifySession");
+//
+//					pr.register(PersonBroadcast.NOTIFY_PERSON_UPDATE, cats);
+//
+//					PersonJsonSql.update(application, person, "verifySession");
+//				} else {
+//					onError(new ApiException("VerifySession did not return any people"));
+//				}
+//			}
+//
+//			@Override public void onError(final Throwable throwable) {
+//				super.onError(throwable);
+//				SessionBroadcast.broadcastVerifyFail(application, throwable);
+//			}
+//		});
+//	}
 
 	/**
 	 * Gets the session access token

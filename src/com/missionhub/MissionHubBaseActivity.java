@@ -3,9 +3,8 @@ package com.missionhub;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.missionhub.api.model.sql.DaoSession;
-import roboguice.activity.RoboFragmentActivity;
 
-public class MissionHubBaseActivity extends RoboFragmentActivity {
+public class MissionHubBaseActivity extends MissionHubRoboFragmentActivity {
 
 	/**
 	 * Returns the session

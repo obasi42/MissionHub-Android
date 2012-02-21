@@ -32,7 +32,7 @@ public class MissionHubActivity extends MissionHubBaseActivity {
 		ApiHelper.configAutoLogin(this); // setup debug auto-login
 		
 		// redirect to Dashboard if session can be resumed
-		if (getSession().resumeSession(true)) {
+		if (getSession().resumeSession()) {
 			startActivity(new Intent(this, DashboardActivity.class));
 			finish();
 		}

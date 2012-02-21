@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/background" >
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:orientation="vertical"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp" >
+
+        <greendroid.widget.AsyncImageView
+            android:id="@+id/profile_picture"
+            android:layout_width="110dp"
+            android:layout_height="150dp"
+            android:contentDescription="Contact Picture"
+            android:src="@drawable/default_contact" >
+        </greendroid.widget.AsyncImageView>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/version"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="5dp"
+        android:gravity="center"
+        android:textColor="@color/white" >
+    </TextView>
+
+</RelativeLayout>

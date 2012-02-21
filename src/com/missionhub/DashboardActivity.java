@@ -26,6 +26,11 @@ public class DashboardActivity extends MissionHubBaseActivity {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.activity_dashboard);
+		
+		getSupportActionBar().setDisplayShowHomeEnabled(true);
+		getSupportActionBar().setDisplayUseLogoEnabled(true);
+		getSupportActionBar().setLogo(R.drawable.logo);
+		getSupportActionBar().setDisplayShowTitleEnabled(false);
 
 		final SessionReceiver sr = new SessionReceiver(getApplicationContext()) {
 			@Override public void onVerifyPass() {
@@ -43,7 +48,7 @@ public class DashboardActivity extends MissionHubBaseActivity {
 	}
 
 	@Override public boolean onCreateOptionsMenu(final Menu menu) {
-		menu.add(R.string.profile).setOnMenuItemClickListener(new ProfileOnMenuItemClickListener()).setIcon(R.drawable.ic_action_contact).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+		menu.add(R.string.action_profile).setOnMenuItemClickListener(new ProfileOnMenuItemClickListener()).setIcon(R.drawable.ic_action_contact).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 		menu.add(R.string.action_logout).setOnMenuItemClickListener(new LogoutOnMenuItemClickListener()).setIcon(R.drawable.ic_action_logout).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 
 		return super.onCreateOptionsMenu(menu);
@@ -51,7 +56,7 @@ public class DashboardActivity extends MissionHubBaseActivity {
 	
 	private class ProfileOnMenuItemClickListener implements OnMenuItemClickListener {
 		@Override public boolean onMenuItemClick(MenuItem item) {
-			Toast.makeText(getBaseContext(), "Click Profile", Toast.LENGTH_SHORT).show();
+			startActivity(new Intent(DashboardActivity.this, ProfileActivity.class));
 			return false;
 		}
 	}

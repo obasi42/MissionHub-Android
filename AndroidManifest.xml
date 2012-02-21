@@ -10,7 +10,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application android:icon="@drawable/ic_launcher" android:label="@string/app_name" android:name=".MissionHubApplication">
-        <activity android:label="@string/app_name" android:name=".MissionHubActivity" android:theme="@style/Theme.MissionHub.NoActionBar">
+        <activity android:label="@string/app_name" android:name=".MissionHubActivity" android:theme="@style/Theme.MissionHub.NoActionBar" android:logo="@drawable/logo">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -23,6 +23,12 @@
         </activity>
         <activity
             android:name=".LoginActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation"
+            android:theme="@style/Theme.MissionHub" >
+        </activity>
+        <activity
+            android:name=".ProfileActivity"
+            android:label="@string/action_profile"
             android:configChanges="keyboard|keyboardHidden|orientation"
             android:theme="@style/Theme.MissionHub" >
         </activity>
