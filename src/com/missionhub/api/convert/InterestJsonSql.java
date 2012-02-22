@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.missionhub.MissionHubApplication;
 import com.missionhub.api.model.GIdNameProvider;
+import com.missionhub.api.model.sql.DaoSession;
 import com.missionhub.api.model.sql.Interest;
 import com.missionhub.api.model.sql.InterestDao;
 import com.missionhub.api.model.sql.InterestDao.Properties;
@@ -19,7 +20,7 @@ public class InterestJsonSql {
 
 	public static void update(final Context context, final long personId, final GIdNameProvider[] interests, final boolean threaded, final boolean notify,
 			final String... categories) {
-		
+
 		try {
 			privateUpdate(context, personId, interests, threaded, notify, categories);
 		} catch (final Exception e) {
@@ -41,25 +42,30 @@ public class InterestJsonSql {
 		}
 
 		final MissionHubApplication app = (MissionHubApplication) context.getApplicationContext();
-		final InterestDao id = app.getDbSession().getInterestDao();
+		final DaoSession session = app.getDbSession();
+		final InterestDao id = session.getInterestDao();
 
-		// delete current interests in db
-		final LazyList<Interest> currentInterests = id.queryBuilder().where(Properties.Person_id.eq(personId)).listLazy();
-		final CloseableListIterator<Interest> itr = currentInterests.listIteratorAutoClose();
-		while (itr.hasNext()) {
-			final Interest interest = itr.next();
-			id.delete(interest);
-		}
+		app.getDbSession().runInTx(new Runnable() {
+			@Override public void run() {
+				// delete current interests in db
+				final LazyList<Interest> currentInterests = id.queryBuilder().where(Properties.Person_id.eq(personId)).listLazyUncached();
+				final CloseableListIterator<Interest> itr = currentInterests.listIteratorAutoClose();
+				while (itr.hasNext()) {
+					final Interest interest = itr.next();
+					session.delete(interest);
+				}
 
-		// insert interests
-		for (final GIdNameProvider interest : interests) {
-			final Interest i = new Interest();
-			i.setCategory(interest.getCategory());
-			i.setInterest_id(interest.getId());
-			i.setName(interest.getName());
-			i.setPerson_id(personId);
-			i.setProvider(interest.getProvider());
-			id.insert(i);
-		}
+				// insert interests
+				for (final GIdNameProvider interest : interests) {
+					final Interest i = new Interest();
+					i.setCategory(interest.getCategory());
+					i.setInterest_id(interest.getId());
+					i.setName(interest.getName());
+					i.setPerson_id(personId);
+					i.setProvider(interest.getProvider());
+					session.insert(i);
+				}
+			}
+		});
 	}
 }

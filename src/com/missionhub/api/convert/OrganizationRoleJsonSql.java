@@ -4,12 +4,12 @@ import android.content.Context;
 
 import com.missionhub.MissionHubApplication;
 import com.missionhub.api.model.GOrgGeneric;
+import com.missionhub.api.model.sql.DaoSession;
 import com.missionhub.api.model.sql.Organization;
 import com.missionhub.api.model.sql.OrganizationDao;
 import com.missionhub.api.model.sql.OrganizationalRole;
 import com.missionhub.api.model.sql.OrganizationalRoleDao;
 import com.missionhub.api.model.sql.OrganizationalRoleDao.Properties;
-import com.missionhub.broadcast.OrganizationBroadcast;
 
 import de.greenrobot.dao.CloseableListIterator;
 import de.greenrobot.dao.LazyList;
@@ -25,12 +25,6 @@ public class OrganizationRoleJsonSql {
 			privateUpdate(context, personId, roles, threaded, notify, categories);
 		} catch (final Exception e) {
 			// TODO:
-			// long personId = -1;
-			// if (person != null) {
-			// personId = person.getId();
-			// }
-			// PersonJsonSqlBroadcast.broadcastError(context, personId, e,
-			// categories);
 		}
 	}
 
@@ -39,8 +33,6 @@ public class OrganizationRoleJsonSql {
 		if (threaded) {
 			new Thread(new Runnable() {
 				@Override public void run() {
-					// call update again, only this time we are in a thread, so
-					// set threaded=false
 					update(context, personId, roles, false, notify, categories);
 				}
 			}).start();
@@ -48,47 +40,48 @@ public class OrganizationRoleJsonSql {
 		}
 
 		final MissionHubApplication app = (MissionHubApplication) context.getApplicationContext();
-		final OrganizationalRoleDao ord = app.getDbSession().getOrganizationalRoleDao();
-		final OrganizationDao od = app.getDbSession().getOrganizationDao();
+		final DaoSession session = app.getDbSession();
+		final OrganizationalRoleDao ord = session.getOrganizationalRoleDao();
+		final OrganizationDao od = session.getOrganizationDao();
 
-		// delete current roles in db
-		final LazyList<OrganizationalRole> currentRoles = ord.queryBuilder().where(Properties.Person_id.eq(personId)).listLazy();
-		final CloseableListIterator<OrganizationalRole> itr = currentRoles.listIteratorAutoClose();
-		while (itr.hasNext()) {
-			final OrganizationalRole role = itr.next();
-			ord.delete(role);
-			// broadcast this?
-		}
+		session.runInTx(new Runnable() {
+			@Override public void run() {
 
-		// Insert new roles
-		for (final GOrgGeneric role : roles) {
-			final OrganizationalRole or = new OrganizationalRole();
-			or.setOrganization_id(role.getOrg_id());
-			or.setPerson_id(personId);
-			if (role.getPrimary() != null) {
-				or.setPrimary(Boolean.parseBoolean(role.getPrimary()));
-			}
-			or.setRole(role.getRole());
-			ord.insert(or);
-			// broadcast this?
-
-			// insert organization stub
-			Organization org = od.load(role.getOrg_id());
-			boolean newOrg = false;
-			if (org == null) {
-				org = new Organization();
-				newOrg = true;
-			}
-			org.setId(role.getOrg_id());
-			org.setName(role.getName());
-			final long id2 = od.insertOrReplace(org);
-			
-			if (notify) {
-				if (newOrg) {
-					OrganizationBroadcast.broadcastCreate(context, id2, categories);
+				// delete current roles in db
+				final LazyList<OrganizationalRole> currentRoles = ord.queryBuilder().where(Properties.Person_id.eq(personId)).listLazyUncached();
+				final CloseableListIterator<OrganizationalRole> itr = currentRoles.listIteratorAutoClose();
+				while (itr.hasNext()) {
+					session.delete(itr.next());
 				}
-				OrganizationBroadcast.broadcastUpdate(context, id2, categories);
+
+				// insert new roles
+				for (final GOrgGeneric role : roles) {
+					final OrganizationalRole or = new OrganizationalRole();
+					or.setOrganization_id(role.getOrg_id());
+					or.setPerson_id(personId);
+					if (role.getPrimary() != null) {
+						or.setPrimary(Boolean.parseBoolean(role.getPrimary()));
+					}
+					or.setRole(role.getRole());
+					session.insert(or);
+
+					// insert organization stub
+					Organization org = od.load(role.getOrg_id());
+					if (org == null) {
+						org = new Organization();
+					} else {
+						org.refresh();
+					}
+					if (role.getOrg_id() != null) {
+						org.setId(role.getOrg_id());
+					}
+
+					if (role.getName() != null) {
+						org.setName(role.getName());
+					}
+					session.insertOrReplace(org);
+				}
 			}
-		}
+		});
 	}
 }

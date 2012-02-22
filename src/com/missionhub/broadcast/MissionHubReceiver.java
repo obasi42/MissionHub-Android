@@ -86,6 +86,21 @@ abstract class MissionHubReceiver extends BroadcastReceiver {
 	}
 	
 	/**
+	 * Registers the MissionHubReceiver with the LocalBroadcastManager with the
+	 * given action and categories
+	 * 
+	 * @param action
+	 * @param categories
+	 */
+	public void register(List<String> categories, final String ... actions) {
+		final IntentFilter intent = buildIntentFilter(actions);
+		for (final String category : categories) {
+			intent.addCategory(category);
+		}
+		register(intent);
+	}
+	
+	/**
 	 * Unregisters the MissionHubReceiver with the LocalBroadcastManager
 	 */
 	public void unregister() {

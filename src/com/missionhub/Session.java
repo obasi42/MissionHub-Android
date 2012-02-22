@@ -4,10 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.missionhub.api.ApiHandler;
+import com.missionhub.api.OrganizationsApi;
 import com.missionhub.api.PeopleApi;
+import com.missionhub.api.convert.OrganizationJsonSql;
 import com.missionhub.api.convert.PersonJsonSql;
+import com.missionhub.api.model.GMetaOrganizations;
 import com.missionhub.api.model.GMetaPeople;
 import com.missionhub.api.model.GPerson;
+import com.missionhub.broadcast.OrganizationBroadcast;
+import com.missionhub.broadcast.OrganizationReceiver;
 import com.missionhub.broadcast.PersonBroadcast;
 import com.missionhub.broadcast.PersonReceiver;
 import com.missionhub.broadcast.SessionBroadcast;
@@ -36,6 +41,12 @@ public class Session {
 
 	/** current user */
 	private User user;
+	
+	/** state for updatePerson() */
+	private boolean updatingPerson = false;
+	
+	/** state for updateOrganizations() */
+	private boolean updatingOrganizations = false;
 
 	/**
 	 * Creates a new session
@@ -100,8 +111,14 @@ public class Session {
 		}
 		return false;
 	}
-
+	
+	/**
+	 * Updates the current user's information
+	 */
 	public synchronized void updatePerson() {
+		if (updatingPerson) return;
+		updatingPerson = true;
+		
 		SessionBroadcast.broadcastUpdatePersonStart(application);
 
 		PeopleApi.getMe(application, new ApiHandler(GMetaPeople.class) {
@@ -138,6 +155,8 @@ public class Session {
 
 							SessionBroadcast.broadcastUpdatePersonSuccess(application);
 
+							updatingPerson = false;
+							
 							unregister();
 						}
 					};
@@ -155,18 +174,73 @@ public class Session {
 
 			@Override public void onError(final Throwable throwable) {
 				super.onError(throwable);
+				updatingPerson = false;
 				SessionBroadcast.broadcastUpdatePersonError(application, throwable);
 			}
 		});
 	}
 
+	/**
+	 * Update the current user's organizations
+	 */
 	public synchronized void updateOrganizations() {
 		updateOrganizations(null);
 	}
 
+	/**
+	 * Update the current user's organizations
+	 * @param organizations the orgs to update
+	 */
 	public synchronized void updateOrganizations(final long... organizations) {
-		if (organizations != null) {
+		if (updatingOrganizations) return;
+		updatingOrganizations = true;
+		
+		SessionBroadcast.broadcastUpdateOrganizationsStart(application);
 
+		final ApiHandler hander = new ApiHandler(GMetaOrganizations.class) {
+			@Override public void onSuccess(final Object gsonObject) {
+				super.onSuccess(gsonObject);
+
+				// if user logged out during fetch
+				if (getAccessToken().equalsIgnoreCase("") || getAccessToken() == null) {
+					return;
+				}
+				
+				final OrganizationReceiver or = new OrganizationReceiver(application) {
+					@Override public void onComplete(final long[] organizationIds) {
+						SessionBroadcast.broadcastUpdateOrganizationsSuccess(application);
+						updatingOrganizations = false;
+						unregister();
+					}
+
+					@Override public void onError(final long[] organizationIds, final Throwable throwable) {
+						SessionBroadcast.broadcastUpdateOrganizationsError(application, throwable);
+						updatingOrganizations = false;
+						unregister();
+					}
+				};
+				final List<String> cats = new ArrayList<String>();
+				cats.add("updateOrganizations");
+				or.register(cats, OrganizationBroadcast.NOTIFY_ORGANIZATIONS_COMPLETE, OrganizationBroadcast.NOTIFY_ORGANIZATIONS_ERROR);
+
+				final GMetaOrganizations metaOrganizations = (GMetaOrganizations) gsonObject;
+				OrganizationJsonSql.update(application, metaOrganizations.getOrganizations(), true, true, "updateOrganizations");
+			}
+
+			@Override public void onError(final Throwable throwable) {
+				super.onError(throwable);
+				SessionBroadcast.broadcastUpdateOrganizationsError(application, throwable);
+			}
+		};
+
+		if (organizations != null) {
+			final List<Long> orgs = new ArrayList<Long>();
+			for (final long org : organizations) {
+				orgs.add(org);
+			}
+			OrganizationsApi.get(application, orgs, hander);
+		} else {
+			OrganizationsApi.get(application, hander);
 		}
 	}
 

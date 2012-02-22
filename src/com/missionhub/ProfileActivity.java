@@ -5,9 +5,11 @@ import roboguice.inject.InjectView;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
+import com.missionhub.broadcast.SessionReceiver;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,7 +20,7 @@ public class ProfileActivity extends MissionHubBaseActivity {
 
 	/** logging tag */
 	public static final String TAG = ProfileActivity.class.getSimpleName();
-
+	
 	@InjectView(R.id.version) TextView mVersion;
 	
 	/** Called when the activity is first created. */
@@ -39,6 +41,22 @@ public class ProfileActivity extends MissionHubBaseActivity {
 		try {
 			mVersion.setText(getString(R.string.profile_version) + " " + getPackageManager().getPackageInfo(getPackageName(), 0).versionName);
 		} catch (Exception e) {}
+				
+		
+		SessionReceiver sr = new SessionReceiver(this){
+			@Override
+			public void onUpdateOrganizationsSuccess() {
+				Log.e("UPDATE COMPLETE", "DONE");
+				unregister();
+			}
+			
+			@Override 
+			public void onUpdateOrganizationsError(Throwable throwable) {
+				Log.e("UPDATE ERROR", throwable.getMessage(), throwable);
+				unregister();
+			}
+		};
+		sr.register();
 	}
 	
 	@Override public boolean onCreateOptionsMenu(final Menu menu) {
@@ -51,6 +69,10 @@ public class ProfileActivity extends MissionHubBaseActivity {
 		@Override public boolean onMenuItemClick(MenuItem item) {
 			Toast.makeText(getApplicationContext(), "Refresh", Toast.LENGTH_LONG).show();
 			//TODO:
+			
+			//getSession().updatePerson();
+			getSession().updateOrganizations();
+			
 			return false;
 		}
 	}

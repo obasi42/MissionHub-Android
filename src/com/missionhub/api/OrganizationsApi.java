@@ -37,7 +37,7 @@ public class OrganizationsApi {
 	 * @param apiHandler
 	 * @return
 	 */
-	public static ApiRequest get(final Context context, final int organizationId, final ApiHandler apiHandler) {
+	public static ApiRequest get(final Context context, final long organizationId, final ApiHandler apiHandler) {
 		final ApiClient client = new ApiClient();
 		final String url = ApiHelper.getAbsoluteUrl("organizations", String.valueOf(organizationId));
 		final HttpHeaders headers = ApiHelper.getDefaultHeaders(context);
