@@ -117,8 +117,12 @@ public class DashboardActivity extends MissionHubBaseActivity {
 		} catch (final Exception e) {}
 	}
 	
-	public void clickContacts(View v) {
-		Toast.makeText(this, "Contacts", Toast.LENGTH_SHORT).show();
+	public void clickPeople(View v) {
+		Toast.makeText(this, "People", Toast.LENGTH_SHORT).show();
+	}
+	
+	public void clickGroups(View v) {
+		Toast.makeText(this, "Groups", Toast.LENGTH_SHORT).show();
 	}
 	
 	public void clickSurveys(View v) {

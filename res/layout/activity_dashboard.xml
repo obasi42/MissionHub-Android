@@ -10,17 +10,18 @@
         android:layout_above="@+id/dashboard_bottom_bar" >
 
         <Button
-            android:id="@+id/dashboard_contacts"
+            android:id="@+id/dashboard_people"
             style="@style/dashboard_button"
-            android:drawableTop="@drawable/dashboard_contacts"
-            android:onClick="clickContacts"
-            android:text="@string/missionhub_dashboard_contacts" />
+            android:drawableTop="@drawable/dashboard_people"
+            android:onClick="clickPeople"
+            android:text="@string/missionhub_dashboard_people" />
 
-        <!--
-                 <Button android:id="@+id/dashboard_groups" style="@style/DashboardButton" 
-				android:text="@string/dashboard_groups" android:drawableTop="@drawable/dashboard_groups" 
-				android:onClick="clickGroups"/>
-        -->
+        <Button
+            android:id="@+id/dashboard_groups"
+            style="@style/dashboard_button"
+            android:drawableTop="@drawable/dashboard_groups"
+            android:onClick="clickGroups"
+            android:text="@string/missionhub_dashboard_groups" />
 
         <Button
             android:id="@+id/dashboard_surveys"
