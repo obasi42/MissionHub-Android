@@ -106,6 +106,7 @@ public class Session {
 			SessionBroadcast.broadcastLogin(application, application.getSession().getAccessToken());
 			if (userId < 0) {
 				updatePerson();
+				updateOrganizations();
 			}
 			return true;
 		}

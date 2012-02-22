@@ -10,7 +10,6 @@ import android.widget.Toast;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
-import com.missionhub.broadcast.SessionBroadcast;
 import com.missionhub.broadcast.SessionReceiver;
 
 public class DashboardActivity extends MissionHubBaseActivity {
@@ -33,7 +32,20 @@ public class DashboardActivity extends MissionHubBaseActivity {
 		getSupportActionBar().setDisplayShowTitleEnabled(false);
 
 		final SessionReceiver sr = new SessionReceiver(getApplicationContext()) {
+			@Override public void onUpdateOrganizationsStart() {
+				//showPreparing("org");
+			}
+			
+			@Override public void onUpdateOrganizationsSuccess() {
+				//hidePreparing("org");
+			}
+			
+			@Override public void onUpdatePersonStart() {
+				//showPreparing("person");
+			}
+			
 			@Override public void onUpdatePersonSuccess() {
+				//hidePreparing("person");
 				updateBottomBar();
 			}
 			
@@ -44,10 +56,30 @@ public class DashboardActivity extends MissionHubBaseActivity {
 				finish();
 			}
 		};
-		sr.register(SessionBroadcast.NOTIFY_UPDATE_PERSON_SUCCESS, SessionBroadcast.NOTIFY_LOGOUT);
+		sr.register();
 
 		updateBottomBar();
 	}
+//	
+//	List<String> preparing = new ArrayList<String>();
+//	ProgressDialog dialog;
+//	
+//	public void showPreparing(String id) {
+//		if (dialog == null || !dialog.isShowing()) {
+//			dialog = ProgressDialog.show(this, "", "Preparing MissionHub for first use...", true);
+//			dialog.setCancelable(false);
+//		}
+//		preparing.add(id);
+//	}
+//	
+//	public void hidePreparing(String id) {
+//		preparing.remove(id);
+//		if (preparing.isEmpty()) {
+//			if (dialog != null && dialog.isShowing()) {
+//				dialog.hide();
+//			}
+//		}
+//	}
 
 	@Override public boolean onCreateOptionsMenu(final Menu menu) {
 		menu.add(R.string.action_profile).setOnMenuItemClickListener(new ProfileOnMenuItemClickListener()).setIcon(R.drawable.ic_action_contact).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
