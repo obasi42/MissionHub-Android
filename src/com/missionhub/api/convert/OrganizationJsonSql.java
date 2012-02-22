@@ -70,8 +70,7 @@ public class OrganizationJsonSql {
 			}
 
 			if (organization.getKeywords() != null) {
-				// KeywordJsonSql.update(context, organization.getKeywords(),
-				// false, false, categories); TODO:
+				KeywordJsonSql.update(context, organization.getId(), organization.getKeywords(), false, false, categories);
 			}
 
 			if (organization.getLeaders() != null) {
