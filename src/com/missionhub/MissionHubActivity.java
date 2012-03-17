@@ -1,13 +1,11 @@
 package com.missionhub;
 
-import roboguice.inject.InjectView;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 
 /**
  * The main MissionHub Activity.
@@ -20,17 +18,16 @@ public class MissionHubActivity extends MissionHubBaseActivity {
 	/** login activity result constant */
 	public final int RESULT_LOGIN_ACTIVITY = 1;
 
-	@InjectView(R.id.btn_about) Button btnAbout;
-	@InjectView(R.id.btn_login) Button btnLogin;
+	//@InjectView(R.id.btn_about) Button btnAbout;
+	//@InjectView(R.id.btn_login) Button btnLogin;
 
 	/** Called when the activity is first created. */
 	@Override public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		// redirect to Dashboard if session can be resumed
+		
+		// redirect to first screen if session can be resumed
 		if (getSession() != null) {
-			startActivity(new Intent(this, DashboardActivity.class));
-			finish();
+			startMain();
 		}
 
 		setContentView(R.layout.activity_missionhub);
@@ -38,12 +35,19 @@ public class MissionHubActivity extends MissionHubBaseActivity {
 
 	@Override protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
 		if (requestCode == RESULT_LOGIN_ACTIVITY && resultCode == RESULT_OK) {
-			startActivity(new Intent(this, DashboardActivity.class));
-			finish();
+			startMain();
 		}
 		if (requestCode == RESULT_LOGIN_ACTIVITY && resultCode == RESULT_FIRST_USER) {
 			clickLogin(null);
 		}
+	}
+	
+	/**
+	 * Starts the main activity
+	 */
+	private void startMain() {
+		startActivity(new Intent(this, PeopleMyActivity.class));
+		finish();
 	}
 
 	/**

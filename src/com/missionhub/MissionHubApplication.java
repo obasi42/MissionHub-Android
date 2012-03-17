@@ -9,6 +9,8 @@ import com.missionhub.api.model.sql.DaoMaster;
 import com.missionhub.api.model.sql.DaoMaster.OpenHelper;
 import com.missionhub.api.model.sql.DaoSession;
 import com.missionhub.api.model.sql.MissionHubOpenHelper;
+import com.missionhub.config.Preferences;
+import com.missionhub.util.Upgrade;
 
 /**
  * MissionHub's Base Application
@@ -36,6 +38,9 @@ public class MissionHubApplication extends GDApplication {
 		// enables the http response cache for ICS
 		NetworkUtils.enableHttpResponseCache(this);
 
+		// runs upgrade methods
+		Upgrade.doUpgrades(this);
+		
 		// resumes the session if possible
 		session = Session.resumeSession(this);
 	}
@@ -114,5 +119,13 @@ public class MissionHubApplication extends GDApplication {
 	 */
 	public synchronized void setSession(Session session) {
 		this.session = session;
+	}
+	
+	/**
+	 * Resets all app data
+	 */
+	public void reset() {
+		Preferences.reset(this);
+		deleteDatabase();
 	}
 }

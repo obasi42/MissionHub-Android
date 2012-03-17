@@ -8,6 +8,14 @@ public class Preferences {
 	public static final String PREFS_NAME = "MissionHubPrivate";
 
 	/**
+	 * Removes all the shared preferences
+	 * @param context
+	 */
+	public static synchronized void reset(final Context context) {
+		context.getSharedPreferences(PREFS_NAME, 0).edit().clear().commit();
+	}
+	
+	/**
 	 * Get the stored access token
 	 * 
 	 * @param context
@@ -114,40 +122,50 @@ public class Preferences {
 		editor.remove("userID");
 		editor.commit();
 	}
-
+	
 	/**
-	 * Returns the stored lastRunVersion
-	 * 
+	 * Returns the stored lastRunMajorVersion
 	 * @param context
-	 * @return the lastRunVersion or null
+	 * @return
 	 */
-	public static synchronized String getLastRunVersion(final Context context) {
+	public static synchronized int getLastRunMajorVersion(final Context context) {
 		final SharedPreferences settings = context.getSharedPreferences(PREFS_NAME, 0);
-		return settings.getString("lastRunVersion", null);
+		return settings.getInt("lastRunMajorVersion", -1);
+	}
+	
+	/**
+	 * Returns the stored lastRunMinorVersion
+	 * @param context
+	 * @return
+	 */
+	public static synchronized int getLastRunMinorVersion(final Context context) {
+		final SharedPreferences settings = context.getSharedPreferences(PREFS_NAME, 0);
+		return settings.getInt("lastRunMinorVersion", -1);
 	}
 
 	/**
-	 * Sets the stored lastRunVersion
+	 * Sets the stored lastRunMajorVersion
 	 * 
 	 * @param context
-	 * @param lastRunVersion
+	 * @param lastRunMajorVersion
 	 */
-	public static synchronized void setLastRunVersion(final Context context, final String lastRunVersion) {
+	public static synchronized void setLastRunMajorVersion(final Context context, final int lastRunMajorVersion) {
 		final SharedPreferences settings = context.getSharedPreferences(PREFS_NAME, 0);
 		final SharedPreferences.Editor editor = settings.edit();
-		editor.putString("lastRunVersion", lastRunVersion);
+		editor.putInt("lastRunMajorVersion", lastRunMajorVersion);
 		editor.commit();
 	}
-
+	
 	/**
-	 * Removes the stored lastRunVersion
+	 * Sets the stored lastRunMinorVersion
 	 * 
 	 * @param context
+	 * @param lastRunMinorVersion
 	 */
-	public static synchronized void removeLastRunVersion(final Context context) {
+	public static synchronized void setLastRunMinorVersion(final Context context, final int lastRunMinorVersion) {
 		final SharedPreferences settings = context.getSharedPreferences(PREFS_NAME, 0);
 		final SharedPreferences.Editor editor = settings.edit();
-		editor.remove("lastRunVersion");
+		editor.putInt("lastRunMinorVersion", lastRunMinorVersion);
 		editor.commit();
 	}
 }
