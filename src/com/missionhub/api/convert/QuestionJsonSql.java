@@ -11,15 +11,15 @@ import com.missionhub.MissionHubApplication;
 import com.missionhub.api.model.GQuestion;
 import com.missionhub.api.model.sql.DaoSession;
 import com.missionhub.api.model.sql.Question;
+import com.missionhub.api.model.sql.QuestionChoice;
 import com.missionhub.api.model.sql.QuestionChoiceDao;
 import com.missionhub.api.model.sql.QuestionChoiceDao.Properties;
 import com.missionhub.api.model.sql.QuestionDao;
-import com.missionhub.api.model.sql.QuestionChoice;
 
 import de.greenrobot.dao.LazyList;
 
 public class QuestionJsonSql {
-	
+
 	/** logging tag */
 	public final static String TAG = QuestionJsonSql.class.getSimpleName();
 
@@ -50,71 +50,73 @@ public class QuestionJsonSql {
 
 		final MissionHubApplication app = (MissionHubApplication) context.getApplicationContext();
 		final DaoSession session = app.getDbSession();
-		QuestionDao qd = session.getQuestionDao();
-		QuestionChoiceDao qcd = session.getQuestionChoiceDao();
-		
+		final QuestionDao qd = session.getQuestionDao();
+		final QuestionChoiceDao qcd = session.getQuestionChoiceDao();
+
 		final List<Question> qs = new ArrayList<Question>();
 		final ArrayList<QuestionChoice> qcDelete = new ArrayList<QuestionChoice>();
- 		final List<QuestionChoice> qcInsert = new ArrayList<QuestionChoice>();
-		
-		for (GQuestion question : questions) {
+		final List<QuestionChoice> qcInsert = new ArrayList<QuestionChoice>();
+
+		for (final GQuestion question : questions) {
 			Question q = qd.load(question.getId());
 			if (q == null) {
 				q = new Question();
 			} else {
 				q.refresh();
 			}
-			
+
 			q.setId(question.getId());
 			q.setKeyword_id(keywordId);
 
-			if (question.getLabel() != null)
+			if (question.getLabel() != null) {
 				q.setLabel(question.getLabel());
+			}
 
-			
 			if (question.getRequired() != null) {
 				q.setRequired(Boolean.parseBoolean(question.getRequired()));
 			}
 
-			if (question.getStyle() != null)
+			if (question.getStyle() != null) {
 				q.setStyle(question.getStyle());
+			}
 
-			if (question.getKind() != null)
+			if (question.getKind() != null) {
 				q.setKind(question.getKind());
+			}
 
 			if (question.getChoices() != null) {
 				// Delete all questions choices for this question
-				LazyList<QuestionChoice> questionChoices = qcd.queryBuilder().where(Properties.Question_id.eq(question.getId())).listLazyUncached();
-				Iterator<QuestionChoice> itr = questionChoices.listIteratorAutoClose();
+				final LazyList<QuestionChoice> questionChoices = qcd.queryBuilder().where(Properties.Question_id.eq(question.getId())).listLazyUncached();
+				final Iterator<QuestionChoice> itr = questionChoices.listIteratorAutoClose();
 				while (itr.hasNext()) {
 					qcDelete.add(itr.next());
 				}
 
-				for (String choice : question.getChoices()) {
-					QuestionChoice qc = new QuestionChoice();
+				for (final String choice : question.getChoices()) {
+					final QuestionChoice qc = new QuestionChoice();
 					qc.setChoice(choice);
 					qc.setQuestion_id(question.getId());
 					qcInsert.add(qc);
 				}
 			}
-			
+
 			qs.add(q);
 		}
-		
+
 		app.getDbSession().runInTx(new Runnable() {
 			@Override public void run() {
-				for(final QuestionChoice qc : qcDelete) {
+				for (final QuestionChoice qc : qcDelete) {
 					session.delete(qc);
 				}
-				
-				for(final Question q : qs) {
+
+				for (final Question q : qs) {
 					session.insertOrReplace(q);
 				}
-				
+
 				for (final QuestionChoice qc : qcInsert) {
 					session.insert(qc);
 				}
-				
+
 			}
 		});
 	}

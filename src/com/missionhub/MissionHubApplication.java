@@ -35,6 +35,9 @@ public class MissionHubApplication extends GDApplication {
 
 		// enables the http response cache for ICS
 		NetworkUtils.enableHttpResponseCache(this);
+
+		// resumes the session if possible
+		session = Session.resumeSession(this);
 	}
 
 	@Override public void onTerminate() {
@@ -52,9 +55,6 @@ public class MissionHubApplication extends GDApplication {
 	 * @return
 	 */
 	public synchronized Session getSession() {
-		if (session == null) {
-			session = new Session(this);
-		}
 		return session;
 	}
 
@@ -95,9 +95,10 @@ public class MissionHubApplication extends GDApplication {
 		}
 		return daoSession;
 	}
-	
+
 	/**
 	 * Deletes the mh-db
+	 * 
 	 * @return
 	 */
 	public boolean deleteDatabase() {
@@ -105,5 +106,13 @@ public class MissionHubApplication extends GDApplication {
 		daoSession = null;
 		db = null;
 		return deleteDatabase("mh-db");
+	}
+
+	/**
+	 * Sets the session
+	 * @param session
+	 */
+	public synchronized void setSession(Session session) {
+		this.session = session;
 	}
 }

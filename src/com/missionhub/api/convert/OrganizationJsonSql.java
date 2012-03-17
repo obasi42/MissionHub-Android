@@ -22,7 +22,7 @@ public class OrganizationJsonSql {
 		try {
 			privateUpdate(context, organizations, threaded, notify, categories);
 		} catch (final Exception e) {
-			long[] orgs = new long[organizations.length];
+			final long[] orgs = new long[organizations.length];
 			for (int i = 0; i < organizations.length; i++) {
 				orgs[i] = organizations[i].getId();
 			}
@@ -70,11 +70,11 @@ public class OrganizationJsonSql {
 			}
 
 			if (organization.getKeywords() != null) {
-				KeywordJsonSql.update(context, organization.getId(), organization.getKeywords(), false, false, categories);
+				KeywordJsonSql.update(context, organization.getId(), organization.getKeywords(), false, notify, categories);
 			}
 
 			if (organization.getLeaders() != null) {
-				PersonJsonSql.update(context, organization.getLeaders(), false, false, categories);
+				PersonJsonSql.update(context, organization.getLeaders(), false, notify, categories);
 			}
 
 			orgs.add(org);

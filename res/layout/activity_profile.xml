@@ -19,6 +19,13 @@
             android:contentDescription="Contact Picture"
             android:src="@drawable/default_contact" >
         </greendroid.widget.AsyncImageView>
+
+        <Spinner
+            android:id="@+id/spinner"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:spinnerMode="dialog" />
+
     </LinearLayout>
 
     <TextView

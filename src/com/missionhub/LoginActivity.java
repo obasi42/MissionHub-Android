@@ -232,21 +232,21 @@ public class LoginActivity extends MissionHubBaseActivity {
 
 			@Override public void onSuccess(final Object gsonObject) {
 				final GLoginDone loginDone = (GLoginDone) gsonObject;
-				
+
 				Preferences.setAccessToken(LoginActivity.this, loginDone.getAccess_token());
 				Preferences.setUserID(LoginActivity.this, loginDone.getPerson().getId());
-				
+
 				final PersonReceiver pr = new PersonReceiver(getApplicationContext()) {
 					@Override public void onUpdate(final long personId) {
-						if (personId != loginDone.getPerson().getId())
+						if (personId != loginDone.getPerson().getId()) {
 							return;
+						}
 						
-						getSession().setAccessToken(loginDone.getAccess_token());
-						getSession().setPersonId(loginDone.getPerson().getId());
-						getSession().setUser(new User((MissionHubApplication) getApplicationContext(), loginDone.getPerson().getId()));
-
+						MissionHubApplication application = (MissionHubApplication) getApplicationContext();
+						application.setSession(Session.resumeSession(application));
+						
 						unregister();
-						
+
 						finishOK();
 					}
 				};
@@ -255,7 +255,7 @@ public class LoginActivity extends MissionHubBaseActivity {
 				cats.add("getTokenFromCode");
 
 				pr.register(PersonBroadcast.NOTIFY_PERSON_UPDATE, cats);
-				
+
 				PersonJsonSql.update(getApplicationContext(), loginDone.getPerson(), "getTokenFromCode");
 			}
 

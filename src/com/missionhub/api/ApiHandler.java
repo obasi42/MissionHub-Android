@@ -47,22 +47,22 @@ public abstract class ApiHandler extends HttpHandler {
 	}
 
 	public void onError(final Throwable throwable) {
-		
+
 	}
 
 	@Override public void onCancel(final HttpResponse response) {
-		
+
 	}
 
 	@Override public void onRetry(final HttpResponse response) {
 
 	}
-	
+
 	@Override public void onStart(final HttpResponse response) {
 		onStart();
 	}
-	
+
 	public void onStart() {
-		
+
 	}
 }

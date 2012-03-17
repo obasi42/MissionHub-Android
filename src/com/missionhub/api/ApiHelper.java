@@ -10,7 +10,6 @@ import com.cr_wd.android.network.HttpHeaders;
 import com.cr_wd.android.network.HttpParams;
 import com.missionhub.MissionHubApplication;
 import com.missionhub.config.Config;
-import com.missionhub.config.Preferences;
 
 public class ApiHelper {
 
@@ -95,16 +94,5 @@ public class ApiHelper {
 
 	public static String stripUnsafeChars(final String string) {
 		return string.replaceAll("[\\]\\[|=?]", "");
-	}
-
-	/**
-	 * Configures auto login from config file
-	 * 
-	 * @param context
-	 */
-	public static void configAutoLogin(final Context context) {
-		if (Config.autoLoginToken != null && !Config.autoLoginToken.trim().equals("")) {
-			Preferences.setAccessToken(context, Config.autoLoginToken);
-		}
 	}
 }

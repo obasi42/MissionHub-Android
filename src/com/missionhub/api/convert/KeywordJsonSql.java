@@ -13,7 +13,7 @@ import com.missionhub.api.model.sql.Keyword;
 import com.missionhub.api.model.sql.KeywordDao;
 
 public class KeywordJsonSql {
-	
+
 	/** logging tag */
 	public final static String TAG = KeywordJsonSql.class.getSimpleName();
 
@@ -45,10 +45,10 @@ public class KeywordJsonSql {
 		final MissionHubApplication app = (MissionHubApplication) context.getApplicationContext();
 		final DaoSession session = app.getDbSession();
 		final KeywordDao kd = session.getKeywordDao();
-		
+
 		final List<Keyword> words = new ArrayList<Keyword>();
-		
-		for (GKeyword keyword : keywords) {
+
+		for (final GKeyword keyword : keywords) {
 			Keyword k = kd.load(keyword.getId());
 			if (k == null) {
 				k = new Keyword();
@@ -58,25 +58,25 @@ public class KeywordJsonSql {
 
 			k.setId(keyword.getId());
 			k.setOrganization_id(organizationId);
-			
+
 			if (keyword.getKeyword() != null) {
 				k.setKeyword(keyword.getKeyword());
 			}
-			
+
 			if (keyword.getState() != null) {
 				k.setState(keyword.getState());
 			}
-			
-			if (keyword.getQuestions() != null) {				
+
+			if (keyword.getQuestions() != null) {
 				QuestionJsonSql.update(context, keyword.getId(), keyword.getQuestions(), false, false, categories);
 			}
-			
+
 			words.add(k);
 		}
-		
+
 		app.getDbSession().runInTx(new Runnable() {
 			@Override public void run() {
-				for ( final Keyword word : words) {
+				for (final Keyword word : words) {
 					session.insertOrReplace(word);
 				}
 			}

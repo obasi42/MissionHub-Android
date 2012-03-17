@@ -9,8 +9,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-import com.missionhub.api.ApiHelper;
-
 /**
  * The main MissionHub Activity.
  */
@@ -29,10 +27,8 @@ public class MissionHubActivity extends MissionHubBaseActivity {
 	@Override public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		ApiHelper.configAutoLogin(this); // setup debug auto-login
-		
 		// redirect to Dashboard if session can be resumed
-		if (getSession().resumeSession()) {
+		if (getSession() != null) {
 			startActivity(new Intent(this, DashboardActivity.class));
 			finish();
 		}
@@ -59,7 +55,8 @@ public class MissionHubActivity extends MissionHubBaseActivity {
 				.setPositiveButton(R.string.action_ok, new DialogInterface.OnClickListener() {
 					@Override public void onClick(final DialogInterface dialog, final int id) {
 						// TODO:
-						// getTracker().trackEvent(MissionHubActivity.class.getCanonicalName(), "Click", "About", 0);
+						// getTracker().trackEvent(MissionHubActivity.class.getCanonicalName(),
+						// "Click", "About", 0);
 						final Uri uri = Uri.parse("http://missionhub.com?mobile=0");
 						startActivity(new Intent(Intent.ACTION_VIEW, uri));
 					}

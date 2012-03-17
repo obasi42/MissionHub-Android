@@ -69,9 +69,8 @@ public class OrganizationRoleJsonSql {
 					Organization org = od.load(role.getOrg_id());
 					if (org == null) {
 						org = new Organization();
-					} else {
-						org.refresh();
 					}
+
 					if (role.getOrg_id() != null) {
 						org.setId(role.getOrg_id());
 					}

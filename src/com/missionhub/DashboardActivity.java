@@ -25,7 +25,7 @@ public class DashboardActivity extends MissionHubBaseActivity {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.activity_dashboard);
-		
+
 		getSupportActionBar().setDisplayShowHomeEnabled(true);
 		getSupportActionBar().setDisplayUseLogoEnabled(true);
 		getSupportActionBar().setLogo(R.drawable.logo);
@@ -33,24 +33,24 @@ public class DashboardActivity extends MissionHubBaseActivity {
 
 		final SessionReceiver sr = new SessionReceiver(getApplicationContext()) {
 			@Override public void onUpdateOrganizationsStart() {
-				//showPreparing("org");
+				// showPreparing("org");
 			}
-			
+
 			@Override public void onUpdateOrganizationsSuccess() {
-				//hidePreparing("org");
+				// hidePreparing("org");
 			}
-			
+
 			@Override public void onUpdatePersonStart() {
-				//showPreparing("person");
+				// showPreparing("person");
 			}
-			
+
 			@Override public void onUpdatePersonSuccess() {
-				//hidePreparing("person");
+				// hidePreparing("person");
 				updateBottomBar();
 			}
-			
+
 			@Override public void onLogout() {
-				Intent intent = new Intent(getApplicationContext(), MissionHubActivity.class);
+				final Intent intent = new Intent(getApplicationContext(), MissionHubActivity.class);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				startActivity(new Intent(getApplicationContext(), MissionHubActivity.class));
 				finish();
@@ -60,43 +60,47 @@ public class DashboardActivity extends MissionHubBaseActivity {
 
 		updateBottomBar();
 	}
-//	
-//	List<String> preparing = new ArrayList<String>();
-//	ProgressDialog dialog;
-//	
-//	public void showPreparing(String id) {
-//		if (dialog == null || !dialog.isShowing()) {
-//			dialog = ProgressDialog.show(this, "", "Preparing MissionHub for first use...", true);
-//			dialog.setCancelable(false);
-//		}
-//		preparing.add(id);
-//	}
-//	
-//	public void hidePreparing(String id) {
-//		preparing.remove(id);
-//		if (preparing.isEmpty()) {
-//			if (dialog != null && dialog.isShowing()) {
-//				dialog.hide();
-//			}
-//		}
-//	}
+
+	//
+	// List<String> preparing = new ArrayList<String>();
+	// ProgressDialog dialog;
+	//
+	// public void showPreparing(String id) {
+	// if (dialog == null || !dialog.isShowing()) {
+	// dialog = ProgressDialog.show(this, "",
+	// "Preparing MissionHub for first use...", true);
+	// dialog.setCancelable(false);
+	// }
+	// preparing.add(id);
+	// }
+	//
+	// public void hidePreparing(String id) {
+	// preparing.remove(id);
+	// if (preparing.isEmpty()) {
+	// if (dialog != null && dialog.isShowing()) {
+	// dialog.hide();
+	// }
+	// }
+	// }
 
 	@Override public boolean onCreateOptionsMenu(final Menu menu) {
-		menu.add(R.string.action_profile).setOnMenuItemClickListener(new ProfileOnMenuItemClickListener()).setIcon(R.drawable.ic_action_contact).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
-		menu.add(R.string.action_logout).setOnMenuItemClickListener(new LogoutOnMenuItemClickListener()).setIcon(R.drawable.ic_action_logout).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+		menu.add(R.string.action_profile).setOnMenuItemClickListener(new ProfileOnMenuItemClickListener()).setIcon(R.drawable.ic_action_contact)
+				.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+		menu.add(R.string.action_logout).setOnMenuItemClickListener(new LogoutOnMenuItemClickListener()).setIcon(R.drawable.ic_action_logout)
+				.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 
 		return super.onCreateOptionsMenu(menu);
 	}
-	
+
 	private class ProfileOnMenuItemClickListener implements OnMenuItemClickListener {
-		@Override public boolean onMenuItemClick(MenuItem item) {
+		@Override public boolean onMenuItemClick(final MenuItem item) {
 			startActivity(new Intent(DashboardActivity.this, ProfileActivity.class));
 			return false;
 		}
 	}
-	
+
 	private class LogoutOnMenuItemClickListener implements OnMenuItemClickListener {
-		@Override public boolean onMenuItemClick(MenuItem item) {
+		@Override public boolean onMenuItemClick(final MenuItem item) {
 			getSession().logout();
 			return false;
 		}
@@ -116,16 +120,16 @@ public class DashboardActivity extends MissionHubBaseActivity {
 			mOrganization.setText(getDbSession().getOrganizationDao().load(getSession().getOrganizationId()).getName());
 		} catch (final Exception e) {}
 	}
-	
-	public void clickPeople(View v) {
+
+	public void clickPeople(final View v) {
 		Toast.makeText(this, "People", Toast.LENGTH_SHORT).show();
 	}
-	
-	public void clickGroups(View v) {
+
+	public void clickGroups(final View v) {
 		Toast.makeText(this, "Groups", Toast.LENGTH_SHORT).show();
 	}
-	
-	public void clickSurveys(View v) {
+
+	public void clickSurveys(final View v) {
 		Toast.makeText(this, "Surveys", Toast.LENGTH_SHORT).show();
 	}
 }

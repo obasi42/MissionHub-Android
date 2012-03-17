@@ -3,6 +3,8 @@ package com.missionhub;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.widget.Toast;
+
 import com.missionhub.api.ApiHandler;
 import com.missionhub.api.OrganizationsApi;
 import com.missionhub.api.PeopleApi;
@@ -41,10 +43,10 @@ public class Session {
 
 	/** current user */
 	private User user;
-	
+
 	/** state for updatePerson() */
 	private boolean updatingPerson = false;
-	
+
 	/** state for updateOrganizations() */
 	private boolean updatingOrganizations = false;
 
@@ -89,37 +91,14 @@ public class Session {
 	}
 
 	/**
-	 * Attempts to resume a previous user session
-	 * 
-	 * @return true if resume data is available
-	 */
-	public synchronized boolean resumeSession() {
-		final long userId = Preferences.getUserID(application);
-		final long organizationId = Preferences.getOrganizationID(application);
-		final String accessToken = Preferences.getAccessToken(application);
-
-		if (accessToken != null && accessToken.trim().length() > 0) {
-			setPersonId(userId);
-			setOrganizationId(organizationId);
-			setAccessToken(accessToken);
-			setUser(new User(application, userId));
-			SessionBroadcast.broadcastLogin(application, application.getSession().getAccessToken());
-			if (userId < 0) {
-				updatePerson();
-				updateOrganizations();
-			}
-			return true;
-		}
-		return false;
-	}
-	
-	/**
 	 * Updates the current user's information
 	 */
 	public synchronized void updatePerson() {
-		if (updatingPerson) return;
+		if (updatingPerson) {
+			return;
+		}
 		updatingPerson = true;
-		
+
 		SessionBroadcast.broadcastUpdatePersonStart(application);
 
 		PeopleApi.getMe(application, new ApiHandler(GMetaPeople.class) {
@@ -149,7 +128,6 @@ public class Session {
 							}
 							setPersonId(person.getId());
 
-							Preferences.setAccessToken(application, getAccessToken());
 							Preferences.setUserID(application, getPersonId());
 
 							setUser(new User(application, getPersonId()));
@@ -157,7 +135,7 @@ public class Session {
 							SessionBroadcast.broadcastUpdatePersonSuccess(application);
 
 							updatingPerson = false;
-							
+
 							unregister();
 						}
 					};
@@ -190,12 +168,16 @@ public class Session {
 
 	/**
 	 * Update the current user's organizations
-	 * @param organizations the orgs to update
+	 * 
+	 * @param organizations
+	 *            the orgs to update
 	 */
 	public synchronized void updateOrganizations(final long... organizations) {
-		if (updatingOrganizations) return;
+		if (updatingOrganizations) {
+			return;
+		}
 		updatingOrganizations = true;
-		
+
 		SessionBroadcast.broadcastUpdateOrganizationsStart(application);
 
 		final ApiHandler hander = new ApiHandler(GMetaOrganizations.class) {
@@ -206,7 +188,7 @@ public class Session {
 				if (getAccessToken().equalsIgnoreCase("") || getAccessToken() == null) {
 					return;
 				}
-				
+
 				final OrganizationReceiver or = new OrganizationReceiver(application) {
 					@Override public void onComplete(final long[] organizationIds) {
 						SessionBroadcast.broadcastUpdateOrganizationsSuccess(application);
@@ -263,6 +245,7 @@ public class Session {
 		if (accessToken == null) {
 			accessToken = "";
 		}
+		Preferences.setAccessToken(application, accessToken);
 		this.accessToken = accessToken;
 	}
 
@@ -281,6 +264,7 @@ public class Session {
 	 * @param personId
 	 */
 	public synchronized void setPersonId(final long personId) {
+		Preferences.setUserID(application, personId);
 		this.personId = personId;
 	}
 
@@ -299,7 +283,10 @@ public class Session {
 	 * @param organizationId
 	 */
 	public synchronized void setOrganizationId(final long organizationId) {
+		Preferences.setOrganizationID(application, organizationId);
+
 		this.organizationId = organizationId;
+		Toast.makeText(application, "Org Changed", Toast.LENGTH_LONG).show();
 	}
 
 	/**
@@ -324,5 +311,29 @@ public class Session {
 			setUser(new User(application, -1));
 		}
 		this.user = user;
+	}
+
+	/**
+	 * Returns a session with previous information
+	 * 
+	 * @param application
+	 * @return
+	 */
+	public static Session resumeSession(final MissionHubApplication application) {
+		final long userId = Preferences.getUserID(application);
+		final long organizationId = Preferences.getOrganizationID(application);
+		final String accessToken = Preferences.getAccessToken(application);
+
+		if (accessToken != null && accessToken.trim().length() > 0 && userId >= 0) {
+			final Session session = new Session(application);
+			session.setPersonId(userId);
+			session.setOrganizationId(organizationId);
+			session.setAccessToken(accessToken);
+			session.setUser(new User(application, userId));
+			SessionBroadcast.broadcastLogin(application, application.getSession().getAccessToken());
+			return session;
+		}
+
+		return null;
 	}
 }

@@ -8,26 +8,27 @@ public class MissionHubBaseActivity extends MissionHubRoboFragmentActivity {
 
 	/**
 	 * Returns the session
+	 * 
 	 * @return
 	 */
 	public Session getSession() {
 		return ((MissionHubApplication) getApplicationContext()).getSession();
 	}
-	
+
 	/**
 	 * Shortcut to show the Indeterminate progress bar
 	 */
 	public void showProgress() {
 		setSupportProgressBarIndeterminateVisibility(true);
 	}
-	
+
 	/**
 	 * Shortcut to hide the Indeterminate progress bar
 	 */
 	public void hideProgress() {
 		setSupportProgressBarIndeterminateVisibility(false);
 	}
-	
+
 	/**
 	 * Gets the raw sqlite database for the application context
 	 * 
