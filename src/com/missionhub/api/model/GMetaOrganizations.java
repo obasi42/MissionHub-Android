@@ -4,7 +4,7 @@ public class GMetaOrganizations {
 	private GMeta meta;
 	private GOrganization[] organizations;
 
-	public void setMeta(GMeta x) {
+	public void setMeta(final GMeta x) {
 		meta = x;
 	}
 
@@ -12,7 +12,7 @@ public class GMetaOrganizations {
 		return meta;
 	}
 
-	public void setOrganizations(GOrganization[] x) {
+	public void setOrganizations(final GOrganization[] x) {
 		organizations = x;
 	}
 

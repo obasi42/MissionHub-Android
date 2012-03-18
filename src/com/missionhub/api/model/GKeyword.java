@@ -22,19 +22,19 @@ public class GKeyword {
 		return state;
 	}
 
-	public void setKeyword(String s) {
+	public void setKeyword(final String s) {
 		keyword = s;
 	}
 
-	public void setId(long i) {
+	public void setId(final long i) {
 		id = i;
 	}
 
-	public void setQuestions(GQuestion[] i) {
+	public void setQuestions(final GQuestion[] i) {
 		questions = i;
 	}
 
-	public void setState(String s) {
+	public void setState(final String s) {
 		state = s;
 	}
 }

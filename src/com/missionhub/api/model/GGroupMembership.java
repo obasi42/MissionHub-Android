@@ -1,10 +1,10 @@
-package com.missionhub.api;
+package com.missionhub.api.model;
 
 public class GGroupMembership {
 
-	public int group_id;
-	public String name;
-	public String role;
+	private int group_id;
+	private String name;
+	private String role;
 
 	public int getGroup_id() {
 		return group_id;

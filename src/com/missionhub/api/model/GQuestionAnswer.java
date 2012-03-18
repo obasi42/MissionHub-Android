@@ -12,11 +12,11 @@ public class GQuestionAnswer {
 		return a;
 	}
 
-	public void setQ(int i) {
+	public void setQ(final int i) {
 		q = i;
 	}
 
-	public void setA(String s) {
+	public void setA(final String s) {
 		a = s;
 	}
 

@@ -30,13 +30,15 @@ import com.missionhub.api.ApiHandler;
 import com.missionhub.api.convert.PersonJsonSql;
 import com.missionhub.api.model.GError;
 import com.missionhub.api.model.GLoginDone;
-import com.missionhub.broadcast.PersonBroadcast;
-import com.missionhub.broadcast.PersonReceiver;
+import com.missionhub.api.model.sql.Person;
+import com.missionhub.broadcast.GenericCUDEBroadcast;
+import com.missionhub.broadcast.GenericCUDEReceiver;
 import com.missionhub.broadcast.SessionBroadcast;
 import com.missionhub.config.Config;
 import com.missionhub.config.Preferences;
 import com.missionhub.error.MissionHubException;
 import com.missionhub.ui.DisplayError;
+import com.missionhub.util.U;
 
 /**
  * The Login Activity
@@ -46,10 +48,13 @@ public class LoginActivity extends MissionHubBaseActivity {
 	/** logging tag */
 	public static final String TAG = LoginActivity.class.getSimpleName();
 
-	@InjectView(R.id.webview) WebView mWebView;
-	@InjectView(R.id.progressBar) ProgressBar mProgressBar;
+	@InjectView(R.id.webview)
+	WebView mWebView;
+	@InjectView(R.id.progressBar)
+	ProgressBar mProgressBar;
 
-	@Override public void onCreate(final Bundle savedInstanceState) {
+	@Override
+	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.activity_login);
@@ -98,7 +103,8 @@ public class LoginActivity extends MissionHubBaseActivity {
 	 * Chrome client that manages indeterminate progress visibility
 	 */
 	private class ProgressChromeClient extends WebChromeClient {
-		@Override public void onProgressChanged(final WebView view, final int progress) {
+		@Override
+		public void onProgressChanged(final WebView view, final int progress) {
 			if (progress < 100) {
 				showProgress();
 			}
@@ -115,12 +121,14 @@ public class LoginActivity extends MissionHubBaseActivity {
 	 * the webview
 	 */
 	private class InternalWebViewClient extends WebViewClient {
-		@Override public boolean shouldOverrideUrlLoading(final WebView view, final String url) {
+		@Override
+		public boolean shouldOverrideUrlLoading(final WebView view, final String url) {
 			view.loadUrl(url);
 			return true;
 		}
 
-		@Override public void onReceivedError(final WebView view, final int errorCode, String description, final String failingUrl) {
+		@Override
+		public void onReceivedError(final WebView view, final int errorCode, String description, final String failingUrl) {
 			// Hide the webview to not show errors
 			mWebView.setVisibility(View.GONE);
 
@@ -143,20 +151,23 @@ public class LoginActivity extends MissionHubBaseActivity {
 
 			final AlertDialog ad = DisplayError.display(LoginActivity.this, exception);
 			ad.setButton(ad.getContext().getString(R.string.action_retry), new DialogInterface.OnClickListener() {
-				@Override public void onClick(final DialogInterface dialog, final int id) {
+				@Override
+				public void onClick(final DialogInterface dialog, final int id) {
 					dialog.dismiss();
 					mWebView.reload();
 					mWebView.setVisibility(View.VISIBLE);
 				}
 			});
 			ad.setButton(DialogInterface.BUTTON_NEUTRAL, getString(R.string.action_close), new DialogInterface.OnClickListener() {
-				@Override public void onClick(final DialogInterface dialog, final int id) {
+				@Override
+				public void onClick(final DialogInterface dialog, final int id) {
 					dialog.dismiss();
 					finishCanceled();
 				}
 			});
 			ad.setOnCancelListener(new OnCancelListener() {
-				@Override public void onCancel(final DialogInterface dialog) {
+				@Override
+				public void onCancel(final DialogInterface dialog) {
 					finishCanceled();
 				}
 			});
@@ -166,7 +177,8 @@ public class LoginActivity extends MissionHubBaseActivity {
 		public static final int URI_ERROR = 1; // error code for api error
 												// response
 
-		@Override public void onPageFinished(final WebView view, final String url) {
+		@Override
+		public void onPageFinished(final WebView view, final String url) {
 			final Uri uri = Uri.parse(url);
 			final Uri configUri = Uri.parse(Config.oauthUrl);
 
@@ -230,53 +242,66 @@ public class LoginActivity extends MissionHubBaseActivity {
 
 		client.post(Config.oauthUrl + "/access_token", params, new ApiHandler(GLoginDone.class) {
 
-			@Override public void onSuccess(final Object gsonObject) {
+			@Override
+			public void onSuccess(final Object gsonObject) {
+				final ApiHandler handler = this;
 				final GLoginDone loginDone = (GLoginDone) gsonObject;
 
 				Preferences.setAccessToken(LoginActivity.this, loginDone.getAccess_token());
 				Preferences.setUserID(LoginActivity.this, loginDone.getPerson().getId());
 
-				final PersonReceiver pr = new PersonReceiver(getApplicationContext()) {
-					@Override public void onUpdate(final long personId) {
-						if (personId != loginDone.getPerson().getId()) {
+				final GenericCUDEReceiver receiver = new GenericCUDEReceiver(LoginActivity.this, Person.class) {
+
+					@Override
+					public void onUpdate(final long[] rowIds) {
+						if (!U.contains(rowIds, loginDone.getPerson().getId())) {
+							handler.onError(new MissionHubException("Person not found in response."));
 							return;
 						}
-						
-						MissionHubApplication application = (MissionHubApplication) getApplicationContext();
+
+						final MissionHubApplication application = (MissionHubApplication) getApplicationContext();
 						application.setSession(Session.resumeSession(application));
-						
+
 						unregister();
 
 						finishOK();
 					}
+
+					@Override
+					public void onError(final long[] rowIds, final Throwable t) {
+						handler.onError(new MissionHubException("Person not found in response."));
+					}
 				};
 
 				final List<String> cats = new ArrayList<String>();
-				cats.add("getTokenFromCode");
+				cats.add(this.toString());
+				receiver.register(cats, GenericCUDEBroadcast.NOTIFY_GENERIC_UPDATE, GenericCUDEBroadcast.NOTIFY_GENERIC_ERROR);
 
-				pr.register(PersonBroadcast.NOTIFY_PERSON_UPDATE, cats);
-
-				PersonJsonSql.update(getApplicationContext(), loginDone.getPerson(), "getTokenFromCode");
+				PersonJsonSql.update(getApplicationContext(), loginDone.getPerson(), this.toString());
 			}
 
-			@Override public void onError(final Throwable throwable) {
+			@Override
+			public void onError(final Throwable throwable) {
 				Log.e(TAG, "Login Failed", throwable);
 				final AlertDialog ad = DisplayError.display(LoginActivity.this, throwable);
 				ad.setButton(ad.getContext().getString(R.string.action_retry), new DialogInterface.OnClickListener() {
-					@Override public void onClick(final DialogInterface dialog, final int id) {
+					@Override
+					public void onClick(final DialogInterface dialog, final int id) {
 						dialog.dismiss();
 						setResult(RESULT_FIRST_USER);
 						finish();
 					}
 				});
 				ad.setButton(DialogInterface.BUTTON_NEUTRAL, getString(R.string.action_close), new DialogInterface.OnClickListener() {
-					@Override public void onClick(final DialogInterface dialog, final int id) {
+					@Override
+					public void onClick(final DialogInterface dialog, final int id) {
 						dialog.dismiss();
 						finishCanceled();
 					}
 				});
 				ad.setOnCancelListener(new OnCancelListener() {
-					@Override public void onCancel(final DialogInterface dialog) {
+					@Override
+					public void onCancel(final DialogInterface dialog) {
 						finishCanceled();
 					}
 				});
@@ -288,11 +313,13 @@ public class LoginActivity extends MissionHubBaseActivity {
 		});
 	}
 
-	@Override public void onSaveInstanceState(final Bundle b) {
+	@Override
+	public void onSaveInstanceState(final Bundle b) {
 		((WebView) findViewById(R.id.webview)).saveState(b);
 	}
 
-	@Override public void onRestoreInstanceState(final Bundle b) {
+	@Override
+	public void onRestoreInstanceState(final Bundle b) {
 		((WebView) findViewById(R.id.webview)).restoreState(b);
 	}
 

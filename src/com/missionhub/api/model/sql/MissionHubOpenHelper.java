@@ -15,12 +15,14 @@ public class MissionHubOpenHelper extends OpenHelper {
 		super(context, name, factory);
 	}
 
-	@Override public void onCreate(final SQLiteDatabase db) {
+	@Override
+	public void onCreate(final SQLiteDatabase db) {
 		Log.i(TAG, "Creating tables for schema version " + DaoMaster.SCHEMA_VERSION);
 		DaoMaster.createAllTables(db, true);
 	}
 
-	@Override public void onUpgrade(final SQLiteDatabase db, final int oldVersion, final int newVersion) {
+	@Override
+	public void onUpgrade(final SQLiteDatabase db, final int oldVersion, final int newVersion) {
 		Log.i(TAG, "Upgrading schema from version " + oldVersion + " to " + newVersion);
 		DaoMaster.dropAllTables(db, true);
 		onCreate(db);

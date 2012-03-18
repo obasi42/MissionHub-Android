@@ -17,11 +17,14 @@ public class DashboardActivity extends MissionHubBaseActivity {
 	/** logging tag */
 	public static final String TAG = DashboardActivity.class.getSimpleName();
 
-	@InjectView(R.id.name) TextView mName;
-	@InjectView(R.id.organization) TextView mOrganization;
+	@InjectView(R.id.name)
+	TextView mName;
+	@InjectView(R.id.organization)
+	TextView mOrganization;
 
 	/** Called when the activity is first created. */
-	@Override public void onCreate(final Bundle savedInstanceState) {
+	@Override
+	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.activity_dashboard);
@@ -32,24 +35,25 @@ public class DashboardActivity extends MissionHubBaseActivity {
 		getSupportActionBar().setDisplayShowTitleEnabled(false);
 
 		final SessionReceiver sr = new SessionReceiver(getApplicationContext()) {
-			@Override public void onUpdateOrganizationsStart() {
-				// showPreparing("org");
-			}
+			// @Override public void onUpdateOrganizationsStart() {
+			// // showPreparing("org");
+			// }
+			//
+			// @Override public void onUpdateOrganizationsSuccess() {
+			// // hidePreparing("org");
+			// }
+			//
+			// @Override public void onUpdatePersonStart() {
+			// // showPreparing("person");
+			// }
+			//
+			// @Override public void onUpdatePersonSuccess() {
+			// // hidePreparing("person");
+			// updateBottomBar();
+			// }
 
-			@Override public void onUpdateOrganizationsSuccess() {
-				// hidePreparing("org");
-			}
-
-			@Override public void onUpdatePersonStart() {
-				// showPreparing("person");
-			}
-
-			@Override public void onUpdatePersonSuccess() {
-				// hidePreparing("person");
-				updateBottomBar();
-			}
-
-			@Override public void onLogout() {
+			@Override
+			public void onLogout() {
 				final Intent intent = new Intent(getApplicationContext(), MissionHubActivity.class);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				startActivity(new Intent(getApplicationContext(), MissionHubActivity.class));
@@ -83,7 +87,8 @@ public class DashboardActivity extends MissionHubBaseActivity {
 	// }
 	// }
 
-	@Override public boolean onCreateOptionsMenu(final Menu menu) {
+	@Override
+	public boolean onCreateOptionsMenu(final Menu menu) {
 		menu.add(R.string.action_profile).setOnMenuItemClickListener(new ProfileOnMenuItemClickListener()).setIcon(R.drawable.ic_action_contact)
 				.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 		menu.add(R.string.action_logout).setOnMenuItemClickListener(new LogoutOnMenuItemClickListener()).setIcon(R.drawable.ic_action_logout)
@@ -93,20 +98,23 @@ public class DashboardActivity extends MissionHubBaseActivity {
 	}
 
 	private class ProfileOnMenuItemClickListener implements OnMenuItemClickListener {
-		@Override public boolean onMenuItemClick(final MenuItem item) {
+		@Override
+		public boolean onMenuItemClick(final MenuItem item) {
 			startActivity(new Intent(DashboardActivity.this, ProfileActivity.class));
 			return false;
 		}
 	}
 
 	private class LogoutOnMenuItemClickListener implements OnMenuItemClickListener {
-		@Override public boolean onMenuItemClick(final MenuItem item) {
+		@Override
+		public boolean onMenuItemClick(final MenuItem item) {
 			getSession().logout();
 			return false;
 		}
 	}
 
-	@Override public void onResume() {
+	@Override
+	public void onResume() {
 		super.onResume();
 		updateBottomBar();
 	}

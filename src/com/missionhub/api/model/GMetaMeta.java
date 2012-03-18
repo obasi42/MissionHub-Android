@@ -1,10 +1,10 @@
 package com.missionhub.api.model;
 
 public class GMetaMeta {
-	public GMeta meta;
-	public GPerson person;
-	public GOrganization[] organizations;
-	public GGroup[] groups;
+	private GMeta meta;
+	private GPerson person;
+	private GOrganization[] organizations;
+	private GGroup[] groups;
 
 	public GMeta getMeta() {
 		return meta;

@@ -15,12 +15,13 @@ public class GPerson {
 	private String request_org_id;
 	private String phone_number;
 	private String email_address;
-	// private String first_contact_date;
-	// private String date_surveyed;
+	private String first_contact_date;
+	private String date_surveyed;
 	private GIdNameProvider location;
 	private GIdNameProvider[] interests;
 	private GAssignment assignment;
 	private GOrgGeneric[] organizational_roles;
+	private GGroupMembership[] group_memberships;
 	private GEducation[] education;
 	private String num_contacts;
 
@@ -168,6 +169,14 @@ public class GPerson {
 	// date_surveyed = s;
 	// }
 
+	public void setFirst_contact_date(final String first_contact_date) {
+		this.first_contact_date = first_contact_date;
+	}
+
+	public String getFirst_contact_date() {
+		return first_contact_date;
+	}
+
 	public void setLocation(final GIdNameProvider x) {
 		location = x;
 	}
@@ -184,11 +193,27 @@ public class GPerson {
 		organizational_roles = g;
 	}
 
+	public void setGroup_memberships(final GGroupMembership[] group_memberships) {
+		this.group_memberships = group_memberships;
+	}
+
+	public GGroupMembership[] getGroup_memberships() {
+		return group_memberships;
+	}
+
 	public void setEducation(final GEducation[] g) {
 		education = g;
 	}
 
 	public void setNum_contacts(final String s) {
 		num_contacts = s;
+	}
+
+	public void setDate_surveyed(final String date_surveyed) {
+		this.date_surveyed = date_surveyed;
+	}
+
+	public String getDate_surveyed() {
+		return date_surveyed;
 	}
 }

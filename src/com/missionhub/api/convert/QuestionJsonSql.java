@@ -39,7 +39,8 @@ public class QuestionJsonSql {
 			final String... categories) throws Exception {
 		if (threaded) {
 			new Thread(new Runnable() {
-				@Override public void run() {
+				@Override
+				public void run() {
 					// call update again, only this time we are in a thread, so
 					// set threaded=false
 					update(context, keywordId, questions, false, notify, categories);
@@ -104,7 +105,8 @@ public class QuestionJsonSql {
 		}
 
 		app.getDbSession().runInTx(new Runnable() {
-			@Override public void run() {
+			@Override
+			public void run() {
 				for (final QuestionChoice qc : qcDelete) {
 					session.delete(qc);
 				}

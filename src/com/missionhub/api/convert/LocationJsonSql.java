@@ -31,7 +31,8 @@ public class LocationJsonSql {
 			final String... categories) throws Exception {
 		if (threaded) {
 			new Thread(new Runnable() {
-				@Override public void run() {
+				@Override
+				public void run() {
 					// call update again, only this time we are in a thread, so
 					// set threaded=false
 					update(context, personId, location, false, notify, categories);
@@ -45,7 +46,8 @@ public class LocationJsonSql {
 		final LocationDao ld = session.getLocationDao();
 
 		session.runInTx(new Runnable() {
-			@Override public void run() {
+			@Override
+			public void run() {
 				// delete current interests in db
 				final LazyList<Location> currentInterests = ld.queryBuilder().where(Properties.Person_id.eq(personId)).listLazyUncached();
 				final CloseableListIterator<Location> itr = currentInterests.listIteratorAutoClose();

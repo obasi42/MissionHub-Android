@@ -2,18 +2,18 @@ package com.missionhub.api.model;
 
 public class GGroup {
 
-	public long id;
-	public String name;
-	public String location;
-	public String meets;
-	public int start_time;
-	public int end_time;
-	public long organization_id;
-	public String created_at;
-	public String updated_at;
-	public boolean list_publicly;
-	public boolean approve_join_requests;
-	public GLabel[] labels;
+	private long id;
+	private String name;
+	private String location;
+	private String meets;
+	private int start_time;
+	private int end_time;
+	private long organization_id;
+	private String created_at;
+	private String updated_at;
+	private boolean list_publicly;
+	private boolean approve_join_requests;
+	private GLabel[] labels;
 
 	public long getId() {
 		return id;

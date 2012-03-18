@@ -38,12 +38,16 @@ public class ProfileActivity extends MissionHubBaseActivity {
 	/** logging tag */
 	public static final String TAG = ProfileActivity.class.getSimpleName();
 
-	@InjectView(R.id.version) TextView mVersion;
-	@InjectView(R.id.profile_picture) AsyncImageView mProfilePicture;
-	@InjectView(R.id.spinner) Spinner mSpinner;
+	@InjectView(R.id.version)
+	TextView mVersion;
+	@InjectView(R.id.profile_picture)
+	AsyncImageView mProfilePicture;
+	@InjectView(R.id.spinner)
+	Spinner mSpinner;
 
 	/** Called when the activity is first created. */
-	@Override public void onCreate(final Bundle savedInstanceState) {
+	@Override
+	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_profile);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -64,22 +68,24 @@ public class ProfileActivity extends MissionHubBaseActivity {
 		} catch (final Exception e) {}
 
 		final SessionReceiver sr = new SessionReceiver(this) {
-			@Override public void onUpdateOrganizationsSuccess() {
-				Log.e("UPDATE COMPLETE", "DONE");
-				unregister();
-			}
-
-			@Override public void onUpdateOrganizationsError(final Throwable throwable) {
-				Log.e("UPDATE ERROR", throwable.getMessage(), throwable);
-				unregister();
-			}
+			// @Override public void onUpdateOrganizationsSuccess() {
+			// Log.e("UPDATE COMPLETE", "DONE");
+			// unregister();
+			// }
+			//
+			// @Override public void onUpdateOrganizationsError(final Throwable
+			// throwable) {
+			// Log.e("UPDATE ERROR", throwable.getMessage(), throwable);
+			// unregister();
+			// }
 		};
 		sr.register();
 
 		prepareSpinner();
 	}
 
-	@Override public boolean onCreateOptionsMenu(final Menu menu) {
+	@Override
+	public boolean onCreateOptionsMenu(final Menu menu) {
 		menu.add(R.string.action_refresh).setOnMenuItemClickListener(new RefreshOnMenuItemClickListener()).setIcon(R.drawable.ic_action_refresh)
 				.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 
@@ -87,19 +93,21 @@ public class ProfileActivity extends MissionHubBaseActivity {
 	}
 
 	private class RefreshOnMenuItemClickListener implements OnMenuItemClickListener {
-		@Override public boolean onMenuItemClick(final MenuItem item) {
+		@Override
+		public boolean onMenuItemClick(final MenuItem item) {
 			Toast.makeText(getApplicationContext(), "Refresh", Toast.LENGTH_LONG).show();
 
 			// TODO:
 
 			// getSession().updatePerson();
-			getSession().updateOrganizations();
+			// getSession().updateOrganizations();
 
 			return false;
 		}
 	}
 
-	@Override public boolean onOptionsItemSelected(final MenuItem item) {
+	@Override
+	public boolean onOptionsItemSelected(final MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
 			final Intent intent = new Intent(this, DashboardActivity.class);
@@ -162,13 +170,15 @@ public class ProfileActivity extends MissionHubBaseActivity {
 	}
 
 	private final OnItemSelectedListener organizationSelectedListener = new OnItemSelectedListener() {
-		@Override public void onItemSelected(final AdapterView<?> parent, final View view, final int position, final long id) {
+		@Override
+		public void onItemSelected(final AdapterView<?> parent, final View view, final int position, final long id) {
 			// TODO Auto-generated method stub
 			final ProfileOrganizationItem item = (ProfileOrganizationItem) ((ItemAdapter) parent.getAdapter()).getItem(position);
 			getSession().setOrganizationId(item.organizationId);
 		}
 
-		@Override public void onNothingSelected(final AdapterView<?> parent) {
+		@Override
+		public void onNothingSelected(final AdapterView<?> parent) {
 			// TODO Auto-generated method stub
 
 		}

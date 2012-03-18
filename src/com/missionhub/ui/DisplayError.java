@@ -1,17 +1,17 @@
 package com.missionhub.ui;
 
-import com.google.gson.JsonParseException;
-import com.missionhub.R;
-import com.missionhub.error.MissionHubException;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.util.Log;
 
+import com.google.gson.JsonParseException;
+import com.missionhub.R;
+import com.missionhub.error.MissionHubException;
+
 public class DisplayError {
 
-	public static final AlertDialog display(Context ctx, Throwable t) {
+	public static final AlertDialog display(final Context ctx, final Throwable t) {
 		String title = ctx.getString(R.string.error);
 		String message = ctx.getString(R.string.error_msg);
 		try {
@@ -32,13 +32,13 @@ public class DisplayError {
 					title = ((MissionHubException) t).getTitle();
 				}
 			}
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			Log.e("DisplayError", "Error Setup Failed", e);
 		}
-		AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+		final AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
 		builder.setTitle(title).setIcon(R.drawable.ic_dialog_alert).setMessage(message).setNeutralButton(R.string.action_close, new DialogInterface.OnClickListener() {
 			@Override
-			public void onClick(DialogInterface dialog, int id) {
+			public void onClick(final DialogInterface dialog, final int id) {
 				dialog.cancel();
 			}
 		});
@@ -46,9 +46,10 @@ public class DisplayError {
 	}
 
 	public static final AlertDialog displayWithRetry(final Context ctx, final Throwable t, final Retry retry) {
-		AlertDialog ad = display(ctx, t);
+		final AlertDialog ad = display(ctx, t);
 		ad.setButton(ad.getContext().getString(R.string.action_retry), new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int id) {
+			@Override
+			public void onClick(final DialogInterface dialog, final int id) {
 				dialog.dismiss();
 				retry.run();
 			}

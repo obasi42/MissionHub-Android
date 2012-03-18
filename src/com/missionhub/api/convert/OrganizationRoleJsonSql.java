@@ -32,7 +32,8 @@ public class OrganizationRoleJsonSql {
 			final String... categories) throws Exception {
 		if (threaded) {
 			new Thread(new Runnable() {
-				@Override public void run() {
+				@Override
+				public void run() {
 					update(context, personId, roles, false, notify, categories);
 				}
 			}).start();
@@ -45,7 +46,8 @@ public class OrganizationRoleJsonSql {
 		final OrganizationDao od = session.getOrganizationDao();
 
 		session.runInTx(new Runnable() {
-			@Override public void run() {
+			@Override
+			public void run() {
 
 				// delete current roles in db
 				final LazyList<OrganizationalRole> currentRoles = ord.queryBuilder().where(Properties.Person_id.eq(personId)).listLazyUncached();

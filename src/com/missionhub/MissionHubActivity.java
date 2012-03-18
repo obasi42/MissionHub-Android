@@ -18,13 +18,11 @@ public class MissionHubActivity extends MissionHubBaseActivity {
 	/** login activity result constant */
 	public final int RESULT_LOGIN_ACTIVITY = 1;
 
-	//@InjectView(R.id.btn_about) Button btnAbout;
-	//@InjectView(R.id.btn_login) Button btnLogin;
-
 	/** Called when the activity is first created. */
-	@Override public void onCreate(final Bundle savedInstanceState) {
+	@Override
+	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		// redirect to first screen if session can be resumed
 		if (getSession() != null) {
 			startMain();
@@ -33,7 +31,8 @@ public class MissionHubActivity extends MissionHubBaseActivity {
 		setContentView(R.layout.activity_missionhub);
 	}
 
-	@Override protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+	@Override
+	protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
 		if (requestCode == RESULT_LOGIN_ACTIVITY && resultCode == RESULT_OK) {
 			startMain();
 		}
@@ -41,7 +40,7 @@ public class MissionHubActivity extends MissionHubBaseActivity {
 			clickLogin(null);
 		}
 	}
-	
+
 	/**
 	 * Starts the main activity
 	 */
@@ -57,7 +56,8 @@ public class MissionHubActivity extends MissionHubBaseActivity {
 		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(R.string.missionhub_alert_about).setIcon(R.drawable.ic_dialog_info).setMessage(R.string.missionhub_alert_about_content)
 				.setPositiveButton(R.string.action_ok, new DialogInterface.OnClickListener() {
-					@Override public void onClick(final DialogInterface dialog, final int id) {
+					@Override
+					public void onClick(final DialogInterface dialog, final int id) {
 						// TODO:
 						// getTracker().trackEvent(MissionHubActivity.class.getCanonicalName(),
 						// "Click", "About", 0);
@@ -65,7 +65,8 @@ public class MissionHubActivity extends MissionHubBaseActivity {
 						startActivity(new Intent(Intent.ACTION_VIEW, uri));
 					}
 				}).setNegativeButton(R.string.action_cancel, new DialogInterface.OnClickListener() {
-					@Override public void onClick(final DialogInterface dialog, final int id) {
+					@Override
+					public void onClick(final DialogInterface dialog, final int id) {
 						dialog.cancel();
 					}
 				});

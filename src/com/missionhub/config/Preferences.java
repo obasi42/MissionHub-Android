@@ -9,12 +9,13 @@ public class Preferences {
 
 	/**
 	 * Removes all the shared preferences
+	 * 
 	 * @param context
 	 */
 	public static synchronized void reset(final Context context) {
 		context.getSharedPreferences(PREFS_NAME, 0).edit().clear().commit();
 	}
-	
+
 	/**
 	 * Get the stored access token
 	 * 
@@ -122,9 +123,10 @@ public class Preferences {
 		editor.remove("userID");
 		editor.commit();
 	}
-	
+
 	/**
 	 * Returns the stored lastRunMajorVersion
+	 * 
 	 * @param context
 	 * @return
 	 */
@@ -132,9 +134,10 @@ public class Preferences {
 		final SharedPreferences settings = context.getSharedPreferences(PREFS_NAME, 0);
 		return settings.getInt("lastRunMajorVersion", -1);
 	}
-	
+
 	/**
 	 * Returns the stored lastRunMinorVersion
+	 * 
 	 * @param context
 	 * @return
 	 */
@@ -155,7 +158,7 @@ public class Preferences {
 		editor.putInt("lastRunMajorVersion", lastRunMajorVersion);
 		editor.commit();
 	}
-	
+
 	/**
 	 * Sets the stored lastRunMinorVersion
 	 * 

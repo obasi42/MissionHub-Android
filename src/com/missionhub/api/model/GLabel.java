@@ -2,13 +2,13 @@ package com.missionhub.api.model;
 
 public class GLabel {
 
-	public long id;
-	public String name;
-	public long organization_id;
-	public String ancestry;
-	public String created_at;
-	public String updated_at;
-	public int group_labelings_count;
+	private long id;
+	private String name;
+	private long organization_id;
+	private String ancestry;
+	private String created_at;
+	private String updated_at;
+	private int group_labelings_count;
 
 	public long getId() {
 		return id;

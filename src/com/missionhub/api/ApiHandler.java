@@ -18,7 +18,8 @@ public abstract class ApiHandler extends HttpHandler {
 		this.type = type;
 	}
 
-	@Override public void onSuccess(final HttpResponse response) {
+	@Override
+	public void onSuccess(final HttpResponse response) {
 		final Gson gson = new Gson();
 		try {
 			final GError error = gson.fromJson(response.responseBody, GError.class);
@@ -42,7 +43,8 @@ public abstract class ApiHandler extends HttpHandler {
 
 	}
 
-	@Override public void onError(final HttpResponse response) {
+	@Override
+	public void onError(final HttpResponse response) {
 		onError(response.throwable);
 	}
 
@@ -50,15 +52,18 @@ public abstract class ApiHandler extends HttpHandler {
 
 	}
 
-	@Override public void onCancel(final HttpResponse response) {
+	@Override
+	public void onCancel(final HttpResponse response) {
 
 	}
 
-	@Override public void onRetry(final HttpResponse response) {
+	@Override
+	public void onRetry(final HttpResponse response) {
 
 	}
 
-	@Override public void onStart(final HttpResponse response) {
+	@Override
+	public void onStart(final HttpResponse response) {
 		onStart();
 	}
 

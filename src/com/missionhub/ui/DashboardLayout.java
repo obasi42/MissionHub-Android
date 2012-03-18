@@ -44,7 +44,8 @@ public class DashboardLayout extends ViewGroup {
 		super(context, attrs, defStyle);
 	}
 
-	@Override protected void onMeasure(final int widthMeasureSpec, final int heightMeasureSpec) {
+	@Override
+	protected void onMeasure(final int widthMeasureSpec, final int heightMeasureSpec) {
 		mMaxChildWidth = 0;
 		mMaxChildHeight = 0;
 
@@ -83,7 +84,8 @@ public class DashboardLayout extends ViewGroup {
 		setMeasuredDimension(resolveSize(mMaxChildWidth, widthMeasureSpec), resolveSize(mMaxChildHeight, heightMeasureSpec));
 	}
 
-	@Override protected void onLayout(final boolean changed, final int l, final int t, final int r, final int b) {
+	@Override
+	protected void onLayout(final boolean changed, final int l, final int t, final int r, final int b) {
 		int width = r - l;
 		int height = b - t;
 

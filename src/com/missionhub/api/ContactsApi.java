@@ -252,7 +252,8 @@ public class ContactsApi {
 			return params.toString();
 		}
 
-		@Override public String toString() {
+		@Override
+		public String toString() {
 			final HttpParams params = new HttpParams();
 			this.appendFiltersParams(params);
 			this.appendLimits(params);

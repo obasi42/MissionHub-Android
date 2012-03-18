@@ -13,15 +13,15 @@ abstract class MissionHubReceiver extends BroadcastReceiver {
 	protected final Context context;
 
 	/**
-	 * Creats a new MissionHubReciever Object
+	 * Creates a new MissionHubReciever Object
 	 * 
 	 * @param context
 	 */
-	public MissionHubReceiver(final Context context) {
+	protected MissionHubReceiver(final Context context) {
 		this.context = context;
 	}
 
-	private IntentFilter buildIntentFilter(final String... actions) {
+	protected IntentFilter buildIntentFilter(final String... actions) {
 		final IntentFilter intent = new IntentFilter();
 		for (final String action : actions) {
 			intent.addAction(action);
@@ -40,7 +40,8 @@ abstract class MissionHubReceiver extends BroadcastReceiver {
 	 * This method is called when the BroadcastReceiver is receiving an Intent
 	 * broadcast.
 	 */
-	@Override abstract public void onReceive(Context context, Intent intent);
+	@Override
+	abstract public void onReceive(Context context, Intent intent);
 
 	/**
 	 * Registers the MissionHubReceiver with the LocalBroadcastManager with all
@@ -77,14 +78,14 @@ abstract class MissionHubReceiver extends BroadcastReceiver {
 	 * @param action
 	 * @param categories
 	 */
-	public void register(final String action, List<String> categories) {
+	public void register(final String action, final List<String> categories) {
 		final IntentFilter intent = buildIntentFilter(action);
 		for (final String category : categories) {
 			intent.addCategory(category);
 		}
 		register(intent);
 	}
-	
+
 	/**
 	 * Registers the MissionHubReceiver with the LocalBroadcastManager with the
 	 * given action and categories
@@ -92,14 +93,14 @@ abstract class MissionHubReceiver extends BroadcastReceiver {
 	 * @param action
 	 * @param categories
 	 */
-	public void register(List<String> categories, final String ... actions) {
+	public void register(final List<String> categories, final String... actions) {
 		final IntentFilter intent = buildIntentFilter(actions);
 		for (final String category : categories) {
 			intent.addCategory(category);
 		}
 		register(intent);
 	}
-	
+
 	/**
 	 * Unregisters the MissionHubReceiver with the LocalBroadcastManager
 	 */

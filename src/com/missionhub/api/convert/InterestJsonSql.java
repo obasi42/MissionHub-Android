@@ -32,7 +32,8 @@ public class InterestJsonSql {
 			final String... categories) throws Exception {
 		if (threaded) {
 			new Thread(new Runnable() {
-				@Override public void run() {
+				@Override
+				public void run() {
 					// call update again, only this time we are in a thread, so
 					// set threaded=false
 					update(context, personId, interests, false, notify, categories);
@@ -46,7 +47,8 @@ public class InterestJsonSql {
 		final InterestDao id = session.getInterestDao();
 
 		app.getDbSession().runInTx(new Runnable() {
-			@Override public void run() {
+			@Override
+			public void run() {
 				// delete current interests in db
 				final LazyList<Interest> currentInterests = id.queryBuilder().where(Properties.Person_id.eq(personId)).listLazyUncached();
 				final CloseableListIterator<Interest> itr = currentInterests.listIteratorAutoClose();

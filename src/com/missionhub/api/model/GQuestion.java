@@ -37,31 +37,31 @@ public class GQuestion {
 		return active;
 	}
 
-	public void setId(long i) {
+	public void setId(final long i) {
 		id = i;
 	}
 
-	public void setKind(String s) {
+	public void setKind(final String s) {
 		kind = s;
 	}
 
-	public void setLabel(String s) {
+	public void setLabel(final String s) {
 		label = s;
 	}
 
-	public void setStyle(String s) {
+	public void setStyle(final String s) {
 		style = s;
 	}
 
-	public void setRequired(String b) {
+	public void setRequired(final String b) {
 		required = b;
 	}
 
-	public void setChoices(String[] s) {
+	public void setChoices(final String[] s) {
 		choices = s;
 	}
 
-	public void setActive(String b) {
+	public void setActive(final String b) {
 		active = b;
 	}
 }

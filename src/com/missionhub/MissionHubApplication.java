@@ -29,7 +29,11 @@ public class MissionHubApplication extends GDApplication {
 	/** application context's database cache session */
 	private DaoSession daoSession;
 
-	@Override public void onCreate() {
+	/**
+	 * Called when the application is started
+	 */
+	@Override
+	public void onCreate() {
 		super.onCreate();
 
 		// disables http connection reuse in Donut and below, as it was buggy
@@ -40,16 +44,21 @@ public class MissionHubApplication extends GDApplication {
 
 		// runs upgrade methods
 		Upgrade.doUpgrades(this);
-		
-		// resumes the session if possible
-		session = Session.resumeSession(this);
+
+		// sets up the session
+		Session.resumeSession(this);
 	}
 
-	@Override public void onTerminate() {
+	/**
+	 * Called when the application terminates. Makes sure the database closes
+	 * nicely.
+	 */
+	@Override
+	public void onTerminate() {
 		try {
 			db.close();
 		} catch (final Exception e) {
-			Log.w(TAG, e.getMessage(), e);
+			Log.e(TAG, e.getMessage(), e);
 		}
 		super.onTerminate();
 	}
@@ -64,13 +73,22 @@ public class MissionHubApplication extends GDApplication {
 	}
 
 	/**
-	 * Returns the version code of the application
+	 * Sets the session
+	 * 
+	 * @param session
+	 */
+	public synchronized void setSession(final Session session) {
+		this.session = session;
+	}
+
+	/**
+	 * Returns the version name of the application
 	 * 
 	 * @return
 	 */
 	public synchronized String getVersion() {
 		try {
-			return String.valueOf(getPackageManager().getPackageInfo(getPackageName(), 0).versionCode);
+			return String.valueOf(getPackageManager().getPackageInfo(getPackageName(), 0).versionName);
 		} catch (final Exception e) {}
 		return null;
 	}
@@ -114,18 +132,11 @@ public class MissionHubApplication extends GDApplication {
 	}
 
 	/**
-	 * Sets the session
-	 * @param session
-	 */
-	public synchronized void setSession(Session session) {
-		this.session = session;
-	}
-	
-	/**
 	 * Resets all app data
 	 */
-	public void reset() {
+	public synchronized void reset() {
 		Preferences.reset(this);
+		setSession(null);
 		deleteDatabase();
 	}
 }

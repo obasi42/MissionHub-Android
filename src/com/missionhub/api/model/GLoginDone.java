@@ -17,15 +17,15 @@ public class GLoginDone {
 		return person;
 	}
 
-	public void setAccess_token(String s) {
+	public void setAccess_token(final String s) {
 		access_token = s;
 	}
 
-	public void setScope(String s) {
+	public void setScope(final String s) {
 		scope = s;
 	}
 
-	public void setPerson(GPerson p) {
+	public void setPerson(final GPerson p) {
 		person = p;
 	}
 }

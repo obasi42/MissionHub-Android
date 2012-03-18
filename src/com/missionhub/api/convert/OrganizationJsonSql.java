@@ -10,7 +10,7 @@ import com.missionhub.api.model.GOrganization;
 import com.missionhub.api.model.sql.DaoSession;
 import com.missionhub.api.model.sql.Organization;
 import com.missionhub.api.model.sql.OrganizationDao;
-import com.missionhub.broadcast.OrganizationBroadcast;
+import com.missionhub.broadcast.GenericCUDEBroadcast;
 
 public class OrganizationJsonSql {
 
@@ -26,7 +26,7 @@ public class OrganizationJsonSql {
 			for (int i = 0; i < organizations.length; i++) {
 				orgs[i] = organizations[i].getId();
 			}
-			OrganizationBroadcast.broadcastError(context, orgs, e, categories);
+			GenericCUDEBroadcast.broadcastError(context, Organization.class, orgs, e, categories);
 		}
 	}
 
@@ -34,7 +34,8 @@ public class OrganizationJsonSql {
 			throws Exception {
 		if (threaded) {
 			new Thread(new Runnable() {
-				@Override public void run() {
+				@Override
+				public void run() {
 					// call update again, only this time we are in a thread, so
 					// set threaded=false
 					update(context, organizations, false, notify, categories);
@@ -82,7 +83,8 @@ public class OrganizationJsonSql {
 		}
 
 		session.runInTx(new Runnable() {
-			@Override public void run() {
+			@Override
+			public void run() {
 				for (final Organization org : orgs) {
 					session.insertOrReplace(org);
 				}
@@ -92,10 +94,10 @@ public class OrganizationJsonSql {
 		if (notify) {
 			final long[] orgIds = new long[organizationIds.size()];
 			for (int i = 0; i < organizationIds.size(); i++) {
-				OrganizationBroadcast.broadcastUpdate(context, organizationIds.get(i), categories);
 				orgIds[i] = organizationIds.get(i);
 			}
-			OrganizationBroadcast.broadcastComplete(context, orgIds, categories);
+
+			GenericCUDEBroadcast.broadcastUpdate(context, Organization.class, orgIds, categories);
 		}
 	}
 }

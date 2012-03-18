@@ -33,7 +33,8 @@ public class KeywordJsonSql {
 			final String... categories) throws Exception {
 		if (threaded) {
 			new Thread(new Runnable() {
-				@Override public void run() {
+				@Override
+				public void run() {
 					// call update again, only this time we are in a thread, so
 					// set threaded=false
 					update(context, organizationId, keywords, false, notify, categories);
@@ -75,7 +76,8 @@ public class KeywordJsonSql {
 		}
 
 		app.getDbSession().runInTx(new Runnable() {
-			@Override public void run() {
+			@Override
+			public void run() {
 				for (final Keyword word : words) {
 					session.insertOrReplace(word);
 				}

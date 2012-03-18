@@ -30,9 +30,6 @@ public class Upgrade {
 	/** the missionhub application */
 	MissionHubApplication app;
 
-	/** the app version name */
-	private String version = null;
-
 	/** major version */
 	private int majorVersion = -1;
 
@@ -81,8 +78,7 @@ public class Upgrade {
 	 */
 	private void initVersions() {
 		try {
-			version = app.getPackageManager().getPackageInfo(app.getPackageName(), 0).versionName;
-			final String[] versions = version.split("\\.");
+			final String[] versions = app.getVersion().split("\\.");
 			majorVersion = Integer.parseInt(versions[0]);
 			minorVersion = Integer.parseInt(versions[1]);
 

@@ -28,23 +28,23 @@ public class GOrganization {
 		return keywords;
 	}
 
-	public void setId(long id) {
+	public void setId(final long id) {
 		this.id = id;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
-	public void setAncestry(String ancestry) {
+	public void setAncestry(final String ancestry) {
 		this.ancestry = ancestry;
 	}
 
-	public void setLeaders(GPerson[] leaders) {
+	public void setLeaders(final GPerson[] leaders) {
 		this.leaders = leaders;
 	}
 
-	public void setKeywords(GKeyword[] keywords) {
+	public void setKeywords(final GKeyword[] keywords) {
 		this.keywords = keywords;
 	}
 }

@@ -10,7 +10,7 @@ import com.missionhub.api.model.GPerson;
 import com.missionhub.api.model.sql.DaoSession;
 import com.missionhub.api.model.sql.Person;
 import com.missionhub.api.model.sql.PersonDao;
-import com.missionhub.broadcast.PersonBroadcast;
+import com.missionhub.broadcast.GenericCUDEBroadcast;
 
 public class PersonJsonSql {
 
@@ -26,9 +26,12 @@ public class PersonJsonSql {
 		try {
 			privateUpdate(context, new GPerson[] { person }, threaded, notify, categories);
 		} catch (final Exception e) {
-			if (!notify) {
-				return;
-				// TODO:
+			if (notify) {
+				if (person != null) {
+					GenericCUDEBroadcast.broadcastError(context, Person.class, person.getId(), e, categories);
+				} else {
+					GenericCUDEBroadcast.broadcastError(context, Person.class, -1, e, categories);
+				}
 			}
 		}
 	}
@@ -37,9 +40,14 @@ public class PersonJsonSql {
 		try {
 			privateUpdate(context, people, threaded, notify, categories);
 		} catch (final Exception e) {
-			if (!notify) {
-				return;
-				// TODO:
+			if (notify) {
+				final ArrayList<Long> ids = new ArrayList<Long>();
+				for (final GPerson person : people) {
+					if (person != null) {
+						ids.add(person.getId());
+					}
+				}
+				GenericCUDEBroadcast.broadcastError(context, Person.class, ids, e, categories);
 			}
 		}
 	}
@@ -47,7 +55,8 @@ public class PersonJsonSql {
 	private static void privateUpdate(final Context context, final GPerson[] people, final boolean threaded, final boolean notify, final String... categories) throws Exception {
 		if (threaded) {
 			new Thread(new Runnable() {
-				@Override public void run() {
+				@Override
+				public void run() {
 					// call update again, only this time we are in a thread, so
 					// set threaded=false
 					update(context, people, false, notify, categories);
@@ -128,6 +137,11 @@ public class PersonJsonSql {
 				OrganizationRoleJsonSql.update(context, person.getId(), person.getOrganizational_roles(), threaded, notify, categories);
 			}
 
+			if (person.getGroup_memberships() != null) {
+				// GroupMembershipJsonSql.update(context, person.getId(),
+				// person.getGroup_memberships(), threaded, notify, categories);
+			}
+
 			if (person.getInterests() != null) {
 				InterestJsonSql.update(context, person.getId(), person.getInterests(), threaded, notify, categories);
 			}
@@ -145,7 +159,8 @@ public class PersonJsonSql {
 		}
 
 		session.runInTx(new Runnable() {
-			@Override public void run() {
+			@Override
+			public void run() {
 				for (final Person person : peoples) {
 					session.insertOrReplace(person);
 				}
@@ -153,9 +168,7 @@ public class PersonJsonSql {
 		});
 
 		if (notify) {
-			for (final Long id : peopleIds) {
-				PersonBroadcast.broadcastUpdate(context, id, categories);
-			}
+			GenericCUDEBroadcast.broadcastUpdate(context, Person.class, peopleIds, categories);
 		}
 	}
 }
