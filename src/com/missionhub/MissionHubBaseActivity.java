@@ -2,9 +2,10 @@ package com.missionhub;
 
 import android.database.sqlite.SQLiteDatabase;
 
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.missionhub.api.model.sql.DaoSession;
 
-public class MissionHubBaseActivity extends MissionHubRoboFragmentActivity {
+public class MissionHubBaseActivity extends SherlockFragmentActivity {
 
 	/**
 	 * Returns the session
