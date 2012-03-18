@@ -36,6 +36,7 @@ public class Person {
     private List<Education> educationList;
     private List<Location> locationList;
     private List<OrganizationalRole> organizationalRoleList;
+    private List<GroupMembership> groups;
     private List<FollowupComment> followup_comments;
     private List<FollowupComment> posted_comments;
     private List<Answer> answerList;
@@ -273,6 +274,23 @@ public class Person {
     /** Resets a to-many relationship, making the next get call to query for a fresh result. */
     public synchronized void resetOrganizationalRoleList() {
         organizationalRoleList = null;
+    }
+
+    /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
+    public synchronized List<GroupMembership> getGroups() {
+        if (groups == null) {
+            if (daoSession == null) {
+                throw new DaoException("Entity is detached from DAO context");
+            }
+            GroupMembershipDao targetDao = daoSession.getGroupMembershipDao();
+            groups = targetDao._queryPerson_Groups(id);
+        }
+        return groups;
+    }
+
+    /** Resets a to-many relationship, making the next get call to query for a fresh result. */
+    public synchronized void resetGroups() {
+        groups = null;
     }
 
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */

@@ -20,6 +20,7 @@ public class Organization {
     /** Used for active entity operations. */
     private OrganizationDao myDao;
 
+    private List<Group> groups;
     private List<FollowupComment> followupCommentList;
     private List<Keyword> keywordList;
     private List<Answer> answerList;
@@ -65,6 +66,23 @@ public class Organization {
 
     public void setAncestry(String ancestry) {
         this.ancestry = ancestry;
+    }
+
+    /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
+    public synchronized List<Group> getGroups() {
+        if (groups == null) {
+            if (daoSession == null) {
+                throw new DaoException("Entity is detached from DAO context");
+            }
+            GroupDao targetDao = daoSession.getGroupDao();
+            groups = targetDao._queryOrganization_Groups(id);
+        }
+        return groups;
+    }
+
+    /** Resets a to-many relationship, making the next get call to query for a fresh result. */
+    public synchronized void resetGroups() {
+        groups = null;
     }
 
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
