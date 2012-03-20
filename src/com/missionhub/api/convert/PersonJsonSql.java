@@ -69,21 +69,22 @@ public class PersonJsonSql {
 		final DaoSession session = app.getDbSession();
 		final PersonDao pd = session.getPersonDao();
 
-		final List<Long> peopleIds = new ArrayList<Long>();
 		final List<Person> peoples = new ArrayList<Person>();
+		final List<Long> createdIds = new ArrayList<Long>();
+		final List<Long> updatedIds = new ArrayList<Long>();
 
 		for (final GPerson person : people) {
 			Person p = pd.load(person.getId());
 
 			if (p == null) {
 				p = new Person();
+				createdIds.add(person.getId());
 			} else {
 				p.refresh();
+				updatedIds.add(person.getId());
 			}
 
-			if (person.getId() != null) {
-				p.setId(person.getId());
-			}
+			p.setId(person.getId());
 
 			if (person.getName() != null) {
 				p.setName(person.getName());
@@ -138,8 +139,7 @@ public class PersonJsonSql {
 			}
 
 			if (person.getGroup_memberships() != null) {
-				// GroupMembershipJsonSql.update(context, person.getId(),
-				// person.getGroup_memberships(), threaded, notify, categories);
+				GroupMembershipJsonSql.update(context, person.getId(), person.getGroup_memberships(), threaded, notify, categories);
 			}
 
 			if (person.getInterests() != null) {
@@ -155,7 +155,6 @@ public class PersonJsonSql {
 			}
 
 			peoples.add(p);
-			peopleIds.add(person.getId());
 		}
 
 		session.runInTx(new Runnable() {
@@ -168,7 +167,8 @@ public class PersonJsonSql {
 		});
 
 		if (notify) {
-			GenericCUDEBroadcast.broadcastUpdate(context, Person.class, peopleIds, categories);
+			GenericCUDEBroadcast.broadcastCreate(context, Person.class, createdIds, categories);
+			GenericCUDEBroadcast.broadcastUpdate(context, Person.class, updatedIds, categories);
 		}
 	}
 }

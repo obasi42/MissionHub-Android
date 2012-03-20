@@ -1,5 +1,7 @@
 package com.missionhub.api.convert;
 
+import java.util.ArrayList;
+
 import android.content.Context;
 
 import com.missionhub.MissionHubApplication;
@@ -8,6 +10,7 @@ import com.missionhub.api.model.sql.DaoSession;
 import com.missionhub.api.model.sql.Education;
 import com.missionhub.api.model.sql.EducationDao;
 import com.missionhub.api.model.sql.EducationDao.Properties;
+import com.missionhub.broadcast.GenericCUDEBroadcast;
 
 import de.greenrobot.dao.CloseableListIterator;
 import de.greenrobot.dao.LazyList;
@@ -23,7 +26,9 @@ public class EducationJsonSql {
 		try {
 			privateUpdate(context, personId, educations, threaded, notify, categories);
 		} catch (final Exception e) {
-			// TODO:
+			if (notify) {
+				GenericCUDEBroadcast.broadcastError(context, Education.class, -1, e, categories);
+			}
 		}
 	}
 
@@ -51,12 +56,18 @@ public class EducationJsonSql {
 				// delete current educations
 				final LazyList<Education> currentEducation = ed.queryBuilder().where(Properties.Person_id.eq(personId)).listLazyUncached();
 				final CloseableListIterator<Education> itr = currentEducation.listIteratorAutoClose();
+				final ArrayList<Long> deleteIds = new ArrayList<Long>();
 				while (itr.hasNext()) {
 					final Education edu = itr.next();
+					deleteIds.add(edu.getId());
 					session.delete(edu);
+				}
+				if (notify) {
+					GenericCUDEBroadcast.broadcastDelete(context, Education.class, deleteIds, categories);
 				}
 
 				// insert new educations
+				final ArrayList<Long> insertIds = new ArrayList<Long>();
 				for (final GEducation education : educations) {
 					final Education edu = new Education();
 					edu.setPerson_id(personId);
@@ -70,7 +81,10 @@ public class EducationJsonSql {
 						edu.setYear_id(education.getYear().getId());
 						edu.setYear_name(education.getYear().getName());
 					}
-					session.insert(edu);
+					insertIds.add(session.insert(edu));
+					if (notify) {
+						GenericCUDEBroadcast.broadcastCreate(context, Education.class, personId, categories);
+					}
 				}
 			}
 		});

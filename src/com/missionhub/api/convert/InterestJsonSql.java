@@ -1,5 +1,7 @@
 package com.missionhub.api.convert;
 
+import java.util.ArrayList;
+
 import android.content.Context;
 
 import com.missionhub.MissionHubApplication;
@@ -8,6 +10,7 @@ import com.missionhub.api.model.sql.DaoSession;
 import com.missionhub.api.model.sql.Interest;
 import com.missionhub.api.model.sql.InterestDao;
 import com.missionhub.api.model.sql.InterestDao.Properties;
+import com.missionhub.broadcast.GenericCUDEBroadcast;
 
 import de.greenrobot.dao.CloseableListIterator;
 import de.greenrobot.dao.LazyList;
@@ -24,7 +27,9 @@ public class InterestJsonSql {
 		try {
 			privateUpdate(context, personId, interests, threaded, notify, categories);
 		} catch (final Exception e) {
-			// TODO:
+			if (notify) {
+				GenericCUDEBroadcast.broadcastError(context, Interest.class, -1, e, categories);
+			}
 		}
 	}
 
@@ -52,12 +57,18 @@ public class InterestJsonSql {
 				// delete current interests in db
 				final LazyList<Interest> currentInterests = id.queryBuilder().where(Properties.Person_id.eq(personId)).listLazyUncached();
 				final CloseableListIterator<Interest> itr = currentInterests.listIteratorAutoClose();
+				final ArrayList<Long> deletedIds = new ArrayList<Long>();
 				while (itr.hasNext()) {
 					final Interest interest = itr.next();
+					deletedIds.add(interest.getId());
 					session.delete(interest);
+				}
+				if (notify) {
+					GenericCUDEBroadcast.broadcastDelete(context, Interest.class, deletedIds, categories);
 				}
 
 				// insert interests
+				final ArrayList<Long> createdIds = new ArrayList<Long>();
 				for (final GIdNameProvider interest : interests) {
 					final Interest i = new Interest();
 					i.setCategory(interest.getCategory());
@@ -65,7 +76,10 @@ public class InterestJsonSql {
 					i.setName(interest.getName());
 					i.setPerson_id(personId);
 					i.setProvider(interest.getProvider());
-					session.insert(i);
+					createdIds.add(session.insert(i));
+				}
+				if (notify) {
+					GenericCUDEBroadcast.broadcastCreate(context, Interest.class, createdIds, categories);
 				}
 			}
 		});

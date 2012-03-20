@@ -2,7 +2,6 @@ package com.missionhub.api.convert;
 
 import android.content.Context;
 
-import com.missionhub.MissionHubApplication;
 import com.missionhub.api.model.GMetaMeta;
 import com.missionhub.broadcast.GenericSEBroadcast;
 import com.missionhub.broadcast.GenericSEBroadcast.Type;
@@ -34,11 +33,9 @@ public class MetaJsonSql {
 			return;
 		}
 
-		final MissionHubApplication app = (MissionHubApplication) context.getApplicationContext();
-
 		OrganizationJsonSql.update(context, meta.getOrganizations(), false, true);
 
-		// GroupJsonSql.update(context, meta.getGroups(), false, true);
+		GroupJsonSql.update(context, meta.getGroups(), false, true);
 
 		PersonJsonSql.update(context, meta.getPerson(), false, true);
 

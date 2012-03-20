@@ -22,11 +22,13 @@ public class OrganizationJsonSql {
 		try {
 			privateUpdate(context, organizations, threaded, notify, categories);
 		} catch (final Exception e) {
-			final long[] orgs = new long[organizations.length];
-			for (int i = 0; i < organizations.length; i++) {
-				orgs[i] = organizations[i].getId();
+			if (notify) {
+				final long[] ids = new long[organizations.length];
+				for (int i = 0; i < organizations.length; i++) {
+					ids[i] = organizations[i].getId();
+				}
+				GenericCUDEBroadcast.broadcastError(context, Organization.class, ids, e, categories);
 			}
-			GenericCUDEBroadcast.broadcastError(context, Organization.class, orgs, e, categories);
 		}
 	}
 
@@ -51,13 +53,18 @@ public class OrganizationJsonSql {
 		final List<Long> organizationIds = new ArrayList<Long>();
 		final List<Organization> orgs = new ArrayList<Organization>();
 
+		final ArrayList<Long> createdIds = new ArrayList<Long>();
+		final ArrayList<Long> updatedIds = new ArrayList<Long>();
+
 		for (final GOrganization organization : organizations) {
 			Organization org = od.load(organization.getId());
 
 			if (org == null) {
 				org = new Organization();
+				createdIds.add(organization.getId());
 			} else {
 				org.refresh();
+				updatedIds.add(organization.getId());
 			}
 
 			org.setId(organization.getId());
@@ -92,12 +99,8 @@ public class OrganizationJsonSql {
 		});
 
 		if (notify) {
-			final long[] orgIds = new long[organizationIds.size()];
-			for (int i = 0; i < organizationIds.size(); i++) {
-				orgIds[i] = organizationIds.get(i);
-			}
-
-			GenericCUDEBroadcast.broadcastUpdate(context, Organization.class, orgIds, categories);
+			GenericCUDEBroadcast.broadcastCreate(context, Organization.class, createdIds, categories);
+			GenericCUDEBroadcast.broadcastUpdate(context, Organization.class, updatedIds, categories);
 		}
 	}
 }

@@ -13,7 +13,7 @@ public class GGroup {
 	private String updated_at;
 	private boolean list_publicly;
 	private boolean approve_join_requests;
-	private GLabel[] labels;
+	private GGroupLabel[] labels;
 
 	public long getId() {
 		return id;
@@ -103,11 +103,11 @@ public class GGroup {
 		this.approve_join_requests = approve_join_requests;
 	}
 
-	public GLabel[] getLabels() {
+	public GGroupLabel[] getLabels() {
 		return labels;
 	}
 
-	public void setLabels(final GLabel[] labels) {
+	public void setLabels(final GGroupLabel[] labels) {
 		this.labels = labels;
 	}
 

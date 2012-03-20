@@ -1,5 +1,7 @@
 package com.missionhub.api.convert;
 
+import java.util.ArrayList;
+
 import android.content.Context;
 
 import com.missionhub.MissionHubApplication;
@@ -8,6 +10,7 @@ import com.missionhub.api.model.sql.DaoSession;
 import com.missionhub.api.model.sql.Location;
 import com.missionhub.api.model.sql.LocationDao;
 import com.missionhub.api.model.sql.LocationDao.Properties;
+import com.missionhub.broadcast.GenericCUDEBroadcast;
 
 import de.greenrobot.dao.CloseableListIterator;
 import de.greenrobot.dao.LazyList;
@@ -23,7 +26,9 @@ public class LocationJsonSql {
 		try {
 			privateUpdate(context, personId, location, threaded, notify, categories);
 		} catch (final Exception e) {
-			// TODO:
+			if (notify) {
+				GenericCUDEBroadcast.broadcastError(context, Location.class, -1, e, categories);
+			}
 		}
 	}
 
@@ -51,18 +56,27 @@ public class LocationJsonSql {
 				// delete current interests in db
 				final LazyList<Location> currentInterests = ld.queryBuilder().where(Properties.Person_id.eq(personId)).listLazyUncached();
 				final CloseableListIterator<Location> itr = currentInterests.listIteratorAutoClose();
+				final ArrayList<Long> deletedIds = new ArrayList<Long>();
 				while (itr.hasNext()) {
 					final Location loc = itr.next();
+					deletedIds.add(loc.getId());
 					session.delete(loc);
+				}
+				if (notify) {
+					GenericCUDEBroadcast.broadcastDelete(context, Location.class, deletedIds, categories);
 				}
 
 				// insert location
+				final ArrayList<Long> createdIds = new ArrayList<Long>();
 				final Location l = new Location();
 				l.setLocation_id(location.getId());
 				l.setName(location.getName());
 				l.setPerson_id(personId);
 				l.setProvider(location.getProvider());
-				session.insert(l);
+				createdIds.add(session.insert(l));
+				if (notify) {
+					GenericCUDEBroadcast.broadcastCreate(context, Location.class, createdIds, categories);
+				}
 			}
 		});
 	}

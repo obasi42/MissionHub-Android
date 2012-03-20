@@ -5,7 +5,7 @@ public class GPerson {
 	private String first_name;
 	private String last_name;
 	private String name;
-	private Long id;
+	private long id;
 	private String birthday;
 	private String locale;
 	private String gender;
@@ -37,7 +37,7 @@ public class GPerson {
 		return name;
 	}
 
-	public Long getId() {
+	public long getId() {
 		return id;
 	}
 
@@ -121,7 +121,7 @@ public class GPerson {
 		name = s;
 	}
 
-	public void setId(final Long i) {
+	public void setId(final long i) {
 		id = i;
 	}
 

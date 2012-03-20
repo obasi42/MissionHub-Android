@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.missionhub.MissionHubApplication;
 import com.missionhub.api.model.GQuestion;
@@ -15,6 +14,7 @@ import com.missionhub.api.model.sql.QuestionChoice;
 import com.missionhub.api.model.sql.QuestionChoiceDao;
 import com.missionhub.api.model.sql.QuestionChoiceDao.Properties;
 import com.missionhub.api.model.sql.QuestionDao;
+import com.missionhub.broadcast.GenericCUDEBroadcast;
 
 import de.greenrobot.dao.LazyList;
 
@@ -31,7 +31,15 @@ public class QuestionJsonSql {
 		try {
 			privateUpdate(context, keywordId, questions, threaded, notify, categories);
 		} catch (final Exception e) {
-			Log.w(TAG, e.getMessage(), e);
+			if (notify) {
+				final ArrayList<Long> ids = new ArrayList<Long>();
+				for (final GQuestion question : questions) {
+					if (question != null) {
+						ids.add(question.getId());
+					}
+				}
+				GenericCUDEBroadcast.broadcastError(context, Question.class, ids, e, categories);
+			}
 		}
 	}
 
@@ -58,12 +66,17 @@ public class QuestionJsonSql {
 		final ArrayList<QuestionChoice> qcDelete = new ArrayList<QuestionChoice>();
 		final List<QuestionChoice> qcInsert = new ArrayList<QuestionChoice>();
 
+		final List<Long> createdIds = new ArrayList<Long>();
+		final List<Long> updatedIds = new ArrayList<Long>();
+
 		for (final GQuestion question : questions) {
 			Question q = qd.load(question.getId());
 			if (q == null) {
 				q = new Question();
+				createdIds.add(question.getId());
 			} else {
 				q.refresh();
+				updatedIds.add(question.getId());
 			}
 
 			q.setId(question.getId());
@@ -104,10 +117,14 @@ public class QuestionJsonSql {
 			qs.add(q);
 		}
 
+		final ArrayList<Long> qcDeletedIds = new ArrayList<Long>();
+		final ArrayList<Long> qcCreatedIds = new ArrayList<Long>();
+
 		app.getDbSession().runInTx(new Runnable() {
 			@Override
 			public void run() {
 				for (final QuestionChoice qc : qcDelete) {
+					qcDeletedIds.add(qc.getId());
 					session.delete(qc);
 				}
 
@@ -116,10 +133,17 @@ public class QuestionJsonSql {
 				}
 
 				for (final QuestionChoice qc : qcInsert) {
+					qcCreatedIds.add(qc.getId());
 					session.insert(qc);
 				}
-
 			}
 		});
+
+		if (notify) {
+			GenericCUDEBroadcast.broadcastDelete(context, QuestionChoice.class, qcDeletedIds, categories);
+			GenericCUDEBroadcast.broadcastCreate(context, Question.class, createdIds, categories);
+			GenericCUDEBroadcast.broadcastUpdate(context, Question.class, updatedIds, categories);
+			GenericCUDEBroadcast.broadcastCreate(context, QuestionChoice.class, qcCreatedIds, categories);
+		}
 	}
 }

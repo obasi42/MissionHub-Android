@@ -6,95 +6,95 @@ package com.missionhub.api.model.sql;
  */
 public class Education {
 
-	private Long id;
-	private Long person_id;
-	private String school_name;
-	private String school_id;
-	private String year_name;
-	private String year_id;
-	private String type;
-	private String provider;
+    private Long id;
+    private Long person_id;
+    private String school_name;
+    private String school_id;
+    private String year_name;
+    private String year_id;
+    private String type;
+    private String provider;
 
-	public Education() {}
+    public Education() {
+    }
 
-	public Education(final Long id) {
-		this.id = id;
-	}
+    public Education(Long id) {
+        this.id = id;
+    }
 
-	public Education(final Long id, final Long person_id, final String school_name, final String school_id, final String year_name, final String year_id, final String type,
-			final String provider) {
-		this.id = id;
-		this.person_id = person_id;
-		this.school_name = school_name;
-		this.school_id = school_id;
-		this.year_name = year_name;
-		this.year_id = year_id;
-		this.type = type;
-		this.provider = provider;
-	}
+    public Education(Long id, Long person_id, String school_name, String school_id, String year_name, String year_id, String type, String provider) {
+        this.id = id;
+        this.person_id = person_id;
+        this.school_name = school_name;
+        this.school_id = school_id;
+        this.year_name = year_name;
+        this.year_id = year_id;
+        this.type = type;
+        this.provider = provider;
+    }
 
-	public Long getId() {
-		return id;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public void setId(final Long id) {
-		this.id = id;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public Long getPerson_id() {
-		return person_id;
-	}
+    public Long getPerson_id() {
+        return person_id;
+    }
 
-	public void setPerson_id(final Long person_id) {
-		this.person_id = person_id;
-	}
+    public void setPerson_id(Long person_id) {
+        this.person_id = person_id;
+    }
 
-	public String getSchool_name() {
-		return school_name;
-	}
+    public String getSchool_name() {
+        return school_name;
+    }
 
-	public void setSchool_name(final String school_name) {
-		this.school_name = school_name;
-	}
+    public void setSchool_name(String school_name) {
+        this.school_name = school_name;
+    }
 
-	public String getSchool_id() {
-		return school_id;
-	}
+    public String getSchool_id() {
+        return school_id;
+    }
 
-	public void setSchool_id(final String school_id) {
-		this.school_id = school_id;
-	}
+    public void setSchool_id(String school_id) {
+        this.school_id = school_id;
+    }
 
-	public String getYear_name() {
-		return year_name;
-	}
+    public String getYear_name() {
+        return year_name;
+    }
 
-	public void setYear_name(final String year_name) {
-		this.year_name = year_name;
-	}
+    public void setYear_name(String year_name) {
+        this.year_name = year_name;
+    }
 
-	public String getYear_id() {
-		return year_id;
-	}
+    public String getYear_id() {
+        return year_id;
+    }
 
-	public void setYear_id(final String year_id) {
-		this.year_id = year_id;
-	}
+    public void setYear_id(String year_id) {
+        this.year_id = year_id;
+    }
 
-	public String getType() {
-		return type;
-	}
+    public String getType() {
+        return type;
+    }
 
-	public void setType(final String type) {
-		this.type = type;
-	}
+    public void setType(String type) {
+        this.type = type;
+    }
 
-	public String getProvider() {
-		return provider;
-	}
+    public String getProvider() {
+        return provider;
+    }
 
-	public void setProvider(final String provider) {
-		this.provider = provider;
-	}
+    public void setProvider(String provider) {
+        this.provider = provider;
+    }
 
 }

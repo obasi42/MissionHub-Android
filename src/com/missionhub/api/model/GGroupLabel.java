@@ -1,6 +1,6 @@
 package com.missionhub.api.model;
 
-public class GLabel {
+public class GGroupLabel {
 
 	private long id;
 	private String name;

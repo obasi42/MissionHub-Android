@@ -2,15 +2,15 @@ package com.missionhub.api.model;
 
 public class GGroupMembership {
 
-	private int group_id;
+	private long group_id;
 	private String name;
 	private String role;
 
-	public int getGroup_id() {
+	public long getGroup_id() {
 		return group_id;
 	}
 
-	public void setGroup_id(final int group_id) {
+	public void setGroup_id(final long group_id) {
 		this.group_id = group_id;
 	}
 

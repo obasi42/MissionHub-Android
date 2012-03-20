@@ -1,5 +1,7 @@
 package com.missionhub.api.convert;
 
+import java.util.ArrayList;
+
 import android.content.Context;
 
 import com.missionhub.MissionHubApplication;
@@ -10,6 +12,7 @@ import com.missionhub.api.model.sql.OrganizationDao;
 import com.missionhub.api.model.sql.OrganizationalRole;
 import com.missionhub.api.model.sql.OrganizationalRoleDao;
 import com.missionhub.api.model.sql.OrganizationalRoleDao.Properties;
+import com.missionhub.broadcast.GenericCUDEBroadcast;
 
 import de.greenrobot.dao.CloseableListIterator;
 import de.greenrobot.dao.LazyList;
@@ -24,7 +27,9 @@ public class OrganizationRoleJsonSql {
 		try {
 			privateUpdate(context, personId, roles, threaded, notify, categories);
 		} catch (final Exception e) {
-			// TODO:
+			if (notify) {
+				GenericCUDEBroadcast.broadcastError(context, OrganizationalRole.class, -1, e, categories);
+			}
 		}
 	}
 
@@ -52,11 +57,18 @@ public class OrganizationRoleJsonSql {
 				// delete current roles in db
 				final LazyList<OrganizationalRole> currentRoles = ord.queryBuilder().where(Properties.Person_id.eq(personId)).listLazyUncached();
 				final CloseableListIterator<OrganizationalRole> itr = currentRoles.listIteratorAutoClose();
+				final ArrayList<Long> deletedIds = new ArrayList<Long>();
 				while (itr.hasNext()) {
-					session.delete(itr.next());
+					final OrganizationalRole or = itr.next();
+					deletedIds.add(or.getId());
+					session.delete(or);
+				}
+				if (notify) {
+					GenericCUDEBroadcast.broadcastDelete(context, OrganizationalRole.class, deletedIds, categories);
 				}
 
 				// insert new roles
+				final ArrayList<Long> createdIds = new ArrayList<Long>();
 				for (final GOrgGeneric role : roles) {
 					final OrganizationalRole or = new OrganizationalRole();
 					or.setOrganization_id(role.getOrg_id());
@@ -65,7 +77,7 @@ public class OrganizationRoleJsonSql {
 						or.setPrimary(Boolean.parseBoolean(role.getPrimary()));
 					}
 					or.setRole(role.getRole());
-					session.insert(or);
+					createdIds.add(session.insert(or));
 
 					// insert organization stub
 					Organization org = od.load(role.getOrg_id());
@@ -81,6 +93,9 @@ public class OrganizationRoleJsonSql {
 						org.setName(role.getName());
 					}
 					session.insertOrReplace(org);
+				}
+				if (notify) {
+					GenericCUDEBroadcast.broadcastCreate(context, OrganizationalRole.class, createdIds, categories);
 				}
 			}
 		});
