@@ -102,11 +102,11 @@ public class GroupLabelJsonSql {
 					}
 
 					if (label.getCreated_at() != null) {
-						gl.setCreated_at(U.getDateFromUTCString(label.getCreated_at()));
+						gl.setCreated_at(U.parseISO8601(label.getCreated_at()));
 					}
 
 					if (label.getUpdated_at() != null) {
-						gl.setUpdated_at(U.getDateFromUTCString(label.getUpdated_at()));
+						gl.setUpdated_at(U.parseISO8601(label.getUpdated_at()));
 					}
 
 					gl.setGroup_labelings_count(label.getGroup_labelings_count());

@@ -73,11 +73,11 @@ public class GroupJsonSql {
 			}
 
 			if (group.getCreated_at() != null) {
-				g.setCreated_at(U.getDateFromUTCString(group.getCreated_at()));
+				g.setCreated_at(U.parseISO8601(group.getCreated_at()));
 			}
 
 			if (group.getUpdated_at() != null) {
-				g.setUpdated_at(U.getDateFromUTCString(group.getCreated_at()));
+				g.setUpdated_at(U.parseISO8601(group.getCreated_at()));
 			}
 
 			g.setStart_time(group.getStart_time());
