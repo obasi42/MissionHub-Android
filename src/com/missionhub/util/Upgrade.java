@@ -45,10 +45,10 @@ public class Upgrade {
 	/** stores the past versions */
 	private static final SetMultimap<Integer, Integer> versions = Multimaps.synchronizedSetMultimap(HashMultimap.<Integer, Integer> create());
 	static {
-		versions.put(1, 0);
-		versions.put(1, 1);
-		versions.put(1, 2);
-		versions.put(2, 0);
+		versions.put(1, 0); // v1.0.x
+		versions.put(1, 1); // v1.1.x
+		versions.put(1, 2); // v1.2.x
+		versions.put(2, 0); // v2.0.x
 	}
 
 	/**

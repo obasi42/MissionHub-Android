@@ -1,11 +1,33 @@
 package com.missionhub;
 
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.missionhub.api.model.sql.DaoSession;
 
 public class MissionHubBaseActivity extends SherlockFragmentActivity {
+
+	/** Called when the activity is first created. */
+	@Override
+	public void onCreate(final Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+	}
+
+	/** Called when the activity is destroyed */
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+	}
+
+	/**
+	 * Shortcut to the MissionHubApplication
+	 * 
+	 * @return
+	 */
+	public MissionHubApplication getMHApplication() {
+		return ((MissionHubApplication) getApplicationContext());
+	}
 
 	/**
 	 * Returns the session
@@ -13,7 +35,7 @@ public class MissionHubBaseActivity extends SherlockFragmentActivity {
 	 * @return
 	 */
 	public Session getSession() {
-		return ((MissionHubApplication) getApplicationContext()).getSession();
+		return getMHApplication().getSession();
 	}
 
 	/**
@@ -36,7 +58,7 @@ public class MissionHubBaseActivity extends SherlockFragmentActivity {
 	 * @return
 	 */
 	public synchronized SQLiteDatabase getDb() {
-		return ((MissionHubApplication) getApplicationContext()).getDb();
+		return getMHApplication().getDb();
 	}
 
 	/**
@@ -45,6 +67,6 @@ public class MissionHubBaseActivity extends SherlockFragmentActivity {
 	 * @return
 	 */
 	public synchronized DaoSession getDbSession() {
-		return ((MissionHubApplication) getApplicationContext()).getDbSession();
+		return getMHApplication().getDbSession();
 	}
 }

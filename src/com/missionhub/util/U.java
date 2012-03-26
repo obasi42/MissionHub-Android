@@ -3,6 +3,7 @@ package com.missionhub.util;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 
 import javax.xml.datatype.DatatypeFactory;
@@ -10,12 +11,13 @@ import javax.xml.datatype.DatatypeFactory;
 import android.util.Log;
 
 public class U {
-	
+
 	/** logging tag */
 	public static final String TAG = U.class.getSimpleName();
 
 	/**
 	 * Checks if a long array contains a value
+	 * 
 	 * @param values
 	 * @param value
 	 * @return
@@ -24,44 +26,101 @@ public class U {
 		Arrays.sort(values);
 		return Arrays.binarySearch(values, value) >= 0;
 	}
-	
+
 	/**
 	 * Parses Rails Time.utc.to_s
-	 * @param time string
+	 * 
+	 * @param time
+	 *            string
 	 * @return date object
 	 */
 	public static Date parseUTC(String s) {
-		java.text.DateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
+		final java.text.DateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
 		df.setTimeZone(java.util.TimeZone.getTimeZone("Zulu"));
 		s = s.replace("UTC", "");
 
 		try {
 			return df.parse(s);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			Log.w(TAG, "date parse exception", e);
 		}
 		return new Date();
 	}
-	
+
 	/**
 	 * Parses Rails Time.iso8601.to_s
-	 * @param time string
+	 * 
+	 * @param time
+	 *            string
 	 * @return date object
 	 */
-	public static Date parseISO8601(String iso8601String) {
+	public static Date parseISO8601(final String iso8601String) {
 		try {
 			return DatatypeFactory.newInstance().newXMLGregorianCalendar(iso8601String).toGregorianCalendar().getTime();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			try {
-				DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSZ");
+				final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSZ");
 				return df.parse(iso8601String);
-			} catch (Exception e2) {
+			} catch (final Exception e2) {
 				Log.w(TAG, "SimpleDateFormat parse exception", e2);
 			}
 			Log.w(TAG, "XMLGregorianCalendar parse exception", e);
 		}
 		return new Date();
-		
+
 	}
 
+	/**
+	 * Checks any object in a list is null
+	 * 
+	 * @param objects
+	 * @return true if an object is null
+	 */
+	public static boolean isNull(final Object... objects) {
+		for (final Object o : objects) {
+			if (o == null) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Checks if any object in a list is null or empty
+	 * 
+	 * @param objects
+	 * @return true if an object is null or empty
+	 */
+	public static boolean isNullEmpty(final Object... objects) {
+		for (final Object o : objects) {
+			if (o == null) {
+				return true;
+			}
+			if (o instanceof CharSequence && ((CharSequence) o).length() <= 0) {
+				return true;
+			}
+			if (o instanceof Collection && ((Collection<?>) o).isEmpty()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Checks if any object in a list is null, empty, or negative
+	 * 
+	 * @param objects
+	 * @return true if any object is null, empty, or negative
+	 */
+	public static boolean isNullEmptyNegative(final Object... objects) {
+		for (final Object o : objects) {
+			if (isNullEmpty(o)) {
+				return true;
+			}
+			if (o instanceof Number && ((Number) o).doubleValue() < 0) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

@@ -33,11 +33,14 @@ public class MetaJsonSql {
 			return;
 		}
 
-		OrganizationJsonSql.update(context, meta.getOrganizations(), false, true);
+		if (meta.getOrganizations() != null)
+			OrganizationJsonSql.update(context, meta.getOrganizations(), false, true);
 
-		GroupJsonSql.update(context, meta.getGroups(), false, true);
+		if (meta.getGroups() != null)
+			GroupJsonSql.update(context, meta.getGroups(), false, true);
 
-		PersonJsonSql.update(context, meta.getPerson(), false, true);
+		if (meta.getPerson() != null)
+			PersonJsonSql.update(context, meta.getPerson(), false, true);
 
 		if (notify) {
 			GenericSEBroadcast.broadcastSuccess(context, Type.MetaJsonSql, categories);

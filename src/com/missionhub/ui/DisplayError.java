@@ -47,7 +47,7 @@ public class DisplayError {
 
 	public static final AlertDialog displayWithRetry(final Context ctx, final Throwable t, final Retry retry) {
 		final AlertDialog ad = display(ctx, t);
-		ad.setButton(ad.getContext().getString(R.string.action_retry), new DialogInterface.OnClickListener() {
+		ad.setButton(AlertDialog.BUTTON_POSITIVE, ad.getContext().getString(R.string.action_retry), new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(final DialogInterface dialog, final int id) {
 				dialog.dismiss();

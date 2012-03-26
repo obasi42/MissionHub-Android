@@ -5,7 +5,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
+
+import com.missionhub.broadcast.SessionBroadcast;
+import com.missionhub.broadcast.SessionReceiver;
 
 /**
  * The main MissionHub Activity.
@@ -23,20 +28,48 @@ public class MissionHubActivity extends MissionHubBaseActivity {
 	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		// redirect to first screen if session can be resumed
-		if (getSession() != null) {
+		if (getSession().isValid()) {
 			startMain();
+		} else if (getSession().isUpdating()) {
+			// TODO: display blocking dialog
+			Toast.makeText(this, "Updating", Toast.LENGTH_LONG).show();
 		}
+
+		final SessionReceiver sr = new SessionReceiver(this) {
+			@Override
+			public void onLogin(final String accessToken) {
+				Log.d(TAG, "Logged In");
+				startMain();
+			}
+		};
+		sr.register(SessionBroadcast.NOTIFY_LOGIN);
 
 		setContentView(R.layout.activity_missionhub);
 	}
 
 	@Override
 	protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
-		if (requestCode == RESULT_LOGIN_ACTIVITY && resultCode == RESULT_OK) {
-			startMain();
+		if (requestCode == RESULT_LOGIN_ACTIVITY && resultCode == LoginActivity.RESULT_OK) {
+			final SessionReceiver sr = new SessionReceiver(this) {
+				@Override
+				public void onUpdateSuccess() {
+					SessionBroadcast.broadcastLogin(context, getSession().getAccessToken());
+					unregister();
+				}
+				
+				@Override
+				public void onUpdateError(Throwable t) {
+					// TODO: show error
+					Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG).show();
+					unregister();
+				}
+			};
+			sr.register(SessionBroadcast.NOTIFY_LOGIN);
+			getSession().update();
+			
+			// TODO: block interface
 		}
-		if (requestCode == RESULT_LOGIN_ACTIVITY && resultCode == RESULT_FIRST_USER) {
+		if (requestCode == RESULT_LOGIN_ACTIVITY && resultCode == LoginActivity.RESULT_RETRY) {
 			clickLogin(null);
 		}
 	}

@@ -29,6 +29,9 @@ public class MissionHubApplication extends GDApplication {
 	/** application context's database cache session */
 	private DaoSession daoSession;
 
+	/** database name */
+	private static final String DB_NAME = "mh-db";
+
 	/**
 	 * Called when the application is started
 	 */
@@ -100,7 +103,7 @@ public class MissionHubApplication extends GDApplication {
 	 */
 	public synchronized SQLiteDatabase getDb() {
 		if (db == null) {
-			final OpenHelper helper = new MissionHubOpenHelper(getApplicationContext(), "mh-db", null);
+			final OpenHelper helper = new MissionHubOpenHelper(getApplicationContext(), DB_NAME, null);
 			db = helper.getWritableDatabase();
 		}
 		return db;
@@ -128,15 +131,19 @@ public class MissionHubApplication extends GDApplication {
 		getDb().close();
 		daoSession = null;
 		db = null;
-		return deleteDatabase("mh-db");
+		return deleteDatabase(DB_NAME);
 	}
 
 	/**
 	 * Resets all app data
 	 */
 	public synchronized void reset() {
-		Preferences.reset(this);
 		setSession(null);
 		deleteDatabase();
+		Preferences.reset(this);
+	}
+
+	public synchronized void logout() {
+		getSession().logout();
 	}
 }

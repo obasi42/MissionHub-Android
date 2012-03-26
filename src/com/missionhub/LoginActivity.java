@@ -1,11 +1,9 @@
 package com.missionhub;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.List;
 
 import roboguice.inject.InjectView;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
@@ -27,18 +25,12 @@ import com.cr_wd.android.network.HttpClient;
 import com.cr_wd.android.network.HttpParams;
 import com.google.gson.Gson;
 import com.missionhub.api.ApiHandler;
-import com.missionhub.api.convert.PersonJsonSql;
 import com.missionhub.api.model.GError;
 import com.missionhub.api.model.GLoginDone;
-import com.missionhub.api.model.sql.Person;
-import com.missionhub.broadcast.GenericCUDEBroadcast;
-import com.missionhub.broadcast.GenericCUDEReceiver;
-import com.missionhub.broadcast.SessionBroadcast;
 import com.missionhub.config.Config;
 import com.missionhub.config.Preferences;
 import com.missionhub.error.MissionHubException;
 import com.missionhub.ui.DisplayError;
-import com.missionhub.util.U;
 
 /**
  * The Login Activity
@@ -47,6 +39,9 @@ public class LoginActivity extends MissionHubBaseActivity {
 
 	/** logging tag */
 	public static final String TAG = LoginActivity.class.getSimpleName();
+
+	/** result retry */
+	public static final int RESULT_RETRY = 1;
 
 	@InjectView(R.id.webview)
 	WebView mWebView;
@@ -82,11 +77,9 @@ public class LoginActivity extends MissionHubBaseActivity {
 	}
 
 	/**
-	 * Broadcasts a successful login, sets the activity result to OK and
-	 * finishes the activity.
+	 * Sets the activity result to OK and finishes the activity.
 	 */
 	private void finishOK() {
-		SessionBroadcast.broadcastLogin(this.getApplicationContext(), this.getSession().getAccessToken());
 		setResult(RESULT_OK);
 		finish();
 	}
@@ -95,7 +88,15 @@ public class LoginActivity extends MissionHubBaseActivity {
 	 * Sets the activity result to canceled and finishes the activity
 	 */
 	private void finishCanceled() {
-		setResult(Activity.RESULT_CANCELED);
+		setResult(RESULT_CANCELED);
+		finish();
+	}
+
+	/**
+	 * Sets the activity result to retry and finished the activity
+	 */
+	private void finishRetry() {
+		setResult(RESULT_RETRY);
 		finish();
 	}
 
@@ -150,7 +151,7 @@ public class LoginActivity extends MissionHubBaseActivity {
 			}
 
 			final AlertDialog ad = DisplayError.display(LoginActivity.this, exception);
-			ad.setButton(ad.getContext().getString(R.string.action_retry), new DialogInterface.OnClickListener() {
+			ad.setButton(AlertDialog.BUTTON_POSITIVE, ad.getContext().getString(R.string.action_retry), new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(final DialogInterface dialog, final int id) {
 					dialog.dismiss();
@@ -184,7 +185,11 @@ public class LoginActivity extends MissionHubBaseActivity {
 
 			// api returned an error
 			if (uri.getQueryParameter("error_description") != null) {
-				onReceivedError(view, URI_ERROR, URLDecoder.decode(uri.getQueryParameter("error_description")), url);
+				try {
+					onReceivedError(view, URI_ERROR, URLDecoder.decode(uri.getQueryParameter("error_description"), "x-www-form-urlencoded"), url);
+				} catch (UnsupportedEncodingException e) {
+					onReceivedError(view, URI_ERROR, e.getLocalizedMessage(), url);
+				}
 				return;
 			}
 
@@ -244,52 +249,26 @@ public class LoginActivity extends MissionHubBaseActivity {
 
 			@Override
 			public void onSuccess(final Object gsonObject) {
-				final ApiHandler handler = this;
 				final GLoginDone loginDone = (GLoginDone) gsonObject;
 
 				Preferences.setAccessToken(LoginActivity.this, loginDone.getAccess_token());
-				Preferences.setUserID(LoginActivity.this, loginDone.getPerson().getId());
 
-				final GenericCUDEReceiver receiver = new GenericCUDEReceiver(LoginActivity.this, Person.class) {
+				if (loginDone.getPerson() != null) {
+					Preferences.setUserID(LoginActivity.this, loginDone.getPerson().getId());
+				}
 
-					@Override
-					public void onUpdate(final long[] rowIds) {
-						if (!U.contains(rowIds, loginDone.getPerson().getId())) {
-							handler.onError(new MissionHubException("Person not found in response."));
-							return;
-						}
-
-						final MissionHubApplication application = (MissionHubApplication) getApplicationContext();
-						application.setSession(Session.resumeSession(application));
-
-						unregister();
-
-						finishOK();
-					}
-
-					@Override
-					public void onError(final long[] rowIds, final Throwable t) {
-						handler.onError(new MissionHubException("Person not found in response."));
-					}
-				};
-
-				final List<String> cats = new ArrayList<String>();
-				cats.add(this.toString());
-				receiver.register(cats, GenericCUDEBroadcast.NOTIFY_GENERIC_UPDATE, GenericCUDEBroadcast.NOTIFY_GENERIC_ERROR);
-
-				PersonJsonSql.update(getApplicationContext(), loginDone.getPerson(), this.toString());
+				finishOK();
 			}
 
 			@Override
 			public void onError(final Throwable throwable) {
 				Log.e(TAG, "Login Failed", throwable);
 				final AlertDialog ad = DisplayError.display(LoginActivity.this, throwable);
-				ad.setButton(ad.getContext().getString(R.string.action_retry), new DialogInterface.OnClickListener() {
+				ad.setButton(AlertDialog.BUTTON_POSITIVE, ad.getContext().getString(R.string.action_retry), new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(final DialogInterface dialog, final int id) {
 						dialog.dismiss();
-						setResult(RESULT_FIRST_USER);
-						finish();
+						finishRetry();
 					}
 				});
 				ad.setButton(DialogInterface.BUTTON_NEUTRAL, getString(R.string.action_close), new DialogInterface.OnClickListener() {

@@ -3,6 +3,7 @@ package com.missionhub;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.util.Log;
 import android.widget.Toast;
 
 import com.missionhub.api.ApiHandler;
@@ -13,7 +14,10 @@ import com.missionhub.broadcast.GenericSEBroadcast;
 import com.missionhub.broadcast.GenericSEBroadcast.Type;
 import com.missionhub.broadcast.GenericSEReceiver;
 import com.missionhub.broadcast.SessionBroadcast;
+import com.missionhub.broadcast.SessionReceiver;
+import com.missionhub.config.Config;
 import com.missionhub.config.Preferences;
+import com.missionhub.util.U;
 
 /**
  * Stores state and user data for the application session
@@ -42,6 +46,63 @@ public class Session {
 	private boolean updating = false;
 
 	/**
+	 * Returns a session with previous information
+	 * 
+	 * @param application
+	 * @return
+	 */
+	public static void resumeSession(final MissionHubApplication application) {
+		String accessToken = Preferences.getAccessToken(application);
+		long userId = Preferences.getUserID(application);
+		long organizationId = Preferences.getOrganizationID(application);
+
+		if (Config.debug && Config.autoLoginToken != null && Config.autoLoginToken.trim().length() > 0) {
+			accessToken = Config.autoLoginToken.trim();
+			userId = -1;
+			organizationId = -1;
+		}
+
+		Session session = application.getSession();
+		if (application.getSession() == null) {
+			session = new Session(application);
+		}
+
+		if (!U.isNullEmpty(accessToken)) {
+			session.setAccessToken(accessToken);
+		}
+		if (userId > -1) {
+			final User user = new User(application, userId);
+			if (user != null && user.getPerson() != null && user.getPerson().getName() != null && user.getPerson().getName().trim().length() > 0) {
+				session.setUser(user);
+			}
+		}
+		if (organizationId > -1) {
+			session.setOrganizationId(organizationId);
+		}
+		application.setSession(session);
+
+		if (application.getSession().isValid()) {
+			SessionBroadcast.broadcastLogin(application, application.getSession().getAccessToken());
+		} else if (!U.isNullEmpty(application.getSession().getAccessToken())) {
+			final SessionReceiver sr = new SessionReceiver(application) {
+				@Override
+				public void onUpdateSuccess() {
+					Session.resumeSession(application);
+					unregister();
+				}
+
+				@Override
+				public void onUpdateError(final Throwable t) {
+					Log.w(TAG, t.getMessage(), t);
+					unregister();
+				}
+			};
+			sr.register(SessionBroadcast.NOTIFY_SESSION_UPDATE_SUCCESS, SessionBroadcast.NOTIFY_SESSION_UPDATE_ERROR);
+			application.getSession().update();
+		}
+	}
+
+	/**
 	 * Creates a new session
 	 * 
 	 * @param application
@@ -50,13 +111,11 @@ public class Session {
 		this.application = application;
 	}
 
-	/**
-	 * Returns true if the session is active
-	 * 
-	 * @return
-	 */
-	public synchronized boolean isActive() {
-		return getPersonId() > 0 && getOrganizationId() > 0 && getAccessToken().trim().length() > 0;
+	public synchronized boolean isValid() {
+		if (!U.isNullEmptyNegative(getAccessToken(), getPersonId(), getOrganizationId(), getUser()) && getUser().getPerson() != null) {
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -96,12 +155,18 @@ public class Session {
 				final GenericSEReceiver receiver = new GenericSEReceiver(application, Type.MetaJsonSql) {
 					@Override
 					public void onUpdateSuccess() {
+						if (meta != null && meta.getPerson() != null) {
+							setPersonId(meta.getPerson().getId());
+						}
+						updating = false;
 						SessionBroadcast.broadcastUpdateSuccess(application);
+						unregister();
 					}
 
 					@Override
 					public void onUpdateError(final Throwable throwable) {
 						onError(throwable);
+						unregister();
 					}
 				};
 				final List<String> cats = new ArrayList<String>();
@@ -114,156 +179,11 @@ public class Session {
 			@Override
 			public void onError(final Throwable t) {
 				super.onError(t);
+				updating = false;
 				SessionBroadcast.broadcastUpdateError(application, t);
 			}
 		});
 	}
-
-	// /**
-	// * Updates the current user's information
-	// */
-	// public synchronized void updatePerson() {
-	// if (updatingPerson) {
-	// return;
-	// }
-	// updatingPerson = true;
-	//
-	// SessionBroadcast.broadcastUpdatePersonStart(application);
-	//
-	// PeopleApi.getMe(application, new ApiHandler(GMetaPeople.class) {
-	// @Override public void onSuccess(final Object gsonObject) {
-	// super.onSuccess(gsonObject);
-	//
-	// // if user logged out before verify finished
-	// if (getAccessToken().equalsIgnoreCase("") || getAccessToken() == null) {
-	// return;
-	// }
-	//
-	// final GMetaPeople metaPeople = (GMetaPeople) gsonObject;
-	// final GPerson[] people = metaPeople.getPeople();
-	//
-	// if (people.length > 0) {
-	// final GPerson person = people[0];
-	//
-	// final PersonReceiver pr = new PersonReceiver(application) {
-	// @Override public void onUpdate(final long personId) {
-	// if (personId != person.getId()) {
-	// return;
-	// }
-	//
-	// if ((getOrganizationId() < 0 || getPersonId() != person.getId()) &&
-	// metaPeople.getMeta().getRequest_organization() != null) {
-	// setOrganizationId(Integer.parseInt(metaPeople.getMeta().getRequest_organization()));
-	// Preferences.setOrganizationID(application, getOrganizationId());
-	// }
-	// setPersonId(person.getId());
-	//
-	// Preferences.setUserID(application, getPersonId());
-	//
-	// setUser(new User(application, getPersonId()));
-	//
-	// SessionBroadcast.broadcastUpdatePersonSuccess(application);
-	//
-	// updatingPerson = false;
-	//
-	// unregister();
-	// }
-	// };
-	//
-	// final List<String> cats = new ArrayList<String>();
-	// cats.add("updatePerson");
-	//
-	// pr.register(PersonBroadcast.NOTIFY_PERSON_UPDATE, cats);
-	//
-	// PersonJsonSql.update(application, person, "updatePerson");
-	// } else {
-	// onError(new
-	// ApiException("Session.updatePerson did not return any people"));
-	// }
-	// }
-	//
-	// @Override public void onError(final Throwable throwable) {
-	// super.onError(throwable);
-	// updatingPerson = false;
-	// SessionBroadcast.broadcastUpdatePersonError(application, throwable);
-	// }
-	// });
-	// }
-	//
-	// /**
-	// * Update the current user's organizations
-	// */
-	// public synchronized void updateOrganizations() {
-	// updateOrganizations(null);
-	// }
-	//
-	// /**
-	// * Update the current user's organizations
-	// *
-	// * @param organizations
-	// * the orgs to update
-	// */
-	// public synchronized void updateOrganizations(final long... organizations)
-	// {
-	// if (updatingOrganizations) {
-	// return;
-	// }
-	// updatingOrganizations = true;
-	//
-	// SessionBroadcast.broadcastUpdateOrganizationsStart(application);
-	//
-	// final ApiHandler hander = new ApiHandler(GMetaOrganizations.class) {
-	// @Override public void onSuccess(final Object gsonObject) {
-	// super.onSuccess(gsonObject);
-	//
-	// // if user logged out during fetch
-	// if (getAccessToken().equalsIgnoreCase("") || getAccessToken() == null) {
-	// return;
-	// }
-	//
-	// final OrganizationReceiver or = new OrganizationReceiver(application) {
-	// @Override public void onComplete(final long[] organizationIds) {
-	// SessionBroadcast.broadcastUpdateOrganizationsSuccess(application);
-	// updatingOrganizations = false;
-	// unregister();
-	// }
-	//
-	// @Override public void onError(final long[] organizationIds, final
-	// Throwable throwable) {
-	// SessionBroadcast.broadcastUpdateOrganizationsError(application,
-	// throwable);
-	// updatingOrganizations = false;
-	// unregister();
-	// }
-	// };
-	// final List<String> cats = new ArrayList<String>();
-	// cats.add("updateOrganizations");
-	// or.register(cats, OrganizationBroadcast.NOTIFY_ORGANIZATIONS_COMPLETE,
-	// OrganizationBroadcast.NOTIFY_ORGANIZATIONS_ERROR);
-	//
-	// final GMetaOrganizations metaOrganizations = (GMetaOrganizations)
-	// gsonObject;
-	// OrganizationJsonSql.update(application,
-	// metaOrganizations.getOrganizations(), true, true, "updateOrganizations");
-	// }
-	//
-	// @Override public void onError(final Throwable throwable) {
-	// super.onError(throwable);
-	// SessionBroadcast.broadcastUpdateOrganizationsError(application,
-	// throwable);
-	// }
-	// };
-	//
-	// if (organizations != null) {
-	// final List<Long> orgs = new ArrayList<Long>();
-	// for (final long org : organizations) {
-	// orgs.add(org);
-	// }
-	// OrganizationsApi.get(application, orgs, hander);
-	// } else {
-	// OrganizationsApi.get(application, hander);
-	// }
-	// }
 
 	/**
 	 * Gets the session access token
@@ -312,6 +232,9 @@ public class Session {
 	 * @return
 	 */
 	public synchronized long getOrganizationId() {
+		if (organizationId < 0 && getUser() != null) {
+			setOrganizationId(getUser().getPrimaryOrganization());
+		}
 		return organizationId;
 	}
 
@@ -346,26 +269,11 @@ public class Session {
 	}
 
 	/**
-	 * Returns a session with previous information
+	 * Returns true when the session is updating
 	 * 
-	 * @param application
-	 * @return
+	 * @return true if the session is updating
 	 */
-	public static Session resumeSession(final MissionHubApplication application) {
-		final String accessToken = Preferences.getAccessToken(application);
-		final long userId = Preferences.getUserID(application);
-		final long organizationId = Preferences.getOrganizationID(application);
-
-		if (accessToken != null && accessToken.trim().length() > 0) {
-			final Session session = new Session(application);
-			session.setPersonId(userId);
-			session.setOrganizationId(organizationId);
-			session.setAccessToken(accessToken);
-			session.setUser(new User(application, userId));
-			SessionBroadcast.broadcastLogin(application, application.getSession().getAccessToken());
-			return session;
-		}
-
-		return null;
+	public synchronized boolean isUpdating() {
+		return updating;
 	}
 }
