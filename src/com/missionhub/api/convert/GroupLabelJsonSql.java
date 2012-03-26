@@ -111,12 +111,12 @@ public class GroupLabelJsonSql {
 
 					gl.setGroup_labelings_count(label.getGroup_labelings_count());
 
-					session.insertOrReplace(gl);
+					gld.insertOrReplace(gl);
 
 					final GroupLabels gls = new GroupLabels();
 					gls.setGroup_id(groupId);
 					gls.setLabel_id(label.getId());
-					createdGroupLabelsIds.add(session.insert(gls));
+					createdGroupLabelsIds.add(glsd.insert(gls));
 				}
 				if (notify) {
 					GenericCUDEBroadcast.broadcastCreate(context, GroupLabel.class, createdLabelIds, categories);

@@ -17,18 +17,22 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".DashboardActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation"
-            android:theme="@style/Theme.MissionHub" >
-        </activity>
-        <activity
             android:name=".LoginActivity"
             android:configChanges="keyboard|keyboardHidden|orientation"
             android:theme="@style/Theme.MissionHub" >
         </activity>
         <activity
-            android:name=".ProfileActivity"
-            android:label="@string/action_profile"
+            android:name=".PeopleAllActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation"
+            android:theme="@style/Theme.MissionHub" >
+        </activity>
+        <activity
+            android:name=".PeopleDirectoryActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation"
+            android:theme="@style/Theme.MissionHub" >
+        </activity>
+        <activity
+            android:name=".PeopleMyActivity"
             android:configChanges="keyboard|keyboardHidden|orientation"
             android:theme="@style/Theme.MissionHub" >
         </activity>

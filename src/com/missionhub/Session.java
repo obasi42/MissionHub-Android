@@ -58,8 +58,10 @@ public class Session {
 
 		if (Config.debug && Config.autoLoginToken != null && Config.autoLoginToken.trim().length() > 0) {
 			accessToken = Config.autoLoginToken.trim();
-			userId = -1;
-			organizationId = -1;
+			if (application.getSession() == null) {
+				userId = -1;
+				organizationId = -1;
+			}
 		}
 
 		Session session = application.getSession();

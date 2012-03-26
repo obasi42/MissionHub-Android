@@ -3,6 +3,7 @@ package com.missionhub.api.convert;
 import java.util.ArrayList;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.missionhub.MissionHubApplication;
 import com.missionhub.api.model.GGroup;
@@ -102,6 +103,7 @@ public class GroupJsonSql {
 			@Override
 			public void run() {
 				for (final Group g : gs) {
+					Log.e("Group", "Add Group: " + g.getName());
 					gd.insertOrReplace(g);
 				}
 			}

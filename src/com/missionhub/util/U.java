@@ -6,8 +6,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 
-import javax.xml.datatype.DatatypeFactory;
-
 import android.util.Log;
 
 public class U {
@@ -56,15 +54,14 @@ public class U {
 	 */
 	public static Date parseISO8601(final String iso8601String) {
 		try {
-			return DatatypeFactory.newInstance().newXMLGregorianCalendar(iso8601String).toGregorianCalendar().getTime();
-		} catch (final Exception e) {
+			return ISO8601.parse(iso8601String).getTime();
+		} catch (Exception e) {
 			try {
-				final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSZ");
+				final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 				return df.parse(iso8601String);
-			} catch (final Exception e2) {
-				Log.w(TAG, "SimpleDateFormat parse exception", e2);
+			} catch (Exception e2) {
+				Log.w(TAG, "Could not parse date", e);
 			}
-			Log.w(TAG, "XMLGregorianCalendar parse exception", e);
 		}
 		return new Date();
 

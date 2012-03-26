@@ -10,6 +10,6 @@ public class PeopleDirectoryActivity extends MissionHubBaseActivity {
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
-
+		super.onCreate(savedInstanceState);
 	}
 }

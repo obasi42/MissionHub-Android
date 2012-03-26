@@ -186,7 +186,7 @@ public class GroupMembershipDao extends AbstractDao<GroupMembership, Long> {
             SqlUtils.appendColumns(builder, "T1", daoSession.getGroupDao().getAllColumns());
             builder.append(" FROM GROUP_MEMBERSHIP T");
             builder.append(" LEFT JOIN PERSON T0 ON T.'PERSON_ID'=T0.'_id'");
-            builder.append(" LEFT JOIN GROUP T1 ON T.'GROUP_ID'=T1.'_id'");
+            builder.append(" LEFT JOIN Groups T1 ON T.'GROUP_ID'=T1.'_id'");
             builder.append(' ');
             selectDeep = builder.toString();
         }
