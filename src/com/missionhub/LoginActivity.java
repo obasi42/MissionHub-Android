@@ -3,7 +3,6 @@ package com.missionhub;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
-import roboguice.inject.InjectView;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
@@ -43,16 +42,20 @@ public class LoginActivity extends MissionHubBaseActivity {
 	/** result retry */
 	public static final int RESULT_RETRY = 1;
 
-	@InjectView(R.id.webview)
-	WebView mWebView;
-	@InjectView(R.id.progressBar)
-	ProgressBar mProgressBar;
+	/** the webview */
+	private WebView mWebView;
+
+	/** the progress bar */
+	private ProgressBar mProgressBar;
 
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.activity_login);
+
+		mWebView = (WebView) findViewById(R.id.webview);
+		mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
 
 		clearCookies(); // clear cookies to make sure we get a clean session
 
@@ -151,7 +154,7 @@ public class LoginActivity extends MissionHubBaseActivity {
 			}
 
 			final AlertDialog ad = DisplayError.display(LoginActivity.this, exception);
-			ad.setButton(AlertDialog.BUTTON_POSITIVE, ad.getContext().getString(R.string.action_retry), new DialogInterface.OnClickListener() {
+			ad.setButton(DialogInterface.BUTTON_POSITIVE, ad.getContext().getString(R.string.action_retry), new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(final DialogInterface dialog, final int id) {
 					dialog.dismiss();
@@ -186,8 +189,8 @@ public class LoginActivity extends MissionHubBaseActivity {
 			// api returned an error
 			if (uri.getQueryParameter("error_description") != null) {
 				try {
-					onReceivedError(view, URI_ERROR, URLDecoder.decode(uri.getQueryParameter("error_description"), "x-www-form-urlencoded"), url);
-				} catch (UnsupportedEncodingException e) {
+					onReceivedError(view, URI_ERROR, URLDecoder.decode(uri.getQueryParameter("error_description"), "UTF-8"), url);
+				} catch (final UnsupportedEncodingException e) {
 					onReceivedError(view, URI_ERROR, e.getLocalizedMessage(), url);
 				}
 				return;
@@ -264,7 +267,7 @@ public class LoginActivity extends MissionHubBaseActivity {
 			public void onError(final Throwable throwable) {
 				Log.e(TAG, "Login Failed", throwable);
 				final AlertDialog ad = DisplayError.display(LoginActivity.this, throwable);
-				ad.setButton(AlertDialog.BUTTON_POSITIVE, ad.getContext().getString(R.string.action_retry), new DialogInterface.OnClickListener() {
+				ad.setButton(DialogInterface.BUTTON_POSITIVE, ad.getContext().getString(R.string.action_retry), new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(final DialogInterface dialog, final int id) {
 						dialog.dismiss();

@@ -1,16 +1,18 @@
 package com.missionhub;
 
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
 import com.missionhub.broadcast.SessionBroadcast;
 import com.missionhub.broadcast.SessionReceiver;
+import com.missionhub.ui.DisplayError;
 
 /**
  * The main MissionHub Activity.
@@ -31,14 +33,12 @@ public class MissionHubActivity extends MissionHubBaseActivity {
 		if (getSession().isValid()) {
 			startMain();
 		} else if (getSession().isUpdating()) {
-			// TODO: display blocking dialog
-			Toast.makeText(this, "Updating", Toast.LENGTH_LONG).show();
+			blockingUpdate();
 		}
 
 		final SessionReceiver sr = new SessionReceiver(this) {
 			@Override
 			public void onLogin(final String accessToken) {
-				Log.d(TAG, "Logged In");
 				startMain();
 			}
 		};
@@ -49,29 +49,54 @@ public class MissionHubActivity extends MissionHubBaseActivity {
 
 	@Override
 	protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
-		if (requestCode == RESULT_LOGIN_ACTIVITY && resultCode == LoginActivity.RESULT_OK) {
-			final SessionReceiver sr = new SessionReceiver(this) {
-				@Override
-				public void onUpdateSuccess() {
-					SessionBroadcast.broadcastLogin(context, getSession().getAccessToken());
-					unregister();
-				}
-				
-				@Override
-				public void onUpdateError(Throwable t) {
-					// TODO: show error
-					Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG).show();
-					unregister();
-				}
-			};
-			sr.register(SessionBroadcast.NOTIFY_LOGIN);
-			getSession().update();
-			
-			// TODO: block interface
+		if (requestCode == RESULT_LOGIN_ACTIVITY && resultCode == Activity.RESULT_OK) {
+			blockingUpdate();
+			Session.resumeSession(getMHApplication());
 		}
 		if (requestCode == RESULT_LOGIN_ACTIVITY && resultCode == LoginActivity.RESULT_RETRY) {
 			clickLogin(null);
 		}
+	}
+
+	private void blockingUpdate() {
+
+		final ProgressDialog dialog = ProgressDialog.show(this, getString(R.string.progress_loading), getString(R.string.progress_logging_in), true, false);
+
+		final SessionReceiver sr = new SessionReceiver(this) {
+
+			@Override
+			public void onUpdateSuccess() {
+				dialog.dismiss();
+				SessionBroadcast.broadcastLogin(context, getSession().getAccessToken());
+				unregister();
+			}
+
+			@Override
+			public void onUpdateError(final Throwable t) {
+				Log.w(TAG, t.getMessage(), t);
+				dialog.dismiss();
+
+				final AlertDialog ad = DisplayError.display(MissionHubActivity.this, t);
+				ad.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.action_retry), new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(final DialogInterface dialog, final int id) {
+						dialog.dismiss();
+						blockingUpdate();
+						Session.resumeSession(getMHApplication());
+					}
+				});
+				ad.setButton(DialogInterface.BUTTON_NEUTRAL, getString(R.string.action_close), new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(final DialogInterface dialog, final int id) {
+						dialog.dismiss();
+					}
+				});
+				ad.show();
+
+				unregister();
+			}
+		};
+		sr.register(SessionBroadcast.NOTIFY_SESSION_UPDATE_START, SessionBroadcast.NOTIFY_SESSION_UPDATE_SUCCESS, SessionBroadcast.NOTIFY_SESSION_UPDATE_ERROR);
 	}
 
 	/**

@@ -55,11 +55,11 @@ public class U {
 	public static Date parseISO8601(final String iso8601String) {
 		try {
 			return ISO8601.parse(iso8601String).getTime();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			try {
 				final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 				return df.parse(iso8601String);
-			} catch (Exception e2) {
+			} catch (final Exception e2) {
 				Log.w(TAG, "Could not parse date", e);
 			}
 		}

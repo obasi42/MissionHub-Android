@@ -2,7 +2,6 @@ package com.missionhub;
 
 import java.util.List;
 
-import android.util.Log;
 import android.widget.Toast;
 
 import com.google.common.collect.HashMultimap;
@@ -51,8 +50,6 @@ public class User {
 		this.application = application;
 		this.id = id;
 
-		Log.e("NEW USER", "" + id);
-
 		person = application.getDbSession().getPersonDao().load(id);
 		if (person == null) {
 			return;
@@ -83,10 +80,23 @@ public class User {
 	 * Makes sure the organization set in the session is valid
 	 */
 	private synchronized void verifySessionOrganization() {
+		if (application.getSession() == null) {
+			return;
+		}
 		if (application.getSession().getOrganizationId() < 0 || !labels.containsKey(application.getSession().getOrganizationId())) {
 			application.getSession().setOrganizationId(primaryOrganization);
 			Toast.makeText(application, R.string.user_toast_invalid_organization, Toast.LENGTH_LONG).show();
 		}
+	}
+
+	/**
+	 * Makes sure the organization set in the labels
+	 */
+	public synchronized long getSessionOrganization(final long organizationId) {
+		if (organizationId < 0 || !labels.containsKey(organizationId)) {
+			return primaryOrganization;
+		}
+		return organizationId;
 	}
 
 	/**

@@ -167,7 +167,7 @@ public class GroupLabelsDao extends AbstractDao<GroupLabels, Long> {
             builder.append(',');
             SqlUtils.appendColumns(builder, "T1", daoSession.getGroupLabelDao().getAllColumns());
             builder.append(" FROM GROUP_LABELS T");
-            builder.append(" LEFT JOIN Groups T0 ON T.'GROUP_ID'=T0.'_id'");
+            builder.append(" LEFT JOIN GROUPS T0 ON T.'GROUP_ID'=T0.'_id'");
             builder.append(" LEFT JOIN GROUP_LABEL T1 ON T.'LABEL_ID'=T1.'_id'");
             builder.append(' ');
             selectDeep = builder.toString();

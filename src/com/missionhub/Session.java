@@ -3,9 +3,6 @@ package com.missionhub;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.util.Log;
-import android.widget.Toast;
-
 import com.missionhub.api.ApiHandler;
 import com.missionhub.api.MetaApi;
 import com.missionhub.api.convert.MetaJsonSql;
@@ -75,11 +72,10 @@ public class Session {
 		if (userId > -1) {
 			final User user = new User(application, userId);
 			if (user != null && user.getPerson() != null && user.getPerson().getName() != null && user.getPerson().getName().trim().length() > 0) {
+				session.setPersonId(userId);
 				session.setUser(user);
+				session.setOrganizationId(user.getSessionOrganization(organizationId));
 			}
-		}
-		if (organizationId > -1) {
-			session.setOrganizationId(organizationId);
 		}
 		application.setSession(session);
 
@@ -95,7 +91,6 @@ public class Session {
 
 				@Override
 				public void onUpdateError(final Throwable t) {
-					Log.w(TAG, t.getMessage(), t);
 					unregister();
 				}
 			};
@@ -249,7 +244,6 @@ public class Session {
 		Preferences.setOrganizationID(application, organizationId);
 
 		this.organizationId = organizationId;
-		Toast.makeText(application, "Org Changed", Toast.LENGTH_LONG).show();
 	}
 
 	/**
