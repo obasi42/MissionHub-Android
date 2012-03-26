@@ -5,6 +5,7 @@
     <string name="app_name">MissionHub</string>
 
     <!-- Actions -->
+    <string name="action_add">Add</string>
     <string name="action_cancel">Cancel</string>
     <string name="action_close">Close</string>
     <string name="action_delete">Delete</string>
@@ -20,6 +21,24 @@
     <string name="action_search">Search</string>
     <string name="action_settings">Settings</string>
     <string name="action_yes">Yes</string>
+
+    <!-- Main Menu Titles-->
+    <string-array name="menu_titles">
+        <item>People</item>
+        <item>People</item>
+        <item>People</item>
+        <item>Groups</item>
+        <item>Surveys</item>
+    </string-array>
+    
+    <!-- Main Menu Subtitles -->
+    <string-array name="menu_subtitles">
+        <item>My Contacts</item>
+        <item>All Contacts</item>
+        <item>Directory</item>
+        <item></item>
+        <item></item>
+    </string-array>
 
     <!-- Contact Level -->
     <string name="contact_invalid_person">Invalid Person Id</string>
@@ -58,7 +77,7 @@
     <string name="contact_post">Add Comment / Update Status</string>
     <string name="contact_post_attach_rejoicables">Attach Rejoicables</string>
     <string name="contact_post_cant_save">You must provide a message, change contact status, or add a rejoicable before saving!</string>
-    <string name="contact_post_comment_hint">Add comment here&#8230;</string>
+    <string name="contact_post_comment_hint">Add comment here…</string>
     <string name="contact_post_invalid_person">Invalid Person Id</string>
 
     <!-- Contacts Activity -->
@@ -72,7 +91,7 @@
 
     <!-- Egg Activity -->
     <string name="egg">Rejoicables 4TW</string>
-    <string name="egg_todd">For You Todd&#8230;</string>
+    <string name="egg_todd">For You Todd…</string>
 
     <!-- Error Messages -->
     <string name="error">Error</string>
@@ -98,7 +117,7 @@
     <string name="helper_cant_sms">Could not send SMS message.</string>
     <string name="helper_open_link">Open link in browser?</string>
     <string name="helper_open_profile">Open Facebook profile?</string>
-    <string name="helper_send_email">Send Email&#8230;</string>
+    <string name="helper_send_email">Send Email…</string>
     <string name="helper_rejoice_spiritual_conversation">Spiritual Conversation</string>
     <string name="helper_rejoice_prayed_to_receive">Prayed To Receive Christ</string>
     <string name="helper_rejoice_gospel_presentation">Gospel Presentation</string>
@@ -123,14 +142,14 @@
     <string name="profile_version">Version</string>
 
     <!-- Progress Indicators -->
-    <string name="progress_loading">Loading&#8230;</string>
-    <string name="progress_logging_in">Logging In. Please wait&#8230;</string>
+    <string name="progress_loading">Loading…</string>
+    <string name="progress_logging_in">Logging In. Please wait…</string>
 
     <!-- Surveys Activity -->
     <string name="surveys">Survey Mode</string>
     <string name="surveys_exit">Exit Survey Mode?</string>
     <string name="surveys_exit_msg">Clicking OK will exit survey mode.</string>
-    
+
     <!-- User Model -->
     <string name="user_toast_invalid_organization">Your organization roles have changed. Using your primary organization.</string>
 

@@ -1,5 +1,7 @@
 package com.missionhub;
 
+import com.missionhub.ui.MainMenu;
+
 import android.os.Bundle;
 
 public class PeopleAllActivity extends MissionHubBaseActivity {
@@ -11,5 +13,7 @@ public class PeopleAllActivity extends MissionHubBaseActivity {
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		MainMenu.initialize(this, MainMenu.PEOPLE_ALL);
 	}
 }
