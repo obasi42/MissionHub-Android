@@ -186,9 +186,9 @@ public class GroupLabelDao extends AbstractDao<GroupLabel, Long> {
             StringBuilder builder = new StringBuilder("SELECT ");
             SqlUtils.appendColumns(builder, "T", getAllColumns());
             builder.append(',');
-            SqlUtils.appendColumns(builder, "T0", daoSession.getGroupDao().getAllColumns());
+            SqlUtils.appendColumns(builder, "T0", daoSession.getOrganizationDao().getAllColumns());
             builder.append(" FROM GROUP_LABEL T");
-            builder.append(" LEFT JOIN GROUP T0 ON T.'ORGANIZATION_ID'=T0.'_id'");
+            builder.append(" LEFT JOIN ORGANIZATION T0 ON T.'ORGANIZATION_ID'=T0.'_id'");
             builder.append(' ');
             selectDeep = builder.toString();
         }
@@ -199,8 +199,8 @@ public class GroupLabelDao extends AbstractDao<GroupLabel, Long> {
         GroupLabel entity = loadCurrent(cursor, 0, lock);
         int offset = getAllColumns().length;
 
-        Group group = loadCurrentOther(daoSession.getGroupDao(), cursor, offset);
-        entity.setGroup(group);
+        Organization organization = loadCurrentOther(daoSession.getOrganizationDao(), cursor, offset);
+        entity.setOrganization(organization);
 
         return entity;    
     }

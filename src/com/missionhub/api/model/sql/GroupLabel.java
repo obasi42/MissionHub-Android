@@ -24,8 +24,8 @@ public class GroupLabel {
     /** Used for active entity operations. */
     private GroupLabelDao myDao;
 
-    private Group group;
-    private Long group__resolvedKey;
+    private Organization organization;
+    private Long organization__resolvedKey;
 
     private List<GroupLabels> GroupLabels;
 
@@ -109,22 +109,22 @@ public class GroupLabel {
     }
 
     /** To-one relationship, resolved on first access. */
-    public Group getGroup() {
-        if (group__resolvedKey == null || !group__resolvedKey.equals(organization_id)) {
+    public Organization getOrganization() {
+        if (organization__resolvedKey == null || !organization__resolvedKey.equals(organization_id)) {
             if (daoSession == null) {
                 throw new DaoException("Entity is detached from DAO context");
             }
-            GroupDao targetDao = daoSession.getGroupDao();
-            group = targetDao.load(organization_id);
-            group__resolvedKey = organization_id;
+            OrganizationDao targetDao = daoSession.getOrganizationDao();
+            organization = targetDao.load(organization_id);
+            organization__resolvedKey = organization_id;
         }
-        return group;
+        return organization;
     }
 
-    public void setGroup(Group group) {
-        this.group = group;
-        organization_id = group == null ? null : group.getId();
-        group__resolvedKey = organization_id;
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
+        organization_id = organization == null ? null : organization.getId();
+        organization__resolvedKey = organization_id;
     }
 
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
