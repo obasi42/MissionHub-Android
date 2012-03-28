@@ -133,17 +133,22 @@ public class U {
 	 * @param context
 	 * @return
 	 */
-	@SuppressWarnings("deprecation")
 	public static boolean isTablet(final Context context) {
 		final WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
 		final Display display = wm.getDefaultDisplay();
 
 		final DisplayMetrics dm = new DisplayMetrics();
 		display.getMetrics(dm);
-
-		final int dp = (int) (display.getWidth() / dm.density);
-
-		return dp >= 600;
+		
+		final int widthdp = (int) (dm.widthPixels / dm.density + 0.5f);
+		final int heightdp = (int) (dm.heightPixels / dm.density + 0.5f);
+		
+		// compare to the smallest
+		if (widthdp > heightdp) {
+			return heightdp >= 600;
+		} else {
+			return widthdp >= 600;
+		}
 	}
 
 	/**
