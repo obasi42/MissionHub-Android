@@ -25,6 +25,9 @@ public class MissionHubActivity extends MissionHubBaseActivity {
 	/** login activity result constant */
 	public final int RESULT_LOGIN_ACTIVITY = 1;
 
+	/** blocking progress dialog */
+	private ProgressDialog dialog;
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
@@ -58,15 +61,22 @@ public class MissionHubActivity extends MissionHubBaseActivity {
 		}
 	}
 
+	@Override
+	public void onStop() {
+		if (dialog != null) {
+			dialog.dismiss();
+		}
+		super.onStop();
+	}
+
 	private void blockingUpdate() {
 
-		final ProgressDialog dialog = ProgressDialog.show(this, getString(R.string.progress_loading), getString(R.string.progress_logging_in), true, false);
+		dialog = ProgressDialog.show(this, getString(R.string.progress_loading), getString(R.string.progress_logging_in), true, false);
 
 		final SessionReceiver sr = new SessionReceiver(this) {
 
 			@Override
 			public void onUpdateSuccess() {
-				dialog.dismiss();
 				SessionBroadcast.broadcastLogin(context, getSession().getAccessToken());
 				unregister();
 			}
@@ -74,24 +84,28 @@ public class MissionHubActivity extends MissionHubBaseActivity {
 			@Override
 			public void onUpdateError(final Throwable t) {
 				Log.w(TAG, t.getMessage(), t);
-				dialog.dismiss();
 
-				final AlertDialog ad = DisplayError.display(MissionHubActivity.this, t);
-				ad.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.action_retry), new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(final DialogInterface dialog, final int id) {
-						dialog.dismiss();
-						blockingUpdate();
-						Session.resumeSession(getMHApplication());
-					}
-				});
-				ad.setButton(DialogInterface.BUTTON_NEUTRAL, getString(R.string.action_close), new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(final DialogInterface dialog, final int id) {
-						dialog.dismiss();
-					}
-				});
-				ad.show();
+				if (dialog.getWindow() != null) {
+					dialog.dismiss();
+
+					final AlertDialog ad = DisplayError.display(MissionHubActivity.this, t);
+					ad.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.action_retry), new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(final DialogInterface dialog, final int id) {
+							dialog.dismiss();
+							blockingUpdate();
+							Session.resumeSession(getMHApplication());
+						}
+					});
+					ad.setButton(DialogInterface.BUTTON_NEUTRAL, getString(R.string.action_close), new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(final DialogInterface dialog, final int id) {
+							dialog.dismiss();
+						}
+					});
+					ad.show();
+
+				}
 
 				unregister();
 			}
@@ -103,7 +117,7 @@ public class MissionHubActivity extends MissionHubBaseActivity {
 	 * Starts the main activity
 	 */
 	private void startMain() {
-		Intent intent = new Intent(this, PeopleMyActivity.class);
+		final Intent intent = new Intent(this, MissionHubMainActivity.class);
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		startActivity(intent);
 		finish();

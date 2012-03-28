@@ -18,22 +18,11 @@
         </activity>
         <activity
             android:name=".LoginActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
             android:theme="@style/Theme.MissionHub" >
         </activity>
         <activity
-            android:name=".PeopleAllActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation"
-            android:theme="@style/Theme.MissionHub" >
-        </activity>
-        <activity
-            android:name=".PeopleDirectoryActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation"
-            android:theme="@style/Theme.MissionHub" >
-        </activity>
-        <activity
-            android:name=".PeopleMyActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation"
+            android:name=".MissionHubMainActivity"
             android:theme="@style/Theme.MissionHub" >
         </activity>
     </application>

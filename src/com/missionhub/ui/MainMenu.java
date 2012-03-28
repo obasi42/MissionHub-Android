@@ -1,115 +1,170 @@
 package com.missionhub.ui;
 
 import greendroid.widget.ItemAdapter;
-import greendroid.widget.item.SubtitleItem;
-import greendroid.widget.item.TextItem;
+import greendroid.widget.item.Item;
+
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.Resources;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
-import com.missionhub.MissionHubBaseActivity;
-import com.missionhub.PeopleAllActivity;
-import com.missionhub.PeopleDirectoryActivity;
-import com.missionhub.PeopleMyActivity;
+import com.missionhub.MissionHubMainActivity;
 import com.missionhub.R;
-import com.missionhub.util.U;
+import com.missionhub.fragment.MissionHubFragment;
+import com.missionhub.ui.widget.item.NavigationItem;
 
+/**
+ * The MissionHub Main Action Bar List Menu
+ */
 public class MainMenu implements OnNavigationListener {
 
-	public static final int PEOPLE_MY = 0;
-	public static final int PEOPLE_ALL = 1;
-	public static final int PEOPLE_DIRECTORY = 2;
-	public static final int GROUPS = 3;
-	public static final int SURVEYS = 4;
+	/** the main MissionHub Activity */
+	private final MissionHubMainActivity activity;
 
-	private final MissionHubBaseActivity activity;
-	private ItemAdapter adapter;
-	private OnNavigationListener navigationListener = this;
-	private int currentPosition = PEOPLE_MY;
+	/** the navigation list adapter */
+	private final ItemAdapter adapter;
 
-	private MainMenu(final MissionHubBaseActivity activity, final int defaultPosition) {
+	/** the fragments currently controlling the menu */
+	private final List<WeakReference<MissionHubFragment>> fragments = Collections.synchronizedList(new ArrayList<WeakReference<MissionHubFragment>>());
+
+	/** the default menu items - used as a cache */
+	private List<Item> defaultItems;
+
+	/**
+	 * Creates a MainMenu Object
+	 */
+	public MainMenu(final MissionHubMainActivity activity) {
 		this.activity = activity;
 
-		createAdapter();
-
-		applyMenu();
-
-		currentPosition = defaultPosition;
-		activity.getSupportActionBar().setSelectedNavigationItem(defaultPosition);
-	}
-
-	public static MainMenu initialize(final MissionHubBaseActivity activity, final int defaultPosition) {
-		return new MainMenu(activity, defaultPosition);
-	}
-
-	private void createAdapter() {
 		final Context context = activity.getSupportActionBar().getThemedContext();
 		adapter = new ItemAdapter(context);
+		adapter.setNotifyOnChange(false);
 
-		final Resources res = activity.getResources();
-		final String[] titles = res.getStringArray(R.array.menu_titles);
-		final String[] subtitles = res.getStringArray(R.array.menu_subtitles);
+		initializeDefaultAdapter();
+	}
 
-		for (int i = 0; i < titles.length; i++) {
-			final String title = titles[i];
-			String subtitle = "";
-			try {
-				subtitle = subtitles[i];
-			} catch (final Exception e) {}
+	/**
+	 * Initializes the default menu content from resources
+	 */
+	private synchronized void initializeDefaultAdapter() {
+		adapter.clear();
 
-			if (U.isNullEmpty(subtitle)) {
-				adapter.add(new TextItem(title));
-			} else {
-				adapter.add(new SubtitleItem(title, subtitle));
+		if (defaultItems == null) {
+			defaultItems = Collections.synchronizedList(new ArrayList<Item>());
+
+			final Resources res = activity.getResources();
+			final String[] titles = res.getStringArray(R.array.menu_titles);
+			final String[] subtitles = res.getStringArray(R.array.menu_subtitles);
+
+			for (int i = 0; i < titles.length; i++) {
+				final String title = titles[i];
+				String subtitle = null;
+				try {
+					subtitle = subtitles[i];
+				} catch (final Exception e) {}
+
+				defaultItems.add(new NavigationItem(title, subtitle));
 			}
+		}
+
+		for (final Item item : defaultItems) {
+			adapter.add(item);
 		}
 	}
 
-	private void applyMenu() {
+	/**
+	 * Resets the adapter and content
+	 */
+	public synchronized void resetAdapter() {
+		initializeDefaultAdapter();
+		addFragmentMenuItems();
+		adapter.notifyDataSetChanged();
+	}
+
+	/**
+	 * Attaches the navigation list to the actionbar
+	 */
+	public void attach() {
+		adapter.notifyDataSetChanged();
 		activity.getSupportActionBar().setDisplayShowTitleEnabled(false);
 		activity.getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-		activity.getSupportActionBar().setListNavigationCallbacks(adapter, navigationListener);
+		activity.getSupportActionBar().setListNavigationCallbacks(adapter, this);
+	}
+
+	/**
+	 * Removes the navigation list from the actionbar
+	 */
+	public void detatch() {
+		activity.getSupportActionBar().setDisplayShowTitleEnabled(true);
+		activity.getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+		activity.getSupportActionBar().setListNavigationCallbacks(null, null);
 	}
 
 	@Override
-	public boolean onNavigationItemSelected(final int itemPosition, final long itemId) {
-		switch (itemPosition) {
-		case PEOPLE_MY:
-			final Intent myIntent = new Intent(activity, PeopleMyActivity.class);
-			myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			activity.startActivity(myIntent);
-			activity.finish();
+	public synchronized boolean onNavigationItemSelected(final int itemPosition, final long itemId) {
+		for (final WeakReference<MissionHubFragment> reference : fragments) {
+			final MissionHubFragment fragment = reference.get();
+			if (fragment != null) {
+				if (fragment.onNavigationItemSelected((NavigationItem) adapter.getItem(itemPosition))) {
+					return true;
+				}
+			}
+		}
+		if (activity.onNavigationItemSelected((NavigationItem) adapter.getItem(itemPosition))) {
 			return true;
-		case PEOPLE_ALL:
-			final Intent allIntent = new Intent(activity, PeopleAllActivity.class);
-			allIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			activity.startActivity(allIntent);
-			return true;
-		case PEOPLE_DIRECTORY:
-			final Intent directoryIntent = new Intent(activity, PeopleDirectoryActivity.class);
-			directoryIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			activity.startActivity(directoryIntent);
-			return true;
-		case GROUPS:
+		}
+		return false;
+	}
 
-			return true;
-		case SURVEYS:
+	/**
+	 * Adds a controlling fragment
+	 * 
+	 * @param fragment
+	 */
+	public synchronized void addFragment(final MissionHubFragment fragment) {
+		fragments.add(new WeakReference<MissionHubFragment>(fragment));
+		resetAdapter();
+	}
 
-			return true;
-		default:
-			return false;
+	/**
+	 * Removes a fragment from the list of controlling fragments
+	 * 
+	 * @param fragment
+	 */
+	public synchronized void removeFragment(final MissionHubFragment fragment) {
+		WeakReference<MissionHubFragment> ref = null;
+		for (final WeakReference<MissionHubFragment> reference : fragments) {
+			final MissionHubFragment frag = reference.get();
+			if (frag == fragment) {
+				ref = reference;
+			}
+		}
+		if (ref != null) {
+			fragments.remove(ref);
+		}
+		resetAdapter();
+	}
+
+	/**
+	 * Runs the onCreateMainMenu method in each fragment
+	 */
+	private synchronized void addFragmentMenuItems() {
+		final ArrayList<WeakReference<MissionHubFragment>> nulls = new ArrayList<WeakReference<MissionHubFragment>>();
+		for (final WeakReference<MissionHubFragment> reference : fragments) {
+			final MissionHubFragment fragment = reference.get();
+			if (fragment != null) {
+				fragment.onCreateMainMenu(this, adapter);
+			} else {
+				nulls.add(reference);
+			}
+		}
+		for (final WeakReference<MissionHubFragment> reference : nulls) {
+			fragments.remove(reference);
 		}
 	}
-
-	public OnNavigationListener getOnNavigationListener() {
-		return navigationListener;
-	}
-
-	public void setOnNavigationListener(final OnNavigationListener listener) {
-		navigationListener = listener;
-		applyMenu();
-	}
-
 }

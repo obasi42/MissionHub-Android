@@ -1,11 +1,11 @@
 package com.missionhub;
 
+import java.lang.ref.WeakReference;
+
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.MenuItem;
@@ -13,10 +13,12 @@ import com.missionhub.api.model.sql.DaoSession;
 
 public class MissionHubBaseActivity extends SherlockFragmentActivity {
 
-	private MenuItem progressMenuItem;
-	private ImageView progressImageView;
-	private Animation progressAnimation;
-	
+	/** the progress/refresh menu item */
+	private WeakReference<MenuItem> progressMenuItem;
+
+	/** the progress bar view */
+	private LinearLayout progressBarItem;
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
@@ -47,15 +49,6 @@ public class MissionHubBaseActivity extends SherlockFragmentActivity {
 		return getMHApplication().getSession();
 	}
 
-	@Override
-	public void setSupportProgressBarIndeterminateVisibility(boolean visible) {
-		if (progressMenuItem == null) {
-			super.setSupportProgressBarIndeterminateVisibility(visible);
-		} else {
-			updateProgressAnimation(visible);
-		}
-	}
-	
 	/**
 	 * Shortcut to show the Indeterminate progress bar
 	 */
@@ -87,37 +80,49 @@ public class MissionHubBaseActivity extends SherlockFragmentActivity {
 	public synchronized DaoSession getDbSession() {
 		return getMHApplication().getDbSession();
 	}
-	
-	/**
-	 * Sets the menu item to use as a indeterminate progress bar
-	 * @param item
-	 */
-	public void setSupportProgressBarIndeterminateItem(MenuItem item) {
-		progressMenuItem = item;
-		
-		if (progressMenuItem != null) {			
-			LayoutInflater layoutInflater = LayoutInflater.from(this);
-			progressImageView = (ImageView) layoutInflater.inflate(R.layout.widget_refresh_button, null);
-			progressImageView.setImageDrawable(item.getIcon());
-			progressAnimation = AnimationUtils.loadAnimation(this, R.anim.rotate_cw);
-			progressAnimation.setRepeatCount(Animation.INFINITE);
+
+	@Override
+	public void setSupportProgressBarIndeterminateVisibility(final boolean visible) {
+		if (progressMenuItem == null) {
+			super.setSupportProgressBarIndeterminateVisibility(visible);
+		} else {
+			updateProgressAnimation(visible);
 		}
 	}
-	
+
+	/**
+	 * Sets the menu item to use as a indeterminate progress bar
+	 * 
+	 * @param item
+	 */
+	public void setSupportProgressBarIndeterminateItem(final MenuItem item) {
+		progressMenuItem = new WeakReference<MenuItem>(item);
+
+		if (progressMenuItem != null) {
+			final LayoutInflater layoutInflater = LayoutInflater.from(getSupportActionBar().getThemedContext());
+			progressBarItem = (LinearLayout) layoutInflater.inflate(R.layout.widget_refresh_button, null);
+		}
+	}
+
 	/**
 	 * Starts/stops animation on progress change
 	 */
-	private void updateProgressAnimation(boolean visible) {
-		if (progressMenuItem == null || progressImageView == null) return;
-		
+	private void updateProgressAnimation(final boolean visible) {
+		if (progressMenuItem == null || progressBarItem == null) {
+			return;
+		}
+
+		final MenuItem item = progressMenuItem.get();
+		if (item == null) {
+			return;
+		}
+
 		if (visible) {
-			progressMenuItem.setEnabled(false);
-			progressImageView.startAnimation(progressAnimation);
-			progressMenuItem.setActionView(progressImageView);
+			item.setEnabled(false);
+			item.setActionView(progressBarItem);
 		} else {
-			progressMenuItem.setEnabled(true);
-			progressImageView.clearAnimation();
-			progressMenuItem.setActionView(null);
+			item.setEnabled(true);
+			item.setActionView(null);
 		}
 	}
 }

@@ -6,7 +6,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 
+import android.content.Context;
+import android.os.Build;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
+import android.view.WindowManager;
 
 public class U {
 
@@ -117,6 +122,49 @@ public class U {
 			if (o instanceof Number && ((Number) o).doubleValue() < 0) {
 				return true;
 			}
+		}
+		return false;
+	}
+
+	/**
+	 * Returns true if the current device is a tablet. e.g. screen width >=
+	 * 600dp
+	 * 
+	 * @param context
+	 * @return
+	 */
+	@SuppressWarnings("deprecation")
+	public static boolean isTablet(final Context context) {
+		final WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+		final Display display = wm.getDefaultDisplay();
+
+		final DisplayMetrics dm = new DisplayMetrics();
+		display.getMetrics(dm);
+
+		final int dp = (int) (display.getWidth() / dm.density);
+
+		return dp >= 600;
+	}
+
+	/**
+	 * Returns true of the current device is a phone. e.g. screen width < 600dp
+	 * 
+	 * @param context
+	 * @return
+	 */
+	public static boolean isPhone(final Context context) {
+		return !isTablet(context);
+	}
+
+	/**
+	 * Determines if the current device is an old tablet Used to select layouts
+	 * for old tables like the Kindle Fire, Nook, Dell Streak, etc.
+	 * 
+	 * @return true if screen width dp >= 600 and SDK version < Honeycomb
+	 */
+	public static boolean isOldTablet(final Context context) {
+		if (isTablet(context) && Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+			return true;
 		}
 		return false;
 	}

@@ -7,16 +7,21 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.webkit.WebViewDatabase;
+import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 
 import com.actionbarsherlock.view.Window;
@@ -42,6 +47,9 @@ public class LoginActivity extends MissionHubBaseActivity {
 	/** result retry */
 	public static final int RESULT_RETRY = 1;
 
+	/** the webview container */
+	private FrameLayout container;
+
 	/** the webview */
 	private WebView mWebView;
 
@@ -54,29 +62,43 @@ public class LoginActivity extends MissionHubBaseActivity {
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.activity_login);
 
-		mWebView = (WebView) findViewById(R.id.webview);
 		mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
-
 		clearCookies(); // clear cookies to make sure we get a clean session
 
-		// build the initial request
-		final String url = Config.oauthUrl + "/authorize";
-		final HttpParams params = new HttpParams();
-		params.put("android", true);
-		params.put("display", "touch");
-		params.put("simple", true);
-		params.put("response_type", "code");
-		params.put("redirect_uri", Config.oauthUrl + "/done.json");
-		params.put("client_id", Config.oauthClientId);
-		params.put("scope", Config.oauthScope);
+		initWebView();
+	}
 
-		// setup the webview
-		mWebView.getSettings().setJavaScriptEnabled(true);
-		mWebView.getSettings().setSupportZoom(false);
-		mWebView.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_OVERLAY);
-		mWebView.setWebViewClient(new InternalWebViewClient());
-		mWebView.setWebChromeClient(new ProgressChromeClient());
-		mWebView.loadUrl(url + '?' + params.getParamString());
+	@SuppressWarnings("deprecation")
+	private void initWebView() {
+		container = (FrameLayout) findViewById(R.id.container);
+
+		if (mWebView == null) {
+			// build the initial request
+			final String url = Config.oauthUrl + "/authorize";
+			final HttpParams params = new HttpParams();
+			params.put("android", true);
+			params.put("display", "touch");
+			params.put("simple", true);
+			params.put("response_type", "code");
+			params.put("redirect_uri", Config.oauthUrl + "/done.json");
+			params.put("client_id", Config.oauthClientId);
+			params.put("scope", Config.oauthScope);
+
+			// setup the webview
+			mWebView = new WebView(this);
+			mWebView.setLayoutParams(new ViewGroup.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
+			mWebView.getSettings().setJavaScriptEnabled(true);
+			mWebView.getSettings().setAppCacheEnabled(true);
+			mWebView.getSettings().setSupportZoom(false);
+			mWebView.getSettings().setSavePassword(false);
+			mWebView.getSettings().setBuiltInZoomControls(true);
+			mWebView.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_OVERLAY);
+			mWebView.setWebViewClient(new InternalWebViewClient());
+			mWebView.setWebChromeClient(new ProgressChromeClient());
+			mWebView.loadUrl(url + '?' + params.getParamString());
+		}
+
+		container.addView(mWebView);
 	}
 
 	/**
@@ -125,16 +147,11 @@ public class LoginActivity extends MissionHubBaseActivity {
 	 * the webview
 	 */
 	private class InternalWebViewClient extends WebViewClient {
-		@Override
-		public boolean shouldOverrideUrlLoading(final WebView view, final String url) {
-			view.loadUrl(url);
-			return true;
-		}
 
 		@Override
 		public void onReceivedError(final WebView view, final int errorCode, String description, final String failingUrl) {
 			// Hide the webview to not show errors
-			mWebView.setVisibility(View.GONE);
+			container.setVisibility(View.GONE);
 
 			Throwable exception = new MissionHubException(description);
 
@@ -158,8 +175,12 @@ public class LoginActivity extends MissionHubBaseActivity {
 				@Override
 				public void onClick(final DialogInterface dialog, final int id) {
 					dialog.dismiss();
-					mWebView.reload();
-					mWebView.setVisibility(View.VISIBLE);
+					if (errorCode == FATAL_ERROR) {
+						finishRetry();
+					} else {
+						mWebView.reload();
+						container.setVisibility(View.VISIBLE);
+					}
 				}
 			});
 			ad.setButton(DialogInterface.BUTTON_NEUTRAL, getString(R.string.action_close), new DialogInterface.OnClickListener() {
@@ -180,6 +201,7 @@ public class LoginActivity extends MissionHubBaseActivity {
 
 		public static final int URI_ERROR = 1; // error code for api error
 												// response
+		public static final int FATAL_ERROR = 2;
 
 		@Override
 		public void onPageFinished(final WebView view, final String url) {
@@ -193,6 +215,13 @@ public class LoginActivity extends MissionHubBaseActivity {
 				} catch (final UnsupportedEncodingException e) {
 					onReceivedError(view, URI_ERROR, e.getLocalizedMessage(), url);
 				}
+				return;
+			}
+
+			// somehow we have loaded the contacts page
+			if (uri.getPath().contains("contacts")) {
+				mWebView.stopLoading();
+				onReceivedError(view, FATAL_ERROR, getString(R.string.error_msg), url);
 				return;
 			}
 
@@ -210,7 +239,7 @@ public class LoginActivity extends MissionHubBaseActivity {
 			}
 			final String code = uri.getQueryParameter("code");
 			if (code != null && uri.getHost().equalsIgnoreCase(configUri.getHost()) && uri.getPath().contains("/done")) {
-				mWebView.setVisibility(View.GONE);
+				container.setVisibility(View.GONE);
 				getTokenFromCode(code);
 				return;
 			}
@@ -296,19 +325,38 @@ public class LoginActivity extends MissionHubBaseActivity {
 	}
 
 	@Override
-	public void onSaveInstanceState(final Bundle b) {
-		((WebView) findViewById(R.id.webview)).saveState(b);
+	public void onConfigurationChanged(final Configuration newConfig) {
+		if (mWebView != null) {
+			container.removeView(mWebView);
+		}
+
+		super.onConfigurationChanged(newConfig);
+
+		setContentView(R.layout.activity_login);
+
+		initWebView();
 	}
 
 	@Override
-	public void onRestoreInstanceState(final Bundle b) {
-		((WebView) findViewById(R.id.webview)).restoreState(b);
+	protected void onSaveInstanceState(final Bundle outState) {
+		super.onSaveInstanceState(outState);
+		mWebView.saveState(outState);
+	}
+
+	@Override
+	protected void onRestoreInstanceState(final Bundle savedInstanceState) {
+		super.onRestoreInstanceState(savedInstanceState);
+		mWebView.restoreState(savedInstanceState);
 	}
 
 	/**
 	 * Clears all of the webview cookies to make sure we get a fresh login
 	 */
 	private void clearCookies() {
+		final WebViewDatabase db = WebViewDatabase.getInstance(this);
+		db.clearFormData();
+		db.clearHttpAuthUsernamePassword();
+		db.clearUsernamePassword();
 		final CookieSyncManager csm = CookieSyncManager.createInstance(this);
 		final CookieManager mgr = CookieManager.getInstance();
 		mgr.removeAllCookie();

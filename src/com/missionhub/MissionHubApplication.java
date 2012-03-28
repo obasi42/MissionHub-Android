@@ -138,9 +138,10 @@ public class MissionHubApplication extends GDApplication {
 	 * Resets all app data
 	 */
 	public synchronized void reset() {
-		setSession(null);
 		deleteDatabase();
 		Preferences.reset(this);
+		setSession(null);
+		Session.resumeSession(this);
 	}
 
 	public synchronized void logout() {
