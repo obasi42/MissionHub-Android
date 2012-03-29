@@ -134,6 +134,10 @@ public class U {
 	 * @return
 	 */
 	public static boolean isTablet(final Context context) {
+		return isSW720dp(context) || isW1024dp(context);
+	}
+	
+	public static boolean isSW720dp(Context context) {
 		final WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
 		final Display display = wm.getDefaultDisplay();
 
@@ -145,11 +149,28 @@ public class U {
 		
 		// compare to the smallest
 		if (widthdp > heightdp) {
-			return heightdp >= 600;
+			return heightdp >= 720;
 		} else {
-			return widthdp >= 600;
+			return widthdp >= 720;
 		}
 	}
+	
+	public static boolean isW1024dp(Context context) {
+		final WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+		final Display display = wm.getDefaultDisplay();
+
+		final DisplayMetrics dm = new DisplayMetrics();
+		display.getMetrics(dm);
+		
+		final int widthdp = (int) (dm.widthPixels / dm.density + 0.5f);
+		final int heightdp = (int) (dm.heightPixels / dm.density + 0.5f);
+		
+		if (widthdp >= 1024 && heightdp >= 600) {
+			return true;
+		}
+		return false;
+	}
+	
 
 	/**
 	 * Returns true of the current device is a phone. e.g. screen width < 600dp
@@ -163,7 +184,7 @@ public class U {
 
 	/**
 	 * Determines if the current device is an old tablet Used to select layouts
-	 * for old tables like the Kindle Fire, Nook, Dell Streak, etc.
+	 * for old tables like the Kindle Fire, Nook, etc.
 	 * 
 	 * @return true if screen width dp >= 600 and SDK version < Honeycomb
 	 */

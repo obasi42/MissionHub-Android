@@ -11,6 +11,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.missionhub.fragment.PeopleMyFragment;
 import com.missionhub.ui.MainMenu;
 import com.missionhub.ui.widget.item.NavigationItem;
+import com.missionhub.util.U;
 
 /**
  * The main activity for MissionHub. Manages the Action Bar and fragment
@@ -30,6 +31,11 @@ public class MissionHubMainActivity extends MissionHubBaseActivity {
 		super.onCreate(savedInstanceState);
 
 		this.setContentView(R.layout.activity_missionhub_main);
+		
+		if (U.isTablet(this)) {
+			this.getSupportActionBar().setDisplayUseLogoEnabled(true);
+			this.getSupportActionBar().setLogo(R.drawable.logo);
+		}
 
 		menu = new MainMenu(this);
 

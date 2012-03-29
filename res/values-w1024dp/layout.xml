@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <item type="layout" name="fragment_people_my">
-            @layout/fragment_people_my_tablet10
+            @layout/fragment_people_my_tablet
     </item>
 </resources>

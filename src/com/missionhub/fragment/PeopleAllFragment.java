@@ -28,7 +28,7 @@ public class PeopleAllFragment extends MissionHubFragment {
 	@Override
 	public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
 		if (U.isOldTablet(inflater.getContext())) {
-			return inflater.inflate(R.layout.fragment_people_my_tablet7, container, false);
+			return inflater.inflate(R.layout.fragment_people_my_tablet, container, false);
 		} else {
 			return inflater.inflate(R.layout.fragment_people_my, container, false);
 		}
