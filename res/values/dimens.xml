@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="list_view_item_padding">8.0dip</dimen>
+    <dimen name="list_view_item_min_height">48.0dip</dimen>
+    <dimen name="category_list_item_padding_sides">12.0dip</dimen>
+</resources>

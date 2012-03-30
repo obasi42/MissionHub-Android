@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
     <resources>
-        <style name="Theme.MissionHub" parent="Theme.Sherlock">
+        <style name="Theme.MissionHub" parent="Theme.Sherlock.Light">
             <item name="actionBarStyle">@style/Widget.MissionHub.ActionBar</item>
             <item name="android:actionBarStyle">?actionBarStyle</item>
             

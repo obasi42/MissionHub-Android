@@ -9,6 +9,6 @@
     android:shadowColor="@color/black"
     android:shadowDx="2"
     android:shadowDy="2"
-    android:textColor="@color/dark_gray"
+    android:textColor="@color/light_gray"
     android:textSize="16dp"
     android:textStyle="bold" />

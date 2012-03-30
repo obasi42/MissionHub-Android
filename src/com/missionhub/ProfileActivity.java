@@ -110,10 +110,10 @@ public class ProfileActivity extends MissionHubBaseActivity {
 	public boolean onOptionsItemSelected(final MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
-			final Intent intent = new Intent(this, DashboardActivity.class);
-			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			startActivity(intent);
-			return true;
+//			final Intent intent = new Intent(this, DashboardActivity.class);
+//			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//			startActivity(intent);
+//			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
