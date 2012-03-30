@@ -77,7 +77,8 @@ public class ContactListFragment extends MissionHubFragment implements OnItemCli
 	}
 
 	/**
-	 * Interface definition for a callback to be invoked when an item in the contact list is selected.
+	 * Interface definition for a callback to be invoked when an item in the
+	 * contact list is selected.
 	 */
 	public interface OnContactClickListener {
 		public void onContactClick(Person person);
@@ -85,6 +86,7 @@ public class ContactListFragment extends MissionHubFragment implements OnItemCli
 
 	/**
 	 * Sets the OnContactClickListner to listen for clicks on a contact item
+	 * 
 	 * @param listener
 	 */
 	public void setOnContactClickListener(final OnContactClickListener listener) {

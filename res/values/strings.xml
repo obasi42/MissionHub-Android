@@ -24,20 +24,11 @@
 
     <!-- Main Menu Titles-->
     <string-array name="menu_titles">
-        <item>People</item>
-        <item>People</item>
-        <item>People</item>
-        <item>Groups</item>
-        <item>Surveys</item>
-    </string-array>
-    
-    <!-- Main Menu Subtitles -->
-    <string-array name="menu_subtitles">
         <item>My Contacts</item>
         <item>All Contacts</item>
         <item>Directory</item>
-        <item></item>
-        <item></item>
+        <item>Groups</item>
+        <item>Surveys</item>
     </string-array>
 
     <!-- Contact Level -->

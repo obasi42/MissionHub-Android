@@ -1,19 +1,32 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="10" android:versionName="2.0.x" package="com.missionhub">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.missionhub"
+    android:versionCode="10"
+    android:versionName="2.0.x" >
 
-    <uses-sdk android:minSdkVersion="7" android:targetSdkVersion="15" />
-    
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-sdk
+        android:minSdkVersion="7"
+        android:targetSdkVersion="15" />
 
-    <application android:icon="@drawable/ic_launcher" android:label="@string/app_name" android:name=".MissionHubApplication">
-        <activity android:label="@string/app_name" android:name=".MissionHubActivity" android:theme="@style/Theme.MissionHub.NoActionBar" android:logo="@drawable/logo">
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <application
+        android:name=".MissionHubApplication"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name" >
+        <activity
+            android:name=".MissionHubActivity"
+            android:label="@string/app_name"
+            android:logo="@drawable/logo"
+            android:theme="@style/Theme.MissionHub.NoActionBar" >
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
@@ -23,6 +36,18 @@
         </activity>
         <activity
             android:name=".MissionHubMainActivity"
+            android:theme="@style/Theme.MissionHub" >
+        </activity>
+        <activity
+            android:name=".PeopleAllActivity"
+            android:theme="@style/Theme.MissionHub" >
+        </activity>
+        <activity
+            android:name=".PeopleDirectoryActivity"
+            android:theme="@style/Theme.MissionHub" >
+        </activity>
+        <activity
+            android:name=".PeopleMyActivity"
             android:theme="@style/Theme.MissionHub" >
         </activity>
     </application>

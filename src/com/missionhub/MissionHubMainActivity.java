@@ -1,17 +1,11 @@
 package com.missionhub;
 
 import android.content.Intent;
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-import com.missionhub.fragment.PeopleMyFragment;
-import com.missionhub.ui.MainMenu;
+import com.missionhub.ui.NavigationMenu;
 import com.missionhub.ui.widget.item.NavigationItem;
-import com.missionhub.util.U;
 
 /**
  * The main activity for MissionHub. Manages the Action Bar and fragment
@@ -22,38 +16,8 @@ public class MissionHubMainActivity extends MissionHubBaseActivity {
 	/** logging tag */
 	public static final String TAG = MissionHubMainActivity.class.getSimpleName();
 
-	/** main menu */
-	private MainMenu menu;
-
-	/** Called when the activity is first created. */
-	@Override
-	public void onCreate(final Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-
-		this.setContentView(R.layout.activity_missionhub_main);
-		
-		if (U.isTablet(this)) {
-			this.getSupportActionBar().setDisplayUseLogoEnabled(true);
-			this.getSupportActionBar().setLogo(R.drawable.logo);
-		}
-
-		menu = new MainMenu(this);
-
-		final FragmentManager fm = getSupportFragmentManager();
-		final FragmentTransaction ft = fm.beginTransaction();
-		Fragment f1 = fm.findFragmentByTag("people_my");
-		if (f1 == null) {
-			f1 = new PeopleMyFragment();
-			ft.add(R.id.container, f1, "people_my");
-		}
-		ft.commit();
-
-		menu.attach();
-	}
-
-	public MainMenu getMenu() {
-		return menu;
-	}
+	/** the navigation menu */
+	private final NavigationMenu mNavigationMenu = new NavigationMenu(this);
 
 	/** Global menu items */
 	@Override
@@ -80,5 +44,9 @@ public class MissionHubMainActivity extends MissionHubBaseActivity {
 
 	public boolean onNavigationItemSelected(final NavigationItem item) {
 		return false;
+	}
+
+	public NavigationMenu getNavigationMenu() {
+		return mNavigationMenu;
 	}
 }

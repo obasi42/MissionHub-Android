@@ -117,7 +117,7 @@ public class MissionHubActivity extends MissionHubBaseActivity {
 	 * Starts the main activity
 	 */
 	private void startMain() {
-		final Intent intent = new Intent(this, MissionHubMainActivity.class);
+		final Intent intent = new Intent(this, PeopleMyActivity.class);
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		startActivity(intent);
 		finish();

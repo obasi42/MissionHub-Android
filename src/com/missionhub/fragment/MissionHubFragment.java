@@ -8,7 +8,7 @@ import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.MenuItem;
 import com.missionhub.MissionHubBaseActivity;
 import com.missionhub.MissionHubMainActivity;
-import com.missionhub.ui.MainMenu;
+import com.missionhub.ui.NavigationMenu;
 import com.missionhub.ui.widget.item.NavigationItem;
 
 /**
@@ -45,7 +45,7 @@ public class MissionHubFragment extends SherlockFragment {
 	 */
 	private void addToMenu(final Activity activity) {
 		if (activity instanceof MissionHubMainActivity) {
-			final MainMenu menu = ((MissionHubMainActivity) activity).getMenu();
+			final NavigationMenu menu = ((MissionHubMainActivity) activity).getNavigationMenu();
 			if (menu != null) {
 				menu.addFragment(this);
 			}
@@ -57,7 +57,7 @@ public class MissionHubFragment extends SherlockFragment {
 		final Activity activity = getSherlockActivity();
 		if (activity != null) {
 			if (activity instanceof MissionHubMainActivity) {
-				final MainMenu menu = ((MissionHubMainActivity) activity).getMenu();
+				final NavigationMenu menu = ((MissionHubMainActivity) activity).getNavigationMenu();
 				if (menu != null) {
 					menu.removeFragment(this);
 				}
@@ -72,7 +72,7 @@ public class MissionHubFragment extends SherlockFragment {
 	 * 
 	 * @param adapter
 	 */
-	public void onCreateMainMenu(final MainMenu menu, final ItemAdapter adapter) {
+	public void onCreateMainMenu(final NavigationMenu menu, final ItemAdapter adapter) {
 
 	}
 

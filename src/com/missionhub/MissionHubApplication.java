@@ -20,17 +20,17 @@ public class MissionHubApplication extends GDApplication {
 	/** logging tag */
 	public static final String TAG = MissionHubActivity.class.getSimpleName();
 
-	/** the session */
-	private Session session;
+	/** the mSession */
+	private Session mSession;
 
 	/** application context's sqlite database */
-	private SQLiteDatabase db;
+	private SQLiteDatabase mDb;
 
-	/** application context's database cache session */
-	private DaoSession daoSession;
+	/** application context's database cache mSession */
+	private DaoSession mDaoSession;
 
 	/** database name */
-	private static final String DB_NAME = "mh-db";
+	private static final String DB_NAME = "mh-mDb";
 
 	/**
 	 * Called when the application is started
@@ -48,7 +48,7 @@ public class MissionHubApplication extends GDApplication {
 		// runs upgrade methods
 		Upgrade.doUpgrades(this);
 
-		// sets up the session
+		// sets up the mSession
 		Session.resumeSession(this);
 	}
 
@@ -59,7 +59,7 @@ public class MissionHubApplication extends GDApplication {
 	@Override
 	public void onTerminate() {
 		try {
-			db.close();
+			mDb.close();
 		} catch (final Exception e) {
 			Log.e(TAG, e.getMessage(), e);
 		}
@@ -67,21 +67,21 @@ public class MissionHubApplication extends GDApplication {
 	}
 
 	/**
-	 * Gets the current session
+	 * Gets the current mSession
 	 * 
 	 * @return
 	 */
 	public synchronized Session getSession() {
-		return session;
+		return mSession;
 	}
 
 	/**
-	 * Sets the session
+	 * Sets the mSession
 	 * 
-	 * @param session
+	 * @param mSession
 	 */
-	public synchronized void setSession(final Session session) {
-		this.session = session;
+	public synchronized void setSession(final Session mSession) {
+		this.mSession = mSession;
 	}
 
 	/**
@@ -102,35 +102,35 @@ public class MissionHubApplication extends GDApplication {
 	 * @return
 	 */
 	public synchronized SQLiteDatabase getDb() {
-		if (db == null) {
+		if (mDb == null) {
 			final OpenHelper helper = new MissionHubOpenHelper(getApplicationContext(), DB_NAME, null);
-			db = helper.getWritableDatabase();
+			mDb = helper.getWritableDatabase();
 		}
-		return db;
+		return mDb;
 	}
 
 	/**
-	 * Returns the database session for the application context
+	 * Returns the database mSession for the application context
 	 * 
 	 * @return
 	 */
 	public synchronized DaoSession getDbSession() {
-		if (daoSession == null) {
+		if (mDaoSession == null) {
 			final DaoMaster daoMaster = new DaoMaster(getDb());
-			daoSession = daoMaster.newSession();
+			mDaoSession = daoMaster.newSession();
 		}
-		return daoSession;
+		return mDaoSession;
 	}
 
 	/**
-	 * Deletes the mh-db
+	 * Deletes the mh-mDb
 	 * 
 	 * @return
 	 */
 	public boolean deleteDatabase() {
 		getDb().close();
-		daoSession = null;
-		db = null;
+		mDaoSession = null;
+		mDb = null;
 		return deleteDatabase(DB_NAME);
 	}
 

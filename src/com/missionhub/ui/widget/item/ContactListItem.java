@@ -12,7 +12,7 @@ public class ContactListItem extends Item {
 
 	/** the person object for this item */
 	public Person mPerson;
-	
+
 	/**
 	 * Construct a Contact List Item from a person
 	 * 

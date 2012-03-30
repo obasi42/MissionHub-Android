@@ -1,15 +1,19 @@
 package com.missionhub.ui.widget.item;
 
-import greendroid.widget.item.SubtitleItem;
+import greendroid.widget.item.TextItem;
 
+public class NavigationItem extends TextItem {
 
-public class NavigationItem extends SubtitleItem {
+	public int mId = -1;
+	public Class<?> mActivityClass = null;
 
-	public NavigationItem(String title) {
-		super(title, null);
+	public NavigationItem(final Class<?> c, final String title) {
+		super(title);
+		mActivityClass = c;
 	}
 
-	public NavigationItem(String title, String string) {
-		super(title, string);
-	}	
+	public NavigationItem(final int id, final String title) {
+		super(title);
+		mId = id;
+	}
 }

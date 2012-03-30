@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/linearLayout"
+    android:id="@+id/container"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
+    android:layout_height="fill_parent"
+    android:orientation="horizontal" >
 
     <fragment
-        android:id="@+id/people_my_contact_list_fragment"
-        android:name="com.missionhub.fragment.ContactListFragment"
+        android:id="@+id/people_my_contact_list"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent" >
+        android:layout_height="fill_parent"
+        android:name="com.missionhub.fragment.ContactListFragment" >
+
         <!-- Preview: layout=@layout/fragment_contact_list -->
     </fragment>
-
+    
 </LinearLayout>

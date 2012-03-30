@@ -1,9 +1,5 @@
 package com.missionhub.ui.widget;
 
-import com.missionhub.R;
-import com.missionhub.api.model.sql.Person;
-import com.missionhub.ui.widget.item.ContactListItem;
-
 import greendroid.widget.item.Item;
 import greendroid.widget.itemview.ItemView;
 import android.content.Context;
@@ -12,17 +8,21 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.missionhub.R;
+import com.missionhub.api.model.sql.Person;
+import com.missionhub.ui.widget.item.ContactListItem;
+
 public class ContactListItemView extends LinearLayout implements ItemView {
 
 	private ImageView mPicture;
 	private TextView mName;
 	private TextView mStatus;
 
-	public ContactListItemView(Context context) {
+	public ContactListItemView(final Context context) {
 		this(context, null);
 	}
 
-	public ContactListItemView(Context context, AttributeSet attrs) {
+	public ContactListItemView(final Context context, final AttributeSet attrs) {
 		super(context, attrs);
 	}
 
@@ -34,9 +34,9 @@ public class ContactListItemView extends LinearLayout implements ItemView {
 	}
 
 	@Override
-	public void setObject(Item object) {
+	public void setObject(final Item object) {
 		final ContactListItem item = (ContactListItem) object;
-		
+
 		final Person person = item.mPerson;
 		mName.setText(person.getName());
 		mStatus.setText(person.getStatus());

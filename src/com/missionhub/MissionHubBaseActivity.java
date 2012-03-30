@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.missionhub.api.model.sql.DaoSession;
+import com.missionhub.util.U;
 
 public class MissionHubBaseActivity extends SherlockFragmentActivity {
 
@@ -123,6 +124,20 @@ public class MissionHubBaseActivity extends SherlockFragmentActivity {
 		} else {
 			item.setEnabled(true);
 			item.setActionView(null);
+		}
+	}
+
+	/**
+	 * Convenience method for setting the content view for old tablets
+	 * 
+	 * @param normal
+	 * @param oldTablet
+	 */
+	public void setContentView(final int normal, final int oldTablet) {
+		if (U.isOldTablet(this)) {
+			setContentView(oldTablet);
+		} else {
+			setContentView(normal);
 		}
 	}
 }

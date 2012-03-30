@@ -1,28 +1,26 @@
 package com.missionhub.fragment;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import greendroid.widget.ItemAdapter;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Toast;
 
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.missionhub.R;
-import com.missionhub.api.model.sql.Person;
-import com.missionhub.ui.MainMenu;
+import com.missionhub.ui.NavigationMenu;
 import com.missionhub.ui.widget.item.NavigationItem;
 import com.missionhub.util.U;
 
 public class PeopleMyFragment extends MissionHubFragment implements OnItemClickListener {
-	
+
 	private PeopleMyCategoryFragment categoryFragment;
 	private ContactListFragment contactListFragment;
 
@@ -35,25 +33,63 @@ public class PeopleMyFragment extends MissionHubFragment implements OnItemClickL
 
 	@Override
 	public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
-		View view;
-		
-		if (U.isOldTablet(inflater.getContext())) {
-			view = inflater.inflate(R.layout.fragment_people_my_tablet, container, false);
-		} else {
-			view = inflater.inflate(R.layout.fragment_people_my, container, false);
-		}
-		
-		categoryFragment = (PeopleMyCategoryFragment) getFragmentManager().findFragmentById(R.id.people_my_category_fragment);
-		contactListFragment = (ContactListFragment) getFragmentManager().findFragmentById(R.id.people_my_contact_list_fragment);
-		
-		List<Person> people = new ArrayList<Person>();
-		people.add(getMHActivity().getSession().getUser().getPerson());
-		
-		contactListFragment.addPeople(people);
-		
-		categoryFragment.setOnItemClickListener(this);
-		
+		final View view = null;
+		//
+		// if (U.isOldTablet(inflater.getContext())) {
+		// view = inflater.inflate(R.layout.fragment_people_my_tablet,
+		// container, false);
+		// } else {
+		// view = inflater.inflate(R.layout.fragment_people_my, container,
+		// false);
+		// }
+
+		// final FragmentManager fm = getActivity().getSupportFragmentManager();
+		// final FragmentTransaction ft = fm.beginTransaction();
+		// if (savedInstanceState != null) {
+		// categoryFragment = (PeopleMyCategoryFragment)
+		// fm.getFragment(savedInstanceState, PeopleMyFragment.class.getName() +
+		// "CategoryFragment");
+		// contactListFragment = (ContactListFragment)
+		// fm.getFragment(savedInstanceState, PeopleMyFragment.class.getName() +
+		// "ContactListFragment");
+		// }
+		//
+		// if (categoryFragment == null) {
+		// categoryFragment = new PeopleMyCategoryFragment();
+		// ft.add(R.id.people_my_contact_list_container, categoryFragment);
+		// //categoryFragment.setOnItemClickListener(this);
+		// } else {
+		// //ft.add(R.id.people_my_contact_list_container, categoryFragment);
+		// ft.attach(categoryFragment);
+		// }
+		//
+		// if (contactListFragment == null) {
+		// contactListFragment = new ContactListFragment();
+		// ft.add(R.id.people_my_category_container, contactListFragment);
+		// //
+		// // final List<Person> people = new ArrayList<Person>();
+		// // people.add(getMHActivity().getSession().getUser().getPerson());
+		// //
+		// // contactListFragment.addPeople(people);
+		// } else {
+		// //ft.add(R.id.people_my_category_container, contactListFragment);
+		// ft.attach(contactListFragment);
+		// }
+		//
+		// ft.commit();
+
 		return view;
+	}
+
+	@Override
+	public void onSaveInstanceState(final Bundle savedInstanceState) {
+		final FragmentManager fm = getActivity().getSupportFragmentManager();
+		final FragmentTransaction ft = fm.beginTransaction();
+		fm.putFragment(savedInstanceState, PeopleMyFragment.class.getName() + "CategoryFragment", categoryFragment);
+		fm.putFragment(savedInstanceState, PeopleMyFragment.class.getName() + "ContactListFragment", contactListFragment);
+		ft.detach(categoryFragment);
+		ft.detach(contactListFragment);
+		ft.commit();
 	}
 
 	@Override
@@ -79,12 +115,12 @@ public class PeopleMyFragment extends MissionHubFragment implements OnItemClickL
 	}
 
 	@Override
-	public void onCreateMainMenu(final MainMenu menu, final ItemAdapter adapter) {
+	public void onCreateMainMenu(final NavigationMenu menu, final ItemAdapter adapter) {
 		if (U.isPhone(getActivity())) {
-			adapter.add(new NavigationItem("My Contacts"));
-			adapter.add(new NavigationItem("My Contacts", "All"));
-			adapter.add(new NavigationItem("My Contacts", "In Progress"));
-			adapter.add(new NavigationItem("My Contacts", "Completed"));
+			// adapter.add(new NavigationItem("My Contacts"));
+			// adapter.add(new NavigationItem("My Contacts", "All"));
+			// adapter.add(new NavigationItem("My Contacts", "In Progress"));
+			// adapter.add(new NavigationItem("My Contacts", "Completed"));
 		}
 	}
 
@@ -94,7 +130,7 @@ public class PeopleMyFragment extends MissionHubFragment implements OnItemClickL
 	}
 
 	@Override
-	public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+	public void onItemClick(final AdapterView<?> arg0, final View arg1, final int arg2, final long arg3) {
 		Toast.makeText(getActivity(), "Clicked " + arg3, Toast.LENGTH_SHORT).show();
 	}
 }
