@@ -1,5 +1,8 @@
 package com.missionhub.fragment;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import greendroid.widget.ItemAdapter;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -13,6 +16,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.missionhub.R;
+import com.missionhub.api.model.sql.Person;
 import com.missionhub.ui.MainMenu;
 import com.missionhub.ui.widget.item.NavigationItem;
 import com.missionhub.util.U;
@@ -41,6 +45,11 @@ public class PeopleMyFragment extends MissionHubFragment implements OnItemClickL
 		
 		categoryFragment = (PeopleMyCategoryFragment) getFragmentManager().findFragmentById(R.id.people_my_category_fragment);
 		contactListFragment = (ContactListFragment) getFragmentManager().findFragmentById(R.id.people_my_contact_list_fragment);
+		
+		List<Person> people = new ArrayList<Person>();
+		people.add(getMHActivity().getSession().getUser().getPerson());
+		
+		contactListFragment.addPeople(people);
 		
 		categoryFragment.setOnItemClickListener(this);
 		
