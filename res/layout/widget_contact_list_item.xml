@@ -4,6 +4,7 @@
     android:layout_height="wrap_content"
     android:gravity="left|center"
     android:orientation="horizontal"
+    android:background="@drawable/listview_item_state"
     android:padding="3dp" >
 
     <ImageView
