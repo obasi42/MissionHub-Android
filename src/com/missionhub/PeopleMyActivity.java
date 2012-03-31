@@ -57,6 +57,11 @@ public class PeopleMyActivity extends MissionHubMainActivity implements OnCatego
 		
 		final List<Person> people = new ArrayList<Person>();
 		people.add(getSession().getUser().getPerson());
+		people.add(getSession().getUser().getPerson());
+		people.add(getSession().getUser().getPerson());
+		people.add(getSession().getUser().getPerson());
+		people.add(getSession().getUser().getPerson());
+		people.add(getSession().getUser().getPerson());
 		contactListFragment.addPeople(people);
 
 		getNavigationMenu().attach(this.getClass());

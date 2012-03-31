@@ -12,14 +12,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ListView;
 
 import com.missionhub.R;
 import com.missionhub.api.model.sql.Person;
 import com.missionhub.ui.widget.item.ContactListItem;
 
-public class ContactListFragment extends MissionHubFragment implements OnItemClickListener {
+public class ContactListFragment extends MissionHubFragment implements OnItemClickListener, OnItemSelectedListener {
 
 	/** the list view */
 	private ListView mListView;
@@ -37,12 +39,14 @@ public class ContactListFragment extends MissionHubFragment implements OnItemCli
 	public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
 		final View view = inflater.inflate(R.layout.fragment_contact_list, container, false);
 		mListView = (ListView) view.findViewById(R.id.listView);
+		mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 		mListView.setOnItemClickListener(this);
+		mListView.setOnItemSelectedListener(this);
+		mListView.setItemsCanFocus(true);
 
 		mAdapter = new ItemAdapter(inflater.getContext());
-		mAdapter.setNotifyOnChange(false);
-
 		mListView.setAdapter(mAdapter);
+		
 		return view;
 	}
 
@@ -52,6 +56,8 @@ public class ContactListFragment extends MissionHubFragment implements OnItemCli
 	 * @param people
 	 */
 	public void addPeople(final List<Person> people) {
+		mAdapter.setNotifyOnChange(false);
+		
 		for (final Person person : people) {
 			final ContactListItem item = new ContactListItem(person);
 			mAdapter.add(item);
@@ -67,6 +73,8 @@ public class ContactListFragment extends MissionHubFragment implements OnItemCli
 	 * @param people
 	 */
 	public void removePeople(final List<Person> people) {
+		mAdapter.setNotifyOnChange(false);
+		
 		for (final Person person : people) {
 			final ContactListItem item = mAdapterMap.get(person);
 			mAdapter.remove(item);
@@ -102,5 +110,15 @@ public class ContactListFragment extends MissionHubFragment implements OnItemCli
 
 		final ContactListItem item = (ContactListItem) mAdapter.getItem(position);
 		mListener.onContactClick(item.mPerson);
+	}
+
+	@Override
+	public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+		Toast.makeText(getActivity(), "Selected Item", Toast.LENGTH_SHORT).show();
+	}
+
+	@Override
+	public void onNothingSelected(AdapterView<?> arg0) {
+		Toast.makeText(getActivity(), "Unselected All Items", Toast.LENGTH_SHORT).show();
 	}
 }

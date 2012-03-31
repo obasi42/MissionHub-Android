@@ -3,4 +3,8 @@
     <item type="layout" name="activity_people_my">
             @layout/activity_people_my_tablet
     </item>
+    
+    <item type="layout" name="widget_contact_list_item">
+        @layout/widget_contact_list_item_tablet
+    </item>
 </resources>
