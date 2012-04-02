@@ -19,12 +19,14 @@ import android.widget.ListView;
 
 import com.missionhub.R;
 import com.missionhub.api.model.sql.Person;
+import com.missionhub.ui.ListItemAdapter;
 import com.missionhub.ui.widget.item.ContactListItem;
+import com.missionhub.ui.widget.SelectableListView;
 
 public class ContactListFragment extends MissionHubFragment implements OnItemClickListener, OnItemSelectedListener {
 
 	/** the list view */
-	private ListView mListView;
+	private SelectableListView mListView;
 
 	/** the list view adapter */
 	private ItemAdapter mAdapter;
@@ -38,15 +40,17 @@ public class ContactListFragment extends MissionHubFragment implements OnItemCli
 	@Override
 	public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
 		final View view = inflater.inflate(R.layout.fragment_contact_list, container, false);
-		mListView = (ListView) view.findViewById(R.id.listView);
-		mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+		mListView = (SelectableListView) view.findViewById(R.id.listView);
+		mListView.setItemsCanFocus(false);
+		mListView.setChoiceMode(SelectableListView.CHOICE_MODE_MULTIPLE);
+		mListView.setSelectionWidth(56);
+		mListView.setSelectionSide(SelectableListView.SIDE_RIGHT);
 		mListView.setOnItemClickListener(this);
 		mListView.setOnItemSelectedListener(this);
-		mListView.setItemsCanFocus(true);
 
-		mAdapter = new ItemAdapter(inflater.getContext());
+		mAdapter = new ListItemAdapter(inflater.getContext());
 		mListView.setAdapter(mAdapter);
-		
+
 		return view;
 	}
 
@@ -57,7 +61,7 @@ public class ContactListFragment extends MissionHubFragment implements OnItemCli
 	 */
 	public void addPeople(final List<Person> people) {
 		mAdapter.setNotifyOnChange(false);
-		
+
 		for (final Person person : people) {
 			final ContactListItem item = new ContactListItem(person);
 			mAdapter.add(item);
@@ -74,7 +78,7 @@ public class ContactListFragment extends MissionHubFragment implements OnItemCli
 	 */
 	public void removePeople(final List<Person> people) {
 		mAdapter.setNotifyOnChange(false);
-		
+
 		for (final Person person : people) {
 			final ContactListItem item = mAdapterMap.get(person);
 			mAdapter.remove(item);

@@ -18,17 +18,17 @@ import com.missionhub.fragment.PeopleMyCategoryFragment;
 import com.missionhub.fragment.PeopleMyCategoryFragment.OnCategoryClickListener;
 
 public class PeopleMyActivity extends MissionHubMainActivity implements OnCategoryClickListener, OnContactClickListener {
-	
+
 	private PeopleMyCategoryFragment categoryFragment;
-	
+
 	private ContactListFragment contactListFragment;
-	
+
 	private ContactFragment contactFragment;
-	
+
 	private boolean isTablet = true;
-	
+
 	private boolean mInContactView = false;
-	
+
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -44,18 +44,46 @@ public class PeopleMyActivity extends MissionHubMainActivity implements OnCatego
 			categoryFragment.setOnCategoryClickListener(this);
 		}
 		contactListFragment.setOnContactClickListener(this);
-		
+
 		if (categoryFragment == null) {
 			isTablet = false;
 		}
-		
+
 		final FragmentTransaction ft = fm.beginTransaction();
 		if (isTablet) {
 			ft.hide(contactFragment);
 		}
 		ft.commit();
-		
+
 		final List<Person> people = new ArrayList<Person>();
+		people.add(getSession().getUser().getPerson());
+		people.add(getSession().getUser().getPerson());
+		people.add(getSession().getUser().getPerson());
+		people.add(getSession().getUser().getPerson());
+		people.add(getSession().getUser().getPerson());
+		people.add(getSession().getUser().getPerson());
+		people.add(getSession().getUser().getPerson());
+		people.add(getSession().getUser().getPerson());
+		people.add(getSession().getUser().getPerson());
+		people.add(getSession().getUser().getPerson());
+		people.add(getSession().getUser().getPerson());
+		people.add(getSession().getUser().getPerson());
+		people.add(getSession().getUser().getPerson());
+		people.add(getSession().getUser().getPerson());
+		people.add(getSession().getUser().getPerson());
+		people.add(getSession().getUser().getPerson());
+		people.add(getSession().getUser().getPerson());
+		people.add(getSession().getUser().getPerson());
+		people.add(getSession().getUser().getPerson());
+		people.add(getSession().getUser().getPerson());
+		people.add(getSession().getUser().getPerson());
+		people.add(getSession().getUser().getPerson());
+		people.add(getSession().getUser().getPerson());
+		people.add(getSession().getUser().getPerson());
+		people.add(getSession().getUser().getPerson());
+		people.add(getSession().getUser().getPerson());
+		people.add(getSession().getUser().getPerson());
+		people.add(getSession().getUser().getPerson());
 		people.add(getSession().getUser().getPerson());
 		people.add(getSession().getUser().getPerson());
 		people.add(getSession().getUser().getPerson());
@@ -68,53 +96,54 @@ public class PeopleMyActivity extends MissionHubMainActivity implements OnCatego
 	}
 
 	@Override
-	public void onContactClick(Person person) {
+	public void onContactClick(final Person person) {
 		showContact(person);
-		
+
 	}
 
 	@Override
 	public void onCategoryClick() {
 		Toast.makeText(this, "Clicked Category", Toast.LENGTH_SHORT).show();
 	}
-	
-	private void showContact(Person person) {
+
+	private void showContact(final Person person) {
 		if (isTablet) {
 			Toast.makeText(this, "Clicked Tablet Contact " + person.getName(), Toast.LENGTH_SHORT).show();
 			if (!mInContactView) {
-				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-				//ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left);
+				final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+				// ft.setCustomAnimations(R.anim.slide_in_right,
+				// R.anim.slide_out_left);
 				ft.hide(categoryFragment);
 				ft.show(contactFragment);
-				ft.commit(); 
+				ft.commit();
 			}
-			
-			//contactFragment.setContact(person);
-			
+
+			// contactFragment.setContact(person);
+
 			mInContactView = true;
 		} else {
 			Toast.makeText(this, "Clicked Phone Contact " + person.getName(), Toast.LENGTH_SHORT).show();
-			Intent intent = new Intent(this, ContactActivity.class);
+			final Intent intent = new Intent(this, ContactActivity.class);
 			intent.putExtra("personId", person.getId());
 			startActivity(intent);
 		}
 	}
-	
+
 	private void showCategories() {
-		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-		//ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left);
+		final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+		// ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left);
 		ft.hide(contactFragment);
 		ft.show(categoryFragment);
 		ft.commit();
 		mInContactView = false;
 	}
-	
+
 	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-	    if ((keyCode == KeyEvent.KEYCODE_BACK && mInContactView)) {
-	    	showCategories();
-	    	return true;
-	    }
-	    return super.onKeyDown(keyCode, event);
+	public boolean onKeyDown(final int keyCode, final KeyEvent event) {
+		if ((keyCode == KeyEvent.KEYCODE_BACK && mInContactView)) {
+			showCategories();
+			return true;
+		}
+		return super.onKeyDown(keyCode, event);
 	}
 }

@@ -1,23 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    
+    <style name="Widget.MissionHub">
+    </style>
 
     <style name="Widget.MissionHub.ActionBar" parent="Widget.Sherlock.Light.ActionBar">
-        <!--
-        <item name="background">@drawable/actionbar_background</item>
-		<item name="android:background">@drawable/actionbar_background</item>
-        -->
+    </style>
+    
+    <style name="Widget.MissionHub.ListView">
     </style>
 
-    <style name="CategoryListItem">
-        <item name="android:paddingLeft">@dimen/category_list_item_padding_sides</item>
-        <item name="android:textColor">@color/white</item>
-        <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
+    <style name="Widget.MissionHub.ListView.Contact">
+        <item name="android:background">@color/transparent</item>
+        <item name="android:cacheColorHint">@color/transparent</item>
+    </style>
+
+    <style name="Widget.MissionHub.ListView.Item">
+        <item name="android:background">@drawable/list_item_background</item>
+        <item name="android:padding">@dimen/listview_item_padding</item>
+        <item name="android:minHeight">@dimen/listview_item_min_height</item>
+    </style>
+
+    <style name="Widget.MissionHub.ListView.Item.Contact"></style>
+
+    <style name="Widget.MissionHub.ListView.Item.Category">
+        <item name="android:padding">@null</item>
+        <item name="android:paddingLeft">@dimen/category_listview_item_padding_sides</item>
         <item name="android:gravity">center_vertical</item>
     </style>
-
-    <style name="ListViewItem">
-        <item name="android:minHeight">@dimen/list_view_item_min_height</item>
-        <item name="android:background">@drawable/listview_item_state</item>
+    
+    <style name="Widget.MissionHub.ListView.Item.Category.TextAppearance">
+        <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
+         <item name="android:textColor">@color/white</item>
+    </style>
+    
+    <style name="TextAppearance.MissionHub" parent="@android:style/TextAppearance">
+        
+        
     </style>
 
 </resources>

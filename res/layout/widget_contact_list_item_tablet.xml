@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.missionhub.ui.widget.ContactListItemView xmlns:android="http://schemas.android.com/apk/res/android"
-    style="ListViewItem"
+    style="@style/Widget.MissionHub.ListView.Item.Contact"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:paddingTop="@dimen/list_view_item_padding"
-    android:paddingBottom="@dimen/list_view_item_padding"
-    android:paddingLeft="@dimen/list_view_item_padding"
-    >
+    android:orientation="horizontal" >
 
     <ImageView
         android:id="@+id/picture"
@@ -76,20 +72,12 @@
         android:textSize="14.0dip" >
     </TextView>
 
-    <FrameLayout
-        android:id="@+id/checkmark_container"
-        android:layout_width="56.0dip"
+    <ImageView
+        android:id="@+id/checkmark"
+        android:layout_width="16dip"
         android:layout_height="fill_parent"
-        android:layout_gravity="center_vertical" >
-
-        <ImageView
-            android:id="@+id/checkmark"
-            android:layout_width="16dip"
-            android:layout_height="fill_parent"
-            android:layout_gravity="center_vertical"
-            android:layout_marginLeft="16.0dip"
-            android:layout_marginRight="24.0dip"
-            android:src="@drawable/btn_check_off_normal_holo_light" />
-    </FrameLayout>
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="16.0dip"
+        android:layout_marginRight="16.0dip" />
 
 </com.missionhub.ui.widget.ContactListItemView>

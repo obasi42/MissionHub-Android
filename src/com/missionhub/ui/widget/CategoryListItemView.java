@@ -30,7 +30,7 @@ public class CategoryListItemView extends LinearLayout implements ItemView {
 	@Override
 	public void setObject(final Item object) {
 		final CategoryListItem item = (CategoryListItem) object;
-		
+
 		mCategory.setText(item.mCategory);
 	}
 

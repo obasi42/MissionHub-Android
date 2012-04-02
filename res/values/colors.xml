@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<color name="white">#fff</color>
-	<color name="black">#000</color>
-	<color name="transparent">#00000000</color>
-	<color name="opaque_background">#99000000</color>
-	<color name="blue">#0078AE</color>
-	<color name="light_blue">#1AB4FA</color>
-	<color name="dark_blue">#004361</color>
-	<color name="light_gray">#E6EAED</color>
-	<color name="gray">#848688</color>
-	<color name="dark_gray">#535455</color>
-	<color name="green">#C6DA74</color>
-	<color name="orange">#E3A45A</color>
+    
+    <color name="white">#fff</color>
+    <color name="black">#000</color>
+    <color name="transparent">#00000000</color>
+    <color name="opaque_background">#99000000</color>
+    <color name="blue">#0078AE</color>
+    <color name="light_blue">#1AB4FA</color>
+    <color name="dark_blue">#004361</color>
+    <color name="light_gray">#E6EAED</color>
+    <color name="gray">#848688</color>
+    <color name="dark_gray">#535455</color>
+    <color name="green">#C6DA74</color>
+    <color name="orange">#E3A45A</color>
+
 </resources>

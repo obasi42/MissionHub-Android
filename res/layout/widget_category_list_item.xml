@@ -1,13 +1,12 @@
 <com.missionhub.ui.widget.CategoryListItemView xmlns:android="http://schemas.android.com/apk/res/android"
-    style="@style/ListViewItem"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:background="@drawable/listview_item_state"
-     >
+    android:layout_height="fill_parent" 
+    style="@style/Widget.MissionHub.ListView.Item.Category"
+    >
 
     <TextView
         android:id="@+id/text"
-        style="@style/CategoryListItem"
+        style="@style/Widget.MissionHub.ListView.Item.Category.TextAppearance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
