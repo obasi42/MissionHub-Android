@@ -10,6 +10,7 @@ import android.content.Context;
 import android.os.Build;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.WindowManager;
 
@@ -193,5 +194,15 @@ public class U {
 			return true;
 		}
 		return false;
+	}
+	
+	/**
+	 * converts dip to px
+	 * @param dp
+	 * @param context
+	 * @return
+	 */
+	public static float dpToPixel(float dip,Context context){
+		return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dip, context.getResources().getDisplayMetrics());
 	}
 }

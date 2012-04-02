@@ -10,14 +10,17 @@ import android.support.v4.app.FragmentTransaction;
 import android.view.KeyEvent;
 import android.widget.Toast;
 
+import com.actionbarsherlock.view.ActionMode;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
 import com.missionhub.api.model.sql.Person;
 import com.missionhub.fragment.ContactFragment;
 import com.missionhub.fragment.ContactListFragment;
-import com.missionhub.fragment.ContactListFragment.OnContactClickListener;
+import com.missionhub.fragment.ContactListFragment.OnContactListListener;
 import com.missionhub.fragment.PeopleMyCategoryFragment;
 import com.missionhub.fragment.PeopleMyCategoryFragment.OnCategoryClickListener;
 
-public class PeopleMyActivity extends MissionHubMainActivity implements OnCategoryClickListener, OnContactClickListener {
+public class PeopleMyActivity extends MissionHubMainActivity implements OnCategoryClickListener, OnContactListListener {
 
 	private PeopleMyCategoryFragment categoryFragment;
 
@@ -28,6 +31,8 @@ public class PeopleMyActivity extends MissionHubMainActivity implements OnCatego
 	private boolean isTablet = true;
 
 	private boolean mInContactView = false;
+	
+	private ActionMode mMode;
 
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
@@ -43,7 +48,7 @@ public class PeopleMyActivity extends MissionHubMainActivity implements OnCatego
 		if (categoryFragment != null) {
 			categoryFragment.setOnCategoryClickListener(this);
 		}
-		contactListFragment.setOnContactClickListener(this);
+		contactListFragment.setOnContactListListener(this);
 
 		if (categoryFragment == null) {
 			isTablet = false;
@@ -98,7 +103,28 @@ public class PeopleMyActivity extends MissionHubMainActivity implements OnCatego
 	@Override
 	public void onContactClick(final Person person) {
 		showContact(person);
+	}
 
+	@Override
+	public void onCheckContact(final Person person) {
+		Toast.makeText(this, "Checked " + person.getName(), Toast.LENGTH_SHORT).show();
+		if (mMode == null) {
+			mMode = startActionMode(new AnActionModeOfEpicProportions());
+		}
+	}
+
+	@Override
+	public void onUncheckContact(final Person person) {
+		Toast.makeText(this, "Unchecked " + person.getName(), Toast.LENGTH_SHORT).show();
+	}
+
+	@Override
+	public void onUncheckAllContacts() {
+		Toast.makeText(this, "Unchecked all Contacts", Toast.LENGTH_SHORT).show();
+		if (mMode != null) {
+            mMode.finish();
+            mMode = null;
+        }
 	}
 
 	@Override
@@ -146,4 +172,35 @@ public class PeopleMyActivity extends MissionHubMainActivity implements OnCatego
 		}
 		return super.onKeyDown(keyCode, event);
 	}
+	
+	private final class AnActionModeOfEpicProportions implements ActionMode.Callback {
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            
+            menu.add("Save")
+                .setIcon(R.drawable.ic_action_delete)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+
+
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            Toast.makeText(PeopleMyActivity.this, "Got click: " + item, Toast.LENGTH_SHORT).show();
+            mode.finish();
+            mMode = null;
+            return true;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+        }
+    }
+
 }
