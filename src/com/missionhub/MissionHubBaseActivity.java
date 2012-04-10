@@ -10,7 +10,6 @@ import android.widget.LinearLayout;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.missionhub.api.model.sql.DaoSession;
-import com.missionhub.util.U;
 
 public class MissionHubBaseActivity extends SherlockFragmentActivity {
 
@@ -134,10 +133,14 @@ public class MissionHubBaseActivity extends SherlockFragmentActivity {
 	 * @param oldTablet
 	 */
 	public void setContentView(final int normal, final int oldTablet) {
-		if (U.isOldTablet(this)) {
+		if (getMHApplication().getDisplayMode().isOldTablet()) {
 			setContentView(oldTablet);
 		} else {
 			setContentView(normal);
 		}
+	}
+
+	public DisplayMode getDisplayMode() {
+		return getMHApplication().getDisplayMode();
 	}
 }

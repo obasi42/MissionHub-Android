@@ -1,6 +1,7 @@
 package com.missionhub;
 
 import greendroid.app.GDApplication;
+import android.content.res.Configuration;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
@@ -32,6 +33,9 @@ public class MissionHubApplication extends GDApplication {
 	/** database name */
 	private static final String DB_NAME = "mh-mDb";
 
+	/** the display mode */
+	private DisplayMode mDisplayMode;
+
 	/**
 	 * Called when the application is started
 	 */
@@ -50,6 +54,9 @@ public class MissionHubApplication extends GDApplication {
 
 		// sets up the mSession
 		Session.resumeSession(this);
+		
+		// initialize the display mode container
+		mDisplayMode = new DisplayMode(this);
 	}
 
 	/**
@@ -146,5 +153,15 @@ public class MissionHubApplication extends GDApplication {
 
 	public synchronized void logout() {
 		getSession().logout();
+	}
+
+	public DisplayMode getDisplayMode() {
+		return mDisplayMode;
+	}
+
+	@Override
+	public void onConfigurationChanged(final Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+		mDisplayMode.onConfigurationChanged(newConfig);
 	}
 }

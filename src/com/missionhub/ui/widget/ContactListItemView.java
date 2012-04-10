@@ -14,10 +14,11 @@ import android.widget.TextView;
 
 import com.missionhub.R;
 import com.missionhub.api.model.sql.Person;
+import com.missionhub.ui.widget.SelectableListView.SupportActivatable;
 import com.missionhub.ui.widget.item.ContactListItem;
 import com.missionhub.util.U;
 
-public class ContactListItemView extends LinearLayout implements ListItemView, Checkable {
+public class ContactListItemView extends LinearLayout implements ListItemView, Checkable, SupportActivatable {
 
 	private static Drawable mCheckOn;
 	private static Drawable mCheckOff;
@@ -30,6 +31,7 @@ public class ContactListItemView extends LinearLayout implements ListItemView, C
 	private TextView mUpdated;
 	private ImageView mCheckMark;
 	private boolean mChecked = false;
+	private boolean mActivated = false;
 
 	public ContactListItemView(final Context context) {
 		this(context, null);
@@ -47,10 +49,6 @@ public class ContactListItemView extends LinearLayout implements ListItemView, C
 		if (mCheckOff == null) {
 			mCheckOff = getResources().getDrawable(R.drawable.btn_check_off_normal_holo_light);
 		}
-		// if (mCheckOnBackground == null) {
-		// mCheckOnBackground =
-		// getResources().getDrawable(R.drawable.listview_item_state);
-		// }
 
 		mPicture = (ImageView) findViewById(R.id.picture);
 		mName = (TextView) findViewById(R.id.name);
@@ -138,14 +136,26 @@ public class ContactListItemView extends LinearLayout implements ListItemView, C
 		}
 	}
 
-	private static final int[] CheckedStateSet = { android.R.attr.state_checked };
-
 	@Override
 	protected int[] onCreateDrawableState(final int extraSpace) {
-		final int[] drawableState = super.onCreateDrawableState(extraSpace + 1);
+		final int[] drawableState = super.onCreateDrawableState(extraSpace + 2);
 		if (isChecked()) {
-			mergeDrawableStates(drawableState, CheckedStateSet);
+			mergeDrawableStates(drawableState, new int[] { android.R.attr.state_checked });
+		}
+		if (isSupportActivated()) {
+			mergeDrawableStates(drawableState, new int[] { R.attr.state_support_activated });
 		}
 		return drawableState;
+	}
+
+	@Override
+	public void setSupportActivated(final boolean activated) {
+		mActivated = activated;
+		refreshDrawableState();
+	}
+
+	@Override
+	public boolean isSupportActivated() {
+		return mActivated;
 	}
 }

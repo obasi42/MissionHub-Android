@@ -7,6 +7,12 @@
         <item name="android:listDivider">@drawable/list_divider_holo_light</item>
         <item name="android:listSelector">@drawable/list_selector_holo_light</item>
         <item name="android:activatedBackgroundIndicator">@drawable/activated_background_holo_light</item>
+        
+        <!-- view page indicator stuff -->
+        <item name="vpiCirclePageIndicatorStyle">@style/Widget.MissionHub.VPI.CirclePageIndicator</item>
+        <item name="vpiTitlePageIndicatorStyle">@style/Widget.MissionHub.VPI.TitlePageIndicator</item>
+        <item name="vpiTabPageIndicatorStyle">@style/Widget.MissionHub.VPI.TabPageIndicator</item>
+        <item name="vpiTabTextStyle">@style/Widget.MissionHub.MissionHub.VPI.TabPageIndicator.Text</item>
 
         <!-- GreenDroid stuff -->
         <item name="gdTextAppearance">@style/TextAppearance</item>

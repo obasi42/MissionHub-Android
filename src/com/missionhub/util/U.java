@@ -7,12 +7,10 @@ import java.util.Collection;
 import java.util.Date;
 
 import android.content.Context;
-import android.os.Build;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.Display;
-import android.view.WindowManager;
+
+import com.missionhub.MissionHubApplication;
 
 public class U {
 
@@ -128,81 +126,17 @@ public class U {
 	}
 
 	/**
-	 * Returns true if the current device is a tablet. e.g. screen width >=
-	 * 600dp
-	 * 
-	 * @param context
-	 * @return
-	 */
-	public static boolean isTablet(final Context context) {
-		return isSW720dp(context) || isW1024dp(context);
-	}
-	
-	public static boolean isSW720dp(Context context) {
-		final WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-		final Display display = wm.getDefaultDisplay();
-
-		final DisplayMetrics dm = new DisplayMetrics();
-		display.getMetrics(dm);
-		
-		final int widthdp = (int) (dm.widthPixels / dm.density + 0.5f);
-		final int heightdp = (int) (dm.heightPixels / dm.density + 0.5f);
-		
-		// compare to the smallest
-		if (widthdp > heightdp) {
-			return heightdp >= 720;
-		} else {
-			return widthdp >= 720;
-		}
-	}
-	
-	public static boolean isW1024dp(Context context) {
-		final WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-		final Display display = wm.getDefaultDisplay();
-
-		final DisplayMetrics dm = new DisplayMetrics();
-		display.getMetrics(dm);
-		
-		final int widthdp = (int) (dm.widthPixels / dm.density + 0.5f);
-		final int heightdp = (int) (dm.heightPixels / dm.density + 0.5f);
-		
-		if (widthdp >= 1024 && heightdp >= 600) {
-			return true;
-		}
-		return false;
-	}
-	
-
-	/**
-	 * Returns true of the current device is a phone. e.g. screen width < 600dp
-	 * 
-	 * @param context
-	 * @return
-	 */
-	public static boolean isPhone(final Context context) {
-		return !isTablet(context);
-	}
-
-	/**
-	 * Determines if the current device is an old tablet Used to select layouts
-	 * for old tables like the Kindle Fire, Nook, etc.
-	 * 
-	 * @return true if screen width dp >= 600 and SDK version < Honeycomb
-	 */
-	public static boolean isOldTablet(final Context context) {
-		if (isTablet(context) && Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
-			return true;
-		}
-		return false;
-	}
-	
-	/**
 	 * converts dip to px
+	 * 
 	 * @param dp
 	 * @param context
 	 * @return
 	 */
-	public static float dpToPixel(float dip,Context context){
+	public static float dpToPixel(final float dip, final Context context) {
 		return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dip, context.getResources().getDisplayMetrics());
+	}
+
+	public static MissionHubApplication getMHApplication(final Context context) {
+		return (MissionHubApplication) context.getApplicationContext();
 	}
 }

@@ -3,6 +3,9 @@ package com.missionhub.fragment;
 import greendroid.widget.ItemAdapter;
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.MenuItem;
@@ -15,6 +18,8 @@ import com.missionhub.ui.widget.item.NavigationItem;
  * The base MissionHubFragment
  */
 public class MissionHubFragment extends SherlockFragment {
+
+	private float mWeight = 1f;
 
 	/**
 	 * Returns the activity cast to the MissionHubBaseActivity
@@ -85,5 +90,19 @@ public class MissionHubFragment extends SherlockFragment {
 	 */
 	public boolean onNavigationItemSelected(final NavigationItem item) {
 		return false;
+	}
+
+	public void setLayoutWeight(final float weight) {
+		mWeight = weight;
+		if (getView() != null) {
+			final View view = getView();
+			final LinearLayout.LayoutParams params = (LayoutParams) view.getLayoutParams();
+			params.weight = mWeight;
+			view.setLayoutParams(params);
+		}
+	}
+	
+	public float getLayoutWeight() {
+		return mWeight;
 	}
 }

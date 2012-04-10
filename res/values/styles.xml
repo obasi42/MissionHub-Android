@@ -38,5 +38,20 @@
         
         
     </style>
+    
+    <style name="Widget.MissionHub.VPI"></style>
+
+    <style name="Widget.MissionHub.VPI.TitlePageIndicator" parent="Widget.TitlePageIndicator">
+    </style>
+
+    <style name="Widget.MissionHub.VPI.CirclePageIndicator" parent="Widget.CirclePageIndicator">
+    </style>
+    
+    <style name="Widget.MissionHub.VPI.TabPageIndicator" parent="Widget.TabPageIndicator">
+        <!-- <item name="android:background">@drawable/tab_indicator</item> -->
+    </style>
+    <style name="Widget.MissionHub.MissionHub.VPI.TabPageIndicator.Text" parent="Widget.TabPageIndicator.Text">
+        <item name="android:textColor">@color/black</item>
+    </style>
 
 </resources>

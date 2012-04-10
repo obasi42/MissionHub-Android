@@ -1,7 +1,5 @@
 package com.missionhub.ui.widget;
 
-import com.missionhub.util.U;
-
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.SparseBooleanArray;
@@ -11,6 +9,8 @@ import android.view.View;
 import android.view.accessibility.AccessibilityEvent;
 import android.widget.AdapterView;
 import android.widget.ListView;
+
+import com.missionhub.util.U;
 
 public class SelectableListView extends ListView {
 
@@ -31,6 +31,9 @@ public class SelectableListView extends ListView {
 
 	/** touch start position when entering selection mode */
 	private int mStartPosition;
+
+	/** the activated list item */
+	private int mActivatedItem = -1;
 
 	/** listener to handle item check events */
 	private OnItemCheckedListener mOnItemCheckedListener;
@@ -80,6 +83,10 @@ public class SelectableListView extends ListView {
 		return false;
 	}
 
+	/**
+	 * Override onTouchEvent to capture touch events for setting items as
+	 * checked
+	 */
 	@Override
 	public boolean onTouchEvent(final MotionEvent ev) {
 
@@ -115,6 +122,9 @@ public class SelectableListView extends ListView {
 		return true;
 	}
 
+	/**
+	 * Override setItemChecked to attach the OnItemCheckedListener
+	 */
 	@Override
 	public void setItemChecked(final int position, final boolean checked) {
 		super.setItemChecked(position, checked);
@@ -128,10 +138,10 @@ public class SelectableListView extends ListView {
 	 * Clears all checked items
 	 */
 	public void clearChecked() {
-		final SparseBooleanArray CItem = getCheckedItemPositions();
-		for (int i = 0; i < CItem.size(); i++) {
-			if (CItem.valueAt(i)) {
-				super.setItemChecked(CItem.keyAt(i), false);
+		final SparseBooleanArray cItem = getCheckedItemPositions();
+		for (int i = 0; i < cItem.size(); i++) {
+			if (cItem.valueAt(i)) {
+				super.setItemChecked(cItem.keyAt(i), false);
 			}
 		}
 		checkForAllUnchecked();
@@ -143,7 +153,7 @@ public class SelectableListView extends ListView {
 	 */
 	private void checkForAllUnchecked() {
 		if (mOnItemCheckedListener != null) {
-			@SuppressWarnings("deprecation") int checkedCount = getCheckItemIds().length;
+			@SuppressWarnings("deprecation") final int checkedCount = getCheckItemIds().length;
 			if (checkedCount == 0) {
 				mOnItemCheckedListener.onAllUnchecked();
 			}
@@ -182,8 +192,68 @@ public class SelectableListView extends ListView {
 	 * 
 	 * @param onItemCheckedListener
 	 */
-	public void setOnItemCheckedListener(OnItemCheckedListener onItemCheckedListener) {
+	public void setOnItemCheckedListener(final OnItemCheckedListener onItemCheckedListener) {
 		mOnItemCheckedListener = onItemCheckedListener;
 	}
 
+	/**
+	 * Sets a list item as activated
+	 * 
+	 * @param position
+	 * @param activated
+	 */
+	public void setItemActivated(final int position, final boolean activated) {
+		if (position < 0 || position >= getAdapter().getCount()) {
+			return;
+		}
+
+		mActivatedItem = position;
+	}
+
+	/**
+	 * Returns true if the list item at the given position is activated
+	 * 
+	 * @param position
+	 * @return
+	 */
+	public boolean isItemActivated(final int position) {
+		if (mActivatedItem == position) {
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Returns the currently activated list item
+	 * 
+	 * @return the current activated item or -1 if none activated
+	 */
+	public int getItemActivated() {
+		return mActivatedItem;
+	}
+
+	/**
+	 * Interface for view to implement to support being activated
+	 */
+	public interface SupportActivatable {
+		/**
+		 * @return true if the view is activated
+		 */
+		public boolean isSupportActivated();
+
+		/**
+		 * Sets the view's activation status
+		 * 
+		 * @param activated
+		 *            true if the view is activated
+		 */
+		public void setSupportActivated(boolean activated);
+	}
+	
+	/**
+	 * Scrolls the list to the activated item
+	 */
+	public void scrollToItemActivated() {
+		setSelection(mActivatedItem);
+	}
 }

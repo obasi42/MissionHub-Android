@@ -19,7 +19,6 @@ import com.missionhub.PeopleMyActivity;
 import com.missionhub.R;
 import com.missionhub.fragment.MissionHubFragment;
 import com.missionhub.ui.widget.item.NavigationItem;
-import com.missionhub.util.U;
 
 /**
  * The MissionHub Main Action Bar List Menu
@@ -118,7 +117,7 @@ public class NavigationMenu implements OnNavigationListener {
 	private void attach() {
 		mAdapter.notifyDataSetChanged();
 		mActivity.getSupportActionBar().setDisplayShowTitleEnabled(false);
-		if (U.isTablet(mActivity)) {
+		if (mActivity.getDisplayMode().isTablet()) {
 			mActivity.getSupportActionBar().setDisplayUseLogoEnabled(true);
 			mActivity.getSupportActionBar().setLogo(R.drawable.logo);
 		}

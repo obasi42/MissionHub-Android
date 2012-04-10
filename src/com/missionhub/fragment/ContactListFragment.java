@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
@@ -16,13 +17,16 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.LinearLayout;
 
+import com.missionhub.DisplayMode;
 import com.missionhub.R;
 import com.missionhub.api.model.sql.Person;
 import com.missionhub.ui.ListItemAdapter;
 import com.missionhub.ui.widget.SelectableListView;
 import com.missionhub.ui.widget.SelectableListView.OnItemCheckedListener;
 import com.missionhub.ui.widget.item.ContactListItem;
+import com.missionhub.util.U;
 
 public class ContactListFragment extends MissionHubFragment implements OnItemClickListener, OnItemCheckedListener {
 
@@ -39,8 +43,24 @@ public class ContactListFragment extends MissionHubFragment implements OnItemCli
 	private OnContactListListener mListener;
 
 	@Override
+	public void onAttach(final Activity activity) {
+		super.onAttach(activity);
+		mAdapter = new ListItemAdapter(activity);
+		mAdapterMap.clear();
+	}
+
+	@SuppressWarnings("deprecation")
+	@Override
 	public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
 		final View view = inflater.inflate(R.layout.fragment_contact_list, container, false);
+
+		final DisplayMode dm = U.getMHApplication(inflater.getContext()).getDisplayMode();
+		if (dm.isPhone()) {
+			view.setLayoutParams(new LinearLayout.LayoutParams(android.view.ViewGroup.LayoutParams.FILL_PARENT, android.view.ViewGroup.LayoutParams.FILL_PARENT));
+		} else {
+			view.setLayoutParams(new LinearLayout.LayoutParams(android.view.ViewGroup.LayoutParams.WRAP_CONTENT, android.view.ViewGroup.LayoutParams.FILL_PARENT, getLayoutWeight()));
+		}
+
 		mListView = (SelectableListView) view.findViewById(R.id.listView);
 		mListView.setItemsCanFocus(false);
 		mListView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
@@ -50,6 +70,7 @@ public class ContactListFragment extends MissionHubFragment implements OnItemCli
 		mListView.setOnItemCheckedListener(this);
 
 		mAdapter = new ListItemAdapter(inflater.getContext());
+
 		mListView.setAdapter(mAdapter);
 
 		return view;
@@ -67,6 +88,28 @@ public class ContactListFragment extends MissionHubFragment implements OnItemCli
 			final ContactListItem item = new ContactListItem(person);
 			mAdapter.add(item);
 			mAdapterMap.put(person, item);
+		}
+
+		mAdapter.notifyDataSetChanged();
+	}
+
+	/**
+	 * Inserts a list of people in to the list view beginning at a specified
+	 * position.
+	 * 
+	 * @param people
+	 * @param position
+	 */
+	public void insertPeople(final List<Person> people, final int position) {
+		mAdapter.setNotifyOnChange(false);
+
+		int offset = 0;
+		for (final Person person : people) {
+			final ContactListItem item = new ContactListItem(person);
+			mAdapter.insert(item, position + offset);
+			mAdapter.add(item);
+			mAdapterMap.put(person, item);
+			offset++;
 		}
 
 		mAdapter.notifyDataSetChanged();
@@ -108,6 +151,19 @@ public class ContactListFragment extends MissionHubFragment implements OnItemCli
 	}
 
 	/**
+	 * Returns true if one or more contacts it checked
+	 * 
+	 * @return
+	 */
+	public boolean hasCheckedContacts() {
+		@SuppressWarnings("deprecation") final int checkedCount = mListView.getCheckItemIds().length;
+		if (checkedCount > 0) {
+			return true;
+		}
+		return false;
+	}
+
+	/**
 	 * Interface definition for a callback to be invoked when an item in the
 	 * contact list is clicked or checked.
 	 */
@@ -131,6 +187,9 @@ public class ContactListFragment extends MissionHubFragment implements OnItemCli
 		mListener = listener;
 	}
 
+	/**
+	 * Override to inject contact listener methods
+	 */
 	@Override
 	public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id) {
 		if (mListener != null) {
@@ -138,6 +197,9 @@ public class ContactListFragment extends MissionHubFragment implements OnItemCli
 		}
 	}
 
+	/**
+	 * Override to inject contact listener methods
+	 */
 	@Override
 	public void onSetItemChecked(final int position, final boolean checked) {
 		if (mListener != null) {
@@ -149,6 +211,9 @@ public class ContactListFragment extends MissionHubFragment implements OnItemCli
 		}
 	}
 
+	/**
+	 * Override to inject contact listener methods
+	 */
 	@Override
 	public void onAllUnchecked() {
 		if (mListener != null) {
@@ -160,7 +225,7 @@ public class ContactListFragment extends MissionHubFragment implements OnItemCli
 	 * Gets the person from the adapter item at the specified position
 	 * 
 	 * @param position
-	 * @return
+	 * @return the person
 	 */
 	private Person getPersonAtPosition(final int position) {
 		final ContactListItem item = (ContactListItem) mAdapter.getItem(position);
@@ -168,5 +233,47 @@ public class ContactListFragment extends MissionHubFragment implements OnItemCli
 			return item.mPerson;
 		}
 		return null;
+	}
+
+	/**
+	 * Finds the position of the person in the adapter
+	 * 
+	 * @param person
+	 * @return the position or -1
+	 */
+	private int getPositionOfPerson(final Person person) {
+		for (int i = 0; i < mAdapter.getCount(); i++) {
+			final ContactListItem item = (ContactListItem) mAdapter.getItem(i);
+			if (item.mPerson == person) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	/**
+	 * 
+	 * @param position
+	 * @param activated
+	 */
+	public void setListItemActivated(final int position, final boolean activated) {
+		mListView.setItemActivated(position, activated);
+	}
+
+	/**
+	 * Sets the activated contact
+	 * 
+	 * @param person
+	 * @param activated
+	 */
+	public void setContactActivated(final Person person, final boolean activated) {
+		setListItemActivated(getPositionOfPerson(person), activated);
+	}
+
+	/**
+	 * Scrolls the listview to the activated contact
+	 */
+	public void scrollToActivatedContact() {
+		mListView.scrollToItemActivated();
 	}
 }

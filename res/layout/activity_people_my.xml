@@ -5,13 +5,4 @@
     android:layout_height="fill_parent"
     android:orientation="horizontal" >
 
-    <fragment
-        android:id="@+id/people_my_contact_list"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:name="com.missionhub.fragment.ContactListFragment" >
-
-        <!-- Preview: layout=@layout/fragment_contact_list -->
-    </fragment>
-    
 </LinearLayout>

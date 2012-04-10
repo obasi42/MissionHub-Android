@@ -7,7 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.view.KeyEvent;
+import android.widget.AdapterView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.view.ActionMode;
@@ -17,22 +17,29 @@ import com.missionhub.api.model.sql.Person;
 import com.missionhub.fragment.ContactFragment;
 import com.missionhub.fragment.ContactListFragment;
 import com.missionhub.fragment.ContactListFragment.OnContactListListener;
-import com.missionhub.fragment.PeopleMyCategoryFragment;
-import com.missionhub.fragment.PeopleMyCategoryFragment.OnCategoryClickListener;
+import com.missionhub.fragment.NavigationListFragment;
+import com.missionhub.fragment.NavigationListFragment.OnCategoryClickListener;
+import com.missionhub.ui.widget.item.ContactListItem.ContactListItemSize;
 
-public class PeopleMyActivity extends MissionHubMainActivity implements OnCategoryClickListener, OnContactListListener {
+public class PeopleMyActivity extends MissionHubMainActivity implements OnCategoryClickListener, OnContactListListener, ContactListItemSize {
 
-	private PeopleMyCategoryFragment categoryFragment;
+	/** the left navigation menu fragment */
+	private NavigationListFragment mNavigationFragment;
 
-	private ContactListFragment contactListFragment;
+	/** the contact list fragment */
+	private ContactListFragment mContactListFragment;
 
-	private ContactFragment contactFragment;
-
-	private boolean isTablet = true;
-
-	private boolean mInContactView = false;
-	
+	/** the action mode */
 	private ActionMode mMode;
+
+	/** if the device is currently in tablet mode */
+	private boolean isTablet;
+
+	/** the id currently shown contact */
+	private long mCurrentContactId;
+
+	/** the contact request code */
+	public static final int REQUEST_CODE_CONTACT = 1;
 
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
@@ -40,74 +47,98 @@ public class PeopleMyActivity extends MissionHubMainActivity implements OnCatego
 
 		setContentView(R.layout.activity_people_my, R.layout.activity_people_my_tablet);
 
-		final FragmentManager fm = getSupportFragmentManager();
-		categoryFragment = (PeopleMyCategoryFragment) fm.findFragmentById(R.id.people_my_category);
-		contactListFragment = (ContactListFragment) fm.findFragmentById(R.id.people_my_contact_list);
-		contactFragment = (ContactFragment) fm.findFragmentById(R.id.people_my_contact);
+		isTablet = getDisplayMode().isTablet();
 
-		if (categoryFragment != null) {
-			categoryFragment.setOnCategoryClickListener(this);
-		}
-		contactListFragment.setOnContactListListener(this);
+		restoreInstanceState(savedInstanceState);
 
-		if (categoryFragment == null) {
-			isTablet = false;
-		}
-
-		final FragmentTransaction ft = fm.beginTransaction();
-		if (isTablet) {
-			ft.hide(contactFragment);
-		}
-		ft.commit();
-
-		final List<Person> people = new ArrayList<Person>();
-		people.add(getSession().getUser().getPerson());
-		people.add(getSession().getUser().getPerson());
-		people.add(getSession().getUser().getPerson());
-		people.add(getSession().getUser().getPerson());
-		people.add(getSession().getUser().getPerson());
-		people.add(getSession().getUser().getPerson());
-		people.add(getSession().getUser().getPerson());
-		people.add(getSession().getUser().getPerson());
-		people.add(getSession().getUser().getPerson());
-		people.add(getSession().getUser().getPerson());
-		people.add(getSession().getUser().getPerson());
-		people.add(getSession().getUser().getPerson());
-		people.add(getSession().getUser().getPerson());
-		people.add(getSession().getUser().getPerson());
-		people.add(getSession().getUser().getPerson());
-		people.add(getSession().getUser().getPerson());
-		people.add(getSession().getUser().getPerson());
-		people.add(getSession().getUser().getPerson());
-		people.add(getSession().getUser().getPerson());
-		people.add(getSession().getUser().getPerson());
-		people.add(getSession().getUser().getPerson());
-		people.add(getSession().getUser().getPerson());
-		people.add(getSession().getUser().getPerson());
-		people.add(getSession().getUser().getPerson());
-		people.add(getSession().getUser().getPerson());
-		people.add(getSession().getUser().getPerson());
-		people.add(getSession().getUser().getPerson());
-		people.add(getSession().getUser().getPerson());
-		people.add(getSession().getUser().getPerson());
-		people.add(getSession().getUser().getPerson());
-		people.add(getSession().getUser().getPerson());
-		people.add(getSession().getUser().getPerson());
-		people.add(getSession().getUser().getPerson());
-		people.add(getSession().getUser().getPerson());
-		contactListFragment.addPeople(people);
+		initFragments();
+		restoreFragmentState();
 
 		getNavigationMenu().attach(this.getClass());
 	}
 
+	private void initFragments() {
+		final FragmentManager fm = getSupportFragmentManager();
+		final FragmentTransaction ft = fm.beginTransaction();
+
+		if (isTablet) {
+			mNavigationFragment = (NavigationListFragment) fm.findFragmentByTag(NavigationListFragment.class.getName());
+			if (mNavigationFragment == null) {
+				mNavigationFragment = new NavigationListFragment();
+				ft.add(R.id.container, mNavigationFragment, NavigationListFragment.class.getName());
+			} else {
+				ft.attach(mNavigationFragment);
+			}
+			mNavigationFragment.setLayoutWeight(70f);
+			mNavigationFragment.setRetainInstance(true);
+			mNavigationFragment.setOnCategoryClickListener(this);
+		}
+
+		mContactListFragment = (ContactListFragment) fm.findFragmentByTag(ContactListFragment.class.getName());
+		if (mContactListFragment == null) {
+			mContactListFragment = new ContactListFragment();
+			ft.add(R.id.container, mContactListFragment, ContactListFragment.class.getName());
+		} else {
+			ft.attach(mContactListFragment);
+		}
+		mContactListFragment.setLayoutWeight(30f);
+		mContactListFragment.setRetainInstance(true);
+		mContactListFragment.setOnContactListListener(this);
+
+		ft.commit();
+	}
+
+	private void restoreFragmentState() {
+		if (mCurrentContactId > -1) {
+			final Person person = getDbSession().getPersonDao().load(mCurrentContactId);
+			if (person != null) {
+				showContact(person);
+			} else {
+				mCurrentContactId = -1;
+			}
+		}
+	}
+
 	@Override
-	public void onContactClick(final Person person) {
+	public void onSaveInstanceState(final Bundle savedInstanceState) {
+		super.onSaveInstanceState(savedInstanceState);
+		savedInstanceState.putLong("mCurrentContactId", mCurrentContactId);
+	}
+
+	@Override
+	public void onRestoreInstanceState(final Bundle savedInstanceState) {
+		super.onRestoreInstanceState(savedInstanceState);
+		restoreInstanceState(savedInstanceState);
+	}
+
+	private void restoreInstanceState(final Bundle savedInstanceState) {
+		if (savedInstanceState != null) {
+			mCurrentContactId = savedInstanceState.getLong("mCurrentContactId");
+		} else {
+			mCurrentContactId = -1;
+		}
+		refreshHomeButtonState();
+	}
+
+	@Override
+	public void onPostCreate(final Bundle savedInstanceState) {
+		super.onPostCreate(savedInstanceState);
+
+		final List<Person> people = new ArrayList<Person>();
+
+		for (int i = 0; i < 2000; i++) {
+			people.add(getSession().getUser().getPerson());
+		}
+		mContactListFragment.addPeople(people);
+	}
+
+	@Override
+	public void onContactClick(Person person) {
 		showContact(person);
 	}
 
 	@Override
 	public void onCheckContact(final Person person) {
-		Toast.makeText(this, "Checked " + person.getName(), Toast.LENGTH_SHORT).show();
 		if (mMode == null) {
 			mMode = startActionMode(new AnActionModeOfEpicProportions());
 		}
@@ -115,92 +146,141 @@ public class PeopleMyActivity extends MissionHubMainActivity implements OnCatego
 
 	@Override
 	public void onUncheckContact(final Person person) {
-		Toast.makeText(this, "Unchecked " + person.getName(), Toast.LENGTH_SHORT).show();
+
 	}
 
 	@Override
 	public void onUncheckAllContacts() {
-		Toast.makeText(this, "Unchecked all Contacts", Toast.LENGTH_SHORT).show();
 		if (mMode != null) {
-            mMode.finish();
-            mMode = null;
-        }
+			mMode.finish();
+			mMode = null;
+		}
 	}
 
 	@Override
 	public void onCategoryClick() {
-		Toast.makeText(this, "Clicked Category", Toast.LENGTH_SHORT).show();
+
+	}
+
+	public boolean isInContactMode() {
+		return mCurrentContactId > -1;
 	}
 
 	private void showContact(final Person person) {
+		if (isInContactMode()) {
+			return;
+		}
+
+		mCurrentContactId = person.getId();
+
 		if (isTablet) {
-			Toast.makeText(this, "Clicked Tablet Contact " + person.getName(), Toast.LENGTH_SHORT).show();
-			if (!mInContactView) {
-				final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-				// ft.setCustomAnimations(R.anim.slide_in_right,
-				// R.anim.slide_out_left);
-				ft.hide(categoryFragment);
-				ft.show(contactFragment);
-				ft.commit();
+			final FragmentManager fm = getSupportFragmentManager();
+			final FragmentTransaction ft = fm.beginTransaction();
+
+			ft.hide(mNavigationFragment);
+			ContactFragment contactFragment = (ContactFragment) fm.findFragmentByTag("contact" + mCurrentContactId);
+			if (contactFragment != null) {
+				ft.attach(contactFragment);
+			} else {
+				contactFragment = ContactFragment.newInstance(person.getId());
+				contactFragment.setRetainInstance(true);
+				contactFragment.setLayoutWeight(18f);
+				ft.add(R.id.container, contactFragment, "contact" + mCurrentContactId);
 			}
-
-			// contactFragment.setContact(person);
-
-			mInContactView = true;
+			
+			mContactListFragment.setContactActivated(person, true);
+			ft.commit();
 		} else {
-			Toast.makeText(this, "Clicked Phone Contact " + person.getName(), Toast.LENGTH_SHORT).show();
 			final Intent intent = new Intent(this, ContactActivity.class);
 			intent.putExtra("personId", person.getId());
+			startActivityForResult(intent, REQUEST_CODE_CONTACT);
 			startActivity(intent);
 		}
+
+		refreshHomeButtonState();
 	}
 
-	private void showCategories() {
-		final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-		// ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left);
-		ft.hide(contactFragment);
-		ft.show(categoryFragment);
+	private void closeContact() {
+		final FragmentManager fm = getSupportFragmentManager();
+		final FragmentTransaction ft = fm.beginTransaction();
+
+		final ContactFragment contactFragment = (ContactFragment) fm.findFragmentByTag("contact" + mCurrentContactId);
+		if (contactFragment != null) {
+			ft.detach(contactFragment);
+		}
+		ft.show(mNavigationFragment);
 		ft.commit();
-		mInContactView = false;
+
+		mCurrentContactId = -1;
+		refreshHomeButtonState();
+	}
+	
+	private void refreshHomeButtonState() {
+		if (isInContactMode()) {
+			getSupportActionBar().setHomeButtonEnabled(true);
+			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		} else {
+			getSupportActionBar().setHomeButtonEnabled(false);
+			getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+		}
 	}
 
 	@Override
-	public boolean onKeyDown(final int keyCode, final KeyEvent event) {
-		if ((keyCode == KeyEvent.KEYCODE_BACK && mInContactView)) {
-			showCategories();
+	public void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if (requestCode == REQUEST_CODE_CONTACT) {
+			mCurrentContactId = -1;
+		}
+	}
+
+	@Override
+	public void onBackPressed() {
+		if (isInContactMode()) {
+			closeContact();
+		} else {
+			super.onBackPressed();
+		}
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(final MenuItem item) {
+		switch (item.getItemId()) {
+		case android.R.id.home:
+			onBackPressed();
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+	}
+
+	private final class AnActionModeOfEpicProportions implements ActionMode.Callback {
+		@Override
+		public boolean onCreateActionMode(final ActionMode mode, final Menu menu) {
+
+			menu.add("Save").setIcon(R.drawable.ic_action_delete).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+
 			return true;
 		}
-		return super.onKeyDown(keyCode, event);
+
+		@Override
+		public boolean onPrepareActionMode(final ActionMode mode, final Menu menu) {
+			return false;
+		}
+
+		@Override
+		public boolean onActionItemClicked(final ActionMode mode, final MenuItem item) {
+			Toast.makeText(PeopleMyActivity.this, "Got click: " + item, Toast.LENGTH_SHORT).show();
+			mode.finish();
+			mMode = null;
+			return true;
+		}
+
+		@Override
+		public void onDestroyActionMode(final ActionMode mode) {}
 	}
-	
-	private final class AnActionModeOfEpicProportions implements ActionMode.Callback {
-        @Override
-        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            
-            menu.add("Save")
-                .setIcon(R.drawable.ic_action_delete)
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
-
-            return true;
-        }
-
-        @Override
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            return false;
-        }
-
-        @Override
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            Toast.makeText(PeopleMyActivity.this, "Got click: " + item, Toast.LENGTH_SHORT).show();
-            mode.finish();
-            mMode = null;
-            return true;
-        }
-
-        @Override
-        public void onDestroyActionMode(ActionMode mode) {
-        }
-    }
-
+	@Override
+	public boolean isContactListItemSmall() {
+		return isInContactMode();
+	}
 }
