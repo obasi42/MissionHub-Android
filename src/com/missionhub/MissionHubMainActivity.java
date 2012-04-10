@@ -31,7 +31,7 @@ public class MissionHubMainActivity extends MissionHubBaseActivity {
 	@Override
 	public boolean onMenuItemSelected(final int featureId, final MenuItem item) {
 		switch (item.getItemId()) {
-		case R.string.action_settings:
+		case R.string.action_settings: return true;
 		case R.string.action_logout:
 			getMHApplication().reset();
 			startActivity(new Intent(this, MissionHubActivity.class));

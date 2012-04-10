@@ -256,8 +256,8 @@ public class ContactListFragment extends MissionHubFragment implements OnItemCli
 	 * @param position
 	 * @param activated
 	 */
-	public void setListItemActivated(final int position, final boolean activated) {
-		mListView.setItemActivated(position, activated);
+	public void setListItemActivated(final int position) {
+		mListView.setItemActivated(position);
 	}
 
 	/**
@@ -266,8 +266,12 @@ public class ContactListFragment extends MissionHubFragment implements OnItemCli
 	 * @param person
 	 * @param activated
 	 */
-	public void setContactActivated(final Person person, final boolean activated) {
-		setListItemActivated(getPositionOfPerson(person), activated);
+	public void setContactActivated(final Person person) {
+		if (person == null) {
+			setListItemActivated(-1);
+		} else {
+			setListItemActivated(getPositionOfPerson(person));
+		}
 	}
 
 	/**

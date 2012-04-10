@@ -1,6 +1,8 @@
 package com.missionhub.ui.widget;
 
 import android.content.Context;
+import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.util.SparseBooleanArray;
 import android.view.MotionEvent;
@@ -89,7 +91,6 @@ public class SelectableListView extends ListView {
 	 */
 	@Override
 	public boolean onTouchEvent(final MotionEvent ev) {
-
 		final int action = ev.getAction();
 		final int x = (int) ev.getX();
 		final int y = (int) ev.getY();
@@ -120,6 +121,30 @@ public class SelectableListView extends ListView {
 		}
 
 		return true;
+	}
+
+	@Override
+	public Parcelable onSaveInstanceState() {
+		final Bundle bundle = new Bundle();
+		bundle.putParcelable("superState", super.onSaveInstanceState());
+		bundle.putInt("mActivatedItem", mActivatedItem);
+		bundle.putInt("mSelectionSide", mSelectionSide);
+		bundle.putInt("mSelectionWidth", mSelectionWidth);
+		return bundle;
+	}
+
+	@Override
+	public void onRestoreInstanceState(final Parcelable state) {
+		if (state instanceof Bundle) {
+			final Bundle bundle = (Bundle) state;
+			mActivatedItem = bundle.getInt("mActivatedItem");
+			mSelectionSide = bundle.getInt("mSelectionSide");
+			mSelectionWidth = bundle.getInt("mSelectionWidth");
+			super.onRestoreInstanceState(bundle.getParcelable("superState"));
+			return;
+		}
+
+		super.onRestoreInstanceState(state);
 	}
 
 	/**
@@ -200,14 +225,16 @@ public class SelectableListView extends ListView {
 	 * Sets a list item as activated
 	 * 
 	 * @param position
+	 *            the item position or -1 to clear the activated item
 	 * @param activated
 	 */
-	public void setItemActivated(final int position, final boolean activated) {
+	public void setItemActivated(int position) {
 		if (position < 0 || position >= getAdapter().getCount()) {
-			return;
+			position = -1;
 		}
-
 		mActivatedItem = position;
+		invalidateViews();
+
 	}
 
 	/**
@@ -249,7 +276,7 @@ public class SelectableListView extends ListView {
 		 */
 		public void setSupportActivated(boolean activated);
 	}
-	
+
 	/**
 	 * Scrolls the list to the activated item
 	 */

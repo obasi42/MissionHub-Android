@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.widget.AdapterView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.view.ActionMode;
@@ -188,13 +187,12 @@ public class PeopleMyActivity extends MissionHubMainActivity implements OnCatego
 				ft.add(R.id.container, contactFragment, "contact" + mCurrentContactId);
 			}
 			
-			mContactListFragment.setContactActivated(person, true);
+			mContactListFragment.setContactActivated(person);
 			ft.commit();
 		} else {
 			final Intent intent = new Intent(this, ContactActivity.class);
 			intent.putExtra("personId", person.getId());
 			startActivityForResult(intent, REQUEST_CODE_CONTACT);
-			startActivity(intent);
 		}
 
 		refreshHomeButtonState();
@@ -205,13 +203,14 @@ public class PeopleMyActivity extends MissionHubMainActivity implements OnCatego
 		final FragmentTransaction ft = fm.beginTransaction();
 
 		final ContactFragment contactFragment = (ContactFragment) fm.findFragmentByTag("contact" + mCurrentContactId);
+		mCurrentContactId = -1;
 		if (contactFragment != null) {
 			ft.detach(contactFragment);
 		}
 		ft.show(mNavigationFragment);
 		ft.commit();
 
-		mCurrentContactId = -1;
+		mContactListFragment.setContactActivated(null);
 		refreshHomeButtonState();
 	}
 	
@@ -230,6 +229,7 @@ public class PeopleMyActivity extends MissionHubMainActivity implements OnCatego
 		super.onActivityResult(requestCode, resultCode, data);
 		if (requestCode == REQUEST_CODE_CONTACT) {
 			mCurrentContactId = -1;
+			refreshHomeButtonState();
 		}
 	}
 
