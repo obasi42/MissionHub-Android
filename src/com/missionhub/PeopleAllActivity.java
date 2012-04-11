@@ -1,5 +1,8 @@
 package com.missionhub;
 
+import com.missionhub.ui.NavigationMenu;
+import com.missionhub.ui.widget.item.NavigationItem;
+
 import android.os.Bundle;
 
 public class PeopleAllActivity extends MissionHubMainActivity {
@@ -9,8 +12,18 @@ public class PeopleAllActivity extends MissionHubMainActivity {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.widget_refresh_button);
+	}
 
-		getNavigationMenu().attach(this.getClass());
+	@Override
+	public void onCreateNavigationMenu(NavigationMenu menu) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean onNavigationItemSelected(NavigationItem item) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

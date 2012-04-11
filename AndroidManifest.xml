@@ -30,6 +30,10 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".SettingsActivity"
+            android:theme="@style/Theme.MissionHub" >
+        </activity>
+        <activity
             android:name=".LoginActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
             android:theme="@style/Theme.MissionHub" >

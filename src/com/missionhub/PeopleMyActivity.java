@@ -18,7 +18,9 @@ import com.missionhub.fragment.ContactListFragment;
 import com.missionhub.fragment.ContactListFragment.OnContactListListener;
 import com.missionhub.fragment.NavigationListFragment;
 import com.missionhub.fragment.NavigationListFragment.OnCategoryClickListener;
+import com.missionhub.ui.NavigationMenu;
 import com.missionhub.ui.widget.item.ContactListItem.ContactListItemSize;
+import com.missionhub.ui.widget.item.NavigationItem;
 
 public class PeopleMyActivity extends MissionHubMainActivity implements OnCategoryClickListener, OnContactListListener, ContactListItemSize {
 
@@ -52,8 +54,6 @@ public class PeopleMyActivity extends MissionHubMainActivity implements OnCatego
 
 		initFragments();
 		restoreFragmentState();
-
-		getNavigationMenu().attach(this.getClass());
 	}
 
 	private void initFragments() {
@@ -282,5 +282,17 @@ public class PeopleMyActivity extends MissionHubMainActivity implements OnCatego
 	@Override
 	public boolean isContactListItemSmall() {
 		return isInContactMode();
+	}
+
+	@Override
+	public void onCreateNavigationMenu(NavigationMenu menu) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean onNavigationItemSelected(NavigationItem item) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

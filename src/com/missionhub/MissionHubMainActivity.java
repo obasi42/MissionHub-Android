@@ -1,23 +1,27 @@
 package com.missionhub;
 
 import android.content.Intent;
+import android.os.Bundle;
 
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.missionhub.ui.NavigationMenu;
-import com.missionhub.ui.widget.item.NavigationItem;
+import com.missionhub.ui.NavigationMenu.NavigationMenuActivity;
 
 /**
  * The main activity for MissionHub. Manages the Action Bar and fragment
  * loading.
  */
-public class MissionHubMainActivity extends MissionHubBaseActivity {
+public abstract class MissionHubMainActivity extends MissionHubBaseActivity implements NavigationMenuActivity {
 
 	/** logging tag */
 	public static final String TAG = MissionHubMainActivity.class.getSimpleName();
-
-	/** the navigation menu */
-	private final NavigationMenu mNavigationMenu = new NavigationMenu(this);
+	
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		NavigationMenu.instantiate(this);
+	}
 
 	/** Global menu items */
 	@Override
@@ -31,7 +35,10 @@ public class MissionHubMainActivity extends MissionHubBaseActivity {
 	@Override
 	public boolean onMenuItemSelected(final int featureId, final MenuItem item) {
 		switch (item.getItemId()) {
-		case R.string.action_settings: return true;
+		case R.string.action_settings:
+			final Intent intent = new Intent(this, SettingsActivity.class);
+			startActivity(intent);
+			return true;
 		case R.string.action_logout:
 			getMHApplication().reset();
 			startActivity(new Intent(this, MissionHubActivity.class));
@@ -40,13 +47,5 @@ public class MissionHubMainActivity extends MissionHubBaseActivity {
 		default:
 			return super.onMenuItemSelected(featureId, item);
 		}
-	}
-
-	public boolean onNavigationItemSelected(final NavigationItem item) {
-		return false;
-	}
-
-	public NavigationMenu getNavigationMenu() {
-		return mNavigationMenu;
 	}
 }
