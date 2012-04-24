@@ -37,7 +37,7 @@ public class DisplayMode {
 		} else {
 			mIsWide = false;
 		}
-		
+
 		if (widthdp >= 720 && heightdp >= 720) {
 			mIsSW720dp = true;
 		} else {
@@ -72,7 +72,7 @@ public class DisplayMode {
 	public int getSdkVersion() {
 		return mSdkVersion;
 	}
-	
+
 	public boolean isWide() {
 		return mIsWide;
 	}

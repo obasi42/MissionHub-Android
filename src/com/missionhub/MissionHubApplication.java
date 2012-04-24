@@ -54,7 +54,7 @@ public class MissionHubApplication extends GDApplication {
 
 		// sets up the mSession
 		Session.resumeSession(this);
-		
+
 		// initialize the display mode container
 		mDisplayMode = new DisplayMode(this);
 	}

@@ -24,9 +24,7 @@ public class ListItemAdapter extends ItemAdapter {
 		final Item item = (Item) getItem(position);
 		ListItemView cell = (ListItemView) convertView;
 
-		// create a new view if the parent size has changed or if the item type
-		// if different
-		if ((cell != null && parent != null && ((View) cell).getWidth() != parent.getWidth()) || (cell == null || cell.getItemClass() != item.getClass())) {
+		if ((cell == null || cell.getItemClass() != item.getClass()) || (cell != null && parent != null && ((View) cell).getWidth() != parent.getWidth())) {
 			cell = (ListItemView) item.newView(mContext, null);
 			cell.prepareItemView();
 		}

@@ -1,6 +1,5 @@
 package com.missionhub.ui.widget.item;
 
-import greendroid.widget.item.Item;
 import greendroid.widget.itemview.ItemView;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
@@ -8,42 +7,52 @@ import android.view.ViewGroup;
 
 import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
 import com.actionbarsherlock.view.MenuItem;
+import com.missionhub.MissionHubBaseActivity;
 import com.missionhub.R;
+import com.missionhub.ui.NavigationMenu;
 
-public class NavigationItem extends Item {
+public class NavigationItem extends SpinnerItem {
 
-	private int mLayout;
-	private Context mContext;
-	private OnNavigationListener mNavigationListener;
+	private final Context mContext;
+	private final OnSpinnerItemChangedListener mItemChangedListener;
+	private final OnNavigationListener mNavigationListener;
 	private int mItemId = -1;
 	private CharSequence mTitle;
 	private CharSequence mSubtitle;
 	private Drawable mIcon;
-	private boolean mEnabled;
+	private boolean mEnabled = true;
 
-	public NavigationItem(final int itemId, final Context context, final int layout) {
-		if (context instanceof OnNavigationListener) {
-			mItemId = itemId;
-			mContext = context;
-			mNavigationListener = (OnNavigationListener) context;
-			mLayout = layout;
-		} else {
-			throw new RuntimeException("Context must implement OnNavigationListener");
-		}
+	public NavigationItem(final int itemId, final Context context, final NavigationMenu navigationMenu, final int layout) {
+		mItemId = itemId;
+		mContext = context;
+		mItemChangedListener = navigationMenu;
+		mNavigationListener = navigationMenu;
 	}
 
-	public NavigationItem(final int itemId, final Context context) {
-		this(itemId, context, R.layout.widget_navigation_list_item);
+	public NavigationItem(final MissionHubBaseActivity mActivity, final NavigationMenu navigationMenu, final int layout) {
+		this(-1, mActivity, navigationMenu, layout);
+		setEnabled(false);
 	}
 
 	@Override
 	public ItemView newView(final Context context, final ViewGroup parent) {
-		return createCellFromXml(context, mLayout, parent);
+		return createCellFromXml(context, R.layout.widget_navigation_list_item, parent);
 	}
 
-	public static NavigationItem instantiate(final MenuItem menuItem, final Context context) {
-		final NavigationItem item = new NavigationItem(menuItem.getItemId(), context);
+	@Override
+	public ItemView newDropdownView(final Context context, final ViewGroup parent) {
+		return createCellFromXml(context, R.layout.widget_navigation_list_item, parent);
+	}
+
+	public static NavigationItem instantiate(final MenuItem menuItem, final Context context, final NavigationMenu navigationMenu, final int layout) {
+		final NavigationItem item = new NavigationItem(menuItem.getItemId(), context, navigationMenu, layout);
 		return item.setTitle(menuItem.getTitle()).setIcon(menuItem.getIcon()).setEnabled(menuItem.isEnabled());
+	}
+
+	private void notifyChanged() {
+		if (mItemChangedListener != null) {
+			mItemChangedListener.onSpinnerItemChanged(this);
+		}
 	}
 
 	public int getItemId() {
@@ -52,11 +61,12 @@ public class NavigationItem extends Item {
 
 	public NavigationItem setTitle(final CharSequence title) {
 		mTitle = title;
+		notifyChanged();
 		return this;
 	}
 
 	public NavigationItem setTitle(final int title) {
-		mTitle = mContext.getString(title);
+		setTitle(mContext.getString(title));
 		return this;
 	}
 
@@ -66,11 +76,12 @@ public class NavigationItem extends Item {
 
 	public NavigationItem setSubtitle(final CharSequence subtitle) {
 		mSubtitle = subtitle;
+		notifyChanged();
 		return this;
 	}
 
 	public NavigationItem setSubtitle(final int subtitle) {
-		mSubtitle = mContext.getString(subtitle);
+		setSubtitle(mContext.getString(subtitle));
 		return this;
 	}
 
@@ -80,11 +91,12 @@ public class NavigationItem extends Item {
 
 	public NavigationItem setIcon(final Drawable icon) {
 		mIcon = icon;
+		notifyChanged();
 		return this;
 	}
 
 	public NavigationItem setIcon(final int iconRes) {
-		mIcon = mContext.getResources().getDrawable(iconRes);
+		setIcon(mContext.getResources().getDrawable(iconRes));
 		return this;
 	}
 
@@ -94,6 +106,7 @@ public class NavigationItem extends Item {
 
 	public NavigationItem setEnabled(final boolean enabled) {
 		mEnabled = enabled;
+		notifyChanged();
 		return this;
 	}
 

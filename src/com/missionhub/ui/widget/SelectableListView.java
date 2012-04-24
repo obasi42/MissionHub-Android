@@ -16,6 +16,11 @@ import com.missionhub.util.U;
 
 public class SelectableListView extends ListView {
 
+	/** selection modes */
+	public static final int MODE_NORMAL = 1;
+	public static final int MODE_CLICK_ONLY = 2;
+	public static final int MODE_SELECT_ONLY = 3;
+
 	/** constant for left side selection */
 	public static final int SIDE_LEFT = 1;
 
@@ -36,6 +41,9 @@ public class SelectableListView extends ListView {
 
 	/** the activated list item */
 	private int mActivatedItem = -1;
+
+	/** the selection mode */
+	private int mMode = MODE_NORMAL;
 
 	/** listener to handle item check events */
 	private OnItemCheckedListener mOnItemCheckedListener;
@@ -95,7 +103,8 @@ public class SelectableListView extends ListView {
 		final int x = (int) ev.getX();
 		final int y = (int) ev.getY();
 
-		if (action == MotionEvent.ACTION_DOWN && ((mSelectionSide == SIDE_LEFT && x < mSelectionWidth) || (mSelectionSide == SIDE_RIGHT && x > getWidth() - mSelectionWidth))) {
+		if ((action == MotionEvent.ACTION_DOWN && mMode != MODE_CLICK_ONLY)
+				&& (mMode == MODE_SELECT_ONLY || ((mSelectionSide == SIDE_LEFT && x < mSelectionWidth) || (mSelectionSide == SIDE_RIGHT && x > getWidth() - mSelectionWidth)))) {
 			mSelectionMode = true;
 			mStartPosition = pointToPosition(x, y);
 		}
@@ -229,6 +238,8 @@ public class SelectableListView extends ListView {
 	 * @param activated
 	 */
 	public void setItemActivated(int position) {
+		if (getAdapter() == null) return;
+
 		if (position < 0 || position >= getAdapter().getCount()) {
 			position = -1;
 		}
@@ -282,5 +293,13 @@ public class SelectableListView extends ListView {
 	 */
 	public void scrollToItemActivated() {
 		setSelection(mActivatedItem);
+	}
+	
+	/**
+	 * Sets the selection mode
+	 * @param mode
+	 */
+	public void setMode(int mode) {
+		mMode = mode;
 	}
 }

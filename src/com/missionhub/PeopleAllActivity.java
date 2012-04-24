@@ -1,9 +1,9 @@
 package com.missionhub;
 
+import android.os.Bundle;
+
 import com.missionhub.ui.NavigationMenu;
 import com.missionhub.ui.widget.item.NavigationItem;
-
-import android.os.Bundle;
 
 public class PeopleAllActivity extends MissionHubMainActivity {
 
@@ -15,13 +15,13 @@ public class PeopleAllActivity extends MissionHubMainActivity {
 	}
 
 	@Override
-	public void onCreateNavigationMenu(NavigationMenu menu) {
+	public void onCreateNavigationMenu(final NavigationMenu menu) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
-	public boolean onNavigationItemSelected(NavigationItem item) {
+	public boolean onNavigationItemSelected(final NavigationItem item) {
 		// TODO Auto-generated method stub
 		return false;
 	}

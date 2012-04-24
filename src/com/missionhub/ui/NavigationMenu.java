@@ -7,11 +7,13 @@ import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
 import com.missionhub.MissionHubBaseActivity;
 import com.missionhub.R;
 import com.missionhub.ui.widget.item.NavigationItem;
+import com.missionhub.ui.widget.item.SpinnerItem;
+import com.missionhub.ui.widget.item.SpinnerItem.OnSpinnerItemChangedListener;
 
 /**
  * The MissionHub Main Action Bar List Menu
  */
-public class NavigationMenu implements OnNavigationListener {
+public class NavigationMenu implements OnNavigationListener, OnSpinnerItemChangedListener {
 
 	/** the context */
 	private final MissionHubBaseActivity mActivity;
@@ -19,11 +21,17 @@ public class NavigationMenu implements OnNavigationListener {
 	/** the navigation menu activity interface */
 	private final NavigationMenuActivity mNavigationMenuInterface;
 
+	/** the navigation selected listener */
+	private final OnNavigationItemSelectedListener mNavigationSelectedListener;
+
 	/** the navigation list adapter */
 	private final ListItemAdapter mAdapter;
 
 	/** logo cache */
 	private static Drawable mLogo;
+
+	/** if the menu is in setup stage */
+	private boolean mInSetup;
 
 	/**
 	 * Creates a MainMenu Object
@@ -32,9 +40,13 @@ public class NavigationMenu implements OnNavigationListener {
 		if (!(activity instanceof NavigationMenuActivity)) {
 			throw new RuntimeException("NavigationMenu context must implement the NavigationMenuActivity interface");
 		}
+		if (!(activity instanceof OnNavigationItemSelectedListener)) {
+			throw new RuntimeException("NavigationMenu context must implement the OnNavigationItemSelectedListener interface");
+		}
 
 		mActivity = activity;
 		mNavigationMenuInterface = (NavigationMenuActivity) mActivity;
+		mNavigationSelectedListener = (OnNavigationItemSelectedListener) mActivity;
 		mAdapter = new ListItemAdapter(mActivity);
 
 		setup();
@@ -44,59 +56,177 @@ public class NavigationMenu implements OnNavigationListener {
 	 * Instantiate a new NavigationMenu
 	 * 
 	 * @param activity
+	 * @return
 	 */
-	public static void instantiate(final MissionHubBaseActivity activity) {
-		new NavigationMenu(activity);
+	public static NavigationMenu instantiate(final MissionHubBaseActivity activity) {
+		return new NavigationMenu(activity);
 	}
 
 	/**
 	 * Sets up the navigation menu items and attaches it to the action bar
 	 */
 	private void setup() {
+		mInSetup = true;
+
 		mAdapter.setNotifyOnChange(false);
 		mNavigationMenuInterface.onCreateNavigationMenu(this);
 		if (!mAdapter.isEmpty()) {
 			mActivity.getSupportActionBar().setDisplayShowTitleEnabled(false);
 			if (mActivity.getDisplayMode().isTablet()) {
-				mActivity.getSupportActionBar().setDisplayUseLogoEnabled(true);
 				if (mLogo == null) {
-					mActivity.getResources().getDrawable(R.drawable.logo);
+					mLogo = mActivity.getResources().getDrawable(R.drawable.logo);
 				}
 				mActivity.getSupportActionBar().setLogo(mLogo);
+				mActivity.getSupportActionBar().setDisplayUseLogoEnabled(true);
 			}
 			mActivity.getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 			mActivity.getSupportActionBar().setListNavigationCallbacks(mAdapter, this);
 		}
+
+		mInSetup = false;
 	}
 
 	/**
-	 * Passes navigation selection events to NavigationMenuActivity interface
+	 * Passes navigation selection events to OnNavigationItemSelectedListener
+	 * interface
 	 */
 	@Override
 	public synchronized boolean onNavigationItemSelected(final int itemPosition, final long itemId) {
 		final NavigationItem item = (NavigationItem) mAdapter.getItem(itemPosition);
 		if (item != null) {
-			return mNavigationMenuInterface.onNavigationItemSelected(item);
+			return mNavigationSelectedListener.onNavigationItemSelected(item);
 		}
 		return false;
 	}
 
 	/**
-	 * Adds a menu item to the menu
+	 * Adds a navigation item to the list
 	 * 
 	 * @param itemId
-	 * @return the menu item
+	 * @return the navigation item
 	 */
 	public NavigationItem add(final int itemId) {
-		return new NavigationItem(itemId, mActivity);
+		return add(itemId, R.layout.widget_navigation_list_item);
 	}
 
 	/**
-	 * Interface for NavigationMenu events
+	 * Adds a divider to the list
+	 * 
+	 * @param itemId
+	 * @return
+	 */
+	public NavigationItem addDivider(final int itemId) {
+		return add(itemId, R.layout.widget_navigation_list_divider);
+	}
+
+	/**
+	 * Adds a navigation item to the list
+	 * 
+	 * @param itemId
+	 * @return the navigation item
+	 */
+	public NavigationItem add(final int itemId, final int layout) {
+		final NavigationItem item = new NavigationItem(itemId, mActivity, this, layout);
+		mAdapter.add(item);
+		return item;
+	}
+
+	/**
+	 * Removes a navigation item from the list
+	 * 
+	 * @param itemId
+	 */
+	public void remove(final int itemId) {
+		final int position = findPositionById(itemId);
+		remove((NavigationItem) mAdapter.getItem(position));
+	}
+
+	/**
+	 * Removes a navigation item from the list
+	 * 
+	 * @param item
+	 */
+	public void remove(final NavigationItem item) {
+		if (item != null) {
+			mAdapter.remove(item);
+		}
+	}
+
+	@Override
+	public void onSpinnerItemChanged(final SpinnerItem item) {
+		if (!mInSetup) {
+			mAdapter.notifyDataSetChanged();
+		}
+	}
+
+	/**
+	 * Activities that implement the NavigationMenu must implement this
 	 */
 	public interface NavigationMenuActivity {
 		public void onCreateNavigationMenu(NavigationMenu menu);
+	}
 
+	/**
+	 * Interface for receiving navigation selection events
+	 */
+	public interface OnNavigationItemSelectedListener {
 		public boolean onNavigationItemSelected(NavigationItem item);
+	}
+
+	/**
+	 * Sets the selected menu item
+	 * 
+	 * @param item
+	 */
+	public void setSelectedNavigationItem(final NavigationItem item) {
+		setSelectedNavigationItem(item.getItemId());
+	}
+
+	/**
+	 * Sets the selected menu item by id
+	 * 
+	 * @param id
+	 */
+	public void setSelectedNavigationItem(final int id) {
+		final int position = findPositionById(id);
+		if (position > -1) {
+			mActivity.getSupportActionBar().setSelectedNavigationItem(position);
+		}
+	}
+
+	/**
+	 * Returns the NavigationItem from the list by its position
+	 * 
+	 * @param position
+	 * @return
+	 */
+	public NavigationItem findItemByPosition(final int position) {
+		return (NavigationItem) mAdapter.getItem(position);
+	}
+
+	/**
+	 * Returns the NavigationItem from the list by its id
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public NavigationItem findItemById(final int id) {
+		return findItemByPosition(findPositionById(id));
+	}
+
+	/**
+	 * Finds the position of the navigation item in the adapter
+	 * 
+	 * @param id
+	 * @return
+	 */
+	private int findPositionById(final int id) {
+		for (int i = 0; i < mAdapter.getCount(); i++) {
+			final NavigationItem item = (NavigationItem) mAdapter.getItem(i);
+			if (item.getItemId() == id) {
+				return i;
+			}
+		}
+		return -1;
 	}
 }

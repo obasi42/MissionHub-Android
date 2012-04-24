@@ -46,31 +46,33 @@ public class NavigationItemView extends FrameLayout implements ListItemView {
 	@Override
 	public void setObject(final Item item, final ViewGroup parent, final int position) {
 		final NavigationItem navItem = (NavigationItem) item;
-
-		if (navItem.getIcon() != null) {
+		
+		if (mIcon != null && navItem.getIcon() != null) {
 			mIcon.setImageDrawable(navItem.getIcon());
 			mIcon.setVisibility(View.VISIBLE);
 		} else {
 			mIcon.setVisibility(View.GONE);
 		}
 
-		if (navItem.getTitle() != null) {
+		if (mTitle != null && navItem.getTitle() != null) {
 			mTitle.setText(navItem.getTitle());
 			mTitle.setVisibility(View.VISIBLE);
 		} else {
 			mTitle.setVisibility(View.GONE);
 		}
 
-		if (navItem.getSubtitle() != null) {
+		if (mSubtitle != null && navItem.getSubtitle() != null) {
 			mSubtitle.setText(navItem.getSubtitle());
 			mSubtitle.setVisibility(View.VISIBLE);
 		} else {
 			mSubtitle.setVisibility(View.GONE);
 		}
-		
+
 		if (navItem.isEnabled()) {
+			this.setClickable(false);
 			this.setEnabled(true);
 		} else {
+			this.setClickable(true);
 			this.setEnabled(false);
 		}
 	}

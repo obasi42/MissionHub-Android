@@ -17,10 +17,10 @@ import com.missionhub.ui.widget.FragmentLoadingView;
 import com.viewpagerindicator.PageIndicator;
 
 public class ContactFragment extends MissionHubFragment {
-	
+
 	/** the personId for this contact */
 	long mPersonId = -1;
-	
+
 	/** the sql person for this contact */
 	Person mPerson;
 
@@ -43,15 +43,16 @@ public class ContactFragment extends MissionHubFragment {
 	ContactStatusView mStatus;
 	ContactAboutView mAbout;
 	ContactSurveysView mSurveys;
-	
-	@Override public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
 
-        Bundle args = getArguments();
-        if (args != null) {
-        	setPersonId(args.getLong("personId", -1));
-        }
-    }
+	@Override
+	public void onCreate(final Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		final Bundle args = getArguments();
+		if (args != null) {
+			setPersonId(args.getLong("personId", -1));
+		}
+	}
 
 	@SuppressWarnings("deprecation")
 	@Override
@@ -86,19 +87,19 @@ public class ContactFragment extends MissionHubFragment {
 
 		return view;
 	}
-	
+
 	public void redraw() {
-		
+
 	}
-	
-	public void setPersonId(long personId) {
-		Person person = getMHActivity().getDbSession().getPersonDao().load(personId);
+
+	public void setPersonId(final long personId) {
+		final Person person = getMHActivity().getDbSession().getPersonDao().load(personId);
 		if (person != null) {
 			setPerson(person);
 		}
 	}
-	
-	public void setPerson(Person person) {
+
+	public void setPerson(final Person person) {
 		mPersonId = person.getId();
 		mPerson = person;
 	}
@@ -110,7 +111,7 @@ public class ContactFragment extends MissionHubFragment {
 		f.setArguments(args);
 		return f;
 	}
-	
+
 	public long getPersonId() {
 		return mPersonId;
 	}

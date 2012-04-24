@@ -16,16 +16,15 @@ import com.missionhub.api.model.sql.Person;
 import com.missionhub.fragment.ContactFragment;
 import com.missionhub.fragment.ContactListFragment;
 import com.missionhub.fragment.ContactListFragment.OnContactListListener;
-import com.missionhub.fragment.NavigationListFragment;
-import com.missionhub.fragment.NavigationListFragment.OnCategoryClickListener;
+import com.missionhub.fragment.NavigationMenuFragment;
 import com.missionhub.ui.NavigationMenu;
 import com.missionhub.ui.widget.item.ContactListItem.ContactListItemSize;
 import com.missionhub.ui.widget.item.NavigationItem;
 
-public class PeopleMyActivity extends MissionHubMainActivity implements OnCategoryClickListener, OnContactListListener, ContactListItemSize {
+public class PeopleMyActivity extends MissionHubMainActivity implements OnContactListListener, ContactListItemSize {
 
 	/** the left navigation menu fragment */
-	private NavigationListFragment mNavigationFragment;
+	private NavigationMenuFragment mNavigationFragment;
 
 	/** the contact list fragment */
 	private ContactListFragment mContactListFragment;
@@ -61,16 +60,15 @@ public class PeopleMyActivity extends MissionHubMainActivity implements OnCatego
 		final FragmentTransaction ft = fm.beginTransaction();
 
 		if (isTablet) {
-			mNavigationFragment = (NavigationListFragment) fm.findFragmentByTag(NavigationListFragment.class.getName());
+			mNavigationFragment = (NavigationMenuFragment) fm.findFragmentByTag(NavigationMenuFragment.class.getName());
 			if (mNavigationFragment == null) {
-				mNavigationFragment = new NavigationListFragment();
-				ft.add(R.id.container, mNavigationFragment, NavigationListFragment.class.getName());
+				mNavigationFragment = new NavigationMenuFragment();
+				ft.add(R.id.container, mNavigationFragment, NavigationMenuFragment.class.getName());
 			} else {
 				ft.attach(mNavigationFragment);
 			}
 			mNavigationFragment.setLayoutWeight(70f);
 			mNavigationFragment.setRetainInstance(true);
-			mNavigationFragment.setOnCategoryClickListener(this);
 		}
 
 		mContactListFragment = (ContactListFragment) fm.findFragmentByTag(ContactListFragment.class.getName());
@@ -132,7 +130,7 @@ public class PeopleMyActivity extends MissionHubMainActivity implements OnCatego
 	}
 
 	@Override
-	public void onContactClick(Person person) {
+	public void onContactClick(final Person person) {
 		showContact(person);
 	}
 
@@ -154,11 +152,6 @@ public class PeopleMyActivity extends MissionHubMainActivity implements OnCatego
 			mMode.finish();
 			mMode = null;
 		}
-	}
-
-	@Override
-	public void onCategoryClick() {
-
 	}
 
 	public boolean isInContactMode() {
@@ -186,7 +179,7 @@ public class PeopleMyActivity extends MissionHubMainActivity implements OnCatego
 				contactFragment.setLayoutWeight(18f);
 				ft.add(R.id.container, contactFragment, "contact" + mCurrentContactId);
 			}
-			
+
 			mContactListFragment.setContactActivated(person);
 			ft.commit();
 		} else {
@@ -213,7 +206,7 @@ public class PeopleMyActivity extends MissionHubMainActivity implements OnCatego
 		mContactListFragment.setContactActivated(null);
 		refreshHomeButtonState();
 	}
-	
+
 	private void refreshHomeButtonState() {
 		if (isInContactMode()) {
 			getSupportActionBar().setHomeButtonEnabled(true);
@@ -285,14 +278,23 @@ public class PeopleMyActivity extends MissionHubMainActivity implements OnCatego
 	}
 
 	@Override
-	public void onCreateNavigationMenu(NavigationMenu menu) {
-		// TODO Auto-generated method stub
+	public void onCreateNavigationMenu(final NavigationMenu menu) {
+		menu.add(R.id.nav_my_contacts).setTitle("My Contacts").setSubtitle("In Progress");
+		menu.add(R.id.nav_all_contacts).setTitle("All Contacts");
+		menu.add(R.id.nav_directory).setTitle("Directory");
+		menu.add(R.id.nav_groups).setTitle("Groups");
+		menu.add(R.id.nav_surveys).setTitle("Surveys");
 		
+		//if (!getDisplayMode().isTablet()) {
+			menu.addDivider(R.id.nav_divider).setTitle("My Contacts");
+			menu.add(R.id.nav_my_contacts_all).setTitle("All");
+			menu.add(R.id.nav_my_contacts_completed).setTitle("Completed");
+		//}
 	}
 
 	@Override
-	public boolean onNavigationItemSelected(NavigationItem item) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean onNavigationItemSelected(final NavigationItem item) {
+		Toast.makeText(this, item.getTitle(), Toast.LENGTH_SHORT).show();
+		return true;
 	}
 }
