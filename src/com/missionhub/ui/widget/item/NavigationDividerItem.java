@@ -17,7 +17,7 @@ public class NavigationDividerItem extends SpinnerItem implements DisabledItem {
 	private CharSequence mSubtitle;
 	private final OnSpinnerItemChangedListener mItemChangedListener;
 
-	public NavigationDividerItem(final int id, final Context context, final NavigationMenu navigationMenu, boolean isSidebar) {
+	public NavigationDividerItem(final int id, final Context context, final NavigationMenu navigationMenu, final boolean isSidebar) {
 		mId = id;
 		mContext = context;
 		mItemChangedListener = navigationMenu;

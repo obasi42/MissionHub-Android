@@ -61,7 +61,7 @@ public class NavigationMenuFragment extends MissionHubFragment implements OnItem
 
 	@Override
 	public boolean onNavigationItemSelected(final NavigationItem item) {
-		MissionHubBaseActivity activity = getMHActivity();
+		final MissionHubBaseActivity activity = getMHActivity();
 		if (activity != null && activity instanceof OnNavigationItemSelectedListener) {
 			return ((OnNavigationItemSelectedListener) activity).onNavigationItemSelected(item);
 		}
@@ -70,15 +70,15 @@ public class NavigationMenuFragment extends MissionHubFragment implements OnItem
 
 	@Override
 	public void onCreateNavigationMenu(final NavigationMenu menu) {}
-	
+
 	public NavigationMenu getNavigationMenu() {
 		return mMenu;
 	}
 
 	@Override
-	public void onCreateSideNavigationMenu(NavigationMenu menu) {
+	public void onCreateSideNavigationMenu(final NavigationMenu menu) {
 		Log.e("HERE", "HERE");
-		MissionHubBaseActivity activity = getMHActivity();
+		final MissionHubBaseActivity activity = getMHActivity();
 		if (activity != null && activity instanceof NavigationMenuInterface) {
 			Log.e("HERE2", "HERE2");
 			((NavigationMenuInterface) activity).onCreateSideNavigationMenu(menu);

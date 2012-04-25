@@ -291,7 +291,7 @@ public class PeopleMyActivity extends MissionHubMainActivity implements OnContac
 			menu.add(R.id.nav_my_contacts_completed).setTitle("Completed");
 		}
 	}
-	
+
 	@Override
 	public void onCreateSideNavigationMenu(final NavigationMenu menu) {
 		menu.add(R.id.nav_my_contacts_all).setTitle("All");
