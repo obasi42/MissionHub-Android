@@ -5,9 +5,10 @@ import android.content.Context;
 import android.view.ViewGroup;
 
 import com.missionhub.R;
+import com.missionhub.ui.ListItemAdapter.DisabledItem;
 import com.missionhub.ui.NavigationMenu;
 
-public class NavigationDividerItem extends SpinnerItem {
+public class NavigationDividerItem extends SpinnerItem implements DisabledItem {
 
 	private final Context mContext;
 	private final int mId;

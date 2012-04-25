@@ -1,11 +1,8 @@
 package com.missionhub.ui;
 
-import android.graphics.drawable.Drawable;
-
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
 import com.missionhub.MissionHubBaseActivity;
-import com.missionhub.R;
 import com.missionhub.ui.widget.item.NavigationDividerItem;
 import com.missionhub.ui.widget.item.NavigationItem;
 import com.missionhub.ui.widget.item.SpinnerItem;
@@ -29,7 +26,7 @@ public class NavigationMenu implements OnNavigationListener, OnSpinnerItemChange
 	private final SpinnerItemAdapter mAdapter;
 
 	/** logo cache */
-	private static Drawable mLogo;
+	// private static Drawable mLogo;
 
 	/** if the menu is in setup stage */
 	private boolean mInSetup;
@@ -73,13 +70,13 @@ public class NavigationMenu implements OnNavigationListener, OnSpinnerItemChange
 		mNavigationMenuInterface.onCreateNavigationMenu(this);
 		if (!mAdapter.isEmpty()) {
 			mActivity.getSupportActionBar().setDisplayShowTitleEnabled(false);
-			if (mActivity.getDisplayMode().isTablet()) {
-				if (mLogo == null) {
-					mLogo = mActivity.getResources().getDrawable(R.drawable.logo);
-				}
-				mActivity.getSupportActionBar().setLogo(mLogo);
-				mActivity.getSupportActionBar().setDisplayUseLogoEnabled(true);
-			}
+			// if (mActivity.getDisplayMode().isTablet()) {
+			// if (mLogo == null) {
+			// mLogo = mActivity.getResources().getDrawable(R.drawable.logo);
+			// }
+			// mActivity.getSupportActionBar().setLogo(mLogo);
+			// mActivity.getSupportActionBar().setDisplayUseLogoEnabled(true);
+			// }
 			mActivity.getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 			mActivity.getSupportActionBar().setListNavigationCallbacks(mAdapter, this);
 		}

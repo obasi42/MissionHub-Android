@@ -40,4 +40,24 @@ public class ListItemAdapter extends ItemAdapter {
 
 		return view;
 	}
+
+	@Override
+	public boolean isEnabled(final int position) {
+		if (getItem(position) instanceof DisabledItem) {
+			return false;
+		}
+		return super.isEnabled(position);
+	}
+
+	@Override
+	public boolean areAllItemsEnabled() {
+		for (int i = 0; i < getCount(); i++) {
+			if (getItem(i) instanceof DisabledItem) {
+				return false;
+			}
+		}
+		return super.areAllItemsEnabled();
+	}
+
+	public interface DisabledItem {}
 }

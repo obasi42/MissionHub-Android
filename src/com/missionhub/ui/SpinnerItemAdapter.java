@@ -1,7 +1,6 @@
 package com.missionhub.ui;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SpinnerAdapter;
@@ -29,7 +28,6 @@ public class SpinnerItemAdapter extends ListItemAdapter implements SpinnerAdapte
 	 */
 	@Override
 	public View getView(final int position, final View convertView, final ViewGroup parent) {
-		Log.e("GET VIEW", "GET VIEW");
 		return getView(TYPE_NORMAL, position, convertView, parent);
 	}
 
@@ -39,7 +37,6 @@ public class SpinnerItemAdapter extends ListItemAdapter implements SpinnerAdapte
 	 */
 	@Override
 	public View getDropDownView(final int position, final View convertView, final ViewGroup parent) {
-		Log.e("GET DropDown", "GET DropDown");
 		return getView(TYPE_DROPDOWN, position, convertView, parent);
 	}
 
