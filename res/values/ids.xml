@@ -14,5 +14,8 @@
     <item name="nav_surveys" type="id"/>
     
     <item name="spinner_item_type" type="id"/>
+    <item name="adapter_hide_position" type="id"/>
+    <item name="adapter_hide_previous" type="id"/>
+    <item name="adapter_hide_next" type="id"/>
 
 </resources>

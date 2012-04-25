@@ -123,10 +123,12 @@ public class PeopleMyActivity extends MissionHubMainActivity implements OnContac
 
 		final List<Person> people = new ArrayList<Person>();
 
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < 2000; i++) {
 			people.add(getSession().getUser().getPerson());
 		}
 		mContactListFragment.addPeople(people);
+		
+		getNavigationMenu().setSelectedNavigationItem(R.id.nav_my_contacts_inprogress);
 	}
 
 	@Override
@@ -276,22 +278,19 @@ public class PeopleMyActivity extends MissionHubMainActivity implements OnContac
 	public boolean isContactListItemSmall() {
 		return isInContactMode();
 	}
-
+	
 	@Override
 	public void onCreateNavigationMenu(final NavigationMenu menu) {
-		menu.add(R.id.nav_my_contacts).setTitle("My Contacts").setSubtitle("In Progress");
-		menu.add(R.id.nav_all_contacts).setTitle("All Contacts");
-		menu.add(R.id.nav_directory).setTitle("Directory");
-		menu.add(R.id.nav_groups).setTitle("Groups");
-		menu.add(R.id.nav_surveys).setTitle("Surveys");
-
+		super.onCreateNavigationMenu(menu);
+		
 		if (!getDisplayMode().isTablet()) {
 			menu.addDivider(R.id.nav_divider).setTitle("My Contacts");
 			menu.add(R.id.nav_my_contacts_all).setTitle("All");
+			menu.add(R.id.nav_my_contacts_inprogress).setTitle("In Progress");
 			menu.add(R.id.nav_my_contacts_completed).setTitle("Completed");
 		}
 	}
-
+	
 	@Override
 	public void onCreateSideNavigationMenu(final NavigationMenu menu) {
 		menu.add(R.id.nav_my_contacts_all).setTitle("All");
@@ -301,7 +300,23 @@ public class PeopleMyActivity extends MissionHubMainActivity implements OnContac
 
 	@Override
 	public boolean onNavigationItemSelected(final NavigationItem item) {
-		Toast.makeText(this, item.getTitle(), Toast.LENGTH_SHORT).show();
-		return true;
+		toggleMenuItems(item);	
+		return super.onNavigationItemSelected(item);
+	}
+	
+	private void toggleMenuItems(final NavigationItem item) {			
+		switch (item.getItemId()) {
+		case R.id.nav_my_contacts_all:
+		case R.id.nav_my_contacts_completed:
+		case R.id.nav_my_contacts_inprogress:
+			NavigationItem topItem = getNavigationMenu().findItemById(R.id.nav_my_contacts);
+			topItem.setSubtitle(item.getTitle());
+			getNavigationMenu().setSelectedNavigationItem(topItem);
+			getNavigationMenu().showAll();
+			getNavigationMenu().hide(item);
+			if (mNavigationFragment != null) {
+				mNavigationFragment.setSelectedNavigationItem(item);
+			}
+		}
 	}
 }

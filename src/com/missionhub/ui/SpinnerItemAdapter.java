@@ -15,7 +15,7 @@ public class SpinnerItemAdapter extends ListItemAdapter implements SpinnerAdapte
 	public static final int TYPE_NORMAL = 1;
 	public static final int TYPE_DROPDOWN = 2;
 
-	final private Context mContext;
+	private final Context mContext;
 
 	public SpinnerItemAdapter(final Context context) {
 		super(context);

@@ -8,6 +8,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.missionhub.ui.NavigationMenu;
 import com.missionhub.ui.NavigationMenu.NavigationMenuInterface;
 import com.missionhub.ui.NavigationMenu.OnNavigationItemSelectedListener;
+import com.missionhub.ui.widget.item.NavigationItem;
 
 /**
  * The main activity for MissionHub. Manages the Action Bar and fragment
@@ -60,5 +61,42 @@ public abstract class MissionHubMainActivity extends MissionHubBaseActivity impl
 	 */
 	public NavigationMenu getNavigationMenu() {
 		return mNavigationMenu;
+	}
+
+	@Override
+	public void onCreateNavigationMenu(final NavigationMenu menu) {
+		menu.add(R.id.nav_my_contacts).setTitle("My Contacts");
+		menu.add(R.id.nav_all_contacts).setTitle("All Contacts");
+		menu.add(R.id.nav_directory).setTitle("Directory");
+		menu.add(R.id.nav_groups).setTitle("Groups");
+		menu.add(R.id.nav_surveys).setTitle("Surveys");
+	}
+
+	@Override
+	public void onCreateSideNavigationMenu(NavigationMenu menu) {}
+
+	private NavigationItem mCurrentNavigation;
+
+	@Override
+	public boolean onNavigationItemSelected(final NavigationItem item) {
+
+		if (item == mCurrentNavigation) return false;
+
+		switch (item.getItemId()) {
+		case R.id.nav_my_contacts:
+			//Intent intent1 = new Intent(this, PeopleMyActivity.class);
+			//startActivity(intent1);
+			//finish();
+			break;
+		case R.id.nav_surveys:
+			Intent intent2 = new Intent(this, SurveysActivity.class);
+			startActivity(intent2);
+			finish();
+			break;
+		}
+
+		mCurrentNavigation = item;
+
+		return true;
 	}
 }

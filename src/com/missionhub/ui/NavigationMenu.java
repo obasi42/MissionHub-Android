@@ -203,7 +203,10 @@ public class NavigationMenu implements OnNavigationListener, OnSpinnerItemChange
 	 * @return
 	 */
 	public NavigationItem findItemByPosition(final int position) {
-		return (NavigationItem) mAdapter.getItem(position);
+		try {
+			return (NavigationItem) mAdapter.getItem(position);
+		} catch (Exception e) {}
+		return null;
 	}
 
 	/**
@@ -222,7 +225,7 @@ public class NavigationMenu implements OnNavigationListener, OnSpinnerItemChange
 	 * @param id
 	 * @return
 	 */
-	private int findPositionById(final int id) {
+	public int findPositionById(final int id) {
 		for (int i = 0; i < mAdapter.getCount(); i++) {
 			final SpinnerItem item = (SpinnerItem) mAdapter.getItem(i);
 			if (item instanceof NavigationItem) {
@@ -245,5 +248,48 @@ public class NavigationMenu implements OnNavigationListener, OnSpinnerItemChange
 	 */
 	public SpinnerItemAdapter getAdapter() {
 		return mAdapter;
+	}
+
+	/**
+	 * Hide a navigation item by its id
+	 * 
+	 * @param itemId
+	 */
+	public void hide(final int itemId) {
+		mAdapter.hide(findItemById(itemId), true);
+	}
+
+	/**
+	 * Show a navigation item by its id
+	 * 
+	 * @param itemId
+	 */
+	public void show(final int itemId) {
+		mAdapter.show(findItemById(itemId), true);
+	}
+
+	/**
+	 * Hide a specified navigation item
+	 * 
+	 * @param item
+	 */
+	public void hide(final NavigationItem item) {
+		hide(item.getItemId());
+	}
+
+	/**
+	 * Show the specified navigation item
+	 * 
+	 * @param item
+	 */
+	public void show(final NavigationItem item) {
+		show(item.getItemId());
+	}
+
+	/**
+	 * Show all hidden navigation items
+	 */
+	public void showAll() {
+		mAdapter.showAll();
 	}
 }

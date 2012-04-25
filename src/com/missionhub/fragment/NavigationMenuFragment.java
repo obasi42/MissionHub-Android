@@ -2,7 +2,6 @@ package com.missionhub.fragment;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -77,11 +76,16 @@ public class NavigationMenuFragment extends MissionHubFragment implements OnItem
 
 	@Override
 	public void onCreateSideNavigationMenu(final NavigationMenu menu) {
-		Log.e("HERE", "HERE");
 		final MissionHubBaseActivity activity = getMHActivity();
 		if (activity != null && activity instanceof NavigationMenuInterface) {
-			Log.e("HERE2", "HERE2");
 			((NavigationMenuInterface) activity).onCreateSideNavigationMenu(menu);
+		}
+	}
+	
+	public void setSelectedNavigationItem(final NavigationItem item) {
+		int position = mMenu.findPositionById(item.getItemId());
+		if (position > -1) {
+			mListView.setItemChecked(position, true);
 		}
 	}
 }

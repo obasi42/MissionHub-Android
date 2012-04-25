@@ -16,7 +16,7 @@ public class SurveyApi {
 	 * @param context
 	 * @return
 	 */
-	public String getUrl(final Context context) {
+	public static String getUrl(final Context context) {
 		final String url = Config.baseUrl + "/surveys";
 		final HttpParams params = ApiHelper.getDefaultParams(context);
 		return url + '?' + params.getParamString();

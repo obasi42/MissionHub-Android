@@ -58,6 +58,11 @@
             android:name=".ContactActivity"
             android:theme="@style/Theme.MissionHub" >
         </activity>
+        <activity
+            android:name=".SurveysActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:theme="@style/Theme.MissionHub" >
+        </activity>
     </application>
 
 </manifest>
