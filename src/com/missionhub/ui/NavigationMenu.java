@@ -1,5 +1,7 @@
 package com.missionhub.ui;
 
+import android.content.Context;
+
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
 import com.missionhub.MissionHubBaseActivity;
@@ -13,11 +15,14 @@ import com.missionhub.ui.widget.item.SpinnerItem.OnSpinnerItemChangedListener;
  */
 public class NavigationMenu implements OnNavigationListener, OnSpinnerItemChangedListener {
 
+	/** is a sidebar menu */
+	private final boolean mIsSidebar;
+
 	/** the context */
-	private final MissionHubBaseActivity mActivity;
+	private final Context mContext;
 
 	/** the navigation menu activity interface */
-	private final NavigationMenuActivity mNavigationMenuInterface;
+	private final NavigationMenuInterface mNavigationMenuInterface;
 
 	/** the navigation selected listener */
 	private final OnNavigationItemSelectedListener mNavigationSelectedListener;
@@ -31,33 +36,18 @@ public class NavigationMenu implements OnNavigationListener, OnSpinnerItemChange
 	/** if the menu is in setup stage */
 	private boolean mInSetup;
 
-	/**
-	 * Creates a MainMenu Object
-	 */
-	public NavigationMenu(final MissionHubBaseActivity activity) {
-		if (!(activity instanceof NavigationMenuActivity)) {
-			throw new RuntimeException("NavigationMenu context must implement the NavigationMenuActivity interface");
-		}
-		if (!(activity instanceof OnNavigationItemSelectedListener)) {
-			throw new RuntimeException("NavigationMenu context must implement the OnNavigationItemSelectedListener interface");
-		}
-
-		mActivity = activity;
-		mNavigationMenuInterface = (NavigationMenuActivity) mActivity;
-		mNavigationSelectedListener = (OnNavigationItemSelectedListener) mActivity;
-		mAdapter = new SpinnerItemAdapter(mActivity);
-
-		setup();
+	public NavigationMenu(final Context context) {
+		this(false, context, (NavigationMenuInterface) context, (OnNavigationItemSelectedListener) context);
 	}
 
-	/**
-	 * Instantiate a new NavigationMenu
-	 * 
-	 * @param activity
-	 * @return
-	 */
-	public static NavigationMenu instantiate(final MissionHubBaseActivity activity) {
-		return new NavigationMenu(activity);
+	public NavigationMenu(final boolean isSidebar, final Context context, final NavigationMenuInterface intface, final OnNavigationItemSelectedListener listener) {
+		mIsSidebar = isSidebar;
+		mContext = context;
+		mNavigationMenuInterface = intface;
+		mNavigationSelectedListener = listener;
+		mAdapter = new SpinnerItemAdapter(mContext);
+
+		setup();
 	}
 
 	/**
@@ -67,18 +57,25 @@ public class NavigationMenu implements OnNavigationListener, OnSpinnerItemChange
 		mInSetup = true;
 
 		mAdapter.setNotifyOnChange(false);
-		mNavigationMenuInterface.onCreateNavigationMenu(this);
-		if (!mAdapter.isEmpty()) {
-			mActivity.getSupportActionBar().setDisplayShowTitleEnabled(false);
-			// if (mActivity.getDisplayMode().isTablet()) {
-			// if (mLogo == null) {
-			// mLogo = mActivity.getResources().getDrawable(R.drawable.logo);
-			// }
-			// mActivity.getSupportActionBar().setLogo(mLogo);
-			// mActivity.getSupportActionBar().setDisplayUseLogoEnabled(true);
-			// }
-			mActivity.getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-			mActivity.getSupportActionBar().setListNavigationCallbacks(mAdapter, this);
+
+		if (!mIsSidebar) {
+			final MissionHubBaseActivity activity = (MissionHubBaseActivity) mContext;
+			mNavigationMenuInterface.onCreateNavigationMenu(this);
+			if (!mAdapter.isEmpty()) {
+				activity.getSupportActionBar().setDisplayShowTitleEnabled(false);
+				// if (mActivity.getDisplayMode().isTablet()) {
+				// if (mLogo == null) {
+				// mLogo =
+				// mActivity.getResources().getDrawable(R.drawable.logo);
+				// }
+				// mActivity.getSupportActionBar().setLogo(mLogo);
+				// mActivity.getSupportActionBar().setDisplayUseLogoEnabled(true);
+				// }
+				activity.getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+				activity.getSupportActionBar().setListNavigationCallbacks(mAdapter, this);
+			}
+		} else {
+			mNavigationMenuInterface.onCreateSideNavigationMenu(this);
 		}
 
 		mInSetup = false;
@@ -104,7 +101,12 @@ public class NavigationMenu implements OnNavigationListener, OnSpinnerItemChange
 	 * @return the navigation item
 	 */
 	public NavigationItem add(final int itemId) {
-		final NavigationItem item = new NavigationItem(itemId, mActivity, this);
+		NavigationItem item;
+		if (!mIsSidebar) {
+			item = new NavigationItem(itemId, mContext, this, false);
+		} else {
+			item = new NavigationItem(itemId, mContext, this, true);
+		}
 		mAdapter.add(item);
 		return item;
 	}
@@ -116,7 +118,12 @@ public class NavigationMenu implements OnNavigationListener, OnSpinnerItemChange
 	 * @return
 	 */
 	public NavigationDividerItem addDivider(final int itemId) {
-		final NavigationDividerItem item = new NavigationDividerItem(itemId, mActivity, this);
+		NavigationDividerItem item;
+		if (!mIsSidebar) {
+			item = new NavigationDividerItem(itemId, mContext, this, false);
+		} else {
+			item = new NavigationDividerItem(itemId, mContext, this, true);
+		}
 		mAdapter.add(item);
 		return item;
 	}
@@ -128,7 +135,7 @@ public class NavigationMenu implements OnNavigationListener, OnSpinnerItemChange
 	 */
 	public void remove(final int itemId) {
 		final int position = findPositionById(itemId);
-		remove((NavigationItem) mAdapter.getItem(position));
+		remove((SpinnerItem) mAdapter.getItem(position));
 	}
 
 	/**
@@ -152,8 +159,10 @@ public class NavigationMenu implements OnNavigationListener, OnSpinnerItemChange
 	/**
 	 * Activities that implement the NavigationMenu must implement this
 	 */
-	public interface NavigationMenuActivity {
+	public interface NavigationMenuInterface {
 		public void onCreateNavigationMenu(NavigationMenu menu);
+
+		public void onCreateSideNavigationMenu(NavigationMenu menu);
 	}
 
 	/**
@@ -179,8 +188,11 @@ public class NavigationMenu implements OnNavigationListener, OnSpinnerItemChange
 	 */
 	public void setSelectedNavigationItem(final int id) {
 		final int position = findPositionById(id);
-		if (position > -1) {
-			mActivity.getSupportActionBar().setSelectedNavigationItem(position);
+		if (!mIsSidebar) {
+			final MissionHubBaseActivity activity = (MissionHubBaseActivity) mContext;
+			if (position > -1) {
+				activity.getSupportActionBar().setSelectedNavigationItem(position);
+			}
 		}
 	}
 
@@ -224,5 +236,14 @@ public class NavigationMenu implements OnNavigationListener, OnSpinnerItemChange
 			}
 		}
 		return -1;
+	}
+
+	/**
+	 * Returns the adapter backing the menu
+	 * 
+	 * @return
+	 */
+	public SpinnerItemAdapter getAdapter() {
+		return mAdapter;
 	}
 }

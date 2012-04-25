@@ -6,14 +6,14 @@ import android.os.Bundle;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.missionhub.ui.NavigationMenu;
-import com.missionhub.ui.NavigationMenu.NavigationMenuActivity;
+import com.missionhub.ui.NavigationMenu.NavigationMenuInterface;
 import com.missionhub.ui.NavigationMenu.OnNavigationItemSelectedListener;
 
 /**
  * The main activity for MissionHub. Manages the Action Bar and fragment
  * loading.
  */
-public abstract class MissionHubMainActivity extends MissionHubBaseActivity implements NavigationMenuActivity, OnNavigationItemSelectedListener {
+public abstract class MissionHubMainActivity extends MissionHubBaseActivity implements NavigationMenuInterface, OnNavigationItemSelectedListener {
 
 	/** logging tag */
 	public static final String TAG = MissionHubMainActivity.class.getSimpleName();
@@ -24,7 +24,7 @@ public abstract class MissionHubMainActivity extends MissionHubBaseActivity impl
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mNavigationMenu = NavigationMenu.instantiate(this);
+		mNavigationMenu = new NavigationMenu(this);
 	}
 
 	/** Global menu items */

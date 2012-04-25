@@ -10,25 +10,30 @@ import com.missionhub.ui.NavigationMenu;
 
 public class NavigationDividerItem extends SpinnerItem implements DisabledItem {
 
+	private final boolean mIsSidebar;
 	private final Context mContext;
 	private final int mId;
 	private CharSequence mTitle;
 	private CharSequence mSubtitle;
 	private final OnSpinnerItemChangedListener mItemChangedListener;
 
-	public NavigationDividerItem(final int id, final Context context, final NavigationMenu navigationMenu) {
+	public NavigationDividerItem(final int id, final Context context, final NavigationMenu navigationMenu, boolean isSidebar) {
 		mId = id;
 		mContext = context;
 		mItemChangedListener = navigationMenu;
+		mIsSidebar = isSidebar;
 	}
 
 	@Override
 	public ItemView newDropdownView(final Context context, final ViewGroup parent) {
-		return createCellFromXml(context, R.layout.widget_navigation_divider, parent);
+		return newView(context, parent);
 	}
 
 	@Override
 	public ItemView newView(final Context context, final ViewGroup parent) {
+		if (mIsSidebar) {
+			return createCellFromXml(context, R.layout.widget_side_navigation_divider, parent);
+		}
 		return createCellFromXml(context, R.layout.widget_navigation_divider, parent);
 	}
 

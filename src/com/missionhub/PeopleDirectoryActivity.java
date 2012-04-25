@@ -26,4 +26,10 @@ public class PeopleDirectoryActivity extends MissionHubMainActivity {
 		return false;
 	}
 
+	@Override
+	public void onCreateSideNavigationMenu(NavigationMenu menu) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

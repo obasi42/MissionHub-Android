@@ -26,4 +26,10 @@ public class PeopleAllActivity extends MissionHubMainActivity {
 		return false;
 	}
 
+	@Override
+	public void onCreateSideNavigationMenu(NavigationMenu menu) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

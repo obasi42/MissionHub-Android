@@ -123,7 +123,7 @@ public class PeopleMyActivity extends MissionHubMainActivity implements OnContac
 
 		final List<Person> people = new ArrayList<Person>();
 
-		for (int i = 0; i < 2000; i++) {
+		for (int i = 0; i < 10; i++) {
 			people.add(getSession().getUser().getPerson());
 		}
 		mContactListFragment.addPeople(people);
@@ -285,11 +285,18 @@ public class PeopleMyActivity extends MissionHubMainActivity implements OnContac
 		menu.add(R.id.nav_groups).setTitle("Groups");
 		menu.add(R.id.nav_surveys).setTitle("Surveys");
 
-		// if (!getDisplayMode().isTablet()) {
-		menu.addDivider(R.id.nav_divider).setTitle("My Contacts");
+		if (!getDisplayMode().isTablet()) {
+			menu.addDivider(R.id.nav_divider).setTitle("My Contacts");
+			menu.add(R.id.nav_my_contacts_all).setTitle("All");
+			menu.add(R.id.nav_my_contacts_completed).setTitle("Completed");
+		}
+	}
+	
+	@Override
+	public void onCreateSideNavigationMenu(final NavigationMenu menu) {
 		menu.add(R.id.nav_my_contacts_all).setTitle("All");
+		menu.add(R.id.nav_my_contacts_inprogress).setTitle("In Progress");
 		menu.add(R.id.nav_my_contacts_completed).setTitle("Completed");
-		// }
 	}
 
 	@Override
