@@ -12,5 +12,7 @@
     <item name="nav_directory" type="id"/>
     <item name="nav_groups" type="id"/>
     <item name="nav_surveys" type="id"/>
+    
+    <item name="spinner_item_type" type="id"/>
 
 </resources>

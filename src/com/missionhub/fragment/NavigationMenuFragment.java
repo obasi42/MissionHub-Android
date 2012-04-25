@@ -34,9 +34,9 @@ public class NavigationMenuFragment extends MissionHubFragment implements OnItem
 
 		return view;
 	}
-	
+
 	@Override
-	public void onItemClick(AdapterView<?> adapter, View listView, int position, long id) {
-		
+	public void onItemClick(final AdapterView<?> adapter, final View listView, final int position, final long id) {
+
 	}
 }

@@ -22,30 +22,30 @@ public class NavigationItem extends SpinnerItem {
 	private Drawable mIcon;
 	private boolean mEnabled = true;
 
-	public NavigationItem(final int itemId, final Context context, final NavigationMenu navigationMenu, final int layout) {
+	public NavigationItem(final int itemId, final Context context, final NavigationMenu navigationMenu) {
 		mItemId = itemId;
 		mContext = context;
 		mItemChangedListener = navigationMenu;
 		mNavigationListener = navigationMenu;
 	}
 
-	public NavigationItem(final MissionHubBaseActivity mActivity, final NavigationMenu navigationMenu, final int layout) {
-		this(-1, mActivity, navigationMenu, layout);
+	public NavigationItem(final MissionHubBaseActivity mActivity, final NavigationMenu navigationMenu) {
+		this(-1, mActivity, navigationMenu);
 		setEnabled(false);
 	}
 
 	@Override
 	public ItemView newView(final Context context, final ViewGroup parent) {
-		return createCellFromXml(context, R.layout.widget_navigation_list_item, parent);
+		return createCellFromXml(context, R.layout.widget_navigation_item, parent);
 	}
 
 	@Override
 	public ItemView newDropdownView(final Context context, final ViewGroup parent) {
-		return createCellFromXml(context, R.layout.widget_navigation_list_item, parent);
+		return createCellFromXml(context, R.layout.widget_navigation_dropdown_item, parent);
 	}
 
 	public static NavigationItem instantiate(final MenuItem menuItem, final Context context, final NavigationMenu navigationMenu, final int layout) {
-		final NavigationItem item = new NavigationItem(menuItem.getItemId(), context, navigationMenu, layout);
+		final NavigationItem item = new NavigationItem(menuItem.getItemId(), context, navigationMenu);
 		return item.setTitle(menuItem.getTitle()).setIcon(menuItem.getIcon()).setEnabled(menuItem.isEnabled());
 	}
 

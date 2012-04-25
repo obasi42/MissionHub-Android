@@ -1,74 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    
-    <style name="Widget.MissionHub">
-    </style>
 
-    <style name="Widget.MissionHub.ActionBar" parent="Widget.Sherlock.Light.ActionBar">
-    </style>
-    
-    <style name="Widget.MissionHub.ListView">
-    </style>
+    <style name="Widget.MissionHub"></style>
+
+    <style name="Widget.MissionHub.ActionBar" parent="Widget.Sherlock.Light.ActionBar"></style>
+
+    <style name="Widget.MissionHub.Spinner.DropDown.ActionBar" parent="Widget.Sherlock.Light.Spinner.DropDown.ActionBar"></style>
+
+    <style name="Widget.MissionHub.ListView"></style>
 
     <style name="Widget.MissionHub.ListView.Contact">
         <item name="android:background">@color/transparent</item>
         <item name="android:cacheColorHint">@color/transparent</item>
     </style>
 
-    <style name="Widget.MissionHub.ListView.Item">
+    <style name="Widget.MissionHub.ListView.Item"></style>
+
+    <style name="Widget.MissionHub.ListView.DropDownItem"></style>
+
+    <style name="Widget.MissionHub.ListView.Item.Contact">
         <item name="android:background">@drawable/list_item_background</item>
         <item name="android:padding">@dimen/listview_item_padding</item>
         <item name="android:minHeight">@dimen/listview_item_min_height</item>
     </style>
-
-    <style name="Widget.MissionHub.ListView.Item.Contact"></style>
 
     <style name="Widget.MissionHub.ListView.Item.Category">
         <item name="android:padding">@null</item>
         <item name="android:paddingLeft">@dimen/category_listview_item_padding_sides</item>
         <item name="android:gravity">center_vertical</item>
     </style>
-    
+
     <style name="Widget.MissionHub.ListView.Item.Category.TextAppearance">
         <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
-         <item name="android:textColor">@color/white</item>
+        <item name="android:textColor">@color/white</item>
     </style>
-    
-    
+
     <style name="Widget.MissionHub.ListView.Item.Navigation">
-        <item name="android:padding">0dp</item>
-        <item name="android:gravity">center_vertical</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginLeft">0.0dip</item>
+        <item name="android:paddingLeft">5dp</item>
+        <item name="android:paddingRight">5dp</item>
     </style>
-    
+
     <style name="Widget.MissionHub.ListView.Item.Navigation.Logo" parent="Widget.MissionHub">
-        <item name="android:layout_width">16dp</item>
-        <item name="android:layout_height">16dp</item>
+        <item name="android:layout_width">32dp</item>
+        <item name="android:layout_height">32dp</item>
+        <item name="android:layout_gravity">center_vertical</item>
+        <item name="android:layout_centerVertical">true</item>
     </style>
-    
-    <style name="Widget.MissionHub.ListView.Item.Navigation.Title" parent="Widget.MissionHub">
-        
+
+    <style name="TextAppearance.MissionHub.Widget.ActionBar.Title" parent="TextAppearance.Sherlock.Widget.ActionBar.Title">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textColor">@color/black</item>
     </style>
-    
-     <style name="Widget.MissionHub.ListView.Item.Navigation.Subtitle" parent="Widget.MissionHub">
-        
+
+    <style name="TextAppearance.MissionHub.Widget.ActionBar.Subtitle" parent="TextAppearance.Sherlock.Widget.ActionBar.Subtitle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginRight">4.0dip</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textColor">@color/dark_gray</item>
     </style>
-    
-    <style name="TextAppearance.MissionHub" parent="@android:style/TextAppearance">
-        
-        
-    </style>
-    
+
     <style name="Widget.MissionHub.VPI"></style>
 
-    <style name="Widget.MissionHub.VPI.TitlePageIndicator" parent="Widget.TitlePageIndicator">
-    </style>
+    <style name="Widget.MissionHub.VPI.TitlePageIndicator" parent="Widget.TitlePageIndicator"></style>
 
-    <style name="Widget.MissionHub.VPI.CirclePageIndicator" parent="Widget.CirclePageIndicator">
-    </style>
-    
+    <style name="Widget.MissionHub.VPI.CirclePageIndicator" parent="Widget.CirclePageIndicator"></style>
+
     <style name="Widget.MissionHub.VPI.TabPageIndicator" parent="Widget.TabPageIndicator">
         <!-- <item name="android:background">@drawable/tab_indicator</item> -->
     </style>
+
     <style name="Widget.MissionHub.MissionHub.VPI.TabPageIndicator.Text" parent="Widget.TabPageIndicator.Text">
         <item name="android:textColor">@color/black</item>
     </style>

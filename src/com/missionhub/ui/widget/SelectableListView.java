@@ -238,7 +238,9 @@ public class SelectableListView extends ListView {
 	 * @param activated
 	 */
 	public void setItemActivated(int position) {
-		if (getAdapter() == null) return;
+		if (getAdapter() == null) {
+			return;
+		}
 
 		if (position < 0 || position >= getAdapter().getCount()) {
 			position = -1;
@@ -294,12 +296,13 @@ public class SelectableListView extends ListView {
 	public void scrollToItemActivated() {
 		setSelection(mActivatedItem);
 	}
-	
+
 	/**
 	 * Sets the selection mode
+	 * 
 	 * @param mode
 	 */
-	public void setMode(int mode) {
+	public void setMode(final int mode) {
 		mMode = mode;
 	}
 }

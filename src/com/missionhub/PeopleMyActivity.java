@@ -284,12 +284,12 @@ public class PeopleMyActivity extends MissionHubMainActivity implements OnContac
 		menu.add(R.id.nav_directory).setTitle("Directory");
 		menu.add(R.id.nav_groups).setTitle("Groups");
 		menu.add(R.id.nav_surveys).setTitle("Surveys");
-		
-		//if (!getDisplayMode().isTablet()) {
-			menu.addDivider(R.id.nav_divider).setTitle("My Contacts");
-			menu.add(R.id.nav_my_contacts_all).setTitle("All");
-			menu.add(R.id.nav_my_contacts_completed).setTitle("Completed");
-		//}
+
+		// if (!getDisplayMode().isTablet()) {
+		menu.addDivider(R.id.nav_divider).setTitle("My Contacts");
+		menu.add(R.id.nav_my_contacts_all).setTitle("All");
+		menu.add(R.id.nav_my_contacts_completed).setTitle("Completed");
+		// }
 	}
 
 	@Override

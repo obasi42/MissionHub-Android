@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.missionhub.ui.widget.NavigationItemView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="fill_parent"
+    android:layout_marginLeft="0.0dip"
+    android:paddingLeft="0.0dip" >
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:layout_alignParentLeft="true"
+        android:gravity="center_vertical"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/title"
+            style="@style/TextAppearance.MissionHub.Widget.ActionBar.Title" />
+
+        <TextView
+            android:id="@+id/subtitle"
+            style="@style/TextAppearance.MissionHub.Widget.ActionBar.Subtitle" />
+    </LinearLayout>
+
+</com.missionhub.ui.widget.NavigationItemView><!--
+<?xml version="1.0" encoding="utf-8"?>
+<com.missionhub.ui.widget.NavigationItemView android:gravity="center_vertical" android:layout_width="fill_parent" android:layout_height="48dp" style="?android:attr/spinnerDropDownItemStyle"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+            <ImageView
+            android:id="@+id/icon"
+            style="@style/Widget.MissionHub.ListView.Item.Navigation.Logo"
+            android:src="@drawable/ic_male_user_info" />
+    
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1.0" >
+
+        <TextView
+            android:id="@+id/title"
+            style="@style/TextAppearance.MissionHub.Widget.ActionBar.Title"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:text="Title"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/subtitle"
+            style="@style/TextAppearance.MissionHub.Widget.ActionBar.Subtitle"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/title"
+            android:ellipsize="end"
+            android:text="Subtitle" />
+
+    </RelativeLayout>
+</com.missionhub.ui.widget.NavigationItemView>
+-->

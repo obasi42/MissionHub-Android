@@ -12,6 +12,7 @@ public class NavigationDividerItem extends SpinnerItem {
 	private final Context mContext;
 	private final int mId;
 	private CharSequence mTitle;
+	private CharSequence mSubtitle;
 	private final OnSpinnerItemChangedListener mItemChangedListener;
 
 	public NavigationDividerItem(final int id, final Context context, final NavigationMenu navigationMenu) {
@@ -22,12 +23,12 @@ public class NavigationDividerItem extends SpinnerItem {
 
 	@Override
 	public ItemView newDropdownView(final Context context, final ViewGroup parent) {
-		return createCellFromXml(context, R.layout.widget_navigation_list_divider, parent);
+		return createCellFromXml(context, R.layout.widget_navigation_divider, parent);
 	}
 
 	@Override
 	public ItemView newView(final Context context, final ViewGroup parent) {
-		return createCellFromXml(context, R.layout.widget_navigation_list_divider, parent);
+		return createCellFromXml(context, R.layout.widget_navigation_divider, parent);
 	}
 
 	private void notifyChanged() {
@@ -53,5 +54,20 @@ public class NavigationDividerItem extends SpinnerItem {
 
 	public CharSequence getTitle() {
 		return mTitle;
+	}
+
+	public NavigationDividerItem setSubtitle(final CharSequence subtitle) {
+		mSubtitle = subtitle;
+		notifyChanged();
+		return this;
+	}
+
+	public NavigationDividerItem setSubtitle(final int subtitle) {
+		setSubtitle(mContext.getString(subtitle));
+		return this;
+	}
+
+	public CharSequence getSubtitle() {
+		return mSubtitle;
 	}
 }

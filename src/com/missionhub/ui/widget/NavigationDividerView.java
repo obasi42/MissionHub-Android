@@ -5,35 +5,32 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.missionhub.R;
-import com.missionhub.ui.widget.item.NavigationItem;
+import com.missionhub.ui.widget.item.NavigationDividerItem;
 
-public class NavigationItemView extends RelativeLayout implements ListItemView {
+public class NavigationDividerView extends LinearLayout implements ListItemView {
 
-	private ImageView mIcon;
 	private TextView mTitle;
 	private TextView mSubtitle;
 
-	public NavigationItemView(final Context context) {
+	public NavigationDividerView(final Context context) {
 		this(context, null);
 	}
 
-	public NavigationItemView(final Context context, final AttributeSet attrs) {
+	public NavigationDividerView(final Context context, final AttributeSet attrs) {
 		super(context, attrs);
 	}
 
 	@Override
 	public Class<? extends Item> getItemClass() {
-		return NavigationItem.class;
+		return NavigationDividerItem.class;
 	}
 
 	@Override
 	public void prepareItemView() {
-		// mIcon = (ImageView) findViewById(R.id.icon);
 		mTitle = (TextView) findViewById(R.id.title);
 		mSubtitle = (TextView) findViewById(R.id.subtitle);
 	}
@@ -45,14 +42,7 @@ public class NavigationItemView extends RelativeLayout implements ListItemView {
 
 	@Override
 	public void setObject(final Item item, final ViewGroup parent, final int position) {
-		final NavigationItem navItem = (NavigationItem) item;
-
-		if (mIcon != null && navItem.getIcon() != null) {
-			mIcon.setImageDrawable(navItem.getIcon());
-			mIcon.setVisibility(View.VISIBLE);
-		} else if (mIcon != null) {
-			mIcon.setVisibility(View.GONE);
-		}
+		final NavigationDividerItem navItem = (NavigationDividerItem) item;
 
 		if (mTitle != null && navItem.getTitle() != null) {
 			mTitle.setText(navItem.getTitle());
@@ -66,14 +56,6 @@ public class NavigationItemView extends RelativeLayout implements ListItemView {
 			mSubtitle.setVisibility(View.VISIBLE);
 		} else if (mSubtitle != null) {
 			mSubtitle.setVisibility(View.GONE);
-		}
-
-		if (navItem.isEnabled()) {
-			this.setClickable(false);
-			this.setEnabled(true);
-		} else {
-			this.setClickable(true);
-			this.setEnabled(false);
 		}
 	}
 }

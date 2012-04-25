@@ -6,6 +6,7 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
 import com.missionhub.MissionHubBaseActivity;
 import com.missionhub.R;
+import com.missionhub.ui.widget.item.NavigationDividerItem;
 import com.missionhub.ui.widget.item.NavigationItem;
 import com.missionhub.ui.widget.item.SpinnerItem;
 import com.missionhub.ui.widget.item.SpinnerItem.OnSpinnerItemChangedListener;
@@ -25,7 +26,7 @@ public class NavigationMenu implements OnNavigationListener, OnSpinnerItemChange
 	private final OnNavigationItemSelectedListener mNavigationSelectedListener;
 
 	/** the navigation list adapter */
-	private final ListItemAdapter mAdapter;
+	private final SpinnerItemAdapter mAdapter;
 
 	/** logo cache */
 	private static Drawable mLogo;
@@ -47,7 +48,7 @@ public class NavigationMenu implements OnNavigationListener, OnSpinnerItemChange
 		mActivity = activity;
 		mNavigationMenuInterface = (NavigationMenuActivity) mActivity;
 		mNavigationSelectedListener = (OnNavigationItemSelectedListener) mActivity;
-		mAdapter = new ListItemAdapter(mActivity);
+		mAdapter = new SpinnerItemAdapter(mActivity);
 
 		setup();
 	}
@@ -106,7 +107,9 @@ public class NavigationMenu implements OnNavigationListener, OnSpinnerItemChange
 	 * @return the navigation item
 	 */
 	public NavigationItem add(final int itemId) {
-		return add(itemId, R.layout.widget_navigation_list_item);
+		final NavigationItem item = new NavigationItem(itemId, mActivity, this);
+		mAdapter.add(item);
+		return item;
 	}
 
 	/**
@@ -115,18 +118,8 @@ public class NavigationMenu implements OnNavigationListener, OnSpinnerItemChange
 	 * @param itemId
 	 * @return
 	 */
-	public NavigationItem addDivider(final int itemId) {
-		return add(itemId, R.layout.widget_navigation_list_divider);
-	}
-
-	/**
-	 * Adds a navigation item to the list
-	 * 
-	 * @param itemId
-	 * @return the navigation item
-	 */
-	public NavigationItem add(final int itemId, final int layout) {
-		final NavigationItem item = new NavigationItem(itemId, mActivity, this, layout);
+	public NavigationDividerItem addDivider(final int itemId) {
+		final NavigationDividerItem item = new NavigationDividerItem(itemId, mActivity, this);
 		mAdapter.add(item);
 		return item;
 	}
@@ -146,7 +139,7 @@ public class NavigationMenu implements OnNavigationListener, OnSpinnerItemChange
 	 * 
 	 * @param item
 	 */
-	public void remove(final NavigationItem item) {
+	public void remove(final SpinnerItem item) {
 		if (item != null) {
 			mAdapter.remove(item);
 		}
@@ -222,9 +215,15 @@ public class NavigationMenu implements OnNavigationListener, OnSpinnerItemChange
 	 */
 	private int findPositionById(final int id) {
 		for (int i = 0; i < mAdapter.getCount(); i++) {
-			final NavigationItem item = (NavigationItem) mAdapter.getItem(i);
-			if (item.getItemId() == id) {
-				return i;
+			final SpinnerItem item = (SpinnerItem) mAdapter.getItem(i);
+			if (item instanceof NavigationItem) {
+				if (((NavigationItem) item).getItemId() == id) {
+					return i;
+				}
+			} else if (item instanceof NavigationDividerItem) {
+				if (((NavigationDividerItem) item).getId() == id) {
+					return i;
+				}
 			}
 		}
 		return -1;
