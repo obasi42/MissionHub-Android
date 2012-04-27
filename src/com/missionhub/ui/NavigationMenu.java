@@ -4,7 +4,8 @@ import android.content.Context;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
-import com.missionhub.MissionHubBaseActivity;
+import com.missionhub.MissionHubMainActivity;
+import com.missionhub.fragment.NavigationMenuFragment;
 import com.missionhub.ui.widget.item.NavigationDividerItem;
 import com.missionhub.ui.widget.item.NavigationItem;
 import com.missionhub.ui.widget.item.SpinnerItem;
@@ -15,14 +16,14 @@ import com.missionhub.ui.widget.item.SpinnerItem.OnSpinnerItemChangedListener;
  */
 public class NavigationMenu implements OnNavigationListener, OnSpinnerItemChangedListener {
 
-	/** is a sidebar menu */
-	private final boolean mIsSidebar;
+	/** the activity */
+	private final MissionHubMainActivity mActivity;
 
-	/** the context */
-	private final Context mContext;
-
-	/** the navigation menu activity interface */
+	/** the navigation menu interface */
 	private final NavigationMenuInterface mNavigationMenuInterface;
+
+	/** the navigation menu fragment interface */
+	private final NavigationMenuFragmentInterface mNavigationMenuFragmentInterface;
 
 	/** the navigation selected listener */
 	private final OnNavigationItemSelectedListener mNavigationSelectedListener;
@@ -30,22 +31,39 @@ public class NavigationMenu implements OnNavigationListener, OnSpinnerItemChange
 	/** the navigation list adapter */
 	private final SpinnerItemAdapter mAdapter;
 
-	/** logo cache */
-	// private static Drawable mLogo;
-
 	/** if the menu is in setup stage */
 	private boolean mInSetup;
 
-	public NavigationMenu(final Context context) {
-		this(false, context, (NavigationMenuInterface) context, (OnNavigationItemSelectedListener) context);
+	/** the currently selected item */
+	private NavigationItem mSelectedItem;
+
+	/**
+	 * Creates a new Navigation Menu
+	 * 
+	 * @param activity
+	 */
+	public NavigationMenu(final MissionHubMainActivity activity) {
+		this(activity, activity, activity, null);
 	}
 
-	public NavigationMenu(final boolean isSidebar, final Context context, final NavigationMenuInterface intface, final OnNavigationItemSelectedListener listener) {
-		mIsSidebar = isSidebar;
-		mContext = context;
-		mNavigationMenuInterface = intface;
-		mNavigationSelectedListener = listener;
-		mAdapter = new SpinnerItemAdapter(mContext);
+	public NavigationMenu(final MissionHubMainActivity activity, final NavigationMenuFragment fragment) {
+		this(activity, null, null, fragment);
+	}
+
+	/**
+	 * Creates a new NavigationMenu
+	 * 
+	 * @param activity
+	 */
+	public NavigationMenu(final MissionHubMainActivity activity, final NavigationMenuInterface navigationMenuInterface,
+			final OnNavigationItemSelectedListener navigationItemSelectedListener, final NavigationMenuFragmentInterface navigationMenuFragmentInterface) {
+		mActivity = activity;
+
+		mNavigationMenuInterface = navigationMenuInterface;
+		mNavigationMenuFragmentInterface = navigationMenuFragmentInterface;
+		mNavigationSelectedListener = navigationItemSelectedListener;
+
+		mAdapter = new SpinnerItemAdapter(mActivity);
 
 		setup();
 	}
@@ -58,24 +76,20 @@ public class NavigationMenu implements OnNavigationListener, OnSpinnerItemChange
 
 		mAdapter.setNotifyOnChange(false);
 
-		if (!mIsSidebar) {
-			final MissionHubBaseActivity activity = (MissionHubBaseActivity) mContext;
+		// main menu
+		if (mNavigationMenuInterface != null) {
 			mNavigationMenuInterface.onCreateNavigationMenu(this);
 			if (!mAdapter.isEmpty()) {
-				activity.getSupportActionBar().setDisplayShowTitleEnabled(false);
-				// if (mActivity.getDisplayMode().isTablet()) {
-				// if (mLogo == null) {
-				// mLogo =
-				// mActivity.getResources().getDrawable(R.drawable.logo);
-				// }
-				// mActivity.getSupportActionBar().setLogo(mLogo);
-				// mActivity.getSupportActionBar().setDisplayUseLogoEnabled(true);
-				// }
-				activity.getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-				activity.getSupportActionBar().setListNavigationCallbacks(mAdapter, this);
+				mActivity.getSupportActionBar().setDisplayShowTitleEnabled(false);
+				mActivity.getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+				mActivity.getSupportActionBar().setListNavigationCallbacks(mAdapter, this);
 			}
-		} else {
-			mNavigationMenuInterface.onCreateSideNavigationMenu(this);
+		}
+
+		// fragment menu
+		if (mNavigationMenuFragmentInterface != null) {
+			mNavigationMenuFragmentInterface.onCreateNavigationMenu(this);
+			mNavigationMenuFragmentInterface.setAdapter(mAdapter);
 		}
 
 		mInSetup = false;
@@ -87,11 +101,43 @@ public class NavigationMenu implements OnNavigationListener, OnSpinnerItemChange
 	 */
 	@Override
 	public synchronized boolean onNavigationItemSelected(final int itemPosition, final long itemId) {
-		final NavigationItem item = (NavigationItem) mAdapter.getItem(itemPosition);
-		if (item != null) {
-			return mNavigationSelectedListener.onNavigationItemSelected(item);
+		if (mNavigationSelectedListener != null) {
+			final NavigationItem item = (NavigationItem) mAdapter.getItem(itemPosition);
+			if (item != null && item != mSelectedItem) {
+				mSelectedItem = item;
+				mNavigationSelectedListener.onNavigationItemSelected(item);
+				return true;
+			}
 		}
 		return false;
+	}
+
+	/**
+	 * Returns the selected item
+	 * 
+	 * @return
+	 */
+	public NavigationItem getSelectedItem() {
+		return mSelectedItem;
+	}
+
+	/**
+	 * Sets the selected navigation item
+	 * 
+	 * @param item
+	 */
+	public void setSelectedItem(final NavigationItem item) {
+		if (item != null && mSelectedItem != item) {
+			if (isFragmentMenu()) {
+				mSelectedItem = item;
+				mNavigationMenuFragmentInterface.setSelectedNavigationItem(item);
+			} else {
+				final int position = findPositionByItemId(mAdapter, item.getId());
+				if (position > -1) {
+					mActivity.getSupportActionBar().setSelectedNavigationItem(position);
+				}
+			}
+		}
 	}
 
 	/**
@@ -101,12 +147,7 @@ public class NavigationMenu implements OnNavigationListener, OnSpinnerItemChange
 	 * @return the navigation item
 	 */
 	public NavigationItem add(final int itemId) {
-		NavigationItem item;
-		if (!mIsSidebar) {
-			item = new NavigationItem(itemId, mContext, this, false);
-		} else {
-			item = new NavigationItem(itemId, mContext, this, true);
-		}
+		final NavigationItem item = new NavigationItem(itemId, this);
 		mAdapter.add(item);
 		return item;
 	}
@@ -118,12 +159,7 @@ public class NavigationMenu implements OnNavigationListener, OnSpinnerItemChange
 	 * @return
 	 */
 	public NavigationDividerItem addDivider(final int itemId) {
-		NavigationDividerItem item;
-		if (!mIsSidebar) {
-			item = new NavigationDividerItem(itemId, mContext, this, false);
-		} else {
-			item = new NavigationDividerItem(itemId, mContext, this, true);
-		}
+		final NavigationDividerItem item = new NavigationDividerItem(itemId, this);
 		mAdapter.add(item);
 		return item;
 	}
@@ -134,7 +170,7 @@ public class NavigationMenu implements OnNavigationListener, OnSpinnerItemChange
 	 * @param itemId
 	 */
 	public void remove(final int itemId) {
-		final int position = findPositionById(itemId);
+		final int position = findPositionByItemId(mAdapter, itemId);
 		remove((SpinnerItem) mAdapter.getItem(position));
 	}
 
@@ -161,8 +197,17 @@ public class NavigationMenu implements OnNavigationListener, OnSpinnerItemChange
 	 */
 	public interface NavigationMenuInterface {
 		public void onCreateNavigationMenu(NavigationMenu menu);
+	}
 
-		public void onCreateSideNavigationMenu(NavigationMenu menu);
+	/**
+	 * Activities that implement the NavigationMenu must implement this
+	 */
+	public interface NavigationMenuFragmentInterface {
+		public void onCreateNavigationMenu(NavigationMenu navigationMenu);
+
+		public void setAdapter(SpinnerItemAdapter adapter);
+
+		public void setSelectedNavigationItem(NavigationItem item);
 	}
 
 	/**
@@ -173,63 +218,113 @@ public class NavigationMenu implements OnNavigationListener, OnSpinnerItemChange
 	}
 
 	/**
-	 * Sets the selected menu item
+	 * Hide a navigation item by its id
+	 * 
+	 * @param itemId
+	 */
+	public void hide(final int itemId) {
+		mAdapter.hide(findItemById(mAdapter, itemId), true);
+	}
+
+	/**
+	 * Show a navigation item by its id
+	 * 
+	 * @param itemId
+	 */
+	public void show(final int itemId) {
+		mAdapter.show(findItemById(mAdapter, itemId), true);
+	}
+
+	/**
+	 * Hide a specified navigation item
 	 * 
 	 * @param item
 	 */
-	public void setSelectedNavigationItem(final NavigationItem item) {
-		setSelectedNavigationItem(item.getItemId());
+	public void hide(final NavigationItem item) {
+		hide(item.getId());
 	}
 
 	/**
-	 * Sets the selected menu item by id
+	 * Show the specified navigation item
 	 * 
-	 * @param id
+	 * @param item
 	 */
-	public void setSelectedNavigationItem(final int id) {
-		final int position = findPositionById(id);
-		if (!mIsSidebar) {
-			final MissionHubBaseActivity activity = (MissionHubBaseActivity) mContext;
-			if (position > -1) {
-				activity.getSupportActionBar().setSelectedNavigationItem(position);
-			}
-		}
+	public void show(final NavigationItem item) {
+		show(item.getId());
 	}
 
 	/**
-	 * Returns the NavigationItem from the list by its position
+	 * Show all hidden navigation items
+	 */
+	public void showAll() {
+		mAdapter.showAll();
+	}
+
+	/**
+	 * @return the context of the navigation menu
+	 */
+	public Context getContext() {
+		return mActivity;
+	}
+
+	/**
+	 * @return true if the navigation menu is part of a fragment menu
+	 */
+	public boolean isFragmentMenu() {
+		if (mNavigationMenuFragmentInterface != null) {
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Returns the navigation item from the id
+	 * @param id
+	 * @return
+	 */
+	public NavigationItem findNavigationItemById(int id) {
+		return (NavigationItem) findItemById(mAdapter, id);
+	}
+	
+	/**
+	 * Helper method for finding the navigation item in the adapter by the
+	 * position
 	 * 
+	 * @param adapter
 	 * @param position
 	 * @return
 	 */
-	public NavigationItem findItemByPosition(final int position) {
+	public static SpinnerItem findItemByPosition(final SpinnerItemAdapter adapter, final int position) {
 		try {
-			return (NavigationItem) mAdapter.getItem(position);
-		} catch (Exception e) {}
+			return (SpinnerItem) adapter.getItem(position);
+		} catch (final Exception e) {}
 		return null;
 	}
 
 	/**
-	 * Returns the NavigationItem from the list by its id
+	 * Helper method for finding the navigation item in the adapter by the item
+	 * id
 	 * 
+	 * @param adapter
 	 * @param id
 	 * @return
 	 */
-	public NavigationItem findItemById(final int id) {
-		return findItemByPosition(findPositionById(id));
+	public static SpinnerItem findItemById(final SpinnerItemAdapter adapter, final int id) {
+		return findItemByPosition(adapter, findPositionByItemId(adapter, id));
 	}
 
 	/**
-	 * Finds the position of the navigation item in the adapter
+	 * Helper method for finding the position of a navigation item id
 	 * 
+	 * @param adapter
 	 * @param id
 	 * @return
 	 */
-	public int findPositionById(final int id) {
-		for (int i = 0; i < mAdapter.getCount(); i++) {
-			final SpinnerItem item = (SpinnerItem) mAdapter.getItem(i);
+	public static int findPositionByItemId(final SpinnerItemAdapter adapter, final int id) {
+		for (int i = 0; i < adapter.getCount(); i++) {
+			final SpinnerItem item = (SpinnerItem) adapter.getItem(i);
 			if (item instanceof NavigationItem) {
-				if (((NavigationItem) item).getItemId() == id) {
+				if (((NavigationItem) item).getId() == id) {
 					return i;
 				}
 			} else if (item instanceof NavigationDividerItem) {
@@ -242,54 +337,24 @@ public class NavigationMenu implements OnNavigationListener, OnSpinnerItemChange
 	}
 
 	/**
-	 * Returns the adapter backing the menu
+	 * Helper method for finding the position of a navigation item
 	 * 
+	 * @param adapter
+	 * @param item
 	 * @return
 	 */
-	public SpinnerItemAdapter getAdapter() {
-		return mAdapter;
+	public static int findPositionByItem(final SpinnerItemAdapter adapter, final NavigationItem item) {
+		return findPositionByItemId(adapter, item.getId());
 	}
 
 	/**
-	 * Hide a navigation item by its id
+	 * Helper method for finding the position of a navigation item
 	 * 
-	 * @param itemId
-	 */
-	public void hide(final int itemId) {
-		mAdapter.hide(findItemById(itemId), true);
-	}
-
-	/**
-	 * Show a navigation item by its id
-	 * 
-	 * @param itemId
-	 */
-	public void show(final int itemId) {
-		mAdapter.show(findItemById(itemId), true);
-	}
-
-	/**
-	 * Hide a specified navigation item
-	 * 
+	 * @param adapter
 	 * @param item
+	 * @return
 	 */
-	public void hide(final NavigationItem item) {
-		hide(item.getItemId());
-	}
-
-	/**
-	 * Show the specified navigation item
-	 * 
-	 * @param item
-	 */
-	public void show(final NavigationItem item) {
-		show(item.getItemId());
-	}
-
-	/**
-	 * Show all hidden navigation items
-	 */
-	public void showAll() {
-		mAdapter.showAll();
+	public static int findPositionByItem(final SpinnerItemAdapter adapter, final NavigationDividerItem dividerItem) {
+		return findPositionByItemId(adapter, dividerItem.getId());
 	}
 }

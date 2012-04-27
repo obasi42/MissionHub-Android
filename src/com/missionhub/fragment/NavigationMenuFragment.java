@@ -11,27 +11,50 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
-import com.missionhub.MissionHubBaseActivity;
+import com.missionhub.MissionHubMainActivity;
 import com.missionhub.R;
 import com.missionhub.ui.NavigationMenu;
-import com.missionhub.ui.NavigationMenu.NavigationMenuInterface;
+import com.missionhub.ui.NavigationMenu.NavigationMenuFragmentInterface;
 import com.missionhub.ui.NavigationMenu.OnNavigationItemSelectedListener;
+import com.missionhub.ui.SpinnerItemAdapter;
 import com.missionhub.ui.widget.item.NavigationItem;
 
-public class NavigationMenuFragment extends MissionHubFragment implements OnItemClickListener, NavigationMenuInterface, OnNavigationItemSelectedListener {
+public class NavigationMenuFragment extends MissionHubFragment implements OnItemClickListener, NavigationMenuFragmentInterface {
 
+	/** the activity */
+	private MissionHubMainActivity mActivity;
+
+	/** the navigation menu backing the fragment */
+	private NavigationMenu mNavigationMenu;
+
+	/** the list view */
 	private ListView mListView;
 
-	private NavigationMenu mMenu;
+	/** the list view adapter */
+	private SpinnerItemAdapter mAdapter;
 
-	private NavigationItem mCurrentItem;
+	/** the on navigation item selected listener **/
+	private OnNavigationItemSelectedListener mOnNavigationItemSelectedListener;
 
+	/**
+	 * Called when the fragment is attached to the activity. Sets up the
+	 * navigation menu
+	 */
 	@Override
 	public void onAttach(final Activity activity) {
 		super.onAttach(activity);
-		mMenu = new NavigationMenu(true, activity, this, this);
+		if (!(activity instanceof MissionHubMainActivity)) {
+			throw new RuntimeException("NavigationMenuFragment must be attached to a MissionHubMainActivity");
+		}
+		mActivity = (MissionHubMainActivity) activity;
+		mOnNavigationItemSelectedListener = mActivity;
+		mNavigationMenu = new NavigationMenu(mActivity, this);
 	}
 
+	/**
+	 * Called when the fragment presents its view Sets up the navigation list
+	 * view
+	 */
 	@SuppressWarnings("deprecation")
 	@Override
 	public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
@@ -42,50 +65,66 @@ public class NavigationMenuFragment extends MissionHubFragment implements OnItem
 		mListView.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
 		mListView.setOnItemClickListener(this);
 
-		mListView.setAdapter(mMenu.getAdapter());
+		mListView.setAdapter(mAdapter);
 
 		return view;
 	}
 
+	/**
+	 * Called when an item in the listview is clicked
+	 */
 	@Override
 	public void onItemClick(final AdapterView<?> adapter, final View listView, final int position, final long id) {
-		if (mMenu != null && mMenu.getAdapter().getItem(position) != mCurrentItem) {
-			final NavigationItem item = (NavigationItem) mMenu.getAdapter().getItem(position);
-			if (item != mCurrentItem) {
-				mMenu.onNavigationItemSelected(position, id);
-			}
-			mCurrentItem = item;
-		}
+		final NavigationItem item = (NavigationItem) adapter.getItemAtPosition(position);
+		setSelectedNavigationItem(item);
 	}
 
 	@Override
-	public boolean onNavigationItemSelected(final NavigationItem item) {
-		final MissionHubBaseActivity activity = getMHActivity();
-		if (activity != null && activity instanceof OnNavigationItemSelectedListener) {
-			return ((OnNavigationItemSelectedListener) activity).onNavigationItemSelected(item);
-		}
-		return false;
+	public void setAdapter(final SpinnerItemAdapter adapter) {
+		mAdapter = adapter;
 	}
 
+	/**
+	 * Sets the selected navigation item
+	 */
 	@Override
-	public void onCreateNavigationMenu(final NavigationMenu menu) {}
-
-	public NavigationMenu getNavigationMenu() {
-		return mMenu;
-	}
-
-	@Override
-	public void onCreateSideNavigationMenu(final NavigationMenu menu) {
-		final MissionHubBaseActivity activity = getMHActivity();
-		if (activity != null && activity instanceof NavigationMenuInterface) {
-			((NavigationMenuInterface) activity).onCreateSideNavigationMenu(menu);
-		}
-	}
-	
 	public void setSelectedNavigationItem(final NavigationItem item) {
-		int position = mMenu.findPositionById(item.getItemId());
-		if (position > -1) {
-			mListView.setItemChecked(position, true);
+		if (item != null && item != mNavigationMenu.getSelectedItem()) {
+			mNavigationMenu.setSelectedItem(item);
+			final int position = NavigationMenu.findPositionByItem(mAdapter, item);
+			if (mListView != null) {
+				mListView.setItemChecked(position, true);
+			}
+			if (mOnNavigationItemSelectedListener != null) {
+				mOnNavigationItemSelectedListener.onNavigationItemSelected(item);
+			}
 		}
+	}
+
+	/**
+	 * Returns the navigation menu backing the fragment
+	 * 
+	 * @return
+	 */
+	public NavigationMenu getNavigationMenu() {
+		return mNavigationMenu;
+	}
+
+	/**
+	 * Called when the navigation menu is setup, pass it to the
+	 * NavigationMenuFragmentInterface interface.
+	 */
+	@Override
+	public void onCreateNavigationMenu(final NavigationMenu navigationMenu) {
+		if (mActivity instanceof NavigationMenuFragmentInterface) {
+			((NavigationMenuFragmentInterface) mActivity).onCreateFragmentNavigationMenu(navigationMenu);
+		}
+	}
+
+	/**
+	 * Interface an activity must implement to use the navigation menu fragment
+	 */
+	public interface NavigationMenuFragmentInterface {
+		public void onCreateFragmentNavigationMenu(NavigationMenu navigationMenu);
 	}
 }

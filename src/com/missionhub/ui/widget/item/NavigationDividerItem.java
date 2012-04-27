@@ -10,18 +10,19 @@ import com.missionhub.ui.NavigationMenu;
 
 public class NavigationDividerItem extends SpinnerItem implements DisabledItem {
 
-	private final boolean mIsSidebar;
-	private final Context mContext;
-	private final int mId;
+	private final NavigationMenu mNavigationMenu;
+
+	private int mId = -1;
 	private CharSequence mTitle;
 	private CharSequence mSubtitle;
-	private final OnSpinnerItemChangedListener mItemChangedListener;
 
-	public NavigationDividerItem(final int id, final Context context, final NavigationMenu navigationMenu, final boolean isSidebar) {
+	public NavigationDividerItem(final int id, final NavigationMenu navigationMenu) {
 		mId = id;
-		mContext = context;
-		mItemChangedListener = navigationMenu;
-		mIsSidebar = isSidebar;
+		mNavigationMenu = navigationMenu;
+	}
+
+	public NavigationDividerItem(final NavigationMenu navigationMenu) {
+		this(-1, navigationMenu);
 	}
 
 	@Override
@@ -31,15 +32,15 @@ public class NavigationDividerItem extends SpinnerItem implements DisabledItem {
 
 	@Override
 	public ItemView newView(final Context context, final ViewGroup parent) {
-		if (mIsSidebar) {
-			return createCellFromXml(context, R.layout.widget_side_navigation_divider, parent);
+		if (mNavigationMenu.isFragmentMenu()) {
+			return createCellFromXml(context, R.layout.widget_fragment_navigation_divider, parent);
 		}
 		return createCellFromXml(context, R.layout.widget_navigation_divider, parent);
 	}
 
 	private void notifyChanged() {
-		if (mItemChangedListener != null) {
-			mItemChangedListener.onSpinnerItemChanged(this);
+		if (mNavigationMenu != null) {
+			mNavigationMenu.onSpinnerItemChanged(this);
 		}
 	}
 
@@ -54,7 +55,7 @@ public class NavigationDividerItem extends SpinnerItem implements DisabledItem {
 	}
 
 	public NavigationDividerItem setTitle(final int title) {
-		setTitle(mContext.getString(title));
+		setTitle(mNavigationMenu.getContext().getString(title));
 		return this;
 	}
 
@@ -69,7 +70,7 @@ public class NavigationDividerItem extends SpinnerItem implements DisabledItem {
 	}
 
 	public NavigationDividerItem setSubtitle(final int subtitle) {
-		setSubtitle(mContext.getString(subtitle));
+		setSubtitle(mNavigationMenu.getContext().getString(subtitle));
 		return this;
 	}
 

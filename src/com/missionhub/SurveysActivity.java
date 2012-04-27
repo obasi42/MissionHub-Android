@@ -14,7 +14,6 @@ import android.webkit.WebViewClient;
 
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.Window;
 import com.missionhub.api.SurveyApi;
 import com.missionhub.error.MissionHubException;
 import com.missionhub.ui.DisplayError;
@@ -30,10 +29,8 @@ public class SurveysActivity extends MissionHubMainActivity {
 	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		//this.requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+		// this.requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 
-		
-		
 		setContentView(R.layout.activity_surveys);
 
 		mWebView = (WebView) findViewById(R.id.webView);
@@ -53,7 +50,8 @@ public class SurveysActivity extends MissionHubMainActivity {
 	/** Global menu items */
 	@Override
 	public boolean onCreateOptionsMenu(final Menu menu) {
-		final MenuItem refreshItem = menu.add(Menu.NONE, R.id.refresh, 0, R.string.action_refresh).setIcon(R.drawable.ic_action_refresh).setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		final MenuItem refreshItem = menu.add(Menu.NONE, R.id.refresh, 0, R.string.action_refresh).setIcon(R.drawable.ic_action_refresh)
+				.setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
 		this.setSupportProgressBarIndeterminateItem(refreshItem);
 		return super.onCreateOptionsMenu(menu);
 	}
@@ -77,11 +75,6 @@ public class SurveysActivity extends MissionHubMainActivity {
 	@Override
 	public void onCreateNavigationMenu(final NavigationMenu menu) {
 		super.onCreateNavigationMenu(menu);
-	}
-
-	@Override
-	public boolean onNavigationItemSelected(final NavigationItem item) {
-		return super.onNavigationItemSelected(item);
 	}
 
 	private class InternalWebViewClient extends WebViewClient {
@@ -163,6 +156,12 @@ public class SurveysActivity extends MissionHubMainActivity {
 	@Override
 	public void onRestoreInstanceState(final Bundle b) {
 		((WebView) findViewById(R.id.webView)).restoreState(b);
+	}
+
+	@Override
+	public boolean onNavigationItemSelected(final NavigationItem item) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

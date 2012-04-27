@@ -5,39 +5,31 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.view.ViewGroup;
 
-import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
-import com.missionhub.MissionHubBaseActivity;
 import com.missionhub.R;
 import com.missionhub.ui.NavigationMenu;
 
 public class NavigationItem extends SpinnerItem {
 
-	private final boolean mIsSidebar;
-	private final Context mContext;
-	private final OnSpinnerItemChangedListener mItemChangedListener;
-	private final OnNavigationListener mNavigationListener;
-	private int mItemId = -1;
+	private final NavigationMenu mNavigationMenu;
+
+	private int mId = -1;
 	private CharSequence mTitle;
 	private CharSequence mSubtitle;
 	private Drawable mIcon;
-	private boolean mEnabled = true;
 
-	public NavigationItem(final int itemId, final Context context, final NavigationMenu navigationMenu, final boolean isSidebar) {
-		mItemId = itemId;
-		mContext = context;
-		mItemChangedListener = navigationMenu;
-		mNavigationListener = navigationMenu;
-		mIsSidebar = isSidebar;
+	public NavigationItem(final int id, final NavigationMenu navigationMenu) {
+		mId = id;
+		mNavigationMenu = navigationMenu;
 	}
 
-	public NavigationItem(final MissionHubBaseActivity mActivity, final NavigationMenu navigationMenu) {
-		this(-1, mActivity, navigationMenu, false);
+	public NavigationItem(final NavigationMenu navigationMenu) {
+		this(-1, navigationMenu);
 	}
 
 	@Override
 	public ItemView newView(final Context context, final ViewGroup parent) {
-		if (mIsSidebar) {
-			return createCellFromXml(context, R.layout.widget_side_navigation_item, parent);
+		if (mNavigationMenu.isFragmentMenu()) {
+			return createCellFromXml(context, R.layout.widget_fragment_navigation_item, parent);
 		}
 		return createCellFromXml(context, R.layout.widget_navigation_item, parent);
 	}
@@ -48,13 +40,13 @@ public class NavigationItem extends SpinnerItem {
 	}
 
 	private void notifyChanged() {
-		if (mItemChangedListener != null) {
-			mItemChangedListener.onSpinnerItemChanged(this);
+		if (mNavigationMenu != null) {
+			mNavigationMenu.onSpinnerItemChanged(this);
 		}
 	}
 
-	public int getItemId() {
-		return mItemId;
+	public int getId() {
+		return mId;
 	}
 
 	public NavigationItem setTitle(final CharSequence title) {
@@ -64,7 +56,7 @@ public class NavigationItem extends SpinnerItem {
 	}
 
 	public NavigationItem setTitle(final int title) {
-		setTitle(mContext.getString(title));
+		setTitle(mNavigationMenu.getContext().getString(title));
 		return this;
 	}
 
@@ -79,7 +71,7 @@ public class NavigationItem extends SpinnerItem {
 	}
 
 	public NavigationItem setSubtitle(final int subtitle) {
-		setSubtitle(mContext.getString(subtitle));
+		setSubtitle(mNavigationMenu.getContext().getString(subtitle));
 		return this;
 	}
 
@@ -94,25 +86,11 @@ public class NavigationItem extends SpinnerItem {
 	}
 
 	public NavigationItem setIcon(final int iconRes) {
-		setIcon(mContext.getResources().getDrawable(iconRes));
+		setIcon(mNavigationMenu.getContext().getResources().getDrawable(iconRes));
 		return this;
 	}
 
 	public Drawable getIcon() {
 		return mIcon;
-	}
-
-	public NavigationItem setEnabled(final boolean enabled) {
-		mEnabled = enabled;
-		notifyChanged();
-		return this;
-	}
-
-	public boolean isEnabled() {
-		return mEnabled;
-	}
-
-	public OnNavigationListener getOnNavigationListener() {
-		return mNavigationListener;
 	}
 }

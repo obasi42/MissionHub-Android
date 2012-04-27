@@ -16,8 +16,7 @@ public class PeopleDirectoryActivity extends MissionHubMainActivity {
 
 	@Override
 	public void onCreateNavigationMenu(final NavigationMenu menu) {
-		// TODO Auto-generated method stub
-
+		super.onCreateNavigationMenu(menu);
 	}
 
 	@Override
@@ -25,11 +24,4 @@ public class PeopleDirectoryActivity extends MissionHubMainActivity {
 		// TODO Auto-generated method stub
 		return false;
 	}
-
-	@Override
-	public void onCreateSideNavigationMenu(final NavigationMenu menu) {
-		// TODO Auto-generated method stub
-
-	}
-
 }

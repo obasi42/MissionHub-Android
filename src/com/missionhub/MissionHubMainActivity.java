@@ -71,32 +71,4 @@ public abstract class MissionHubMainActivity extends MissionHubBaseActivity impl
 		menu.add(R.id.nav_groups).setTitle("Groups");
 		menu.add(R.id.nav_surveys).setTitle("Surveys");
 	}
-
-	@Override
-	public void onCreateSideNavigationMenu(NavigationMenu menu) {}
-
-	private NavigationItem mCurrentNavigation;
-
-	@Override
-	public boolean onNavigationItemSelected(final NavigationItem item) {
-
-		if (item == mCurrentNavigation) return false;
-
-		switch (item.getItemId()) {
-		case R.id.nav_my_contacts:
-			//Intent intent1 = new Intent(this, PeopleMyActivity.class);
-			//startActivity(intent1);
-			//finish();
-			break;
-		case R.id.nav_surveys:
-			Intent intent2 = new Intent(this, SurveysActivity.class);
-			startActivity(intent2);
-			finish();
-			break;
-		}
-
-		mCurrentNavigation = item;
-
-		return true;
-	}
 }

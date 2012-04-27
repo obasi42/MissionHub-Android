@@ -16,20 +16,13 @@ public class PeopleAllActivity extends MissionHubMainActivity {
 
 	@Override
 	public void onCreateNavigationMenu(final NavigationMenu menu) {
-		// TODO Auto-generated method stub
-
+		super.onCreateNavigationMenu(menu);
 	}
 
 	@Override
 	public boolean onNavigationItemSelected(final NavigationItem item) {
 		// TODO Auto-generated method stub
 		return false;
-	}
-
-	@Override
-	public void onCreateSideNavigationMenu(final NavigationMenu menu) {
-		// TODO Auto-generated method stub
-
 	}
 
 }

@@ -17,11 +17,12 @@ import com.missionhub.fragment.ContactFragment;
 import com.missionhub.fragment.ContactListFragment;
 import com.missionhub.fragment.ContactListFragment.OnContactListListener;
 import com.missionhub.fragment.NavigationMenuFragment;
+import com.missionhub.fragment.NavigationMenuFragment.NavigationMenuFragmentInterface;
 import com.missionhub.ui.NavigationMenu;
 import com.missionhub.ui.widget.item.ContactListItem.ContactListItemSize;
 import com.missionhub.ui.widget.item.NavigationItem;
 
-public class PeopleMyActivity extends MissionHubMainActivity implements OnContactListListener, ContactListItemSize {
+public class PeopleMyActivity extends MissionHubMainActivity implements OnContactListListener, ContactListItemSize, NavigationMenuFragmentInterface {
 
 	/** the left navigation menu fragment */
 	private NavigationMenuFragment mNavigationFragment;
@@ -127,8 +128,6 @@ public class PeopleMyActivity extends MissionHubMainActivity implements OnContac
 			people.add(getSession().getUser().getPerson());
 		}
 		mContactListFragment.addPeople(people);
-		
-		getNavigationMenu().setSelectedNavigationItem(R.id.nav_my_contacts_inprogress);
 	}
 
 	@Override
@@ -278,11 +277,11 @@ public class PeopleMyActivity extends MissionHubMainActivity implements OnContac
 	public boolean isContactListItemSmall() {
 		return isInContactMode();
 	}
-	
+
 	@Override
 	public void onCreateNavigationMenu(final NavigationMenu menu) {
 		super.onCreateNavigationMenu(menu);
-		
+
 		if (!getDisplayMode().isTablet()) {
 			menu.addDivider(R.id.nav_divider).setTitle("My Contacts");
 			menu.add(R.id.nav_my_contacts_all).setTitle("All");
@@ -290,9 +289,9 @@ public class PeopleMyActivity extends MissionHubMainActivity implements OnContac
 			menu.add(R.id.nav_my_contacts_completed).setTitle("Completed");
 		}
 	}
-	
+
 	@Override
-	public void onCreateSideNavigationMenu(final NavigationMenu menu) {
+	public void onCreateFragmentNavigationMenu(final NavigationMenu menu) {
 		menu.add(R.id.nav_my_contacts_all).setTitle("All");
 		menu.add(R.id.nav_my_contacts_inprogress).setTitle("In Progress");
 		menu.add(R.id.nav_my_contacts_completed).setTitle("Completed");
@@ -300,18 +299,18 @@ public class PeopleMyActivity extends MissionHubMainActivity implements OnContac
 
 	@Override
 	public boolean onNavigationItemSelected(final NavigationItem item) {
-		toggleMenuItems(item);	
-		return super.onNavigationItemSelected(item);
+		toggleMenuItems(item);
+		return true;
 	}
-	
-	private void toggleMenuItems(final NavigationItem item) {			
-		switch (item.getItemId()) {
+
+	private void toggleMenuItems(final NavigationItem item) {
+		switch (item.getId()) {
 		case R.id.nav_my_contacts_all:
 		case R.id.nav_my_contacts_completed:
 		case R.id.nav_my_contacts_inprogress:
-			NavigationItem topItem = getNavigationMenu().findItemById(R.id.nav_my_contacts);
+			final NavigationItem topItem = getNavigationMenu().findNavigationItemById(R.id.nav_my_contacts);
 			topItem.setSubtitle(item.getTitle());
-			getNavigationMenu().setSelectedNavigationItem(topItem);
+			getNavigationMenu().setSelectedItem(topItem);
 			getNavigationMenu().showAll();
 			getNavigationMenu().hide(item);
 			if (mNavigationFragment != null) {

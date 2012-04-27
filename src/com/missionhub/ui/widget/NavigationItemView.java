@@ -67,13 +67,5 @@ public class NavigationItemView extends RelativeLayout implements ListItemView {
 		} else if (mSubtitle != null) {
 			mSubtitle.setVisibility(View.GONE);
 		}
-
-		if (navItem.isEnabled()) {
-			this.setClickable(false);
-			this.setEnabled(true);
-		} else {
-			this.setClickable(true);
-			this.setEnabled(false);
-		}
 	}
 }
