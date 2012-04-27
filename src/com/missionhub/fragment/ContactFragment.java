@@ -24,12 +24,6 @@ public class ContactFragment extends MissionHubFragment {
 	/** the sql person for this contact */
 	Person mPerson;
 
-	/** the loading view */
-	FragmentLoadingView mLoading;
-
-	/** the contact container */
-	ViewGroup mContainer;
-
 	/** the contact view pager */
 	ViewPager mPager;
 
@@ -60,20 +54,21 @@ public class ContactFragment extends MissionHubFragment {
 		final View view = inflater.inflate(R.layout.fragment_contact, container, false);
 		view.setLayoutParams(new LinearLayout.LayoutParams(android.view.ViewGroup.LayoutParams.WRAP_CONTENT, android.view.ViewGroup.LayoutParams.FILL_PARENT, getLayoutWeight()));
 
-		mLoading = (FragmentLoadingView) view.findViewById(R.id.loading);
-		mContainer = (ViewGroup) view.findViewById(R.id.container);
-
 		mPager = (ViewPager) view.findViewById(R.id.pager);
+		mPager.setPageMargin(5);
+		mPager.setPageMarginDrawable(R.color.dark_gray);
 		mIndicator = (PageIndicator) view.findViewById(R.id.indicator);
 
 		mStatus = new ContactStatusView(inflater.getContext());
 		mAbout = new ContactAboutView(inflater.getContext());
 		mSurveys = new ContactSurveysView(inflater.getContext());
 
+		setTabsPerson(mPerson);
+		
 		mAdapter = new ViewPagerAdapter();
 		mAdapter.setNotifyOnChange(false);
-		mAdapter.addPage(mAbout, "About");
 		mAdapter.addPage(mStatus, "Status");
+		mAdapter.addPage(mAbout, "About");
 		mAdapter.addPage(mSurveys, "Surveys");
 		mAdapter.notifyDataSetChanged();
 
@@ -81,10 +76,7 @@ public class ContactFragment extends MissionHubFragment {
 
 		mPager.setCurrentItem(1);
 		mIndicator.setViewPager(mPager, 1);
-
-		mContainer.setVisibility(View.VISIBLE);
-		mLoading.setVisibility(View.GONE);
-
+		
 		return view;
 	}
 
@@ -102,6 +94,12 @@ public class ContactFragment extends MissionHubFragment {
 	public void setPerson(final Person person) {
 		mPersonId = person.getId();
 		mPerson = person;
+	}
+	
+	private void setTabsPerson(Person person) {
+		mStatus.setPerson(mPerson);
+		mAbout.setPerson(mPerson);
+		mSurveys.setPerson(mPerson);
 	}
 
 	public static ContactFragment newInstance(final long personId) {

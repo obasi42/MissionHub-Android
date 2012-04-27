@@ -115,6 +115,7 @@ public class PeopleMyActivity extends MissionHubMainActivity implements OnContac
 		} else {
 			mCurrentContactId = -1;
 		}
+		
 		refreshHomeButtonState();
 	}
 
@@ -124,10 +125,12 @@ public class PeopleMyActivity extends MissionHubMainActivity implements OnContac
 
 		final List<Person> people = new ArrayList<Person>();
 
-		for (int i = 0; i < 2000; i++) {
+		for (int i = 0; i < 2; i++) {
 			people.add(getSession().getUser().getPerson());
 		}
 		mContactListFragment.addPeople(people);
+		
+		showContact(getSession().getUser().getPerson());
 	}
 
 	@Override
@@ -183,13 +186,13 @@ public class PeopleMyActivity extends MissionHubMainActivity implements OnContac
 
 			mContactListFragment.setContactActivated(person);
 			ft.commit();
+			
+			refreshHomeButtonState();
 		} else {
 			final Intent intent = new Intent(this, ContactActivity.class);
 			intent.putExtra("personId", person.getId());
 			startActivityForResult(intent, REQUEST_CODE_CONTACT);
 		}
-
-		refreshHomeButtonState();
 	}
 
 	private void closeContact() {
