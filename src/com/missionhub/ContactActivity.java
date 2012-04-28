@@ -13,7 +13,8 @@ public class ContactActivity extends MissionHubBaseActivity {
 		if (savedInstanceState == null) {
 			final ContactFragment contact = new ContactFragment();
 			contact.setArguments(getIntent().getExtras());
-			getSupportFragmentManager().beginTransaction().add(android.R.id.content, contact).commit();
+			getSupportFragmentManager().beginTransaction()
+			    .add(android.R.id.content, contact).commit();
 		}
 	}
 

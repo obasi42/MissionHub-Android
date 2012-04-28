@@ -13,7 +13,7 @@ public abstract class ContactView extends FrameLayout {
 	@SuppressWarnings("deprecation")
 	public ContactView(final Context context) {
 		super(context);
-		setLayoutParams(new LayoutParams(android.view.ViewGroup.LayoutParams.FILL_PARENT, android.view.ViewGroup.LayoutParams.FILL_PARENT));
+		setLayoutParams(new LayoutParams(FrameLayout.LayoutParams.FILL_PARENT, FrameLayout.LayoutParams.FILL_PARENT));
 	}
 	
 	/**

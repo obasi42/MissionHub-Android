@@ -15,11 +15,12 @@ import com.missionhub.api.model.sql.Person;
  */
 public class User {
 
-	/** logging tag */
+	/** logging tag. */
 	public static final String TAG = User.class.getSimpleName();
 
-	/* system labels */
+	/** system labels. */
 	public static final String LABEL_ADMIN = "admin";
+	
 	public static final String LABEL_CONTACT = "contact";
 	public static final String LABEL_INVOLVED = "involved";
 	public static final String LABEL_LEADER = "leader";

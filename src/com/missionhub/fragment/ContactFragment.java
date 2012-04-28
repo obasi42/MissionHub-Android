@@ -13,7 +13,6 @@ import com.missionhub.ui.ViewPagerAdapter;
 import com.missionhub.ui.widget.ContactAboutView;
 import com.missionhub.ui.widget.ContactStatusView;
 import com.missionhub.ui.widget.ContactSurveysView;
-import com.missionhub.ui.widget.FragmentLoadingView;
 import com.viewpagerindicator.PageIndicator;
 
 public class ContactFragment extends MissionHubFragment {
@@ -64,7 +63,7 @@ public class ContactFragment extends MissionHubFragment {
 		mSurveys = new ContactSurveysView(inflater.getContext());
 
 		setTabsPerson(mPerson);
-		
+
 		mAdapter = new ViewPagerAdapter();
 		mAdapter.setNotifyOnChange(false);
 		mAdapter.addPage(mStatus, "Status");
@@ -76,12 +75,8 @@ public class ContactFragment extends MissionHubFragment {
 
 		mPager.setCurrentItem(1);
 		mIndicator.setViewPager(mPager, 1);
-		
+
 		return view;
-	}
-
-	public void redraw() {
-
 	}
 
 	public void setPersonId(final long personId) {
@@ -95,8 +90,8 @@ public class ContactFragment extends MissionHubFragment {
 		mPersonId = person.getId();
 		mPerson = person;
 	}
-	
-	private void setTabsPerson(Person person) {
+
+	private void setTabsPerson(final Person person) {
 		mStatus.setPerson(mPerson);
 		mAbout.setPerson(mPerson);
 		mSurveys.setPerson(mPerson);
