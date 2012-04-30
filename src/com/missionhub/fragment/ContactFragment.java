@@ -51,13 +51,15 @@ public class ContactFragment extends MissionHubFragment {
 	@Override
 	public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
 		final View view = inflater.inflate(R.layout.fragment_contact, container, false);
-		view.setLayoutParams(new LinearLayout.LayoutParams(android.view.ViewGroup.LayoutParams.WRAP_CONTENT, android.view.ViewGroup.LayoutParams.FILL_PARENT, getLayoutWeight()));
-
+		view.setLayoutParams(new LinearLayout.LayoutParams(android.view.ViewGroup.LayoutParams.WRAP_CONTENT, android.view.ViewGroup.LayoutParams.FILL_PARENT, getLayoutWeight()));		
+		
 		mPager = (ViewPager) view.findViewById(R.id.pager);
 		mPager.setPageMargin(5);
 		mPager.setPageMarginDrawable(R.color.dark_gray);
 		mIndicator = (PageIndicator) view.findViewById(R.id.indicator);
-
+		
+		//setLayoutParams(new LayoutParams(FrameLayout.LayoutParams.FILL_PARENT, FrameLayout.LayoutParams.FILL_PARENT))
+		
 		mStatus = new ContactStatusView(inflater.getContext());
 		mAbout = new ContactAboutView(inflater.getContext());
 		mSurveys = new ContactSurveysView(inflater.getContext());

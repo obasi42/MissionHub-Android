@@ -3,6 +3,7 @@ package com.missionhub.ui.widget;
 import com.missionhub.api.model.sql.Person;
 
 import android.content.Context;
+import android.util.AttributeSet;
 import android.widget.FrameLayout;
 
 public abstract class ContactView extends FrameLayout {
@@ -10,11 +11,13 @@ public abstract class ContactView extends FrameLayout {
 	/** the person the view represents */
 	private Person mPerson;
 	
-	@SuppressWarnings("deprecation")
 	public ContactView(final Context context) {
 		super(context);
-		setLayoutParams(new LayoutParams(FrameLayout.LayoutParams.FILL_PARENT, FrameLayout.LayoutParams.FILL_PARENT));
 	}
+	
+	public ContactView(final Context context, final AttributeSet attrs) {
+        super(context, attrs);
+    }
 	
 	/**
 	 * @return the person the view represents

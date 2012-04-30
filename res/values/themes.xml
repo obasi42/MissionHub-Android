@@ -7,7 +7,7 @@
         <item name="android:listDivider">@drawable/list_divider_holo_light</item>
         <item name="android:listSelector">@drawable/list_selector_holo_light</item>
         <item name="android:activatedBackgroundIndicator">@drawable/activated_background_holo_light</item>
-        
+
         <!-- view page indicator stuff -->
         <item name="vpiCirclePageIndicatorStyle">@style/Widget.MissionHub.VPI.CirclePageIndicator</item>
         <item name="vpiTitlePageIndicatorStyle">@style/Widget.MissionHub.VPI.TitlePageIndicator</item>
@@ -27,6 +27,9 @@
         <item name="gdItemViewPreferredHalfHeight">@dimen/gd_item_view_half_height</item>
         <item name="gdItemViewPreferredPaddingLeft">@dimen/gd_item_view_padding_left</item>
         <item name="gdSeparatorItemViewPreferredHeight">@dimen/gd_separator_item_view_height</item>
+        <item name="gdProgressBarWidth">@dimen/gd_progress_bar_width</item>
+		<item name="gdProgressBarHeight">@dimen/gd_progress_bar_height</item>
+		<item name="gdProgressBarMargin">@dimen/gd_progress_bar_margin</item>
         <item name="gdTextItemViewStyle">@style/GreenDroid.Widget.ItemView.TextItemView</item>
         <item name="gdLongTextItemViewStyle">@style/GreenDroid.Widget.ItemView.LongTextItemView</item>
         <item name="gdDescriptionItemViewStyle">@style/GreenDroid.Widget.ItemView.DescriptionItemView</item>
