@@ -2,6 +2,7 @@ package com.missionhub.ui;
 
 import greendroid.widget.ItemAdapter;
 import greendroid.widget.item.Item;
+import greendroid.widget.itemview.ItemView;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,16 +34,20 @@ public class ListItemAdapter extends ItemAdapter {
 	@Override
 	public View getView(final int position, final View convertView, final ViewGroup parent) {
 		final Item item = (Item) getItem(position);
-		ListItemView cell = (ListItemView) convertView;
+		ItemView cell = (ItemView) convertView;
 
 		if ((cell == null || cell.getItemClass() != item.getClass()) || (cell != null && parent != null && ((View) cell).getWidth() != parent.getWidth())) {
-			cell = (ListItemView) item.newView(mContext, null);
+			cell = item.newView(mContext, null);
 			cell.prepareItemView();
 		}
 
-		cell.setObject(item, parent, position);
-
-		final View view = (View) cell;
+		if (cell instanceof ListItemView) {
+		    ((ListItemView)cell).setObject(item, parent, position);
+		} else {
+		    cell.setObject(item);
+		}
+		
+		View view = (View) cell;
 
 		if (parent instanceof SelectableListView && view instanceof SupportActivatable) {
 			final boolean activated = ((SelectableListView) parent).isItemActivated(position);
