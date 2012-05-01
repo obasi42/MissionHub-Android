@@ -1,5 +1,6 @@
 package com.missionhub.ui.widget;
 
+import greendroid.widget.AsyncImageView;
 import greendroid.widget.item.Item;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
@@ -23,7 +24,7 @@ public class ContactListItemView extends LinearLayout implements ListItemView, C
 	private static Drawable mCheckOn;
 	private static Drawable mCheckOff;
 
-	private ImageView mPicture;
+	private AsyncImageView mPicture;
 	private TextView mName;
 	private TextView mStatus;
 	private TextView mEmail;
@@ -50,7 +51,7 @@ public class ContactListItemView extends LinearLayout implements ListItemView, C
 			mCheckOff = getResources().getDrawable(R.drawable.btn_check_off_normal_holo_light);
 		}
 
-		mPicture = (ImageView) findViewById(R.id.picture);
+		mPicture = (AsyncImageView) findViewById(R.id.picture);
 		mName = (TextView) findViewById(R.id.name);
 		mStatus = (TextView) findViewById(R.id.status);
 		mEmail = (TextView) findViewById(R.id.email);
@@ -70,6 +71,10 @@ public class ContactListItemView extends LinearLayout implements ListItemView, C
 
 		final Person person = listItem.mPerson;
 
+		if (!U.isNullEmpty(person.getPicture())) {
+		    mPicture.setUrl(person.getPicture() + "?type=square");
+		}
+		
 		if (!U.isNullEmpty(person.getName())) {
 			mName.setText(person.getName());
 		}

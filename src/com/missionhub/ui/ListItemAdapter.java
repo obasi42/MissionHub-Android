@@ -35,9 +35,9 @@ public class ListItemAdapter extends ItemAdapter {
 	public View getView(final int position, final View convertView, final ViewGroup parent) {
 		final Item item = (Item) getItem(position);
 		ItemView cell = (ItemView) convertView;
-
-		if ((cell == null || cell.getItemClass() != item.getClass()) || (cell != null && parent != null && ((View) cell).getWidth() != parent.getWidth())) {
-			cell = item.newView(mContext, null);
+		
+		if (cell == null || cell.getItemClass() != item.getClass()) {
+			cell = item.newView(mContext, parent);
 			cell.prepareItemView();
 		}
 
@@ -46,21 +46,23 @@ public class ListItemAdapter extends ItemAdapter {
 		} else {
 		    cell.setObject(item);
 		}
-		
-		View view = (View) cell;
 
+		return setUpSelectableListView(position, (View) cell, parent);
+	}
+	
+	public View setUpSelectableListView(final int position, final View view, final ViewGroup parent) {
 		if (parent instanceof SelectableListView && view instanceof SupportActivatable) {
 			final boolean activated = ((SelectableListView) parent).isItemActivated(position);
 			((SupportActivatable) view).setSupportActivated(activated);
 		}
-
 		return view;
 	}
-
+	
 	@Override
 	public boolean isEnabled(final int position) {
-		if (getItem(position) instanceof DisabledItem) {
-			return false;
+		final Item item = (Item) getItem(position);
+		if (item instanceof Enableable) {
+			return ((Enableable)item).isEnabled();
 		}
 		return super.isEnabled(position);
 	}
@@ -68,14 +70,16 @@ public class ListItemAdapter extends ItemAdapter {
 	@Override
 	public boolean areAllItemsEnabled() {
 		for (int i=0; i < getCount(); i++) {
-			if (getItem(i) instanceof DisabledItem) {
+			if (!isEnabled(i)) {
 				return false;
 			}
 		}
 		return super.areAllItemsEnabled();
 	}
 
-	public interface DisabledItem {}
+	public interface Enableable {
+		public boolean isEnabled();
+	}
 
 	public synchronized void hide(final Item item, final boolean notify) {
 		setNotifyOnChange(notify);

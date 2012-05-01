@@ -1,5 +1,6 @@
 package com.missionhub.fragment;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
@@ -7,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import com.missionhub.ContactActivity;
 import com.missionhub.R;
 import com.missionhub.api.model.sql.Person;
 import com.missionhub.ui.ViewPagerAdapter;
@@ -91,6 +93,9 @@ public class ContactFragment extends MissionHubFragment {
 	public void setPerson(final Person person) {
 		mPersonId = person.getId();
 		mPerson = person;
+		if (getMHActivity() != null && getMHActivity() instanceof ContactActivity) {
+		    getMHActivity().setTitle(mPerson.getName());
+		}
 	}
 
 	private void setTabsPerson(final Person person) {

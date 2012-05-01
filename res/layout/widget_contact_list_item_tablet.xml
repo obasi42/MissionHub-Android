@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.missionhub.ui.widget.ContactListItemView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:greendroid="http://schemas.android.com/apk/res/com.missionhub"
     style="@style/Widget.MissionHub.ListView.Item.Contact"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal" >
 
-    <ImageView
+    <greendroid.widget.AsyncImageView
         android:id="@+id/picture"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="16.0dip"
         android:layout_marginRight="16.0dip"
-        android:src="@drawable/default_contact" />
+        greendroid:defaultSrc="@drawable/default_contact" />
 
     <TextView
         android:id="@+id/name"

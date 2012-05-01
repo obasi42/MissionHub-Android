@@ -10,11 +10,15 @@
     <style name="Widget.MissionHub.ListView"></style>
 
     <style name="Widget.MissionHub.ListView.Contact">
-        <item name="android:background">@color/transparent</item>
-        <item name="android:cacheColorHint">@color/transparent</item>
+        <item name="android:background">@color/background</item>
+        <item name="android:cacheColorHint">@color/background</item>
+        
     </style>
 
-    <style name="Widget.MissionHub.ListView.Item"></style>
+    <style name="Widget.MissionHub.ListView.Item">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
 
     <style name="Widget.MissionHub.ListView.DropDownItem"></style>
 
@@ -24,9 +28,32 @@
         <item name="android:minHeight">@dimen/listview_item_min_height</item>
     </style>
 
-    <style name="Widget.MissionHub.ListView.Item.SideNavigation">
+    <style name="ContactAboutDivider">
+        <item name="android:layout_gravity">right</item>
+        <item name="android:background">?android:listDivider</item>
         <item name="android:layout_width">fill_parent</item>
-        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_height">1.0dip</item>
+    </style>
+
+    <style name="ContactAboutLabel">
+        <item name="android:textSize">12.0sp</item>
+        <item name="android:textColor">#ff999999</item>
+        <item name="android:ellipsize">marquee</item>
+        <item name="android:singleLine">true</item>
+    </style>
+    
+        <style name="ContactAboutAction">
+        <item name="android:background">@drawable/list_selector_holo_light</item>
+    </style>
+
+    <style name="Widget.MissionHub.ListView.Item.Contact.About"></style>
+
+    <style name="Widget.MissionHub.ListView.Item.Contact.About.Heading">
+        <item name="android:paddingLeft">@dimen/listview_item_padding</item>
+        <item name="android:paddingRight">@dimen/listview_item_padding</item>
+    </style>
+
+    <style name="Widget.MissionHub.ListView.Item.SideNavigation">
         <item name="android:background">@drawable/list_item_background</item>
         <item name="android:paddingLeft">@dimen/listview_item_padding</item>
         <item name="android:paddingRight">@dimen/listview_item_padding</item>
@@ -42,7 +69,7 @@
         <item name="android:singleLine">true</item>
         <item name="android:textColor">@color/white</item>
     </style>
-    
+
     <style name="Widget.MissionHub.ListView.Item.SideNavigation.Subtitle">
         <item name="android:background">@color/transparent</item>
         <item name="android:textAppearance">?android:attr/textAppearanceSmall</item>
@@ -102,10 +129,10 @@
     <style name="Widget.MissionHub.MissionHub.VPI.TabPageIndicator.Text" parent="Widget.TabPageIndicator.Text">
         <item name="android:textColor">@color/black</item>
     </style>
-    
-	<style name="GreenDroid.Widget.ItemView.ProgressItemView.Text">
-		<item name="android:textSize">13dp</item>
-		<item name="android:textColor">@color/dark_gray</item>
-	</style>
+
+    <style name="GreenDroid.Widget.ItemView.ProgressItemView.Text">
+        <item name="android:textSize">13dp</item>
+        <item name="android:textColor">@color/dark_gray</item>
+    </style>
 
 </resources>

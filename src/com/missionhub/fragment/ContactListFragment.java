@@ -1,7 +1,5 @@
 package com.missionhub.fragment;
 
-import greendroid.widget.ItemAdapter;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -22,7 +20,7 @@ import android.widget.LinearLayout;
 import com.missionhub.DisplayMode;
 import com.missionhub.R;
 import com.missionhub.api.model.sql.Person;
-import com.missionhub.ui.ListItemAdapter;
+import com.missionhub.ui.DynamicLayoutAdapter;
 import com.missionhub.ui.widget.SelectableListView;
 import com.missionhub.ui.widget.SelectableListView.OnItemCheckedListener;
 import com.missionhub.ui.widget.item.ContactListItem;
@@ -34,7 +32,7 @@ public class ContactListFragment extends MissionHubFragment implements OnItemCli
 	private SelectableListView mListView;
 
 	/** the list view adapter */
-	private ItemAdapter mAdapter;
+	private DynamicLayoutAdapter mAdapter;
 
 	/** map of person to contact list item */
 	private final Map<Person, ContactListItem> mAdapterMap = Collections.synchronizedMap(new HashMap<Person, ContactListItem>());
@@ -45,7 +43,7 @@ public class ContactListFragment extends MissionHubFragment implements OnItemCli
 	@Override
 	public void onAttach(final Activity activity) {
 		super.onAttach(activity);
-		mAdapter = new ListItemAdapter(activity);
+		mAdapter = new DynamicLayoutAdapter(activity);
 		mAdapterMap.clear();
 	}
 
@@ -69,7 +67,7 @@ public class ContactListFragment extends MissionHubFragment implements OnItemCli
 		mListView.setOnItemClickListener(this);
 		mListView.setOnItemCheckedListener(this);
 
-		mAdapter = new ListItemAdapter(inflater.getContext());
+		mAdapter = new DynamicLayoutAdapter(inflater.getContext());
 
 		mListView.setAdapter(mAdapter);
 

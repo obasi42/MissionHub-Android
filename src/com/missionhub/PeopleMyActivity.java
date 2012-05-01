@@ -1,5 +1,7 @@
 package com.missionhub;
 
+import greendroid.widget.item.Item;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,11 +20,12 @@ import com.missionhub.fragment.ContactListFragment;
 import com.missionhub.fragment.ContactListFragment.OnContactListListener;
 import com.missionhub.fragment.NavigationMenuFragment;
 import com.missionhub.fragment.NavigationMenuFragment.NavigationMenuFragmentInterface;
+import com.missionhub.ui.DynamicLayoutAdapter.DynamicLayoutInterface;
 import com.missionhub.ui.NavigationMenu;
-import com.missionhub.ui.widget.item.ContactListItem.ContactListItemSize;
+import com.missionhub.ui.widget.item.ContactListItem;
 import com.missionhub.ui.widget.item.NavigationItem;
 
-public class PeopleMyActivity extends MissionHubMainActivity implements OnContactListListener, ContactListItemSize, NavigationMenuFragmentInterface {
+public class PeopleMyActivity extends MissionHubMainActivity implements OnContactListListener, NavigationMenuFragmentInterface, DynamicLayoutInterface {
 
 	/** the left navigation menu fragment */
 	private NavigationMenuFragment mNavigationFragment;
@@ -115,7 +118,6 @@ public class PeopleMyActivity extends MissionHubMainActivity implements OnContac
 		} else {
 			mCurrentContactId = -1;
 		}
-		
 		refreshHomeButtonState();
 	}
 
@@ -130,7 +132,7 @@ public class PeopleMyActivity extends MissionHubMainActivity implements OnContac
 		}
 		mContactListFragment.addPeople(people);
 		
-		showContact(getSession().getUser().getPerson());
+		//showContact(getSession().getUser().getPerson());
 	}
 
 	@Override
@@ -183,7 +185,6 @@ public class PeopleMyActivity extends MissionHubMainActivity implements OnContac
 				contactFragment.setLayoutWeight(18f);
 				ft.add(R.id.container, contactFragment, "contact" + mCurrentContactId);
 			}
-
 			mContactListFragment.setContactActivated(person);
 			ft.commit();
 			
@@ -195,10 +196,9 @@ public class PeopleMyActivity extends MissionHubMainActivity implements OnContac
 		}
 	}
 
-	private void closeContact() {
+	private void closeContact() {	
 		final FragmentManager fm = getSupportFragmentManager();
-		final FragmentTransaction ft = fm.beginTransaction();
-
+		final FragmentTransaction ft = fm.beginTransaction();		
 		final ContactFragment contactFragment = (ContactFragment) fm.findFragmentByTag("contact" + mCurrentContactId);
 		mCurrentContactId = -1;
 		if (contactFragment != null) {
@@ -206,7 +206,7 @@ public class PeopleMyActivity extends MissionHubMainActivity implements OnContac
 		}
 		ft.show(mNavigationFragment);
 		ft.commit();
-
+		
 		mContactListFragment.setContactActivated(null);
 		refreshHomeButtonState();
 	}
@@ -277,11 +277,6 @@ public class PeopleMyActivity extends MissionHubMainActivity implements OnContac
 	}
 
 	@Override
-	public boolean isContactListItemSmall() {
-		return isInContactMode();
-	}
-
-	@Override
 	public void onCreateNavigationMenu(final NavigationMenu menu) {
 		super.onCreateNavigationMenu(menu);
 
@@ -321,4 +316,18 @@ public class PeopleMyActivity extends MissionHubMainActivity implements OnContac
 			}
 		}
 	}
+
+    @Override
+    public Integer getLayoutResource(final Item item) {
+    	if (item.getClass() == ContactListItem.class) {
+    		final DisplayMode dm = getDisplayMode();
+			final boolean isTablet = dm.isTablet() && dm.isW1024dp();
+    		if (!isTablet || isInContactMode()) {
+    			return ContactListItem.LAYOUT_NORMAL;
+    		} else {
+    			return ContactListItem.LAYOUT_TABLET;
+    		}
+    	}
+    	return null;
+    }
 }

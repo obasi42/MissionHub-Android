@@ -1,0 +1,21 @@
+<com.missionhub.ui.widget.ContactAboutItemHeadingView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:greendroid="http://schemas.android.com/apk/res/com.missionhub"
+    style="@style/Widget.MissionHub.ListView.Item.Contact.About.Heading" >
+
+    <com.missionhub.ui.widget.RoundedAsyncImageView
+        android:id="@+id/picture"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginRight="10dp"
+        android:adjustViewBounds="true"
+        android:clickable="true"
+        greendroid:defaultSrc="@drawable/facebook_question" />
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+</com.missionhub.ui.widget.ContactAboutItemHeadingView>

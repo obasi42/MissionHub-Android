@@ -15,5 +15,6 @@
     
     <item name="spinner_item_type" type="id"/>
     <item name="navigation_item_position" type="id"/>
+    <item name="layout" type="id"/>
 
 </resources>

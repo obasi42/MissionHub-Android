@@ -5,10 +5,10 @@ import android.content.Context;
 import android.view.ViewGroup;
 
 import com.missionhub.R;
-import com.missionhub.ui.ListItemAdapter.DisabledItem;
+import com.missionhub.ui.ListItemAdapter.Enableable;
 import com.missionhub.ui.NavigationMenu;
 
-public class NavigationDividerItem extends SpinnerItem implements DisabledItem {
+public class NavigationDividerItem extends SpinnerItem implements Enableable {
 
 	private final NavigationMenu mNavigationMenu;
 
@@ -17,6 +17,7 @@ public class NavigationDividerItem extends SpinnerItem implements DisabledItem {
 	private CharSequence mSubtitle;
 
 	public NavigationDividerItem(final int id, final NavigationMenu navigationMenu) {
+		enabled = false;
 		mId = id;
 		mNavigationMenu = navigationMenu;
 	}
@@ -77,4 +78,9 @@ public class NavigationDividerItem extends SpinnerItem implements DisabledItem {
 	public CharSequence getSubtitle() {
 		return mSubtitle;
 	}
+
+    @Override
+    public boolean isEnabled() {
+        return enabled;
+    }
 }

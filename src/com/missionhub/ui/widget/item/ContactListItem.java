@@ -1,50 +1,37 @@
 package com.missionhub.ui.widget.item;
 
-import greendroid.widget.item.Item;
 import greendroid.widget.itemview.ItemView;
 import android.content.Context;
 import android.view.ViewGroup;
 
-import com.missionhub.DisplayMode;
 import com.missionhub.R;
 import com.missionhub.api.model.sql.Person;
-import com.missionhub.util.U;
+import com.missionhub.ui.DynamicLayoutAdapter.DynamicLayoutItem;
 
-public class ContactListItem extends Item {
+public class ContactListItem extends ContactItem implements DynamicLayoutItem {
+	
+	public static final int LAYOUT_TABLET = R.layout.widget_contact_list_item_tablet;
+	public static final int LAYOUT_NORMAL = R.layout.widget_contact_list_item;
+	
+	public int mLayout = LAYOUT_NORMAL;
+	
+    /**
+     * Construct a Contact List Item from a person
+     * 
+     * @param person
+     * @param contactListFragment
+     */
+    public ContactListItem(final Person person) {
+        super(person);
+    }
 
-	/** the person object for this item */
-	public Person mPerson;
+    @Override
+    public ItemView newView(final Context context, final ViewGroup parent) {
+        return createCellFromXml(context, mLayout, parent);
+    }
 
-	/**
-	 * Construct a Contact List Item from a person
-	 * 
-	 * @param person
-	 * @param contactListFragment
-	 */
-	public ContactListItem(final Person person) {
-		super();
-		mPerson = person;
-	}
-
-	@Override
-	public ItemView newView(final Context context, final ViewGroup parent) {
-		final DisplayMode dm = U.getMHApplication(context).getDisplayMode();
-		boolean isTablet = dm.isTablet() && dm.isW1024dp();
-
-		if (isTablet) {
-			if (context instanceof ContactListItemSize) {
-				isTablet = !((ContactListItemSize) context).isContactListItemSmall();
-			}
-		}
-
-		if (isTablet) {
-			return createCellFromXml(context, R.layout.widget_contact_list_item_tablet, parent);
-		} else {
-			return createCellFromXml(context, R.layout.widget_contact_list_item, parent);
-		}
-	}
-
-	public interface ContactListItemSize {
-		public boolean isContactListItemSmall();
-	}
+    @Override
+    public void setLayoutResource(int resource) {
+    	mLayout = resource;
+    }
 }
