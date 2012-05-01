@@ -1,6 +1,5 @@
 package com.missionhub.fragment;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
@@ -8,6 +7,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import com.missionhub.ContactActivity;
 import com.missionhub.R;
 import com.missionhub.api.model.sql.Person;
@@ -42,13 +44,19 @@ public class ContactFragment extends MissionHubFragment {
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		setHasOptionsMenu(true);
 		final Bundle args = getArguments();
 		if (args != null) {
 			setPersonId(args.getLong("personId", -1));
 		}
 	}
-
+		
+	@Override
+    public void onCreateOptionsMenu(final Menu menu, final MenuInflater inflater) {
+		menu.add("Assign").setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_WITH_TEXT | MenuItem.SHOW_AS_ACTION_ALWAYS).setIcon(R.drawable.ic_action_attach);
+		menu.add("Add Comment").setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_WITH_TEXT | MenuItem.SHOW_AS_ACTION_ALWAYS).setIcon(R.drawable.ic_action_edit);
+    }
+	
 	@SuppressWarnings("deprecation")
 	@Override
 	public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {

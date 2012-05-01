@@ -50,7 +50,7 @@ public class SurveysActivity extends MissionHubMainActivity {
 	/** Global menu items */
 	@Override
 	public boolean onCreateOptionsMenu(final Menu menu) {
-		final MenuItem refreshItem = menu.add(Menu.NONE, R.id.refresh, 0, R.string.action_refresh).setIcon(R.drawable.ic_action_refresh)
+		final MenuItem refreshItem = menu.add(Menu.NONE, R.id.action_refresh, 0, R.string.action_refresh).setIcon(R.drawable.ic_action_refresh)
 				.setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
 		this.setSupportProgressBarIndeterminateItem(refreshItem);
 		return super.onCreateOptionsMenu(menu);
@@ -64,7 +64,7 @@ public class SurveysActivity extends MissionHubMainActivity {
 	@Override
 	public boolean onOptionsItemSelected(final MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.refresh:
+		case R.id.action_refresh:
 			mWebView.reload();
 			return true;
 		default:

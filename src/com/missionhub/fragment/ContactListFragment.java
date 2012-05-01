@@ -17,6 +17,9 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.LinearLayout;
 
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import com.missionhub.DisplayMode;
 import com.missionhub.R;
 import com.missionhub.api.model.sql.Person;
@@ -40,6 +43,18 @@ public class ContactListFragment extends MissionHubFragment implements OnItemCli
 	/** contact list listener */
 	private OnContactListListener mListener;
 
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setHasOptionsMenu(true);
+	}
+	
+	@Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		menu.add(Menu.NONE, R.id.action_user_add, 0, R.string.action_user_add).setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_WITH_TEXT | MenuItem.SHOW_AS_ACTION_ALWAYS).setIcon(R.drawable.ic_action_user_add);
+		menu.add(Menu.NONE, R.id.action_refresh, 95, R.string.action_refresh).setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_WITH_TEXT | MenuItem.SHOW_AS_ACTION_ALWAYS).setIcon(R.drawable.ic_action_refresh);
+    }
+	
 	@Override
 	public void onAttach(final Activity activity) {
 		super.onAttach(activity);

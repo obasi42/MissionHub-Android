@@ -4,16 +4,24 @@ import greendroid.widget.item.Item;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
+import com.cr_wd.android.network.HttpResponse;
+import com.missionhub.api.ApiHandler;
+import com.missionhub.api.ContactsApi;
+import com.missionhub.api.convert.PersonJsonSql;
+import com.missionhub.api.model.GMetaPeople;
+import com.missionhub.api.model.GPerson;
 import com.missionhub.api.model.sql.Person;
 import com.missionhub.fragment.ContactFragment;
 import com.missionhub.fragment.ContactListFragment;
@@ -24,6 +32,7 @@ import com.missionhub.ui.DynamicLayoutAdapter.DynamicLayoutInterface;
 import com.missionhub.ui.NavigationMenu;
 import com.missionhub.ui.widget.item.ContactListItem;
 import com.missionhub.ui.widget.item.NavigationItem;
+import com.missionhub.util.U;
 
 public class PeopleMyActivity extends MissionHubMainActivity implements OnContactListListener, NavigationMenuFragmentInterface, DynamicLayoutInterface {
 
@@ -44,6 +53,12 @@ public class PeopleMyActivity extends MissionHubMainActivity implements OnContac
 
 	/** the contact request code */
 	public static final int REQUEST_CODE_CONTACT = 1;
+	
+	/** the contacts api options */
+	public ContactsApi.Options mContactsOptions;
+	
+	/** the contacts in the list */
+	public ArrayList<Person> mPeople;
 
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
@@ -104,6 +119,8 @@ public class PeopleMyActivity extends MissionHubMainActivity implements OnContac
 	public void onSaveInstanceState(final Bundle savedInstanceState) {
 		super.onSaveInstanceState(savedInstanceState);
 		savedInstanceState.putLong("mCurrentContactId", mCurrentContactId);
+		savedInstanceState.putParcelable("mContactsOptions", mContactsOptions);
+		savedInstanceState.putSerializable("mPeople", mPeople);
 	}
 
 	@Override
@@ -112,22 +129,104 @@ public class PeopleMyActivity extends MissionHubMainActivity implements OnContac
 		restoreInstanceState(savedInstanceState);
 	}
 
-	private void restoreInstanceState(final Bundle savedInstanceState) {
+	@SuppressWarnings("unchecked")
+    private void restoreInstanceState(final Bundle savedInstanceState) {
 		if (savedInstanceState != null) {
 			mCurrentContactId = savedInstanceState.getLong("mCurrentContactId");
+			mContactsOptions = savedInstanceState.getParcelable("mContactsOptions");
+			mPeople = (ArrayList<Person>) savedInstanceState.getSerializable("mPeople");
 		} else {
 			mCurrentContactId = -1;
+			mContactsOptions = new ContactsApi.Options();
 		}
 		refreshHomeButtonState();
+	}
+	
+	private void restoreMenuFromOptions() {
+		Set<String> status = mContactsOptions.getFilterValues("status");
+		String assignedTo = mContactsOptions.getFilterValue("assigned_to");
+		
+		NavigationMenu menu;
+		if (isTablet) {
+			menu = mNavigationFragment.getNavigationMenu();
+		} else {
+			menu = getNavigationMenu();
+		}
+		
+		if (!U.isNullEmpty(status) || !U.isNullEmpty(assignedTo)) {
+			if (status.contains("uncontacted")) {
+				menu.setSelectedItem(menu.findNavigationItemById(R.id.nav_my_contacts_inprogress));
+			} else if (status.contains("completed")) {
+				menu.setSelectedItem(menu.findNavigationItemById(R.id.nav_my_contacts_completed));
+			} else {
+				menu.setSelectedItem(menu.findNavigationItemById(R.id.nav_my_contacts_all));
+			}
+		} else {
+			mContactsOptions.clearFilters();
+			mContactsOptions.setFilter("assigned_to", "me");
+			mContactsOptions.addFilter("status", "uncontacted");
+			mContactsOptions.addFilter("status", "attempted_contact");
+			mContactsOptions.addFilter("status", "contacted");
+			menu.setSelectedItem(menu.findNavigationItemById(R.id.nav_my_contacts_inprogress));
+		}
+	}
+	
+	private void restoreContactList() {
+		if (mPeople == null) {
+			mPeople = new ArrayList<Person>();
+		}
+		
+//		if (mPeople.isEmpty()) {
+//			
+//			ContactsApi.list(this, mContactsOptions, new ApiHandler(GMetaPeople.class){
+//				@Override
+//                public void onSuccess(HttpResponse response) {
+//					super.onSuccess(response);
+//					
+//					Log.w("RESPONSE", response.responseBody);
+//				}
+//				
+//				@Override
+//				public void onSuccess(final Object gsonObject) {
+//					GMetaPeople metaPeople = (GMetaPeople) gsonObject;
+//					GPerson[] people = metaPeople.getPeople();
+//
+//					if (people != null && people.length > 0) {
+//						ArrayList<Person> peopleToAdd = new ArrayList<Person>();
+//						
+//						PersonJsonSql.update(PeopleMyActivity.this, people, false, true, "PeopleMyActivity");
+//						for(GPerson p : people) { 
+//							Person person = getDbSession().getPersonDao().load(p.getId());
+//							peopleToAdd.add(person);
+//						}
+//						
+//						mContactListFragment.addPeople(peopleToAdd);
+//						mPeople.addAll(peopleToAdd);
+//					}
+//				}
+//
+//				@Override
+//				public void onError(final Throwable throwable) {
+//					Log.e("ERROR", throwable.getMessage(), throwable);
+//				}
+//			});
+//			
+//			
+//		} else {
+//			mContactListFragment.addPeople(mPeople);
+//		}
 	}
 
 	@Override
 	public void onPostCreate(final Bundle savedInstanceState) {
 		super.onPostCreate(savedInstanceState);
-
+		restoreMenuFromOptions();
+		restoreContactList();
+		
+		// demo content
 		final List<Person> people = new ArrayList<Person>();
 
-		for (int i = 0; i < 2; i++) {
+		for (int i = 0; i < 1; i++) {
 			people.add(getSession().getUser().getPerson());
 		}
 		mContactListFragment.addPeople(people);
@@ -298,6 +397,25 @@ public class PeopleMyActivity extends MissionHubMainActivity implements OnContac
 	@Override
 	public boolean onNavigationItemSelected(final NavigationItem item) {
 		toggleMenuItems(item);
+		
+		switch(item.getId()) {
+		case R.id.nav_my_contacts_all:
+			mContactsOptions.clearFilters();
+			mContactsOptions.addFilter("assigned_to", "me");
+			break;
+		case R.id.nav_my_contacts_inprogress:
+			mContactsOptions.clearFilters();
+			mContactsOptions.addFilter("assigned_to", "me");
+			mContactsOptions.addFilter("status", "uncontacted");
+			mContactsOptions.addFilter("status", "attempted_contact");
+			mContactsOptions.addFilter("status", "contacted");
+			break;
+		case R.id.nav_my_contacts_completed:
+			mContactsOptions.clearFilters();
+			mContactsOptions.addFilter("assigned_to", "me");
+			mContactsOptions.addFilter("status", "completed");
+			break;
+		}
 		return true;
 	}
 

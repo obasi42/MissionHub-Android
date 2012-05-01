@@ -15,8 +15,7 @@
 
         <TextView
             android:id="@+id/subtitle"
-            style="@style/TextAppearance.MissionHub.Widget.ActionBar.Subtitle"
-            android:textColor="@color/black" />
+            style="@style/TextAppearance.MissionHub.Widget.ActionBar.Subtitle" />
     </LinearLayout>
 
 </com.missionhub.ui.widget.NavigationItemView>

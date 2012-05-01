@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.missionhub.ui.widget.NavigationDividerView xmlns:android="http://schemas.android.com/apk/res/android"
-    style="?android:attr/listSeparatorTextViewStyle"
+    style="@style/NavigationListSeparator"
     android:layout_width="fill_parent"
     android:layout_height="32.0dip"
     android:layout_gravity="center_vertical"
@@ -12,9 +12,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:text="Title"
         android:textAllCaps="true"
-        android:textColor="@color/dark_gray"
+        android:textColor="@color/light_gray"
         android:textSize="14.0sp"
         android:textStyle="bold" />
 
@@ -26,8 +25,7 @@
         android:ellipsize="end"
         android:gravity="right|center"
         android:singleLine="true"
-        android:text="Subtitle"
-        android:textColor="@color/dark_gray"
+        android:textColor="@color/light_gray"
         android:textSize="14.0sp" />
 
 </com.missionhub.ui.widget.NavigationDividerView>
