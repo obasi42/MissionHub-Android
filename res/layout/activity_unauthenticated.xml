@@ -1,0 +1,16 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:layout_gravity="bottom|center_horizontal"
+    android:background="@drawable/background"
+    tools:context=".activity.UnauthenticatedActivity" >
+
+    <fragment
+        android:id="@+id/fragment_unauthenticated"
+        android:name="com.missionhub.fragment.UnauthenticatedFragment"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        tools:layout="@layout/fragment_unauthenticated" />
+
+</FrameLayout>

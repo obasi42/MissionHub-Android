@@ -1,0 +1,35 @@
+# the production mode. values development|test|production
+ENVIRONMENT=development
+
+# the market the application is deployed to. values: android|amazon|nook
+MARKET=android
+
+# missionhub api
+API_URL=https://www.missionhub.com/api
+API_VERSION=2
+
+# missionhub surveys
+SURVEY_URL=http://mhub.cc/surveys
+
+# missionhub oauth
+OAUTH_URL=https://www.missionhub.com/oauth
+OAUTH_CLIENT_ID=
+OAUTH_CLIENT_SECRET=
+OAUTH_SCOPE=userinfo,contacts,contact_assignment,followup_comments,roles,organization_info,groups,communication
+
+# caching
+CACHE_HTTP_ENABLED=true
+CACHE_FILE_ENABLED=true
+CACHE_FILE_SIZE=10m
+
+# google analytics
+ANALYTICS_ENABLED=false
+ANALYTICS_KEY=UA-XXXXXX-XX
+ANALYTICS_DEBUG=false
+ANALYTICS_DRY_RUN=false
+ANAYLTICS_ANONYMIZE_IP=false
+
+# errbit notifier
+ERRBIT_ENABLED=false
+ERRBIT_API_URL=http://example.com/notifier_api/v2/notices
+ERRBIT_API_KEY=

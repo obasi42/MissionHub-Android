@@ -1,3 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <lint>
+    <issue id="ContentDescription">
+        <ignore path="res/layout/activity_authenticator.xml" />
+        <ignore path="res/layout/activity_unauthenticated.xml" />
+        <ignore path="res/layout/fragment_unauthenticated.xml" />
+        <ignore path="res/layout/item_side_menu.xml" />
+    </issue>
+    <issue id="SetJavaScriptEnabled" severity="ignore" />
 </lint>

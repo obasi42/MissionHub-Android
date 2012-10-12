@@ -10,42 +10,58 @@
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_SYNC_STATS" />
+    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
 
     <application
-        android:name=".android.app.MissionHubApplicationher"
-        android:label="@string/app_name" >
-        <activity
-            android:name="com.missionhub.android.MissionHubActivity"
+        android:name=".application.Application"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/Theme.MissionHub" >
+        <service
+            android:name=".authenticator.AuthenticationService"
+            android:exported="true"
+            android:permission="normal" >
+            <intent-filter>
+                <action android:name="android.accounts.AccountAuthenticator" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/authenticator" />
+        </service>
+
+		<activity
+            android:name=".activity.InitActivity"
             android:label="@string/app_name"
-            android:logo="@drawable/logo"
-            android:theme="@style/Theme.MissionHub.NoActionBar" >
+            android:theme="@style/Theme.MissionHubDark.NoActionBar" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
         <activity
-            android:name="com.missionhub.android.SettingsActivity"
-            android:theme="@style/Theme.MissionHub" >
+            android:name=".activity.HostActivity" >
         </activity>
         <activity
-            android:name="com.missionhub.android.LoginActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
-            android:theme="@style/Theme.MissionHub" >
-        </activity>
-        <activity
-            android:name="com.missionhub.android.ContactsActivity"
-            android:theme="@style/Theme.MissionHub" >
-        </activity>
-        <activity
-            android:name="com.missionhub.android.ContactActivity"
-            android:theme="@style/Theme.MissionHub" >
-        </activity>
-
+            android:name=".authenticator.AuthenticatorActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation"
+            android:theme="@style/Theme.MissionHubDark"
+            android:excludeFromRecents="true"
+            android:label="@string/ui_title_authenticator" />
     </application>
 
 </manifest>
