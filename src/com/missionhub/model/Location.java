@@ -6,65 +6,64 @@ package com.missionhub.model;
  */
 public class Location {
 
-    private Long id;
-    private Long person_id;
-    private String name;
-    private String location_id;
-    private String provider;
+	private Long id;
+	private Long person_id;
+	private String name;
+	private String location_id;
+	private String provider;
 
-    public Location() {
-    }
+	public Location() {}
 
-    public Location(Long id) {
-        this.id = id;
-    }
+	public Location(final Long id) {
+		this.id = id;
+	}
 
-    public Location(Long id, Long person_id, String name, String location_id, String provider) {
-        this.id = id;
-        this.person_id = person_id;
-        this.name = name;
-        this.location_id = location_id;
-        this.provider = provider;
-    }
+	public Location(final Long id, final Long person_id, final String name, final String location_id, final String provider) {
+		this.id = id;
+		this.person_id = person_id;
+		this.name = name;
+		this.location_id = location_id;
+		this.provider = provider;
+	}
 
-    public Long getId() {
-        return id;
-    }
+	public Long getId() {
+		return id;
+	}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+	public void setId(final Long id) {
+		this.id = id;
+	}
 
-    public Long getPerson_id() {
-        return person_id;
-    }
+	public Long getPerson_id() {
+		return person_id;
+	}
 
-    public void setPerson_id(Long person_id) {
-        this.person_id = person_id;
-    }
+	public void setPerson_id(final Long person_id) {
+		this.person_id = person_id;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public void setName(final String name) {
+		this.name = name;
+	}
 
-    public String getLocation_id() {
-        return location_id;
-    }
+	public String getLocation_id() {
+		return location_id;
+	}
 
-    public void setLocation_id(String location_id) {
-        this.location_id = location_id;
-    }
+	public void setLocation_id(final String location_id) {
+		this.location_id = location_id;
+	}
 
-    public String getProvider() {
-        return provider;
-    }
+	public String getProvider() {
+		return provider;
+	}
 
-    public void setProvider(String provider) {
-        this.provider = provider;
-    }
+	public void setProvider(final String provider) {
+		this.provider = provider;
+	}
 
 }

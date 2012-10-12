@@ -6,45 +6,44 @@ package com.missionhub.model;
  */
 public class QuestionChoice {
 
-    private Long id;
-    private Long question_id;
-    private String choice;
+	private Long id;
+	private Long question_id;
+	private String choice;
 
-    public QuestionChoice() {
-    }
+	public QuestionChoice() {}
 
-    public QuestionChoice(Long id) {
-        this.id = id;
-    }
+	public QuestionChoice(final Long id) {
+		this.id = id;
+	}
 
-    public QuestionChoice(Long id, Long question_id, String choice) {
-        this.id = id;
-        this.question_id = question_id;
-        this.choice = choice;
-    }
+	public QuestionChoice(final Long id, final Long question_id, final String choice) {
+		this.id = id;
+		this.question_id = question_id;
+		this.choice = choice;
+	}
 
-    public Long getId() {
-        return id;
-    }
+	public Long getId() {
+		return id;
+	}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+	public void setId(final Long id) {
+		this.id = id;
+	}
 
-    public Long getQuestion_id() {
-        return question_id;
-    }
+	public Long getQuestion_id() {
+		return question_id;
+	}
 
-    public void setQuestion_id(Long question_id) {
-        this.question_id = question_id;
-    }
+	public void setQuestion_id(final Long question_id) {
+		this.question_id = question_id;
+	}
 
-    public String getChoice() {
-        return choice;
-    }
+	public String getChoice() {
+		return choice;
+	}
 
-    public void setChoice(String choice) {
-        this.choice = choice;
-    }
+	public void setChoice(final String choice) {
+		this.choice = choice;
+	}
 
 }

@@ -4,8 +4,8 @@ import android.content.Context;
 
 public class ContactItemAdapter extends ItemAdapter {
 
-	public ContactItemAdapter(Context context) {
+	public ContactItemAdapter(final Context context) {
 		super(context);
 	}
-	
+
 }

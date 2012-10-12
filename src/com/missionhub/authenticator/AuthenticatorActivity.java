@@ -270,7 +270,7 @@ public class AuthenticatorActivity extends RoboSherlockAccountAuthenticatorActiv
 				userdata.putString(Authenticator.KEY_PERSON_ID, String.valueOf(done.person.id));
 				mAccountManager.addAccountExplicitly(account, token, userdata);
 				mAccountManager.setPassword(account, token);
-				
+
 				finishActivity(RESULT_OK, account, done.person.id);
 			}
 

@@ -60,16 +60,15 @@ public class Application extends android.app.Application {
 		// set up networking
 		NetworkUtils.disableConnectionReuseIfNecessary();
 		NetworkUtils.enableHttpResponseCache(this);
-		
+
 		// set up the image loader
-		ImageLoader imageLoader = ImageLoader.getInstance();
-		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext())
-					.memoryCache(new WeakMemoryCache())
-					.discCache(new LimitedAgeDiscCache(StorageUtils.getIndividualCacheDirectory(this), 3600 * 24 * 7)) //cache for a week
-					.threadPoolSize(3)
-					.threadPriority(Thread.MIN_PRIORITY + 2)
-					.offOutOfMemoryHandling()
-					.build();
+		final ImageLoader imageLoader = ImageLoader.getInstance();
+		final ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext()).memoryCache(new WeakMemoryCache())
+				.discCache(new LimitedAgeDiscCache(StorageUtils.getIndividualCacheDirectory(this), 3600 * 24 * 7)) // cache
+																													// for
+																													// a
+																													// week
+				.threadPoolSize(3).threadPriority(Thread.MIN_PRIORITY + 2).offOutOfMemoryHandling().build();
 		imageLoader.init(config);
 	}
 
@@ -100,8 +99,8 @@ public class Application extends android.app.Application {
 	}
 
 	/**
-	 * triggered when a log memory notification is received from the os.
-	 * posts an OnLowMemoryEvent event to notify listeners that they should reduce their memory usage.
+	 * triggered when a log memory notification is received from the os. posts an OnLowMemoryEvent event to notify
+	 * listeners that they should reduce their memory usage.
 	 * 
 	 */
 	@Override
@@ -170,39 +169,39 @@ public class Application extends android.app.Application {
 		} catch (final Exception e) {}
 		return null;
 	}
-	
+
 	/**
 	 * Posts an event to the default EventBus
 	 */
-	public static void postEvent(Object event) {
+	public static void postEvent(final Object event) {
 		EventBus.getDefault().post(event);
 	}
-	
+
 	/**
 	 * Register an EventBus event subscriber with the default bus
 	 */
-	public static void registerEventSubscriber(Object subscriber) {
+	public static void registerEventSubscriber(final Object subscriber) {
 		EventBus.getDefault().registerForMainThread(subscriber);
 	}
-	
+
 	/**
 	 * Register an EventBus event subscriber with the default bus
 	 */
-	public static void registerEventSubscriber(Object subscriber, Class<?> eventType, Class<?> ...moreEventTypes) {
+	public static void registerEventSubscriber(final Object subscriber, final Class<?> eventType, final Class<?>... moreEventTypes) {
 		EventBus.getDefault().registerForMainThread(subscriber, eventType, moreEventTypes);
 	}
-	
+
 	/**
 	 * Unregisters an EventBus event subscriber from the default bus
 	 */
-	public static void unregisterEventSubscriber(Object subscriber) {
+	public static void unregisterEventSubscriber(final Object subscriber) {
 		EventBus.getDefault().unregister(subscriber);
 	}
-	
+
 	/**
 	 * Unregisters an EventBus event subscriber from the default bus
 	 */
-	public static void unregisterEventSubscriber(Object subscriber, Class<?> ... eventTypes) {
+	public static void unregisterEventSubscriber(final Object subscriber, final Class<?>... eventTypes) {
 		EventBus.getDefault().unregister(subscriber, eventTypes);
 	}
 }

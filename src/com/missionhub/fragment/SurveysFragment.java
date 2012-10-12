@@ -24,18 +24,18 @@ public class SurveysFragment extends BaseFragment {
 	@InjectView(R.id.container) ViewGroup mContainer;
 
 	private WebView mWebView;
-	
+
 	@Override
-	public void onAttach(Activity activity) {
+	public void onAttach(final Activity activity) {
 		super.onAttach(activity);
-		
+
 		getSherlockActivity().getSupportActionBar().setTitle("Surveys");
 	}
 
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		setRetainInstance(true);
 		setHasOptionsMenu(true);
 	}
@@ -73,12 +73,12 @@ public class SurveysFragment extends BaseFragment {
 
 		mContainer.addView(mWebView);
 	}
-	
+
 	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		
+	public void onCreateOptionsMenu(final Menu menu, final MenuInflater inflater) {
+
 	}
-	
+
 	public void goInitialUrl() {
 		final RoboAsyncTask<String> task = new RoboAsyncTask<String>(Application.getContext()) {
 			@Override
@@ -140,7 +140,7 @@ public class SurveysFragment extends BaseFragment {
 		// purposely leak the context by storing mWebView
 		// webviews are evil.
 		mContainer.removeView(mWebView);
-		
+
 		super.onDestroyView();
 	}
 
@@ -149,7 +149,7 @@ public class SurveysFragment extends BaseFragment {
 		// make sure we get rid of this reference
 		// we are don't purposely leaking views
 		mWebView = null;
-		
+
 		super.onDestroy();
 	}
 

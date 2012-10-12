@@ -69,9 +69,9 @@ public class PickAccountDialog extends Dialog implements OnItemClickListener {
 	public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id) {
 		final Item item = (Item) mAdapter.getItem(position);
 		if (item instanceof AccountItem) {
-			//Application.postEvent(new SessionAccountPickedEvent(((AccountItem) item).person.getId()));
+			// Application.postEvent(new SessionAccountPickedEvent(((AccountItem) item).person.getId()));
 		} else if (item instanceof AccountItem.NewAccountItem) {
-			//Application.postEvent(new SessionAccountPickedEvent(-1));
+			// Application.postEvent(new SessionAccountPickedEvent(-1));
 		}
 		dismiss();
 	}

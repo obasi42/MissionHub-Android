@@ -8,5 +8,5 @@ import com.missionhub.ui.itemview.SpinnerItemView;
 public abstract class SpinnerItem extends Item {
 
 	public abstract SpinnerItemView newDropDownView(Context context, ViewGroup parent);
-	
+
 }

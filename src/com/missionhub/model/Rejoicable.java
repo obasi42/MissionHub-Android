@@ -6,45 +6,44 @@ package com.missionhub.model;
  */
 public class Rejoicable {
 
-    private Long id;
-    private Long comment_id;
-    private String what;
+	private Long id;
+	private Long comment_id;
+	private String what;
 
-    public Rejoicable() {
-    }
+	public Rejoicable() {}
 
-    public Rejoicable(Long id) {
-        this.id = id;
-    }
+	public Rejoicable(final Long id) {
+		this.id = id;
+	}
 
-    public Rejoicable(Long id, Long comment_id, String what) {
-        this.id = id;
-        this.comment_id = comment_id;
-        this.what = what;
-    }
+	public Rejoicable(final Long id, final Long comment_id, final String what) {
+		this.id = id;
+		this.comment_id = comment_id;
+		this.what = what;
+	}
 
-    public Long getId() {
-        return id;
-    }
+	public Long getId() {
+		return id;
+	}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+	public void setId(final Long id) {
+		this.id = id;
+	}
 
-    public Long getComment_id() {
-        return comment_id;
-    }
+	public Long getComment_id() {
+		return comment_id;
+	}
 
-    public void setComment_id(Long comment_id) {
-        this.comment_id = comment_id;
-    }
+	public void setComment_id(final Long comment_id) {
+		this.comment_id = comment_id;
+	}
 
-    public String getWhat() {
-        return what;
-    }
+	public String getWhat() {
+		return what;
+	}
 
-    public void setWhat(String what) {
-        this.what = what;
-    }
+	public void setWhat(final String what) {
+		this.what = what;
+	}
 
 }

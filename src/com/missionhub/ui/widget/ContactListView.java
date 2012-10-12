@@ -5,7 +5,6 @@ import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import roboguice.util.SafeAsyncTask;
-
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -35,7 +34,7 @@ public class ContactListView extends SelectableListView implements OnItemChecked
 
 	/** the logging tag */
 	public static final String TAG = ContactListView.class.getSimpleName();
-	
+
 	/** the adapter backing the listview */
 	private final ItemAdapter mAdapter;
 
@@ -55,8 +54,8 @@ public class ContactListView extends SelectableListView implements OnItemChecked
 	private int mDefaultContactItemViewResource = R.layout.item_contact;
 
 	/** if data updates are paused */
-	private AtomicBoolean mPaused = new AtomicBoolean(false);
-	
+	private final AtomicBoolean mPaused = new AtomicBoolean(false);
+
 	/** the task used for fetching contacts */
 	private SafeAsyncTask<List<Person>> mFetchTask;
 
@@ -103,15 +102,16 @@ public class ContactListView extends SelectableListView implements OnItemChecked
 		super.setOnItemCheckedListener(this);
 		super.setOnItemClickListener(this);
 		super.setOnItemLongClickListener(this);
-		super.setOnScrollListener(new OnScrollListener(){
-			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+		super.setOnScrollListener(new OnScrollListener() {
+			@Override
+			public void onScroll(final AbsListView view, final int firstVisibleItem, final int visibleItemCount, final int totalItemCount) {
 				if (totalItemCount - firstVisibleItem < 2.5 * visibleItemCount) {
 					fetchContacts();
 				}
 			}
 
-			public void onScrollStateChanged(AbsListView view, int scrollState) {
-			}
+			@Override
+			public void onScrollStateChanged(final AbsListView view, final int scrollState) {}
 		});
 	}
 
@@ -178,10 +178,10 @@ public class ContactListView extends SelectableListView implements OnItemChecked
 	public void setOnItemSelectedListener(final OnItemSelectedListener listener) {
 		throw new RuntimeException("use setOnContactCheckedListener for selection status");
 	}
-	
+
 	@Override
 	@Deprecated
-	public void setOnScrollListener(OnScrollListener listener) {
+	public void setOnScrollListener(final OnScrollListener listener) {
 		throw new RuntimeException("the scroll listener is already bound to the ContactListView and cannot be set");
 	}
 
@@ -392,34 +392,34 @@ public class ContactListView extends SelectableListView implements OnItemChecked
 	}
 
 	/**
-	 * Internal method for fetching the next set of contacts from the api based on the contact list options.
-	 * Calling this while a fetch is occurring will have no effect.
+	 * Internal method for fetching the next set of contacts from the api based on the contact list options. Calling
+	 * this while a fetch is occurring will have no effect.
 	 */
 	private synchronized void fetchContacts() {
-		if (mFetchTask != null || mPaused.get() || mContactListOptions == null || mContactListOptions.isAtEnd()) return;		
-		
+		if (mFetchTask != null || mPaused.get() || mContactListOptions == null || mContactListOptions.isAtEnd()) return;
+
 		mFetchTask = new SafeAsyncTask<List<Person>>() {
-			
+
 			/** store the options when the task was started to track if the options item changes */
 			final ContactListOptions options = mContactListOptions;
-			
+
 			@Override
 			public List<Person> call() throws Exception {
 				return Api.getContactList(mContactListOptions).get();
 			}
-			
+
 			@Override
 			public void onPreExecute() {
-				//TODO: start progress bar
+				// TODO: start progress bar
 			}
-			
+
 			@Override
-			public void onSuccess(List<Person> people) {
+			public void onSuccess(final List<Person> people) {
 				// the options have changed and this response is no longer valid
 				if (options != mContactListOptions) {
 					return;
 				}
-				
+
 				// set up the options for the next run
 				if (people.size() < mContactListOptions.getLimit()) {
 					mContactListOptions.setIsAtEnd(true);
@@ -427,44 +427,45 @@ public class ContactListView extends SelectableListView implements OnItemChecked
 				} else {
 					mContactListOptions.advanceStart();
 				}
-				
+
 				// add the people to the list
 				addPeople(people);
 			}
-			
+
 			@Override
-			public void onInterrupted(Exception e) {
+			public void onInterrupted(final Exception e) {
 				// pass this to onThrowable so we only have to handle exceptions one place.
 				onException(e);
 			}
-			
+
 			@Override
-			public void onException(Exception e) {
+			public void onException(final Exception e) {
 				// pass this to onThrowable so we only have to handle exceptions one place.
 				onThrowable(e);
 			}
-			
-			public void onThrowable(Throwable t) {
-				//TODO handle error
+
+			@Override
+			public void onThrowable(final Throwable t) {
+				// TODO handle error
 				Log.e(TAG, t.getMessage(), t);
-				
+
 				// the options have changed and this response is no longer valid
 				if (options != mContactListOptions) {
 					return;
 				}
-				
+
 				// put ui code here
 			}
-			
+
 			@Override
 			public void onFinally() {
-				//TODO: stop progress bar
-				
+				// TODO: stop progress bar
+
 				// the options have changed and this response is no longer valid
 				if (options != mContactListOptions) {
 					return;
 				}
-				
+
 				// this is after checking for changed options, as setting the options will null the task.
 				mFetchTask = null;
 			}

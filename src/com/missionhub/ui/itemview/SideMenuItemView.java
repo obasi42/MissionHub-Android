@@ -17,7 +17,7 @@ import com.missionhub.util.U;
  * Views for use in side menu
  */
 public class SideMenuItemView extends RelativeLayout implements ItemView {
-	
+
 	ImageView mIcon;
 	TextView mText;
 	ImageView mCountIcon;
@@ -49,14 +49,14 @@ public class SideMenuItemView extends RelativeLayout implements ItemView {
 		} else {
 			mIcon.setVisibility(View.INVISIBLE);
 		}
-		
+
 		if (!U.isNullEmpty(menuitem.text)) {
 			mText.setText(menuitem.text);
 			mText.setVisibility(View.VISIBLE);
 		} else {
 			mText.setVisibility(View.INVISIBLE);
 		}
-		
+
 		// TODO: add count support
 	}
 
@@ -64,5 +64,5 @@ public class SideMenuItemView extends RelativeLayout implements ItemView {
 	public Class<? extends Item> getItemClass() {
 		return SideMenuItem.class;
 	}
-	
+
 }

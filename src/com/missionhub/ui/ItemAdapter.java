@@ -62,7 +62,7 @@ public class ItemAdapter extends BaseAdapter implements SpinnerAdapter {
 
 	private static final int TYPE_NORMAL = 1;
 	private static final int TYPE_DROPDOWN = 2;
-	
+
 	private static class TypeInfo {
 		int count;
 		int type;
@@ -449,14 +449,15 @@ public class ItemAdapter extends BaseAdapter implements SpinnerAdapter {
 	public View getView(final int position, final View convertView, final ViewGroup parent) {
 		return getView(TYPE_NORMAL, position, convertView, parent);
 	}
-	
+
 	@Override
 	public View getDropDownView(final int position, final View convertView, final ViewGroup parent) {
 		return getView(TYPE_DROPDOWN, position, convertView, parent);
 	}
-	
+
 	/**
 	 * A get view implementation that can handle either a spinner item or normal item
+	 * 
 	 * @param type
 	 * @param position
 	 * @param convertView
@@ -466,7 +467,7 @@ public class ItemAdapter extends BaseAdapter implements SpinnerAdapter {
 	private View getView(final int type, final int position, final View convertView, final ViewGroup parent) {
 		final Item item = (Item) getItem(position);
 		ItemView cell = (ItemView) convertView;
-		
+
 		// clear the cell if the layout on the item does not match the cell's layout
 		if (item instanceof LayoutItem && cell instanceof LayoutItemView) {
 			if (((LayoutItem) item).layout != ((LayoutItemView) cell).getLayoutId()) {
@@ -477,19 +478,19 @@ public class ItemAdapter extends BaseAdapter implements SpinnerAdapter {
 		// recreate the layout if the cell is null or the class does not match
 		if (cell == null || cell.getItemClass() != item.getClass()) {
 			if (type == TYPE_DROPDOWN && item instanceof SpinnerItem) {
-				cell = ((SpinnerItem)item).newDropDownView(mContext, parent);
+				cell = ((SpinnerItem) item).newDropDownView(mContext, parent);
 				((SpinnerItemView) cell).prepareDropdownItemView();
 			} else {
 				cell = item.newView(mContext, parent);
 				cell.prepareItemView();
 			}
 		}
-		
+
 		// set the layout id
 		if (item instanceof LayoutItem && cell instanceof LayoutItemView) {
 			((LayoutItemView) cell).setLayoutId(((LayoutItem) item).layout);
 		}
-		
+
 		// handle spinners
 		if (type == TYPE_DROPDOWN && item instanceof SpinnerItem) {
 			((SpinnerItemView) cell).setDropdownObject((SpinnerItem) item, parent, position);

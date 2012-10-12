@@ -22,29 +22,29 @@ public class SimpleSpinnerItemView extends CheckedTextView implements SpinnerIte
 	public SimpleSpinnerItemView(final Context context, final AttributeSet attrs, final int defStyle) {
 		super(context, attrs, defStyle);
 	}
-	
+
 	@Override
 	public void prepareItemView() {}
-	
+
 	@Override
 	public void prepareDropdownItemView() {}
 
 	@Override
-	public void setObject(Item item, ViewGroup parent, int position) {
-		setText(((SimpleSpinnerItem)item).text);
-		
+	public void setObject(final Item item, final ViewGroup parent, final int position) {
+		setText(((SimpleSpinnerItem) item).text);
+
 		this.setCheckMarkDrawable(null);
 	}
-	
+
 	@Override
-	public void setDropdownObject(SpinnerItem item, ViewGroup parent, int position) {
-		setText(((SimpleSpinnerItem)item).text);
-		
+	public void setDropdownObject(final SpinnerItem item, final ViewGroup parent, final int position) {
+		setText(((SimpleSpinnerItem) item).text);
+
 		this.setCheckMarkDrawable(null);
 	}
 
 	@Override
 	public Class<? extends Item> getItemClass() {
 		return SimpleSpinnerItem.class;
-	}	
+	}
 }

@@ -31,12 +31,9 @@ public class ContactListItemView extends LinearLayout implements LayoutItemView,
 
 	private boolean mChecked = false;
 	private boolean mActivated = false;
-	
-	private DisplayImageOptions mImageOptions = new DisplayImageOptions.Builder()
-	.showStubImage(R.drawable.default_contact)
-	.cacheInMemory()
-	.cacheOnDisc()
-	.build();
+
+	private final DisplayImageOptions mImageOptions = new DisplayImageOptions.Builder().showStubImage(R.drawable.default_contact).cacheInMemory().cacheOnDisc()
+			.build();
 
 	public ContactListItemView(final Context context) {
 		this(context, null, -1);
@@ -47,7 +44,7 @@ public class ContactListItemView extends LinearLayout implements LayoutItemView,
 	}
 
 	public ContactListItemView(final Context context, final AttributeSet attrs, final int defStyle) {
-		super(context, attrs, defStyle);		
+		super(context, attrs, defStyle);
 	}
 
 	@Override
@@ -62,7 +59,7 @@ public class ContactListItemView extends LinearLayout implements LayoutItemView,
 	public void setObject(final Item item, final ViewGroup parent, final int position) {
 		final Person person = ((ContactListItem) item).person;
 		if (person != null) {
-			
+
 			if (mPicture != null) {
 				if (!U.isNullEmpty(person.getPicture())) {
 					ImageLoader.getInstance().displayImage(person.getPicture(), mPicture, mImageOptions);

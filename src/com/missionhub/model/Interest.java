@@ -6,75 +6,74 @@ package com.missionhub.model;
  */
 public class Interest {
 
-    private Long id;
-    private Long person_id;
-    private String name;
-    private String interest_id;
-    private String category;
-    private String provider;
+	private Long id;
+	private Long person_id;
+	private String name;
+	private String interest_id;
+	private String category;
+	private String provider;
 
-    public Interest() {
-    }
+	public Interest() {}
 
-    public Interest(Long id) {
-        this.id = id;
-    }
+	public Interest(final Long id) {
+		this.id = id;
+	}
 
-    public Interest(Long id, Long person_id, String name, String interest_id, String category, String provider) {
-        this.id = id;
-        this.person_id = person_id;
-        this.name = name;
-        this.interest_id = interest_id;
-        this.category = category;
-        this.provider = provider;
-    }
+	public Interest(final Long id, final Long person_id, final String name, final String interest_id, final String category, final String provider) {
+		this.id = id;
+		this.person_id = person_id;
+		this.name = name;
+		this.interest_id = interest_id;
+		this.category = category;
+		this.provider = provider;
+	}
 
-    public Long getId() {
-        return id;
-    }
+	public Long getId() {
+		return id;
+	}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+	public void setId(final Long id) {
+		this.id = id;
+	}
 
-    public Long getPerson_id() {
-        return person_id;
-    }
+	public Long getPerson_id() {
+		return person_id;
+	}
 
-    public void setPerson_id(Long person_id) {
-        this.person_id = person_id;
-    }
+	public void setPerson_id(final Long person_id) {
+		this.person_id = person_id;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public void setName(final String name) {
+		this.name = name;
+	}
 
-    public String getInterest_id() {
-        return interest_id;
-    }
+	public String getInterest_id() {
+		return interest_id;
+	}
 
-    public void setInterest_id(String interest_id) {
-        this.interest_id = interest_id;
-    }
+	public void setInterest_id(final String interest_id) {
+		this.interest_id = interest_id;
+	}
 
-    public String getCategory() {
-        return category;
-    }
+	public String getCategory() {
+		return category;
+	}
 
-    public void setCategory(String category) {
-        this.category = category;
-    }
+	public void setCategory(final String category) {
+		this.category = category;
+	}
 
-    public String getProvider() {
-        return provider;
-    }
+	public String getProvider() {
+		return provider;
+	}
 
-    public void setProvider(String provider) {
-        this.provider = provider;
-    }
+	public void setProvider(final String provider) {
+		this.provider = provider;
+	}
 
 }

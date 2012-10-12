@@ -1,12 +1,12 @@
 package com.missionhub.activity;
 
+import android.content.Intent;
+import android.os.Bundle;
+
 import com.WazaBe.HoloEverywhere.widget.Toast;
 import com.missionhub.application.Application;
 import com.missionhub.application.Session.SessionInvalidTokenEvent;
 import com.missionhub.application.Session.SessionInvalidatedEvent;
-
-import android.content.Intent;
-import android.os.Bundle;
 
 /** Listens for SesisonEvents and responds accordingly. */
 public class BaseAuthenticatedActivity extends BaseActivity {
@@ -22,12 +22,12 @@ public class BaseAuthenticatedActivity extends BaseActivity {
 		Application.unregisterEventSubscriber(this);
 		super.onDestroy();
 	}
-	
+
 	public void onEvent(final SessionInvalidatedEvent event) {
 		Toast.makeText(this, "You have been logged out of MissionHub.", Toast.LENGTH_LONG).show();
 		startInitActivity();
 	}
-	
+
 	public void onEvent(final SessionInvalidTokenEvent event) {
 		Toast.makeText(this, "You MissionHub authentication token is invaild. Please login again.", Toast.LENGTH_LONG).show();
 		startInitActivity();

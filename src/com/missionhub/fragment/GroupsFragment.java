@@ -13,10 +13,10 @@ public class GroupsFragment extends BaseFragment {
 		super.onCreate(savedInstanceState);
 		setRetainInstance(true);
 	}
-	
+
 	@Override
 	public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
-		TextView tv = new TextView(inflater.getContext());
+		final TextView tv = new TextView(inflater.getContext());
 		tv.setText("Groups Fragment");
 		return tv;
 	}

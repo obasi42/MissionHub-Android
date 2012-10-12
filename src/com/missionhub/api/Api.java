@@ -139,7 +139,7 @@ public class Api {
 		if (!NetworkUtils.isNetworkAvailable(Application.getContext())) {
 			throw new OfflineException();
 		}
-		
+
 		/* create the headers object if needed and add the api version header */
 		if (headers == null) {
 			headers = new HttpHeaders();
@@ -683,15 +683,15 @@ public class Api {
 			this.appendOrderByParam(params);
 			return params.toString();
 		}
-		
+
 		public boolean isAtEnd() {
 			return atEnd;
 		}
-		
-		public void setIsAtEnd(boolean atEnd) {
+
+		public void setIsAtEnd(final boolean atEnd) {
 			this.atEnd = atEnd;
 		}
-		
+
 		public void advanceStart() {
 			this.start += this.limit;
 		}

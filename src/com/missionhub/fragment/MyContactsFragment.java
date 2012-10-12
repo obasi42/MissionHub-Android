@@ -7,8 +7,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.AbsListView;
 import android.widget.FrameLayout;
-import android.widget.ListView;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
@@ -55,7 +55,7 @@ public class MyContactsFragment extends BaseFragment implements OnNavigationList
 		// initialize the contact list if null
 		if (mContactList == null) {
 			mContactList = new ContactListView(view.getContext());
-			mContactList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+			mContactList.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
 		}
 
 		mContainer.addView(mContactList, new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));

@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
@@ -39,7 +40,7 @@ public class SideMenuFragment extends RoboSherlockFragment {
 	@Override
 	public void onViewCreated(final View v, final Bundle savedInstanceState) {
 		super.onViewCreated(v, savedInstanceState);
-		mListView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+		mListView.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
 		mListView.setAdapter(mAdapter);
 		mListView.setOnItemClickListener(new OnItemClickListener() {
 			@Override

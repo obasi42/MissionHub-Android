@@ -282,7 +282,7 @@ public class Session implements OnAccountsUpdateListener {
 		if (mAccount != null) {
 			try {
 				mAccountManager.removeAccount(mAccount, null, null).getResult();
-				SettingsManager.setSessionLastUserId(-1);				
+				SettingsManager.setSessionLastUserId(-1);
 				resetSession();
 			} catch (final Exception e) {}
 		}
@@ -308,7 +308,7 @@ public class Session implements OnAccountsUpdateListener {
 		SettingsManager.setSessionLastUserId(-1);
 		resetSession();
 	}
-	
+
 	/**
 	 * Reports the Session as having a bad access token
 	 */
