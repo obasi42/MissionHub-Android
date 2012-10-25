@@ -40,12 +40,12 @@ public class InitActivity extends BaseActivity {
 		if (Session.getInstance().resumeSession()) {
 			Session.getInstance().refreshSession();
 		} else {
-			final Intent intent = new Intent(this, AuthenticatorActivity.class);
-			startActivityForResult(intent, REQUEST_AUTHENTICATION);
+			//final Intent intent = new Intent(this, AuthenticatorActivity.class);
+			//startActivityForResult(intent, REQUEST_AUTHENTICATION);
 		}
 	}
 
-	public void onEvent(final SessionRefreshEvent event) {
+	public void onEventMainThread(final SessionRefreshEvent event) {
 		Log.e("EVENT", event.getClass().getSimpleName());
 	}
 

@@ -181,14 +181,14 @@ public class Application extends android.app.Application {
 	 * Register an EventBus event subscriber with the default bus
 	 */
 	public static void registerEventSubscriber(final Object subscriber) {
-		EventBus.getDefault().registerForMainThread(subscriber);
+		EventBus.getDefault().register(subscriber);
 	}
 
 	/**
 	 * Register an EventBus event subscriber with the default bus
 	 */
 	public static void registerEventSubscriber(final Object subscriber, final Class<?> eventType, final Class<?>... moreEventTypes) {
-		EventBus.getDefault().registerForMainThread(subscriber, eventType, moreEventTypes);
+		EventBus.getDefault().register(subscriber, eventType, moreEventTypes);
 	}
 
 	/**

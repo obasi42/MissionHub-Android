@@ -1,5 +1,4 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:layout_gravity="bottom|center_horizontal"
@@ -35,7 +34,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:visibility="gone" />
+            android:visibility="visible" />
 
         <com.WazaBe.HoloEverywhere.widget.TextView
             android:id="@+id/status"
@@ -44,7 +43,18 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="58dp"
             android:textStyle="bold"
-            android:visibility="gone" />
+            android:visibility="visible" />
+        
+        <Button
+            android:id="@+id/btn_login"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="@string/login"
+            android:textSize="22dp"
+            android:visibility="visible"
+             />
 
         <com.WazaBe.HoloEverywhere.widget.TextView
             android:id="@+id/version"

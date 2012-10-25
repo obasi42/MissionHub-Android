@@ -23,12 +23,12 @@ public class BaseAuthenticatedActivity extends BaseActivity {
 		super.onDestroy();
 	}
 
-	public void onEvent(final SessionInvalidatedEvent event) {
+	public void onEventMainThread(final SessionInvalidatedEvent event) {
 		Toast.makeText(this, "You have been logged out of MissionHub.", Toast.LENGTH_LONG).show();
 		startInitActivity();
 	}
 
-	public void onEvent(final SessionInvalidTokenEvent event) {
+	public void onEventMainThread(final SessionInvalidTokenEvent event) {
 		Toast.makeText(this, "You MissionHub authentication token is invaild. Please login again.", Toast.LENGTH_LONG).show();
 		startInitActivity();
 	}
