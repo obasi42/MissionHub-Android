@@ -36,8 +36,8 @@ public class GroupLabel {
 		this.id = id;
 	}
 
-	public GroupLabel(final Long id, final String name, final Long organization_id, final String ancestry, final java.util.Date created_at,
-			final java.util.Date updated_at, final Integer group_labelings_count) {
+	public GroupLabel(final Long id, final String name, final Long organization_id, final String ancestry, final java.util.Date created_at, final java.util.Date updated_at,
+			final Integer group_labelings_count) {
 		this.id = id;
 		this.name = name;
 		this.organization_id = organization_id;

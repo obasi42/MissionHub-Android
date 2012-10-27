@@ -23,16 +23,29 @@ public class BaseAuthenticatedActivity extends BaseActivity {
 		super.onDestroy();
 	}
 
+	/**
+	 * Responds to Session Invalidated Events
+	 * 
+	 * @param event
+	 */
 	public void onEventMainThread(final SessionInvalidatedEvent event) {
 		Toast.makeText(this, "You have been logged out of MissionHub.", Toast.LENGTH_LONG).show();
 		startInitActivity();
 	}
 
+	/**
+	 * Responds to Session Invalid Token Events
+	 * 
+	 * @param event
+	 */
 	public void onEventMainThread(final SessionInvalidTokenEvent event) {
 		Toast.makeText(this, "You MissionHub authentication token is invaild. Please login again.", Toast.LENGTH_LONG).show();
 		startInitActivity();
 	}
 
+	/**
+	 * Finishes the current activity and starts the init activity.
+	 */
 	private void startInitActivity() {
 		final Intent intent = new Intent(getApplicationContext(), InitActivity.class);
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

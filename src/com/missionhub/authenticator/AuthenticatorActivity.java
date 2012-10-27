@@ -1,29 +1,25 @@
 package com.missionhub.authenticator;
 
 import java.net.URLDecoder;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.FutureTask;
 
+import roboguice.inject.ContentView;
 import roboguice.inject.InjectView;
 import roboguice.util.RoboAsyncTask;
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
-import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.webkit.WebViewDatabase;
-import android.widget.Button;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,215 +27,238 @@ import android.widget.Toast;
 import com.actionbarsherlock.view.Window;
 import com.github.rtyley.android.sherlock.roboguice.activity.RoboSherlockAccountAuthenticatorActivity;
 import com.google.gson.Gson;
+import com.google.inject.Inject;
 import com.missionhub.R;
 import com.missionhub.api.Api;
 import com.missionhub.api.ApiErrorGson;
 import com.missionhub.application.Application;
 import com.missionhub.application.Configuration;
 import com.missionhub.application.SettingsManager;
-import com.missionhub.exception.ApiException;
+import com.missionhub.exception.ExceptionHelper;
+import com.missionhub.exception.ExceptionHelper.DialogButton;
+import com.missionhub.exception.WebViewException;
 import com.missionhub.model.gson.GAuthTokenDone;
 import com.missionhub.network.HttpParams;
-import com.missionhub.util.IntentHelper;
 import com.missionhub.util.U;
 
 /**
  * Activity which displays login screen to the user.
  */
+@ContentView(R.layout.activity_authenticator)
 public class AuthenticatorActivity extends RoboSherlockAccountAuthenticatorActivity {
 
 	/** the logging tag */
 	public static final String TAG = AuthenticatorActivity.class.getSimpleName();
 
+	/** the activity result when a duplicate account exists */
+	public static final int RESULT_DUPLICATE = 1;
+
 	/** the system account manager */
-	private AccountManager mAccountManager;
+	@Inject private AccountManager mAccountManager;
 
-	@InjectView(R.id.placeholder) FrameLayout mPlaceholder;
-	@InjectView(R.id.content) LinearLayout mContent;
-	@InjectView(R.id.status) TextView mStatus;
-	@InjectView(R.id.error) TextView mError;
-	@InjectView(R.id.btn_resources) TextView mResources;
-	@InjectView(R.id.loading) ProgressBar mLoading;
-	@InjectView(R.id.btn_retry) Button mRetry;
+	/** the web view used for authentication */
+	@InjectView(R.id.webview) private WebView mWebView;
 
-	/** the authentication webview */
-	private WebView mWebView;
+	/** the progress bar */
+	@InjectView(R.id.progress) private ProgressBar mProgress;
 
-	/** true when fetching the token from a code */
-	private final AtomicBoolean mGettingToken = new AtomicBoolean();
+	/** text to display the current progress action */
+	@InjectView(R.id.progress_text) private TextView mProgressText;
 
-	/** true if the webview has an error */
-	private final AtomicBoolean mWebViewError = new AtomicBoolean();
+	/** holds the task that fetches the access token and adds the system account */
+	private FutureTask<GAuthTokenDone> mAuthTask;
 
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+		super.onCreate(savedInstanceState);
 
-		setContentView(R.layout.activity_authenticator);
+		// web view settings
+		mWebView.getSettings().setAppCacheEnabled(true);
+		mWebView.getSettings().setAllowFileAccess(false);
+		mWebView.getSettings().setBuiltInZoomControls(false);
+		mWebView.getSettings().setJavaScriptEnabled(true);
+		mWebView.getSettings().setLoadsImagesAutomatically(true);
+		mWebView.getSettings().setSaveFormData(false);
+		mWebView.getSettings().setSavePassword(false);
+		mWebView.getSettings().setSupportMultipleWindows(false);
+		mWebView.getSettings().setSupportZoom(false);
 
-		mResources.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(final View v) {
-				IntentHelper.openUrl("http://blog.missionhub.com/");
-			}
-		});
+		// web view display settings
+		mWebView.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_OVERLAY);
+		mWebView.setScrollbarFadingEnabled(true);
 
-		if (savedInstanceState == null) {
-			clearCookies();
-		} else {
-			mGettingToken.set(savedInstanceState.getBoolean("mGettingToken"));
-			if (mGettingToken.get()) {
-				showLoading("Getting authentication token...");
-			}
+		// the web view client
+		mWebView.setWebViewClient(new AuthenticatorWebViewClient());
+
+		// begin authentication
+		resetAuthentication();
+	}
+
+	/** resets the state of the auth activity */
+	private void resetAuthentication() {
+		// cancel the current auth task
+		if (mAuthTask != null) {
+			mAuthTask.cancel(true);
+			mAuthTask = null;
 		}
 
-		mAccountManager = AccountManager.get(this);
+		// clear the web view cookies
+		clearCookies();
 
-		initWebView();
+		// show the webview and go to the initial auth page
+		mWebView.setVisibility(View.VISIBLE);
+		mWebView.loadUrl(getAuthenticationUrl());
 	}
 
 	/**
-	 * Creates the web view used to authenticate the user
+	 * web view client to manage the authentication process
 	 */
-	@SuppressWarnings("deprecation")
-	protected void initWebView() {
-		if (mWebView == null) {
+	private class AuthenticatorWebViewClient extends WebViewClient {
 
-			final String url = Configuration.getOauthUrl() + "/authorize";
-			final HttpParams params = new HttpParams();
-			params.put("android", true);
-			params.put("display", "touch");
-			params.put("simple", true);
-			params.put("response_type", "code");
-			params.put("redirect_uri", Configuration.getOauthUrl() + "/done.json");
-			params.put("client_id", Configuration.getOauthClientId());
-			params.put("scope", Configuration.getOauthScope());
+		@Override
+		public boolean shouldOverrideUrlLoading(final WebView view, final String url) {
+			// parse the url to a uri for easier checking
+			final Uri uri = Uri.parse(url);
 
-			mWebView = new WebView(this);
-			mWebView.setLayoutParams(new ViewGroup.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
-			mWebView.getSettings().setAppCacheEnabled(true);
-			mWebView.getSettings().setJavaScriptEnabled(true);
-			mWebView.getSettings().setLoadsImagesAutomatically(true);
-			mWebView.getSettings().setSupportZoom(false);
-			mWebView.getSettings().setSavePassword(false);
-			mWebView.getSettings().setSaveFormData(false);
-			mWebView.getSettings().setBuiltInZoomControls(true);
-			mWebView.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_OVERLAY);
-			mWebView.setScrollbarFadingEnabled(true);
-			mWebView.setWebViewClient(new InternalWebViewClient());
-			mWebView.setWebChromeClient(new ProgressChromeClient());
-			mWebView.loadUrl(url + '?' + params.getParamString());
+			// parse the oauth url to a uri for comparisons to the uri
+			final Uri oauthUri = Uri.parse(Configuration.getOauthUrl());
 
-			mRetry.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(final View v) {
-					hideError();
-					mWebView.reload();
+			// make sure we are only working with requests from the oauth server
+			if (uri.getHost().equalsIgnoreCase(oauthUri.getHost())) {
+
+				// check for an api error
+				if (!U.isNullEmpty(uri.getQueryParameter("error"))) {
+					try {
+						final Gson gson = new Gson();
+						final ApiErrorGson error = gson.fromJson(URLDecoder.decode(uri.getQueryParameter("error_description"), "UTF-8"), ApiErrorGson.class);
+						onError(error.getException());
+					} catch (final Exception e) {
+						onError(new Exception(uri.getQueryParameter("error")));
+					}
+					return true;
 				}
-			});
+
+				// Check for the authorization parameter. If it exists, automatically grant app access.
+				final String authorization = uri.getQueryParameter("authorization");
+				if (!U.isNullEmpty(authorization) && uri.getPath().contains("/authorize")) {
+					// check for a mh cookie to ensure the user is logged in
+					CookieSyncManager.createInstance(AuthenticatorActivity.this);
+					final CookieManager mgr = CookieManager.getInstance();
+					final String cookieString = mgr.getCookie(oauthUri.getHost());
+					if (cookieString != null && (cookieString.contains("_mh_session="))) {
+						mWebView.loadUrl(Configuration.getOauthUrl() + "/grant.json?authorization=" + authorization);
+						return true;
+					}
+				}
+
+				// Check for the authentication code. If exists, use it to obtain the user's access token
+				final String code = uri.getQueryParameter("code");
+				if (!U.isNullEmpty(code) && uri.getPath().contains("/done")) {
+					mWebView.loadData("", "text/plain; charset=UTF-8", null);
+					mWebView.setVisibility(View.GONE);
+
+					// fetch the access token and add an account
+					addAccountFromCode(code);
+
+					return true;
+				}
+			}
+
+			return false; // make sure this web view handles all other urls
 		}
 
-		mPlaceholder.addView(mWebView);
-	}
-
-	/**
-	 * Chrome client that manages indeterminate progress visibility
-	 */
-	private class ProgressChromeClient extends WebChromeClient {
 		@Override
-		public void onProgressChanged(final WebView view, final int progress) {
-			if (progress < 100) {
-				AuthenticatorActivity.this.setSupportProgressBarIndeterminateVisibility(Boolean.TRUE);
-			}
-			if (progress == 100) {
-				AuthenticatorActivity.this.setSupportProgressBarIndeterminateVisibility(Boolean.FALSE);
-			}
-		}
-	}
-
-	/**
-	 * Web view client that directs the authentication process
-	 */
-	private class InternalWebViewClient extends WebViewClient {
-
-		@Override
-		public void onReceivedError(final WebView view, final int errorCode, final String description, final String failingUrl) {
-			mWebViewError.set(true);
-			showError(getString(R.string.network_error), description);
+		public void onPageStarted(final WebView view, final String url, final Bitmap favicon) {
+			AuthenticatorActivity.this.setSupportProgressBarIndeterminateVisibility(Boolean.TRUE);
 		}
 
 		@Override
 		public void onPageFinished(final WebView view, final String url) {
-			if (!mWebViewError.get()) {
-				hideError();
-			}
+			AuthenticatorActivity.this.setSupportProgressBarIndeterminateVisibility(Boolean.FALSE);
+		}
 
-			final Uri uri = Uri.parse(url);
-			final Uri oauthUri = Uri.parse(Configuration.getOauthUrl());
+		@Override
+		public void onReceivedError(final WebView view, final int errorCode, final String description, final String failingUrl) {
+			Log.e(TAG, "ERROR HERE");
 
-			// api returned an error, show an error and return
-			if (uri.getQueryParameter("error") != null) {
-				try {
-					final Gson gson = new Gson();
-					final ApiErrorGson error = gson.fromJson(URLDecoder.decode(uri.getQueryParameter("error_description"), "UTF-8"), ApiErrorGson.class);
-					showError(error.error.title, error.error.message);
-				} catch (final Exception e) {
-					showError(getString(R.string.network_error), uri.getQueryParameter("error"));
-				}
-				return;
-			}
+			onError(new WebViewException(errorCode, description, failingUrl));
+		}
 
-			// Somehow we have loaded the contacts page, show an error and return;
-			if (uri.getPath().contains("contacts")) {
-				showError(getString(R.string.network_error), null);
-				return;
-			}
+		public void onError(final Exception e) {
+			mWebView.loadData("", "text/plain; charset=UTF-8", null);
+			mWebView.setVisibility(View.GONE);
 
-			// Check for the authorization parameter. If it exists, automatically grant the app access to the user's mh
-			// account.
-			final String authorization = uri.getQueryParameter("authorization");
-			if (authorization != null && uri.getHost().equalsIgnoreCase(oauthUri.getHost()) && uri.getPath().contains("/authorize")) {
-				CookieSyncManager.createInstance(AuthenticatorActivity.this);
-				final CookieManager mgr = CookieManager.getInstance();
-				final String cookieString = mgr.getCookie(oauthUri.getHost());
-
-				if (cookieString != null && (cookieString.contains("_mh_session=") && cookieString.contains("logged_in=true"))) {
-					mWebView.loadUrl(Configuration.getOauthUrl() + "/grant.json?authorization=" + authorization);
-					return;
-				}
-			}
-
-			// Check for the authentication code. If exists, use it to obtain the user's access token
-			final String code = uri.getQueryParameter("code");
-			if (code != null && uri.getHost().equalsIgnoreCase(oauthUri.getHost()) && uri.getPath().contains("/done")) {
-				getTokenFromCode(code);
-				return;
-			}
+			displayError(e);
 		}
 	}
 
 	/**
-	 * Gets the user's access token from a grant code
+	 * Builds and returns the url used for authentication
+	 * 
+	 * @return the url used for authentication
+	 */
+	private String getAuthenticationUrl() {
+		final String url = Configuration.getOauthUrl() + "/authorize";
+		final HttpParams params = new HttpParams();
+		params.put("android", true);
+		params.put("display", "touch");
+		params.put("simple", true);
+		params.put("response_type", "code");
+		params.put("redirect_uri", Configuration.getOauthUrl() + "/done.json");
+		params.put("client_id", Configuration.getOauthClientId());
+		params.put("scope", Configuration.getOauthScope());
+
+		return url + '?' + params.getParamString();
+	}
+
+	/** shows the progress indicator with text */
+	private void showProgress(final String action) {
+		AuthenticatorActivity.this.setSupportProgressBarIndeterminateVisibility(Boolean.TRUE);
+		mProgress.setVisibility(View.VISIBLE);
+
+		if (!U.isNullEmpty(action)) {
+			mProgressText.setText(action);
+			mProgressText.setVisibility(View.VISIBLE);
+		} else {
+			mProgressText.setVisibility(View.INVISIBLE);
+		}
+	}
+
+	/** hides the progress indicator */
+	private void hideProgress() {
+		AuthenticatorActivity.this.setSupportProgressBarIndeterminateVisibility(Boolean.FALSE);
+		mProgress.setVisibility(View.INVISIBLE);
+		mProgressText.setVisibility(View.INVISIBLE);
+	}
+
+	/**
+	 * Fetches an access token and adds a system account from the oauth code
 	 * 
 	 * @param code
 	 */
-	private void getTokenFromCode(final String code) {
-		if (mGettingToken.get()) return;
-		mGettingToken.set(true);
+	private void addAccountFromCode(final String code) {
+		if (mAuthTask != null) return;
 
-		showLoading("Getting authentication token...");
+		showProgress("Fetching Account Information...");
 
 		final RoboAsyncTask<GAuthTokenDone> task = new RoboAsyncTask<GAuthTokenDone>(this) {
 			@Override
 			public GAuthTokenDone call() throws Exception {
+				// request the access token from the code
 				final GAuthTokenDone done = Api.getAccessToken(code).get();
+
+				// save the person to the local database for access later. call .get to ensure the save process has
+				// finished.
 				done.person.save().get();
+
+				// return the done object
 				return done;
 			}
 
 			@Override
 			protected void onSuccess(final GAuthTokenDone done) {
+
 				final String accountId = String.valueOf(done.person.name);
 				final String token = done.access_token;
 
@@ -250,14 +269,14 @@ public class AuthenticatorActivity extends RoboSherlockAccountAuthenticatorActiv
 					if (personId == done.person.id) {
 						// we have a duplicate, show a toast and cancel the authenticator
 						Toast.makeText(getContext(), "Account for " + done.person.name + " already exists.", Toast.LENGTH_LONG).show();
-						finishActivity(RESULT_CANCELED, account, personId);
+						finishActivity(RESULT_DUPLICATE, account, personId);
 						return;
 					}
 				}
 
-				// if there are no other accounts, set this at the last used so it is resumed immediately
-				// otherwise remove the last session user id so a prompt is displayed the next time the session is
-				// resumed.
+				// if there are no other accounts, set this as the last used so it is resumed on next launch
+				// if there are are other accounts, clear the session id to allow the user to pick an account on next
+				// launch
 				if (accounts.length == 0) {
 					SettingsManager.setSessionLastUserId(done.person.id);
 				} else {
@@ -274,6 +293,17 @@ public class AuthenticatorActivity extends RoboSherlockAccountAuthenticatorActiv
 				finishActivity(RESULT_OK, account, done.person.id);
 			}
 
+			@Override
+			protected void onException(final Exception e) {
+				displayError(e);
+			}
+
+			@Override
+			protected void onFinally() {
+				mAuthTask = null;
+				hideProgress();
+			}
+
 			private void finishActivity(final int result, final Account account, final long personId) {
 				final Intent intent = new Intent();
 				intent.putExtra(AccountManager.KEY_ACCOUNT_NAME, account.name);
@@ -283,130 +313,12 @@ public class AuthenticatorActivity extends RoboSherlockAccountAuthenticatorActiv
 				setResult(result, intent);
 				finish();
 			}
-
-			@Override
-			protected void onException(final Exception e) {
-				mRetry.setOnClickListener(new OnClickListener() {
-					@Override
-					public void onClick(final View v) {
-						getTokenFromCode(code);
-					}
-				});
-				showError(e);
-			}
-
-			@Override
-			protected void onFinally() {
-				mGettingToken.set(false);
-			}
 		};
 		Application.getExecutor().execute(task.future());
 	}
 
-	private void showError(String error, final String description) {
-		mContent.setVisibility(View.VISIBLE);
-		mWebView.setVisibility(View.GONE);
-
-		if (!U.isNullEmpty(description)) {
-			error += "\n" + description;
-		}
-		mError.setText(error);
-		mError.setVisibility(View.VISIBLE);
-
-		if (!U.isNullEmpty(error)) {
-			mError.setText(error);
-			mError.setVisibility(View.VISIBLE);
-		} else {
-			mError.setVisibility(View.GONE);
-		}
-
-		mStatus.setVisibility(View.GONE);
-		mLoading.setVisibility(View.GONE);
-		mRetry.setVisibility(View.VISIBLE);
-
-		setProgressBarIndeterminateVisibility(false);
-	}
-
-	private void showError(final Exception e) {
-		Log.e(TAG, e.getMessage(), e);
-
-		if (e instanceof ApiException) {
-			final ApiException e2 = (ApiException) e;
-
-			String error = e2.getTitle();
-			if (U.isNull(error)) {
-				error += e2.getMessage();
-			} else {
-				error += "\n" + e2.getMessage();
-			}
-
-			if (!U.isNullEmpty(e2.getCode())) {
-				error += "\nCode " + e2.getCode() + ".";
-			}
-
-			showError(error, null);
-		} else {
-			final Throwable cause = e.getCause();
-			if (cause != null) {
-				showError(cause.getMessage(), null);
-			} else {
-				showError(e.getMessage(), null);
-			}
-		}
-	}
-
-	private void hideError() {
-		mWebView.setVisibility(View.VISIBLE);
-		mContent.setVisibility(View.GONE);
-	}
-
-	private void showLoading(final String status) {
-		mContent.setVisibility(View.VISIBLE);
-		mWebView.setVisibility(View.GONE);
-
-		if (!U.isNullEmpty(status)) {
-			mStatus.setText(status);
-			mStatus.setVisibility(View.VISIBLE);
-		} else {
-			mStatus.setVisibility(View.GONE);
-		}
-
-		mError.setVisibility(View.GONE);
-		mLoading.setVisibility(View.VISIBLE);
-		mRetry.setVisibility(View.GONE);
-
-		setProgressBarIndeterminateVisibility(true);
-	}
-
-	@Override
-	public void onConfigurationChanged(final android.content.res.Configuration newConfig) {
-		if (mWebView != null) {
-			mPlaceholder.removeView(mWebView);
-		}
-		super.onConfigurationChanged(newConfig);
-		setContentView(R.layout.activity_authenticator);
-		initWebView();
-	}
-
-	@Override
-	protected void onSaveInstanceState(final Bundle outState) {
-		super.onSaveInstanceState(outState);
-		outState.putBoolean("mGettingToken", mGettingToken.get());
-		mWebView.saveState(outState);
-	}
-
-	@Override
-	protected void onRestoreInstanceState(final Bundle savedInstanceState) {
-		super.onRestoreInstanceState(savedInstanceState);
-		mGettingToken.set(savedInstanceState.getBoolean("mGettingToken"));
-		mWebView.restoreState(savedInstanceState);
-		if (mGettingToken.get()) {
-			showLoading("Getting authentication token...");
-		}
-	}
-
 	/**
-	 * Clears all of the webview cookies to make sure we get a fresh login
+	 * Clears all of the web view cookies to make sure we get a fresh login
 	 */
 	private void clearCookies() {
 		final WebViewDatabase db = WebViewDatabase.getInstance(this);
@@ -419,4 +331,35 @@ public class AuthenticatorActivity extends RoboSherlockAccountAuthenticatorActiv
 		csm.sync();
 		csm.startSync();
 	}
+
+	/** displays an error dialog */
+	private void displayError(final Exception e) {
+		final ExceptionHelper eh = new ExceptionHelper(this, e);
+		eh.setPositiveButton(new DialogButton() {
+			@Override
+			public String getTitle() {
+				return "Retry";
+			}
+
+			@Override
+			public void onClick(final DialogInterface dialog, final int whichButton) {
+				resetAuthentication();
+			}
+		});
+		eh.setNegativeButton(new DialogButton() {
+			@Override
+			public String getTitle() {
+				return "Cancel";
+			}
+
+			@Override
+			public void onClick(final DialogInterface dialog, final int whichButton) {
+				dialog.dismiss();
+				setResult(RESULT_CANCELED);
+				finish();
+			}
+		});
+		eh.show();
+	}
+
 }

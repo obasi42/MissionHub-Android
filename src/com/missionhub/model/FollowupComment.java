@@ -35,8 +35,8 @@ public class FollowupComment {
 		this.id = id;
 	}
 
-	public FollowupComment(final Long id, final Long contact_id, final Long commenter_id, final Long organization_id, final String comment,
-			final String status, final java.util.Date created_at, final java.util.Date updated_at, final java.util.Date deleted_at) {
+	public FollowupComment(final Long id, final Long contact_id, final Long commenter_id, final Long organization_id, final String comment, final String status, final java.util.Date created_at,
+			final java.util.Date updated_at, final java.util.Date deleted_at) {
 		this.id = id;
 		this.contact_id = contact_id;
 		this.commenter_id = commenter_id;

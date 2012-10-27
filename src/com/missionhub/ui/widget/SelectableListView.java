@@ -102,8 +102,7 @@ public class SelectableListView extends ListView {
 		final int y = (int) ev.getY();
 
 		if ((action == MotionEvent.ACTION_DOWN && mMode != MODE_CLICK_ONLY)
-				&& (mMode == MODE_SELECT_ONLY || ((mSelectionSide == SIDE_LEFT && x < mSelectionWidth) || (mSelectionSide == SIDE_RIGHT && x > getWidth()
-						- mSelectionWidth)))) {
+				&& (mMode == MODE_SELECT_ONLY || ((mSelectionSide == SIDE_LEFT && x < mSelectionWidth) || (mSelectionSide == SIDE_RIGHT && x > getWidth() - mSelectionWidth)))) {
 			mSelectionMode = true;
 			mStartPosition = pointToPosition(x, y);
 		}

@@ -36,8 +36,7 @@ public class Question {
 		this.id = id;
 	}
 
-	public Question(final Long id, final Long keyword_id, final String label, final String kind, final String style, final Boolean required,
-			final Boolean active) {
+	public Question(final Long id, final Long keyword_id, final String label, final String kind, final String style, final Boolean required, final Boolean active) {
 		this.id = id;
 		this.keyword_id = keyword_id;
 		this.label = label;

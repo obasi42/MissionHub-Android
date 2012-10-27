@@ -34,8 +34,7 @@ public class GGroupLabel {
 		final GroupLabelDao gld = Application.getDb().getGroupLabelDao();
 
 		// delete the current group <--> group labels join
-		final LazyList<GroupLabels> delGroupLabels = glsd.queryBuilder().where(com.missionhub.model.GroupLabelsDao.Properties.Group_id.eq(g.getId()))
-				.listLazyUncached();
+		final LazyList<GroupLabels> delGroupLabels = glsd.queryBuilder().where(com.missionhub.model.GroupLabelsDao.Properties.Group_id.eq(g.getId())).listLazyUncached();
 		final CloseableListIterator<GroupLabels> itr = delGroupLabels.listIteratorAutoClose();
 		while (itr.hasNext()) {
 			glsd.delete(itr.next());

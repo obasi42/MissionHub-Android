@@ -128,8 +128,7 @@ public class ErrbitNotifier {
 		register(context, endpoint, apiKey, environmentName, true);
 	}
 
-	private static void register(final Context context, final String endpoint, final String apiKey, final String environmentName,
-			final boolean notifyOnlyProduction) {
+	private static void register(final Context context, final String endpoint, final String apiKey, final String environmentName, final boolean notifyOnlyProduction) {
 		// Require an airbrake api key
 		if (apiKey != null) {
 			ErrbitNotifier.apiKey = apiKey;

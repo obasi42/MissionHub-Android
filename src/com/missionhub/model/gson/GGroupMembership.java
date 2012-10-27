@@ -25,8 +25,7 @@ public class GGroupMembership {
 		final GroupMembershipDao gmd = Application.getDb().getGroupMembershipDao();
 
 		// delete current records as we don't have stable id's currently
-		final LazyList<GroupMembership> delMemberships = gmd.queryBuilder().where(com.missionhub.model.GroupMembershipDao.Properties.Person_id.eq(p.getId()))
-				.listLazyUncached();
+		final LazyList<GroupMembership> delMemberships = gmd.queryBuilder().where(com.missionhub.model.GroupMembershipDao.Properties.Person_id.eq(p.getId())).listLazyUncached();
 		final CloseableListIterator<GroupMembership> itr = delMemberships.listIteratorAutoClose();
 		while (itr.hasNext()) {
 			final GroupMembership membership = itr.next();

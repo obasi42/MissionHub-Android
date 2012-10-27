@@ -32,8 +32,7 @@ public class ContactListItemView extends LinearLayout implements LayoutItemView,
 	private boolean mChecked = false;
 	private boolean mActivated = false;
 
-	private final DisplayImageOptions mImageOptions = new DisplayImageOptions.Builder().showStubImage(R.drawable.default_contact).cacheInMemory().cacheOnDisc()
-			.build();
+	private final DisplayImageOptions mImageOptions = new DisplayImageOptions.Builder().showStubImage(R.drawable.default_contact).cacheInMemory().cacheOnDisc().build();
 
 	public ContactListItemView(final Context context) {
 		this(context, null, -1);

@@ -43,8 +43,7 @@ public class ApiRequest {
 	 * @param authenticated
 	 * @param organizationId
 	 */
-	protected ApiRequest(final Method method, final String url, final HttpHeaders headers, final HttpParams params, final boolean authenticated,
-			final long organizationId) {
+	protected ApiRequest(final Method method, final String url, final HttpHeaders headers, final HttpParams params, final boolean authenticated, final long organizationId) {
 		this.method = method;
 		this.url = url;
 		this.headers = headers;

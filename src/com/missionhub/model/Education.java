@@ -21,8 +21,7 @@ public class Education {
 		this.id = id;
 	}
 
-	public Education(final Long id, final Long person_id, final String school_name, final String school_id, final String year_name, final String year_id,
-			final String type, final String provider) {
+	public Education(final Long id, final Long person_id, final String school_name, final String school_id, final String year_name, final String year_id, final String type, final String provider) {
 		this.id = id;
 		this.person_id = person_id;
 		this.school_name = school_name;

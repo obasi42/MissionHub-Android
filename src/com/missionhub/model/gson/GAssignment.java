@@ -43,8 +43,7 @@ public class GAssignment {
 						final AssignmentDao ad = Application.getDb().getAssignmentDao();
 
 						// delete current assignment records for the current person
-						final LazyList<Assignment> delAssignments = ad.queryBuilder()
-								.whereOr(Properties.Person_id.eq(p.getId()), Properties.Assigned_to_id.eq(p.getId())).listLazyUncached();
+						final LazyList<Assignment> delAssignments = ad.queryBuilder().whereOr(Properties.Person_id.eq(p.getId()), Properties.Assigned_to_id.eq(p.getId())).listLazyUncached();
 						final CloseableListIterator<Assignment> itr = delAssignments.listIteratorAutoClose();
 						while (itr.hasNext()) {
 							ad.delete(itr.next());

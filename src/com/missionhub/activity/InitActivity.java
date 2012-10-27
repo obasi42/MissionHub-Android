@@ -11,7 +11,6 @@ import com.WazaBe.HoloEverywhere.widget.ProgressBar;
 import com.WazaBe.HoloEverywhere.widget.TextView;
 import com.missionhub.R;
 import com.missionhub.application.Application;
-import com.missionhub.application.Session;
 import com.missionhub.application.Session.SessionRefreshEvent;
 import com.missionhub.authenticator.AuthenticatorActivity;
 
@@ -35,14 +34,19 @@ public class InitActivity extends BaseActivity {
 	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		Application.registerEventSubscriber(this, SessionRefreshEvent.class);
+		final Intent intent = new Intent(this, AuthenticatorActivity.class);
+		startActivity(intent);
 
-		if (Session.getInstance().resumeSession()) {
-			Session.getInstance().refreshSession();
-		} else {
-			//final Intent intent = new Intent(this, AuthenticatorActivity.class);
-			//startActivityForResult(intent, REQUEST_AUTHENTICATION);
-		}
+		return;
+
+		// Application.registerEventSubscriber(this, SessionRefreshEvent.class);
+		//
+		// if (Session.getInstance().resumeSession()) {
+		// Session.getInstance().refreshSession();
+		// } else {
+		// //final Intent intent = new Intent(this, AuthenticatorActivity.class);
+		// //startActivityForResult(intent, REQUEST_AUTHENTICATION);
+		// }
 	}
 
 	public void onEventMainThread(final SessionRefreshEvent event) {

@@ -48,9 +48,8 @@ public class Person {
 		this.id = id;
 	}
 
-	public Person(final Long id, final String name, final String gender, final String fb_id, final String picture, final String status,
-			final String first_name, final String last_name, final String phone_number, final String email_address, final String birthday, final String locale,
-			final String num_contacts) {
+	public Person(final Long id, final String name, final String gender, final String fb_id, final String picture, final String status, final String first_name, final String last_name,
+			final String phone_number, final String email_address, final String birthday, final String locale, final String num_contacts) {
 		this.id = id;
 		this.name = name;
 		this.gender = gender;

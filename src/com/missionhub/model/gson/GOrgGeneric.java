@@ -59,8 +59,7 @@ public class GOrgGeneric {
 		final OrganizationalRoleDao ord = Application.getDb().getOrganizationalRoleDao();
 
 		// delete current records as we don't have stable id's currently
-		final LazyList<OrganizationalRole> delRoles = ord.queryBuilder().where(com.missionhub.model.OrganizationalRoleDao.Properties.Person_id.eq(p.getId()))
-				.listLazyUncached();
+		final LazyList<OrganizationalRole> delRoles = ord.queryBuilder().where(com.missionhub.model.OrganizationalRoleDao.Properties.Person_id.eq(p.getId())).listLazyUncached();
 		final CloseableListIterator<OrganizationalRole> itr = delRoles.listIteratorAutoClose();
 		while (itr.hasNext()) {
 			final OrganizationalRole role = itr.next();

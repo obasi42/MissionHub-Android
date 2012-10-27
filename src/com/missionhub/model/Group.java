@@ -40,9 +40,8 @@ public class Group {
 		this.id = id;
 	}
 
-	public Group(final Long id, final String name, final String location, final String meets, final Integer start_time, final Integer end_time,
-			final Long organization_id, final java.util.Date created_at, final java.util.Date updated_at, final Boolean list_publicly,
-			final Boolean approve_join_requests) {
+	public Group(final Long id, final String name, final String location, final String meets, final Integer start_time, final Integer end_time, final Long organization_id,
+			final java.util.Date created_at, final java.util.Date updated_at, final Boolean list_publicly, final Boolean approve_join_requests) {
 		this.id = id;
 		this.name = name;
 		this.location = location;

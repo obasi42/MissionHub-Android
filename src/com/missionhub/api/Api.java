@@ -69,7 +69,6 @@ public class Api {
 	public static Api getInstance() {
 		if (sApi == null) {
 			sApi = new Api();
-			Application.registerEventSubscriber(sApi);
 		}
 		return sApi;
 	}
@@ -87,8 +86,7 @@ public class Api {
 	 *             all exceptions will be wrapped in an ApiException
 	 * @throws OfflineException
 	 */
-	private ApiResponse doRequest(final Method method, final String url, final HttpHeaders headers, final HttpParams params) throws ApiException,
-			OfflineException {
+	private ApiResponse doRequest(final Method method, final String url, final HttpHeaders headers, final HttpParams params) throws ApiException, OfflineException {
 		return doRequest(method, url, headers, params, true, Session.getInstance().getOrganizationId());
 	}
 
@@ -108,8 +106,8 @@ public class Api {
 	 *             all exceptions will be wrapped in an ApiException
 	 * @throws OfflineException
 	 */
-	private ApiResponse doRequest(final Method method, final String url, final HttpHeaders headers, final HttpParams params, final boolean authenticated,
-			final long organizationId) throws ApiException, OfflineException {
+	private ApiResponse doRequest(final Method method, final String url, final HttpHeaders headers, final HttpParams params, final boolean authenticated, final long organizationId)
+			throws ApiException, OfflineException {
 		return doRequest(null, method, url, headers, params, authenticated, organizationId, 3);
 	}
 
@@ -132,8 +130,8 @@ public class Api {
 	 *             all exceptions will be wrapped in an ApiException
 	 * @throws OfflineException
 	 */
-	private ApiResponse doRequest(ApiRequest request, final Method method, final String url, HttpHeaders headers, final HttpParams params,
-			final boolean authenticated, final long organizationId, final int maxRetries) throws ApiException, OfflineException {
+	private ApiResponse doRequest(ApiRequest request, final Method method, final String url, HttpHeaders headers, final HttpParams params, final boolean authenticated, final long organizationId,
+			final int maxRetries) throws ApiException, OfflineException {
 
 		/* check for a data connection */
 		if (!NetworkUtils.isNetworkAvailable(Application.getContext())) {
