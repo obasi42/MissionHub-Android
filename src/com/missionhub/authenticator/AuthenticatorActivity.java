@@ -114,7 +114,7 @@ public class AuthenticatorActivity extends RoboSherlockAccountAuthenticatorActiv
 	 * web view client to manage the authentication process
 	 */
 	private class AuthenticatorWebViewClient extends WebViewClient {
-
+		
 		@Override
 		public boolean shouldOverrideUrlLoading(final WebView view, final String url) {
 			return false; // make sure this web view handles all other urls
@@ -132,7 +132,13 @@ public class AuthenticatorActivity extends RoboSherlockAccountAuthenticatorActiv
 
 			// make sure we are only working with requests from the oauth server
 			if (uri.getHost() != null && uri.getHost().equalsIgnoreCase(oauthUri.getHost())) {
-
+				
+				// prevent the mission hub server from being dumb
+				if (!uri.getPath().contains("/users") && !uri.getPath().contains(oauthUri.getPath())) {
+					onError(new Exception("The MissionHub server returned unexpected data. Please try again."));
+					return;
+				}
+				
 				// check for an api error
 				if (!U.isNullEmpty(uri.getQueryParameter("error"))) {
 					try {
