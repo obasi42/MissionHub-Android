@@ -117,6 +117,13 @@ public class AuthenticatorActivity extends RoboSherlockAccountAuthenticatorActiv
 
 		@Override
 		public boolean shouldOverrideUrlLoading(final WebView view, final String url) {
+			return false; // make sure this web view handles all other urls
+		}
+
+		@Override
+		public void onPageStarted(final WebView view, final String url, final Bitmap favicon) {
+			AuthenticatorActivity.this.setSupportProgressBarIndeterminateVisibility(Boolean.TRUE);
+
 			// parse the url to a uri for easier checking
 			final Uri uri = Uri.parse(url);
 
@@ -124,7 +131,7 @@ public class AuthenticatorActivity extends RoboSherlockAccountAuthenticatorActiv
 			final Uri oauthUri = Uri.parse(Configuration.getOauthUrl());
 
 			// make sure we are only working with requests from the oauth server
-			if (uri.getHost().equalsIgnoreCase(oauthUri.getHost())) {
+			if (uri.getHost() != null && uri.getHost().equalsIgnoreCase(oauthUri.getHost())) {
 
 				// check for an api error
 				if (!U.isNullEmpty(uri.getQueryParameter("error"))) {
@@ -135,7 +142,7 @@ public class AuthenticatorActivity extends RoboSherlockAccountAuthenticatorActiv
 					} catch (final Exception e) {
 						onError(new Exception(uri.getQueryParameter("error")));
 					}
-					return true;
+					return;
 				}
 
 				// Check for the authorization parameter. If it exists, automatically grant app access.
@@ -146,30 +153,25 @@ public class AuthenticatorActivity extends RoboSherlockAccountAuthenticatorActiv
 					final CookieManager mgr = CookieManager.getInstance();
 					final String cookieString = mgr.getCookie(oauthUri.getHost());
 					if (cookieString != null && (cookieString.contains("_mh_session="))) {
+						mWebView.stopLoading();
 						mWebView.loadUrl(Configuration.getOauthUrl() + "/grant.json?authorization=" + authorization);
-						return true;
+						return;
 					}
 				}
 
 				// Check for the authentication code. If exists, use it to obtain the user's access token
 				final String code = uri.getQueryParameter("code");
 				if (!U.isNullEmpty(code) && uri.getPath().contains("/done")) {
+					mWebView.stopLoading();
 					mWebView.loadData("", "text/plain; charset=UTF-8", null);
 					mWebView.setVisibility(View.GONE);
 
 					// fetch the access token and add an account
 					addAccountFromCode(code);
 
-					return true;
+					return;
 				}
 			}
-
-			return false; // make sure this web view handles all other urls
-		}
-
-		@Override
-		public void onPageStarted(final WebView view, final String url, final Bitmap favicon) {
-			AuthenticatorActivity.this.setSupportProgressBarIndeterminateVisibility(Boolean.TRUE);
 		}
 
 		@Override
@@ -183,6 +185,7 @@ public class AuthenticatorActivity extends RoboSherlockAccountAuthenticatorActiv
 		}
 
 		public void onError(final Exception e) {
+			mWebView.stopLoading();
 			mWebView.loadData("", "text/plain; charset=UTF-8", null);
 			mWebView.setVisibility(View.GONE);
 
