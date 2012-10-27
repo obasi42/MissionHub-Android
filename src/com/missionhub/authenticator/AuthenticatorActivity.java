@@ -13,7 +13,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
@@ -180,8 +179,6 @@ public class AuthenticatorActivity extends RoboSherlockAccountAuthenticatorActiv
 
 		@Override
 		public void onReceivedError(final WebView view, final int errorCode, final String description, final String failingUrl) {
-			Log.e(TAG, "ERROR HERE");
-
 			onError(new WebViewException(errorCode, description, failingUrl));
 		}
 
