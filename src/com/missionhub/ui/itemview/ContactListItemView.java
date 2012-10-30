@@ -35,11 +35,11 @@ public class ContactListItemView extends LinearLayout implements LayoutItemView,
 	private final DisplayImageOptions mImageOptions = new DisplayImageOptions.Builder().showStubImage(R.drawable.default_contact).cacheInMemory().cacheOnDisc().build();
 
 	public ContactListItemView(final Context context) {
-		this(context, null, -1);
+		super(context);
 	}
 
 	public ContactListItemView(final Context context, final AttributeSet attrs) {
-		this(context, attrs, -1);
+		super(context, attrs);
 	}
 
 	public ContactListItemView(final Context context, final AttributeSet attrs, final int defStyle) {

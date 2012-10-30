@@ -176,7 +176,9 @@ public class ContactListView extends SelectableListView implements ContactListPr
 	@Override
 	public boolean onItemLongClick(final AdapterView<?> parent, final View view, final int position, final long id) {
 		if (mOnContactLongClickListener != null) {
-			return mOnContactLongClickListener.onContactLongClick(findPersonAt(position), position, id);
+			final Person person = findPersonAt(position);
+			if (person != null)
+				return mOnContactLongClickListener.onContactLongClick(person, position, id);
 		}
 		return false;
 	}
@@ -201,7 +203,9 @@ public class ContactListView extends SelectableListView implements ContactListPr
 	@Override
 	public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id) {
 		if (mOnContactClickListener != null) {
-			mOnContactClickListener.onContactClick(findPersonAt(position), position, id);
+			final Person person = findPersonAt(position);
+			if (person != null)
+				mOnContactClickListener.onContactClick(person, position, id);
 		}
 	}
 
@@ -227,7 +231,9 @@ public class ContactListView extends SelectableListView implements ContactListPr
 	@Override
 	public void onSetItemChecked(final int position, final boolean checked) {
 		if (mOnContactCheckedListener != null) {
-			mOnContactCheckedListener.onContactChecked(findPersonAt(position), position, checked);
+			final Person person = findPersonAt(position);
+			if (person != null)
+			mOnContactCheckedListener.onContactChecked(person, position, checked);
 		}
 	}
 
@@ -266,7 +272,11 @@ public class ContactListView extends SelectableListView implements ContactListPr
 	 * @return
 	 */
 	private Person findPersonAt(final int position) {
-		return ((ContactListItem) mAdapter.getItem(position)).person;
+		Object item = mAdapter.getItem(position);
+		if (item instanceof ContactListItem) {
+			return ((ContactListItem) item).person;
+		}
+		return null;
 	}
 
 	@Override
