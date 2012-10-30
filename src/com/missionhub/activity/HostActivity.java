@@ -13,7 +13,6 @@ import com.missionhub.fragment.AllContactsFragment;
 import com.missionhub.fragment.ContactListFragment;
 import com.missionhub.fragment.DirectoryFragment;
 import com.missionhub.fragment.GroupsFragment;
-import com.missionhub.fragment.MyContactsFragment;
 import com.missionhub.fragment.SideMenuFragment.SideMenu;
 import com.missionhub.fragment.SurveysFragment;
 import com.missionhub.ui.item.SideMenuItem;

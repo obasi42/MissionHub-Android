@@ -189,21 +189,20 @@ public class Session implements OnAccountsUpdateListener {
 			@Override
 			public void run() {
 				try {
-					//TODO: uncomment
-					
-					// update the person
-					//Application.postEvent(new SessionResumeStatusEvent("Updating Person..."));
+					// TODO: uncomment
 
-					//final Person p = Api.getPersonMe().get();
+					// update the person
+					// Application.postEvent(new SessionResumeStatusEvent("Updating Person..."));
+
+					// final Person p = Api.getPersonMe().get();
 
 					// update the account information
-					//mAccountManager.setUserData(mAccount, Authenticator.KEY_PERSON_ID, String.valueOf(p.getId()));
-					//mAccountManager.setUserData(mAccount, AccountManager.KEY_ACCOUNT_NAME, p.getName());
+					// mAccountManager.setUserData(mAccount, Authenticator.KEY_PERSON_ID, String.valueOf(p.getId()));
+					// mAccountManager.setUserData(mAccount, AccountManager.KEY_ACCOUNT_NAME, p.getName());
 
-					
 					// update the organizations
-					//Application.postEvent(new SessionResumeStatusEvent("Updating Organizations..."));
-					//Api.getOrganizations(null).get();
+					// Application.postEvent(new SessionResumeStatusEvent("Updating Organizations..."));
+					// Api.getOrganizations(null).get();
 
 					Application.postEvent(new SessionResumeSuccessEvent());
 				} catch (final Exception e) {

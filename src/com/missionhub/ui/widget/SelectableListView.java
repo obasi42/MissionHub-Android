@@ -97,11 +97,14 @@ public class SelectableListView extends ListView {
 	 */
 	@Override
 	public boolean onTouchEvent(final MotionEvent ev) {
+		// if the choice mode is none, just pass the touch event
+		if (getChoiceMode() == CHOICE_MODE_NONE || mMode == MODE_CLICK_ONLY) return super.onTouchEvent(ev);
+
 		final int action = ev.getAction();
 		final int x = (int) ev.getX();
 		final int y = (int) ev.getY();
 
-		if ((action == MotionEvent.ACTION_DOWN && mMode != MODE_CLICK_ONLY)
+		if (action == MotionEvent.ACTION_DOWN
 				&& (mMode == MODE_SELECT_ONLY || ((mSelectionSide == SIDE_LEFT && x < mSelectionWidth) || (mSelectionSide == SIDE_RIGHT && x > getWidth() - mSelectionWidth)))) {
 			mSelectionMode = true;
 			mStartPosition = pointToPosition(x, y);

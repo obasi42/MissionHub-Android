@@ -17,6 +17,6 @@ public class StaticContactListProvider extends ContactListProvider {
 	}
 
 	@Override
-	public void onError(Exception e) {}
-	
+	public void onError(final Exception e) {}
+
 }

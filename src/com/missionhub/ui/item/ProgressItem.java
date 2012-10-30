@@ -11,7 +11,7 @@ public class ProgressItem extends Item implements Enableable {
 
 	public boolean indeterminate = true;
 	public int progress = 0;
-	
+
 	public ProgressItem() {}
 
 	@Override

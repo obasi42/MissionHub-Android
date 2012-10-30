@@ -14,10 +14,10 @@ public class ObjectStore {
 
 	/** the logging tag */
 	public static final String TAG = ObjectStore.class.getSimpleName();
-	
+
 	/** the singleton instance of the object store */
 	private static ObjectStore mObjectStoreInstance;
-	
+
 	/** Synchronized map that holds the objects */
 	private final Map<String, ObjectHolder> mObjectStore = Collections.synchronizedMap(new HashMap<String, ObjectHolder>());
 
@@ -28,9 +28,10 @@ public class ObjectStore {
 	 * Creates a new object store
 	 */
 	private ObjectStore() {}
-	
+
 	/**
 	 * Returns the singleton instance of the Object Store
+	 * 
 	 * @return
 	 */
 	public static ObjectStore getInstance() {
@@ -40,18 +41,19 @@ public class ObjectStore {
 		}
 		return mObjectStoreInstance;
 	}
-	
+
 	/**
 	 * Stores and object and returns the key
+	 * 
 	 * @param mProvider
 	 * @return
 	 */
-	public String storeObject(Object object) {
-		String key = object.getClass().getName() + '@' + Integer.toHexString(object.hashCode());
+	public String storeObject(final Object object) {
+		final String key = object.getClass().getName() + '@' + Integer.toHexString(object.hashCode());
 		storeObject(key, object);
 		return key;
 	}
-	
+
 	/**
 	 * Stores an object in the object store
 	 * 

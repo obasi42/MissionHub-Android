@@ -18,7 +18,6 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListAdapter;
 
 import com.missionhub.R;
-
 import com.missionhub.application.ObjectStore;
 import com.missionhub.model.Person;
 import com.missionhub.ui.ContactListProvider;
@@ -53,13 +52,13 @@ public class ContactListView extends SelectableListView implements ContactListPr
 	private int mContactItemViewResource = R.layout.item_contact;
 
 	/** maintains a map of people to contact list items so the items don't have to be recreated on data changes */
-	private Map<Person, ContactListItem> mPersonItemMap = Collections.synchronizedMap(new WeakHashMap<Person, ContactListItem>());
-	
+	private final Map<Person, ContactListItem> mPersonItemMap = Collections.synchronizedMap(new WeakHashMap<Person, ContactListItem>());
+
 	/** the contacts list provider */
 	private ContactListProvider mProvider;
-	
+
 	/** the progress item */
-	private ProgressItem mProgressItem = new ProgressItem();
+	private final ProgressItem mProgressItem = new ProgressItem();
 
 	/**
 	 * Creates a new ContactListView
@@ -94,7 +93,7 @@ public class ContactListView extends SelectableListView implements ContactListPr
 		setSelector(R.drawable.abs__list_selector_holo_light);
 
 		if (attrs != null) {
-			TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.ContactListView, 0, 0);
+			final TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.ContactListView, 0, 0);
 
 			try {
 				mContactItemViewResource = a.getResourceId(R.styleable.ContactListView_item_layout_resource, R.layout.item_contact);
@@ -269,7 +268,7 @@ public class ContactListView extends SelectableListView implements ContactListPr
 	private Person findPersonAt(final int position) {
 		return ((ContactListItem) mAdapter.getItem(position)).person;
 	}
-	
+
 	@Override
 	public Parcelable onSaveInstanceState() {
 		final Bundle bundle = new Bundle();
@@ -280,7 +279,7 @@ public class ContactListView extends SelectableListView implements ContactListPr
 
 	@Override
 	public void onRestoreInstanceState(final Parcelable state) {
-		if (state instanceof Bundle) {		
+		if (state instanceof Bundle) {
 			final Bundle bundle = (Bundle) state;
 			setProvider((ContactListProvider) ObjectStore.getInstance().retrieveObject(bundle.getString("mProvider")));
 			super.onRestoreInstanceState(bundle.getParcelable("superState"));
@@ -289,43 +288,43 @@ public class ContactListView extends SelectableListView implements ContactListPr
 		super.onRestoreInstanceState(state);
 	}
 
-	public void setProvider(ContactListProvider provider) {
+	public void setProvider(final ContactListProvider provider) {
 		mProvider = provider;
 		mProvider.setContactListProviderListener(this);
 	}
-	
+
 	public ContactListProvider getProvider() {
 		return mProvider;
 	}
 
 	@Override
-	public void onContactsChanged(List<Person> people) {
+	public void onContactsChanged(final List<Person> people) {
 		if (people == null) return;
-		
+
 		mAdapter.setNotifyOnChange(false);
 		mAdapter.clear();
-		
-		for(Person person : people) {
+
+		for (final Person person : people) {
 			ContactListItem item = mPersonItemMap.get(person);
-			
+
 			if (item == null) {
 				item = new ContactListItem(person, mContactItemViewResource);
 				mPersonItemMap.put(person, item);
 			}
-			
+
 			mAdapter.add(item);
 		}
-		
+
 		updateProgressItem();
-		
+
 		mAdapter.notifyDataSetChanged();
 	}
-	
+
 	public void updateProgressItem() {
 		if (mProvider == null) return;
-		
+
 		mAdapter.remove(mProgressItem);
-		
+
 		if (mProvider.isGettingMore()) {
 			mAdapter.add(mProgressItem);
 		}

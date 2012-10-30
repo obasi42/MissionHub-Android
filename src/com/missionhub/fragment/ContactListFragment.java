@@ -52,7 +52,6 @@ public class ContactListFragment extends BaseFragment implements OnContactChecke
 	public void onViewCreated(final View view, final Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		mListView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
-
 	}
 
 	@Override
@@ -67,7 +66,7 @@ public class ContactListFragment extends BaseFragment implements OnContactChecke
 				@Override
 				public List<Person> getMore() throws Exception {
 					options.setFilter("assigned_to", "me");
-					
+
 					final List<Person> people = Api.getContactList(options).get();
 
 					// set up the options for the next run
@@ -108,16 +107,16 @@ public class ContactListFragment extends BaseFragment implements OnContactChecke
 	public boolean onContactLongClick(final Person person, final int position, final long id) {
 
 		Toast.makeText(getActivity(), "Long Click: " + person.getName(), Toast.LENGTH_SHORT).show();
-		
+
 		// TODO Auto-generated method stub
 		return true;
 	}
 
 	@Override
 	public void onContactClick(final Person person, final int position, final long id) {
-		
+
 		Toast.makeText(getActivity(), "Click: " + person.getName(), Toast.LENGTH_SHORT).show();
-		
+
 		// TODO Auto-generated method stub
 
 	}
@@ -127,7 +126,7 @@ public class ContactListFragment extends BaseFragment implements OnContactChecke
 		// TODO Auto-generated method stub
 
 		Toast.makeText(getActivity(), "Checked: " + person.getName(), Toast.LENGTH_SHORT).show();
-		
+
 	}
 
 	@Override
@@ -135,7 +134,7 @@ public class ContactListFragment extends BaseFragment implements OnContactChecke
 		// TODO Auto-generated method stub
 
 		Toast.makeText(getActivity(), "Unchecked All", Toast.LENGTH_SHORT).show();
-		
+
 	}
 
 }
