@@ -1,7 +1,5 @@
 package com.missionhub.api;
 
-import com.missionhub.exception.ApiException;
-
 /**
  * PJO representing a JSON api error
  */

@@ -1,6 +1,6 @@
-package com.missionhub.exception;
+package com.missionhub.api;
 
-import com.missionhub.api.ApiErrorGson;
+import com.missionhub.exception.MissionHubException;
 
 /**
  * All API errors extend or directly use this exception type.

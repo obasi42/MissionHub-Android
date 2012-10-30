@@ -1,12 +1,14 @@
-package com.missionhub.exception;
+package com.missionhub.network;
+
+import java.io.IOException;
 
 import com.missionhub.exception.ExceptionHelper.ExceptionHelperException;
 
-public class OfflineException extends MissionHubException implements ExceptionHelperException {
+public class NetworkUnavailableException extends IOException implements ExceptionHelperException {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 4513095539506465265L;
 
-	public OfflineException() {
+	public NetworkUnavailableException() {
 		super("MissionHub is currently working offline. Check your internet connection and retry.");
 	}
 

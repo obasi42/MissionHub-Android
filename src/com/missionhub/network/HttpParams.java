@@ -1,50 +1,37 @@
-/*
-	Android Asynchronous HttpURLConnection
-	Copyright 2011 Chris Roemmich <chris@cr-wd.com>
-	https://cr-wd.com
-
-	Licensed under the Apache License, Version 2.0 (the "License");
- 	you may not use this file except in compliance with the License.
-	You may obtain a copy of the License at
-
-		http://www.apache.org/licenses/LICENSE-2.0
-
-	Unless required by applicable law or agreed to in writing, software
-	distributed under the License is distributed on an "AS IS" BASIS,
-	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-	See the License for the specific language governing permissions and
-	limitations under the License.
- */
-
-/*
- Adapted from https://github.com/loopj/android-async-http/blob/master/src/com/loopj/android/http/RequestParams.java
- */
-
 package com.missionhub.network;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
-import java.util.LinkedList;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.apache.http.client.utils.URLEncodedUtils;
-import org.apache.http.message.BasicNameValuePair;
+import ch.boye.httpclientandroidlib.Consts;
+import ch.boye.httpclientandroidlib.HttpEntity;
+import ch.boye.httpclientandroidlib.NameValuePair;
+import ch.boye.httpclientandroidlib.client.entity.UrlEncodedFormEntity;
+import ch.boye.httpclientandroidlib.entity.mime.MultipartEntity;
+import ch.boye.httpclientandroidlib.entity.mime.content.ByteArrayBody;
+import ch.boye.httpclientandroidlib.entity.mime.content.ContentBody;
+import ch.boye.httpclientandroidlib.entity.mime.content.FileBody;
+import ch.boye.httpclientandroidlib.entity.mime.content.InputStreamBody;
+import ch.boye.httpclientandroidlib.entity.mime.content.StringBody;
+import ch.boye.httpclientandroidlib.message.BasicNameValuePair;
 
-public class HttpParams implements Serializable {
+public class HttpParams {
 
-	private static final long serialVersionUID = -6376078803512393464L;
+	private final Charset mEncoding = Consts.UTF_8;
 
-	protected String encoding = "UTF-8";
-
-	protected ConcurrentMap<String, String> urlParams = new ConcurrentHashMap<String, String>();
-	protected ConcurrentMap<String, FileWrapper> fileParams = new ConcurrentHashMap<String, FileWrapper>();
+	private final ConcurrentMap<String, String> mParams = new ConcurrentHashMap<String, String>();
+	private final ConcurrentMap<String, String> mUriParams = new ConcurrentHashMap<String, String>();
+	private final ConcurrentMap<String, ContentBody> mMultipartParams = new ConcurrentHashMap<String, ContentBody>();
 
 	/**
 	 * Creates a new HttpParams object
@@ -52,27 +39,31 @@ public class HttpParams implements Serializable {
 	public HttpParams() {}
 
 	/**
-	 * Constructs a new RequestParams instance containing the key/value string params from the specified map.
+	 * Returns an unmodifiable map of the basic params
 	 * 
-	 * @param source
-	 *            the source key/value string map to add.
+	 * @return
 	 */
-	public HttpParams(final Map<String, String> source) {
-		for (final Map.Entry<String, String> entry : source.entrySet()) {
-			put(entry.getKey(), entry.getValue());
-		}
+	public Map<String, String> getParams() {
+		return Collections.unmodifiableMap(mParams);
 	}
 
 	/**
-	 * Constructs a new RequestParams instance and populate it with a single initial key/value string param.
+	 * Returns an unmodifiable map of the uri params
+	 */
+	public Map<String, String> getUriParams() {
+		return Collections.unmodifiableMap(mUriParams);
+	}
+
+	/**
+	 * Adds a parameter that is always part of the uri
 	 * 
 	 * @param key
-	 *            the key name for the intial param.
 	 * @param value
-	 *            the value string for the initial param.
 	 */
-	public HttpParams(final String key, final String value) {
-		put(key, value);
+	public void addUri(final String key, final String value) {
+		if (key != null && value != null) {
+			mUriParams.put(key, value);
+		}
 	}
 
 	/**
@@ -83,9 +74,21 @@ public class HttpParams implements Serializable {
 	 * @param value
 	 *            the value string for the new param.
 	 */
-	public void put(final String key, final String value) {
+	public void addUri(final String key, final Object value) {
+		addUri(key, value.toString());
+	}
+
+	/**
+	 * Adds a key/value string pair to the request.
+	 * 
+	 * @param key
+	 *            the key name for the new param.
+	 * @param value
+	 *            the value string for the new param.
+	 */
+	public void add(final String key, final String value) {
 		if (key != null && value != null) {
-			urlParams.put(key, value);
+			mParams.put(key, value);
 		}
 	}
 
@@ -95,8 +98,22 @@ public class HttpParams implements Serializable {
 	 * @param key
 	 * @param value
 	 */
-	public void put(final String key, final Object value) {
-		put(key, value.toString());
+	public void add(final String key, final Object value) {
+		add(key, value.toString());
+	}
+
+	/**
+	 * Adds a byte array to the request.
+	 * 
+	 * @param key
+	 *            the key name for the new param.
+	 * @param bytes
+	 *            the byte array
+	 * @param filename
+	 *            the filename the data represents
+	 */
+	public void add(final String key, final byte[] bytes, final String filename) {
+		mMultipartParams.put(key, new ByteArrayBody(bytes, filename));
 	}
 
 	/**
@@ -107,8 +124,8 @@ public class HttpParams implements Serializable {
 	 * @param file
 	 *            the file to add.
 	 */
-	public void put(final String key, final File file) throws FileNotFoundException {
-		put(key, new FileInputStream(file), file.getName());
+	public void add(final String key, final File file) {
+		mMultipartParams.put(key, new FileBody(file));
 	}
 
 	/**
@@ -118,41 +135,11 @@ public class HttpParams implements Serializable {
 	 *            the key name for the new param.
 	 * @param stream
 	 *            the input stream to add.
-	 */
-	public void put(final String key, final InputStream stream) {
-		put(key, stream, null);
-	}
-
-	/**
-	 * Adds an input stream to the request.
-	 * 
-	 * @param key
-	 *            the key name for the new param.
-	 * @param stream
-	 *            the input stream to add.
-	 * @param fileName
+	 * @param filename
 	 *            the name of the file.
 	 */
-	public void put(final String key, final InputStream stream, final String fileName) {
-		put(key, stream, fileName, null);
-	}
-
-	/**
-	 * Adds an input stream to the request.
-	 * 
-	 * @param key
-	 *            the key name for the new param.
-	 * @param stream
-	 *            the input stream to add.
-	 * @param fileName
-	 *            the name of the file.
-	 * @param contentType
-	 *            the content type of the file, eg. application/json
-	 */
-	public void put(final String key, final InputStream stream, final String fileName, final String contentType) {
-		if (key != null && stream != null) {
-			fileParams.put(key, new FileWrapper(stream, fileName, contentType));
-		}
+	public void add(final String key, final InputStream stream, final String filename) {
+		mMultipartParams.put(key, new InputStreamBody(stream, filename));
 	}
 
 	/**
@@ -162,102 +149,61 @@ public class HttpParams implements Serializable {
 	 *            the key name for the parameter to remove.
 	 */
 	public void remove(final String key) {
-		urlParams.remove(key);
-		fileParams.remove(key);
+		mParams.remove(key);
+		mUriParams.remove(key);
+		mMultipartParams.remove(key);
 	}
 
-	@Override
-	public String toString() {
-		final StringBuilder result = new StringBuilder();
-		for (final ConcurrentHashMap.Entry<String, String> entry : urlParams.entrySet()) {
-			if (result.length() > 0) {
-				result.append("&");
+	/**
+	 * Returns the HttpEntity for POST requests.
+	 * 
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 */
+	public HttpEntity getEntity() throws UnsupportedEncodingException {
+		HttpEntity entity = null;
+
+		if (mMultipartParams.isEmpty()) {
+			// URL Encoded
+
+			final List<NameValuePair> params = new ArrayList<NameValuePair>();
+			final Iterator<Entry<String, String>> itr = mParams.entrySet().iterator();
+			while (itr.hasNext()) {
+				final Entry<String, String> entry = itr.next();
+				params.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
+			}
+			entity = new UrlEncodedFormEntity(params, mEncoding);
+		} else {
+			// Multipart
+
+			final MultipartEntity mpe = new MultipartEntity();
+
+			// add string values
+			final Iterator<Entry<String, String>> itr = mParams.entrySet().iterator();
+			while (itr.hasNext()) {
+				final Entry<String, String> entry = itr.next();
+				mpe.addPart(entry.getKey(), new StringBody(entry.getValue(), mEncoding));
 			}
 
-			result.append(entry.getKey());
-			result.append("=");
-			result.append(entry.getValue());
-		}
-
-		for (final ConcurrentHashMap.Entry<String, FileWrapper> entry : fileParams.entrySet()) {
-			if (result.length() > 0) {
-				result.append("&");
+			// add files
+			final Iterator<Entry<String, ContentBody>> itr2 = mMultipartParams.entrySet().iterator();
+			while (itr2.hasNext()) {
+				final Entry<String, ContentBody> entry = itr2.next();
+				mpe.addPart(entry.getKey(), entry.getValue());
 			}
 
-			result.append(entry.getKey());
-			result.append("=");
-			result.append("FILE");
+			entity = mpe;
 		}
 
-		return result.toString();
+		return entity;
 	}
 
-	protected List<BasicNameValuePair> getParamsList() {
-		final List<BasicNameValuePair> lparams = new LinkedList<BasicNameValuePair>();
-
-		for (final ConcurrentHashMap.Entry<String, String> entry : urlParams.entrySet()) {
-			lparams.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
-		}
-
-		return lparams;
-	}
-
-	public String getParamString() {
-		return URLEncodedUtils.format(getParamsList(), encoding);
-	}
-
-	protected boolean hasMultipartParams() {
-		return !fileParams.isEmpty();
-	}
-
-	protected SimpleMultipart getMultipart() throws IOException {
-		if (fileParams.isEmpty()) {
-			return null;
-		}
-
-		final SimpleMultipart multipart = new SimpleMultipart();
-
-		// Add string params
-		for (final ConcurrentHashMap.Entry<String, String> entry : urlParams.entrySet()) {
-			multipart.addPart(entry.getKey(), entry.getValue());
-		}
-
-		// Add file params
-		int currentIndex = 0;
-		final int lastIndex = fileParams.entrySet().size() - 1;
-		for (final ConcurrentHashMap.Entry<String, FileWrapper> entry : fileParams.entrySet()) {
-			final FileWrapper file = entry.getValue();
-			if (file.inputStream != null) {
-				final boolean isLast = currentIndex == lastIndex;
-				if (file.contentType != null) {
-					multipart.addPart(entry.getKey(), file.getFileName(), file.inputStream, file.contentType, isLast);
-				} else {
-					multipart.addPart(entry.getKey(), file.getFileName(), file.inputStream, isLast);
-				}
-			}
-			currentIndex++;
-		}
-
-		return multipart;
-	}
-
-	private static class FileWrapper {
-		public InputStream inputStream;
-		public String fileName;
-		public String contentType;
-
-		public FileWrapper(final InputStream inputStream, final String fileName, final String contentType) {
-			this.inputStream = inputStream;
-			this.fileName = fileName;
-			this.contentType = contentType;
-		}
-
-		public String getFileName() {
-			if (fileName != null) {
-				return fileName;
-			} else {
-				return "nofilename";
-			}
-		}
+	/**
+	 * Returns true if there are multipart contents
+	 * 
+	 * @return
+	 */
+	public boolean isMultipart() {
+		return !mMultipartParams.isEmpty();
 	}
 }

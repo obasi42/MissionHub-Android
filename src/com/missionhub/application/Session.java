@@ -14,6 +14,7 @@ import com.missionhub.api.Api;
 import com.missionhub.authenticator.Authenticator;
 import com.missionhub.exception.MissionHubException;
 import com.missionhub.model.Person;
+import com.missionhub.network.NetworkUnavailableException;
 import com.missionhub.ui.widget.PickAccountDialog;
 
 public class Session implements OnAccountsUpdateListener {
@@ -43,7 +44,7 @@ public class Session implements OnAccountsUpdateListener {
 	private final AtomicBoolean mUpdatingOrganizations = new AtomicBoolean(false);
 
 	/** true if the session is being refreshed */
-	private final AtomicBoolean mRefreshing = new AtomicBoolean(false);
+	private final AtomicBoolean mResuming = new AtomicBoolean(false);
 
 	/**
 	 * Creates a new session object and sets up the account manager
@@ -94,7 +95,7 @@ public class Session implements OnAccountsUpdateListener {
 	 */
 	public synchronized String getAccessToken() throws NoAccountException, OperationCanceledException, AuthenticatorException, IOException {
 		if (mAccount == null) {
-			throw new NoAccountException("No MissionHub Account Found");
+			throw new NoAccountException();
 		}
 		return mAccountManager.blockingGetAuthToken(mAccount, Authenticator.ACCOUNT_TYPE, true);
 	}
@@ -155,13 +156,13 @@ public class Session implements OnAccountsUpdateListener {
 	}
 
 	/**
-	 * Attempts to resume the previous user session
-	 * 
-	 * @return boolean true on success, false otherwise
+	 * Attempts to resume the previous user's session
 	 */
-	public synchronized boolean resumeSession() {
+	public synchronized void resumeSession() {
+		Application.postEvent(new SessionResumeStatusEvent("Resuming session..."));
+
 		long personId = SettingsManager.getSessionLastUserId();
-		if (personId > 0) {
+		if (personId >= 0) {
 			final Account account = findAccount(personId);
 			if (account != null) {
 				mAccount = account;
@@ -171,44 +172,47 @@ public class Session implements OnAccountsUpdateListener {
 			personId = -1;
 		}
 
-		if (mPersonId > 0) {
-			return true;
-		} else {
-			return false;
+		if (mPersonId < 0) {
+			if (canPickAccount()) {
+				Application.postEvent(new SessionPickAccountEvent());
+			} else {
+				Application.postEvent(new SessionResumeErrorEvent(new NoAccountException()));
+			}
+			return;
 		}
-	}
 
-	/**
-	 * Refresh the user's data from the MissionHub servers
-	 */
-	public synchronized void refreshSession() {
-		if (mRefreshing.get()) return;
-		mRefreshing.set(true);
+		if (mResuming.get()) return;
+		mResuming.set(true);
 
-		Application.postEvent(new SessionRefreshStartedEvent());
-
+		// update from the mh server
 		final Runnable runnable = new Runnable() {
 			@Override
 			public void run() {
 				try {
 					// update the person
-					Application.postEvent(new SessionRefreshPersonEvent());
+					Application.postEvent(new SessionResumeStatusEvent("Updating Person..."));
+
 					final Person p = Api.getPersonMe().get();
+
+					// update the account information
 					mAccountManager.setUserData(mAccount, Authenticator.KEY_PERSON_ID, String.valueOf(p.getId()));
 					mAccountManager.setUserData(mAccount, AccountManager.KEY_ACCOUNT_NAME, p.getName());
 
+					//TODO: uncomment
 					// update the organizations
-					Application.postEvent(new SessionRefreshOrganizationsEvent());
-					Api.getOrganizations(null).get();
+					//Application.postEvent(new SessionResumeStatusEvent("Updating Organizations..."));
+					//Api.getOrganizations(null).get();
 
-					Application.postEvent(new SessionUpdateOrganizationsSuccessEvent());
+					Application.postEvent(new SessionResumeSuccessEvent());
 				} catch (final Exception e) {
-					Application.postEvent(new SessionRefreshErrorEvent(e));
+					if (e instanceof NetworkUnavailableException) {
+						Application.postEvent(new SessionResumeOfflineEvent());
+						return;
+					}
+					Application.postEvent(new SessionResumeErrorEvent(e));
 				}
 
-				Application.postEvent(new SessionRefreshFinishedEvent());
-
-				mRefreshing.set(false);
+				mResuming.set(false);
 			}
 		};
 		Application.getExecutor().submit(runnable);
@@ -358,26 +362,34 @@ public class Session implements OnAccountsUpdateListener {
 		}
 	}
 
-	/* events posted from refreshSession() */
-	public static class SessionRefreshEvent extends SessionEvent {}
+	/* events posted from resumeSession() */
+	public static class SessionResumeEvent extends SessionEvent {}
 
-	public static class SessionRefreshStartedEvent extends SessionRefreshEvent {}
+	public static class SessionResumeSuccessEvent extends SessionResumeEvent {}
 
-	public static class SessionRefreshSuccessEvent extends SessionRefreshEvent {}
-
-	public static class SessionRefreshErrorEvent extends SessionRefreshEvent {
+	public static class SessionResumeErrorEvent extends SessionResumeEvent {
 		public Exception exception;
 
-		public SessionRefreshErrorEvent(final Exception e) {
-			exception = e;
+		public SessionResumeErrorEvent(final Exception exception) {
+			this.exception = exception;
 		}
 	}
 
-	public static class SessionRefreshFinishedEvent extends SessionRefreshEvent {}
+	public static class SessionResumeStatusEvent extends SessionResumeEvent {
+		public String status;
 
-	public static class SessionRefreshPersonEvent extends SessionRefreshEvent {}
+		public SessionResumeStatusEvent(final String status) {
+			this.status = status;
+		}
+	}
 
-	public static class SessionRefreshOrganizationsEvent extends SessionRefreshEvent {}
+	public static class SessionResumeOfflineEvent extends SessionResumeEvent {}
+
+	/* account picker events */
+
+	public static class SessionPickAccountEvent extends SessionEvent {}
+
+	/* general events */
 
 	public static class SessionInvalidTokenEvent extends SessionEvent {}
 
@@ -391,8 +403,8 @@ public class Session implements OnAccountsUpdateListener {
 	public static class NoAccountException extends MissionHubException {
 		private static final long serialVersionUID = 1L;
 
-		public NoAccountException(final String message) {
-			super(message);
+		public NoAccountException() {
+			super("No MissionHub Account Found");
 		}
 	}
 

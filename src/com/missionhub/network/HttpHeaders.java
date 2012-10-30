@@ -1,6 +1,5 @@
 package com.missionhub.network;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -11,9 +10,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-public class HttpHeaders implements Serializable {
-
-	private static final long serialVersionUID = -4953781862024963243L;
+public class HttpHeaders {
 
 	/* Stores the request headers */
 	private final ConcurrentMap<String, List<String>> headers = new ConcurrentHashMap<String, List<String>>();
@@ -29,7 +26,7 @@ public class HttpHeaders implements Serializable {
 	 * @param key
 	 * @param value
 	 */
-	public synchronized void addHeader(final String key, final String value) {
+	public void addHeader(final String key, final String value) {
 		List<String> list = headers.get(key);
 		if (list != null) {
 			list.add(value);
@@ -46,7 +43,7 @@ public class HttpHeaders implements Serializable {
 	 * @param key
 	 * @param value
 	 */
-	public synchronized void setHeader(final String key, final String value) {
+	public void setHeader(final String key, final String value) {
 		final List<String> list = new ArrayList<String>();
 		list.add(value);
 		headers.put(key, list);
@@ -58,7 +55,7 @@ public class HttpHeaders implements Serializable {
 	 * @param key
 	 * @param value
 	 */
-	public synchronized void setHeader(final String key, final ArrayList<String> values) {
+	public void setHeader(final String key, final ArrayList<String> values) {
 		headers.put(key, values);
 	}
 
@@ -67,7 +64,7 @@ public class HttpHeaders implements Serializable {
 	 * 
 	 * @return header value or null
 	 */
-	public synchronized String getHeader(final String key) {
+	public String getHeader(final String key) {
 		final List<String> list = headers.get(key);
 		if (list != null && !list.isEmpty()) {
 			return list.get(0);
@@ -80,7 +77,7 @@ public class HttpHeaders implements Serializable {
 	 * 
 	 * @return unmodifiable copy of the request headers
 	 */
-	public synchronized Map<String, List<String>> getHeaders() {
+	public Map<String, List<String>> getHeaders() {
 		final Map<String, List<String>> tmp = new HashMap<String, List<String>>();
 
 		final Iterator<Entry<String, List<String>>> itr = headers.entrySet().iterator();
@@ -104,7 +101,7 @@ public class HttpHeaders implements Serializable {
 	 * @param key
 	 * @return List of headers
 	 */
-	public synchronized List<String> getHeaders(final String key) {
+	public List<String> getHeaders(final String key) {
 		final List<String> tmpList = new ArrayList<String>();
 		final List<String> values = headers.get(key);
 		if (values != null) {
@@ -120,7 +117,7 @@ public class HttpHeaders implements Serializable {
 	 * 
 	 * @param key
 	 */
-	public synchronized void removeHeader(final String key) {
+	public void removeHeader(final String key) {
 		headers.remove(key);
 	}
 
@@ -130,7 +127,7 @@ public class HttpHeaders implements Serializable {
 	 * @param key
 	 * @param value
 	 */
-	public synchronized void removeHeader(final String key, final String value) {
+	public void removeHeader(final String key, final String value) {
 		final List<String> list = headers.get(key);
 		if (list != null) {
 			list.remove(value);
@@ -141,7 +138,7 @@ public class HttpHeaders implements Serializable {
 	}
 
 	@Override
-	public synchronized String toString() {
+	public String toString() {
 		final StringBuffer sb = new StringBuffer();
 
 		final Iterator<Entry<String, List<String>>> itr = getHeaders().entrySet().iterator();

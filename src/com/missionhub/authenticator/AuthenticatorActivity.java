@@ -1,5 +1,7 @@
 package com.missionhub.authenticator;
 
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.util.concurrent.FutureTask;
 
@@ -22,6 +24,7 @@ import android.webkit.WebViewDatabase;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import ch.boye.httpclientandroidlib.client.utils.URIBuilder;
 
 import com.actionbarsherlock.view.Window;
 import com.github.rtyley.android.sherlock.roboguice.activity.RoboSherlockAccountAuthenticatorActivity;
@@ -37,7 +40,6 @@ import com.missionhub.exception.ExceptionHelper;
 import com.missionhub.exception.ExceptionHelper.DialogButton;
 import com.missionhub.exception.WebViewException;
 import com.missionhub.model.gson.GAuthTokenDone;
-import com.missionhub.network.HttpParams;
 import com.missionhub.util.U;
 
 /**
@@ -107,14 +109,18 @@ public class AuthenticatorActivity extends RoboSherlockAccountAuthenticatorActiv
 
 		// show the webview and go to the initial auth page
 		mWebView.setVisibility(View.VISIBLE);
-		mWebView.loadUrl(getAuthenticationUrl());
+		try {
+			mWebView.loadUrl(getAuthenticationUrl());
+		} catch (final Exception e) {
+			displayError(e);
+		}
 	}
 
 	/**
 	 * web view client to manage the authentication process
 	 */
 	private class AuthenticatorWebViewClient extends WebViewClient {
-		
+
 		@Override
 		public boolean shouldOverrideUrlLoading(final WebView view, final String url) {
 			return false; // make sure this web view handles all other urls
@@ -132,13 +138,13 @@ public class AuthenticatorActivity extends RoboSherlockAccountAuthenticatorActiv
 
 			// make sure we are only working with requests from the oauth server
 			if (uri.getHost() != null && uri.getHost().equalsIgnoreCase(oauthUri.getHost())) {
-				
+
 				// prevent the mission hub server from being dumb
 				if (!uri.getPath().contains("/users") && !uri.getPath().contains(oauthUri.getPath())) {
 					onError(new Exception("The MissionHub server returned unexpected data. Please try again."));
 					return;
 				}
-				
+
 				// check for an api error
 				if (!U.isNullEmpty(uri.getQueryParameter("error"))) {
 					try {
@@ -203,19 +209,20 @@ public class AuthenticatorActivity extends RoboSherlockAccountAuthenticatorActiv
 	 * Builds and returns the url used for authentication
 	 * 
 	 * @return the url used for authentication
+	 * @throws URISyntaxException
+	 * @throws MalformedURLException
 	 */
-	private String getAuthenticationUrl() {
-		final String url = Configuration.getOauthUrl() + "/authorize";
-		final HttpParams params = new HttpParams();
-		params.put("android", true);
-		params.put("display", "touch");
-		params.put("simple", true);
-		params.put("response_type", "code");
-		params.put("redirect_uri", Configuration.getOauthUrl() + "/done.json");
-		params.put("client_id", Configuration.getOauthClientId());
-		params.put("scope", Configuration.getOauthScope());
+	private String getAuthenticationUrl() throws URISyntaxException, MalformedURLException {
+		final URIBuilder builder = new URIBuilder(Configuration.getOauthUrl() + "/authorize");
+		builder.addParameter("android", "true");
+		builder.addParameter("display", "touch");
+		builder.addParameter("simple", "true");
+		builder.addParameter("response_type", "code");
+		builder.addParameter("redirect_uri", Configuration.getOauthUrl() + "/done.json");
+		builder.addParameter("client_id", Configuration.getOauthClientId());
+		builder.addParameter("scope", Configuration.getOauthScope());
 
-		return url + '?' + params.getParamString();
+		return builder.build().toURL().toString();
 	}
 
 	/** shows the progress indicator with text */

@@ -10,7 +10,6 @@ import com.missionhub.model.DaoMaster;
 import com.missionhub.model.DaoMaster.OpenHelper;
 import com.missionhub.model.DaoSession;
 import com.missionhub.model.MissionHubOpenHelper;
-import com.missionhub.network.NetworkUtils;
 import com.missionhub.util.ErrbitNotifier;
 import com.nostra13.universalimageloader.cache.disc.impl.LimitedAgeDiscCache;
 import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
@@ -56,10 +55,6 @@ public class Application extends android.app.Application {
 
 		// set the last last version id for future upgrades
 		SettingsManager.setApplicationLastVersionId(getVersionCode());
-
-		// set up networking
-		NetworkUtils.disableConnectionReuseIfNecessary();
-		NetworkUtils.enableHttpResponseCache(this);
 
 		// set up the image loader
 		final ImageLoader imageLoader = ImageLoader.getInstance();

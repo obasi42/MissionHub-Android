@@ -1,105 +1,23 @@
 package com.missionhub.network;
 
-import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
+import ch.boye.httpclientandroidlib.Header;
 
-/**
- * Holds the data from an http response in a serializable form for passing with messages.
- */
-public class HttpResponse implements Serializable {
+public class HttpResponse {
 
-	private static final long serialVersionUID = 5847719786957029870L;
+	public int statusCode;
+	public String statusReason;
+	public Header[] headers;
 
-	/**
-	 * @see java.net.HttpURLConnection#getContentEncoding()
-	 */
-	public String contentEncoding;
-
-	/**
-	 * @see java.net.HttpURLConnection#getContentLength()
-	 */
-	public int contentLength;
-
-	/**
-	 * @see java.net.HttpURLConnection#getContentType()
-	 */
-	public String contentType;
-
-	/**
-	 * @see java.net.HttpURLConnection#getDate()
-	 */
-	public long date;
-
-	/**
-	 * @see java.net.HttpURLConnection#getExpiration()
-	 */
-	public long expiration;
-
-	/**
-	 * @see java.net.HttpURLConnection#getHeaderFields()
-	 */
-	public Map<String, List<String>> headerFields;
-
-	/**
-	 * @see java.net.HttpURLConnection#getIfModifiedSince()
-	 */
-	public long ifModifiedSince;
-
-	/**
-	 * @see java.net.HttpURLConnection#getLastModified()
-	 */
-	public long lastModified;
-
-	/**
-	 * @see java.net.HttpURLConnection#getResponseMessage()
-	 */
-	public String responseMessage;
-
-	/**
-	 * @see java.net.HttpURLConnection#getRequestMethod()
-	 */
-	public String requestMethod;
-
-	/**
-	 * @see java.net.HttpURLConnection#getRequestProperties()
-	 */
-	public Map<String, List<String>> requestProperties;
-
-	/**
-	 * The body of the response from either {@link java.net.HttpURLConnection#getInputStream()} or
-	 * {@link java.net.HttpURLConnection#getErrorStream()}
-	 */
 	public String responseBody;
+	public byte[] responseBodyRaw;
 
-	/**
-	 * @see java.net.HttpURLConnection#getResponseCode()
-	 */
-	public int responseCode;
+	public HttpResponse() {}
 
-	/**
-	 * An exception that was thrown during the request {@link responseCode} > 400.
-	 */
-	public Throwable throwable;
-
-	/**
-	 * The url as a String. Derived from {@link java.net.HttpURLConnection#getURL()}.
-	 */
-	public String url;
-
-	/**
-	 * Creates a new empty HttpResponse object
-	 */
-	protected HttpResponse() {}
-
-	/**
-	 * Creates a new HttpResponse object
-	 * 
-	 * @param method
-	 * @param url
-	 */
-	protected HttpResponse(final HttpClient.Method method, final String url) {
-		this.requestMethod = method.toString();
-		this.url = url;
+	public boolean isRaw() {
+		if (responseBodyRaw != null) {
+			return true;
+		}
+		return false;
 	}
+
 }

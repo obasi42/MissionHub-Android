@@ -17,6 +17,7 @@ import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.os.Build;
 import android.util.Log;
+import ch.boye.httpclientandroidlib.client.utils.URIBuilder;
 
 import com.google.common.collect.HashMultimap;
 import com.google.gson.Gson;
@@ -24,8 +25,6 @@ import com.missionhub.application.Application;
 import com.missionhub.application.Configuration;
 import com.missionhub.application.Session;
 import com.missionhub.application.Session.NoAccountException;
-import com.missionhub.exception.ApiException;
-import com.missionhub.exception.OfflineException;
 import com.missionhub.model.FollowupComment;
 import com.missionhub.model.Organization;
 import com.missionhub.model.Person;
@@ -38,11 +37,12 @@ import com.missionhub.model.gson.GMetaOrganizations;
 import com.missionhub.model.gson.GMetaPeople;
 import com.missionhub.model.gson.GPerson;
 import com.missionhub.network.HttpClient;
-import com.missionhub.network.HttpClient.Method;
-import com.missionhub.network.HttpException;
+import com.missionhub.network.HttpClient.HttpClientFuture;
+import com.missionhub.network.HttpClient.HttpMethod;
+import com.missionhub.network.HttpClient.ResponseType;
 import com.missionhub.network.HttpHeaders;
 import com.missionhub.network.HttpParams;
-import com.missionhub.network.NetworkUtils;
+import com.missionhub.network.HttpResponse;
 import com.missionhub.util.U;
 
 /**
@@ -54,7 +54,7 @@ public class Api {
 	private static Api sApi;
 
 	/** the logging tag */
-	private static final String TAG = Api.class.getSimpleName();
+	public static final String TAG = Api.class.getSimpleName();
 
 	/** the gson parser */
 	private final Gson gson = new Gson();
@@ -73,122 +73,60 @@ public class Api {
 		return sApi;
 	}
 
-	/**
-	 * Performs a http request automatically appending the organization id and access token
-	 * 
-	 * @param method
-	 * @param url
-	 *            the url for the request. Can be built buildUrlPath().
-	 * @param headers
-	 * @param params
-	 * @return the response of the request
-	 * @throws ApiException
-	 *             all exceptions will be wrapped in an ApiException
-	 * @throws OfflineException
-	 */
-	private ApiResponse doRequest(final Method method, final String url, final HttpHeaders headers, final HttpParams params) throws ApiException, OfflineException {
-		return doRequest(method, url, headers, params, true, Session.getInstance().getOrganizationId());
+	private HttpResponse doRequest(final HttpMethod method, final String url) throws Exception {
+		return doRequest(method, url, null, null, true, ResponseType.STRING);
 	}
 
-	/**
-	 * Performs a http request
-	 * 
-	 * @param method
-	 * @param url
-	 *            the url for the request. Can be built buildUrlPath().
-	 * @param headers
-	 * @param params
-	 * @param authenticated
-	 *            true if the access token from the session should be used
-	 * @param useOrg
-	 * @return the response of the request
-	 * @throws ApiException
-	 *             all exceptions will be wrapped in an ApiException
-	 * @throws OfflineException
-	 */
-	private ApiResponse doRequest(final Method method, final String url, final HttpHeaders headers, final HttpParams params, final boolean authenticated, final long organizationId)
-			throws ApiException, OfflineException {
-		return doRequest(null, method, url, headers, params, authenticated, organizationId, 3);
+	private HttpResponse doRequest(final HttpMethod method, final String url, final HttpParams params) throws Exception {
+		return doRequest(method, url, null, params, true, ResponseType.STRING);
 	}
 
-	/**
-	 * Performs a http request.
-	 * 
-	 * @param request
-	 *            the request to retry
-	 * @param method
-	 * @param url
-	 *            the url for the request. Can be built buildUrlPath().
-	 * @param headers
-	 * @param params
-	 * @param authenticated
-	 *            true if the access token from the session should be used
-	 * @param maxRetries
-	 *            the number of times the request will be retried automatically
-	 * @return the response of the request
-	 * @throws ApiException
-	 *             all exceptions will be wrapped in an ApiException
-	 * @throws OfflineException
-	 */
-	private ApiResponse doRequest(ApiRequest request, final Method method, final String url, HttpHeaders headers, final HttpParams params, final boolean authenticated, final long organizationId,
-			final int maxRetries) throws ApiException, OfflineException {
+	private HttpResponse doRequest(final HttpMethod method, final String url, final HttpHeaders headers, final HttpParams params) throws Exception {
+		return doRequest(method, url, headers, params, true, ResponseType.STRING);
+	}
 
-		/* check for a data connection */
-		if (!NetworkUtils.isNetworkAvailable(Application.getContext())) {
-			throw new OfflineException();
-		}
+	private HttpResponse doRequest(final HttpMethod method, final String url, final HttpHeaders headers, final HttpParams params, final boolean authenticated) throws Exception {
+		return doRequest(method, url, headers, params, authenticated, ResponseType.STRING);
+	}
 
-		/* create the headers object if needed and add the api version header */
-		if (headers == null) {
-			headers = new HttpHeaders();
-		}
-		headers.setHeader("Accept", "application/vnd.missionhub-v" + Configuration.getApiVersion() + "+json");
-
-		/* create the request and response objects for holding state data */
-		if (request == null) {
-			request = new ApiRequest(method, url, headers, params, authenticated, organizationId);
-		}
-
-		final ApiResponse response = new ApiResponse(request);
-
+	private HttpResponse doRequest(final HttpMethod method, final String url, HttpHeaders headers, final HttpParams params, final boolean authenticated, final ResponseType responseType)
+			throws Exception {
+		HttpResponse response = null;
 		try {
-			/* add oauth token to the request if needed */
-			if (request.authenticated) {
-				request.headers.setHeader("Authorization", "OAuth: " + Session.getInstance().getAccessToken());
+			// create the headers object if needed and add the api version header
+			if (headers == null) {
+				headers = new HttpHeaders();
+			}
+			headers.setHeader("Accept", "application/vnd.missionhub-v" + Configuration.getApiVersion() + "+json");
+
+			// add oauth token to the request if needed
+			if (authenticated) {
+				headers.setHeader("Authorization", "OAuth: " + Session.getInstance().getAccessToken());
 			}
 
-			if (request.params == null) request.params = new HttpParams();
-			if (!U.isNullEmptyNegative(request.organizationId)) request.params.put("org_id", request.organizationId);
-			appendLoggingParams(request.params);
+			appendLoggingParams(params);
 
+			// create the client and get the response
 			final HttpClient client = new HttpClient();
-			Log.d(TAG, request.url);
-			if (request.params != null) {
-				Log.d(TAG, "params: " + request.params);
-			}
-			if (request.headers != null) {
-				Log.d(TAG, "headers: " + request.headers);
-			}
-			if (request.method == Method.GET) {
-				response.httpResponse = client.get(request.url, request.headers, request.params);
-			} else if (request.method == Method.POST) {
-				response.httpResponse = client.post(request.url, request.headers, request.params);
-			}
+			client.setResponseType(responseType);
+			final HttpClientFuture future = client.doRequest(method, url, headers, params);
+			response = future.get();
 
-			final Throwable throwable = response.httpResponse.throwable;
-
-			if (throwable != null) {
-				if (throwable instanceof HttpException || throwable instanceof IOException) {
-					if (response.httpResponse.responseCode == 401 || throwable.getMessage().contains("authentication")) {
-						Session.getInstance().reportInvalidAccessToken();
-						throw new AccessTokenException(throwable);
-					}
+			return response;
+		} catch (final Exception e) {
+			// check for authentication errors
+			if (e instanceof IOException) {
+				if (response.statusCode == 401 || e.getMessage().contains("authentication")) {
+					Session.getInstance().reportInvalidAccessToken();
+					throw new AccessTokenException(e);
 				}
-			} else {
-				final String body = response.httpResponse.responseBody;
-				if (!U.isNullEmpty(body) && body.contains("error")) {
+			}
+
+			// check for api errors if the response was a string
+			if (responseType == ResponseType.STRING) {
+				if (!U.isNullEmpty(response.responseBody)) {
 					try {
-						final ApiErrorGson error = gson.fromJson(body, ApiErrorGson.class);
+						final ApiErrorGson error = gson.fromJson(response.responseBody, ApiErrorGson.class);
 						if (error != null) {
 							if (error.error.code.equalsIgnoreCase("56")) {
 								Session.getInstance().reportInvalidAccessToken();
@@ -197,45 +135,13 @@ public class Api {
 								throw new ApiException(error);
 							}
 						}
-					} catch (final Exception e) {
-						// if the exception is not an ApiException, the response is not an JSON api error.
-						if (e instanceof ApiException) {
-							throw (ApiException) e;
-						}
-					}
+					} catch (final Exception ignore) {}
 				}
 			}
-		} catch (final Exception e) {
-			if (e instanceof ApiException) {
-				throw (ApiException) e;
-			} else {
-				request.retries++;
-				if (request.retries > maxRetries) {
-					throw new ApiException(e);
-				} else {
-					return doRequest(request, method, url, headers, params, authenticated, organizationId, maxRetries);
-				}
-			}
+
+			// throw the original exception
+			throw e;
 		}
-
-		return response;
-	}
-
-	/**
-	 * Error thrown when the access token is invalid or missing
-	 */
-	public static class AccessTokenException extends ApiException {
-
-		private static final long serialVersionUID = 1L;
-
-		public AccessTokenException(final Throwable cause) {
-			super(cause);
-		}
-
-		public AccessTokenException(final ApiErrorGson error) {
-			super(error);
-		}
-
 	}
 
 	/**
@@ -245,11 +151,25 @@ public class Api {
 	 */
 	private void appendLoggingParams(final HttpParams params) {
 		try {
-			params.put("platform", "android");
-			params.put("platform_product", Build.PRODUCT);
-			params.put("platform_release", android.os.Build.VERSION.RELEASE);
-			params.put("app", Application.getVersionCode());
-		} catch (final Exception e) { /* this is really not that important */}
+			params.add("platform", "android");
+			params.add("platform_product", Build.PRODUCT);
+			params.add("platform_release", android.os.Build.VERSION.RELEASE);
+			params.add("app", Application.getVersionCode());
+		} catch (final Exception ignore) { /* logging is really not that important */}
+	}
+
+	/**
+	 * Appends parameters for logging
+	 * 
+	 * @param builder
+	 */
+	private void appendLoggingParams(final URIBuilder builder) {
+		try {
+			builder.addParameter("platform", "android");
+			builder.addParameter("platform_product", Build.PRODUCT);
+			builder.addParameter("platform_release", android.os.Build.VERSION.RELEASE);
+			builder.addParameter("app", String.valueOf(Application.getVersionCode()));
+		} catch (final Exception ignore) { /* logging is really not that important */}
 	}
 
 	/**
@@ -292,9 +212,9 @@ public class Api {
 			@Override
 			public Person call() throws Exception {
 				final String url = Api.getInstance().buildUrlPath("people", personId + ".json");
-				final ApiResponse response = Api.getInstance().doRequest(Method.GET, url, null, null);
+				final HttpResponse response = Api.getInstance().doRequest(HttpMethod.GET, url);
 				try {
-					final GMetaPeople gmp = Api.getInstance().gson.fromJson(response.httpResponse.responseBody, GMetaPeople.class);
+					final GMetaPeople gmp = Api.getInstance().gson.fromJson(response.responseBody, GMetaPeople.class);
 					final Person p = gmp.people[0].save().get();
 					return p;
 				} catch (final Exception e) {
@@ -318,9 +238,9 @@ public class Api {
 			@Override
 			public Person call() throws Exception {
 				final String url = Api.getInstance().buildUrlPath("people", "me.json");
-				final ApiResponse response = Api.getInstance().doRequest(Method.GET, url, null, null);
+				final HttpResponse response = Api.getInstance().doRequest(HttpMethod.GET, url);
 				try {
-					final GMetaPeople gmp = Api.getInstance().gson.fromJson(response.httpResponse.responseBody, GMetaPeople.class);
+					final GMetaPeople gmp = Api.getInstance().gson.fromJson(response.responseBody, GMetaPeople.class);
 					final Person p = gmp.people[0].save().get();
 					return p;
 				} catch (final Exception e) {
@@ -344,9 +264,9 @@ public class Api {
 			@Override
 			public List<Person> call() throws Exception {
 				final String url = Api.getInstance().buildUrlPath("people", U.toCSV(personIds) + ".json");
-				final ApiResponse response = Api.getInstance().doRequest(Method.GET, url, null, null);
+				final HttpResponse response = Api.getInstance().doRequest(HttpMethod.GET, url);
 				try {
-					final GMetaPeople gmp = Api.getInstance().gson.fromJson(response.httpResponse.responseBody, GMetaPeople.class);
+					final GMetaPeople gmp = Api.getInstance().gson.fromJson(response.responseBody, GMetaPeople.class);
 					final List<Person> persons = new ArrayList<Person>();
 					for (final GPerson gperson : gmp.people) {
 						persons.add(gperson.save().get());
@@ -388,11 +308,11 @@ public class Api {
 				final String url = Api.getInstance().buildUrlPath("contact_assignments.json");
 
 				final HttpParams params = new HttpParams();
-				params.put("id", U.toCSV(personIds));
-				params.put("type", type.name());
-				params.put("assign_to_id", U.toCSV(toIds));
+				params.add("id", U.toCSV(personIds));
+				params.add("type", type.name());
+				params.add("assign_to_id", U.toCSV(toIds));
 
-				Api.getInstance().doRequest(Method.POST, url, null, params);
+				Api.getInstance().doRequest(HttpMethod.POST, url, params);
 				return true;
 			}
 		};
@@ -415,10 +335,10 @@ public class Api {
 				final String url = Api.getInstance().buildUrlPath("contact_assignments", U.toCSV(personIds) + ".json");
 
 				final HttpParams params = new HttpParams();
-				params.put("ids", U.toCSV(personIds));
-				params.put("_method", "delete");
+				params.add("ids", U.toCSV(personIds));
+				params.add("_method", "delete");
 
-				Api.getInstance().doRequest(Method.POST, url, null, params);
+				Api.getInstance().doRequest(HttpMethod.POST, url, params);
 				return true;
 			}
 		};
@@ -443,9 +363,9 @@ public class Api {
 			@Override
 			public Person call() throws Exception {
 				final String url = Api.getInstance().buildUrlPath("contacts", personId + ".json");
-				final ApiResponse response = Api.getInstance().doRequest(Method.GET, url, null, null);
+				final HttpResponse response = Api.getInstance().doRequest(HttpMethod.GET, url);
 				try {
-					final GMetaContact contacts = Api.getInstance().gson.fromJson(response.httpResponse.responseBody, GMetaContact.class);
+					final GMetaContact contacts = Api.getInstance().gson.fromJson(response.responseBody, GMetaContact.class);
 					// we should only have one result, so just return the first one
 					return contacts.contacts[0].save().get();
 				} catch (final Exception e) {
@@ -470,9 +390,9 @@ public class Api {
 			@Override
 			public List<Person> call() throws Exception {
 				final String url = Api.getInstance().buildUrlPath("contacts", U.toCSV(personIds) + ".json");
-				final ApiResponse response = Api.getInstance().doRequest(Method.GET, url, null, null);
+				final HttpResponse response = Api.getInstance().doRequest(HttpMethod.GET, url);
 				try {
-					final GMetaContact contacts = Api.getInstance().gson.fromJson(response.httpResponse.responseBody, GMetaContact.class);
+					final GMetaContact contacts = Api.getInstance().gson.fromJson(response.responseBody, GMetaContact.class);
 					final List<Person> persons = new ArrayList<Person>();
 					for (final GContact contact : contacts.contacts) {
 						Log.e("HERE", "HERE" + contact.person.name);
@@ -508,10 +428,11 @@ public class Api {
 				options.appendFiltersParams(params);
 				options.appendOrderByParam(params);
 
-				final ApiResponse response = Api.getInstance().doRequest(Method.GET, url, null, params);
+				final HttpResponse response = Api.getInstance().doRequest(HttpMethod.GET, url, params);
 				try {
-					final GMetaContact contacts = Api.getInstance().gson.fromJson(response.httpResponse.responseBody, GMetaContact.class);
-					return contacts.save().get();
+					final GMetaContact contacts = Api.getInstance().gson.fromJson(response.responseBody, GMetaContact.class);
+					final List<Person> people = contacts.save().get();
+					return people;
 				} catch (final Exception e) {
 					Log.e("Exception", e.getMessage(), e);
 					throw new ApiException(e);
@@ -558,8 +479,8 @@ public class Api {
 		}
 
 		protected HttpParams appendLimits(final HttpParams params) {
-			params.put("start", String.valueOf(start));
-			params.put("limit", String.valueOf(limit));
+			params.add("start", String.valueOf(start));
+			params.add("limit", String.valueOf(limit));
 			return params;
 		}
 
@@ -580,7 +501,7 @@ public class Api {
 						value.append("|");
 					}
 				}
-				params.put("filters[" + stripUnsafeChars(filter) + "]", value.toString());
+				params.add("filters[" + stripUnsafeChars(filter) + "]", value.toString());
 			}
 			return params;
 		}
@@ -641,7 +562,7 @@ public class Api {
 				}
 			}
 
-			if (!orderBy.isEmpty()) params.put("order_by", sb.toString());
+			if (!orderBy.isEmpty()) params.add("order_by", sb.toString());
 
 			return params;
 		}
@@ -711,9 +632,9 @@ public class Api {
 			@Override
 			public List<FollowupComment> call() throws Exception {
 				final String url = Api.getInstance().buildUrlPath("followup_comments", personId + ".json");
-				final ApiResponse response = Api.getInstance().doRequest(Method.GET, url, null, null);
+				final HttpResponse response = Api.getInstance().doRequest(HttpMethod.GET, url);
 				try {
-					final GMetaCommentTop comments = Api.getInstance().gson.fromJson(response.httpResponse.responseBody, GMetaCommentTop.class);
+					final GMetaCommentTop comments = Api.getInstance().gson.fromJson(response.responseBody, GMetaCommentTop.class);
 
 					return comments.save().get();
 				} catch (final Exception e) {
@@ -778,9 +699,9 @@ public class Api {
 				json.put("rejoicables", jsonRejoicables);
 
 				final HttpParams params = new HttpParams();
-				params.put("json", json.toString());
+				params.add("json", json.toString());
 
-				Api.getInstance().doRequest(Method.POST, url, null, params);
+				Api.getInstance().doRequest(HttpMethod.POST, url, null, params);
 				return true;
 			}
 		};
@@ -815,9 +736,9 @@ public class Api {
 				final String url = Api.getInstance().buildUrlPath("followup_comments", U.toCSV(commentIds));
 
 				final HttpParams params = new HttpParams();
-				params.put("_method", "delete");
+				params.add("_method", "delete");
 
-				Api.getInstance().doRequest(Method.POST, url, null, params);
+				Api.getInstance().doRequest(HttpMethod.POST, url, params);
 				return true;
 			}
 		};
@@ -846,9 +767,9 @@ public class Api {
 			@Override
 			public Organization call() throws Exception {
 				final String url = Api.getInstance().buildUrlPath("organizations", organizationId);
-				final ApiResponse response = Api.getInstance().doRequest(Method.GET, url, null, null);
+				final HttpResponse response = Api.getInstance().doRequest(HttpMethod.GET, url);
 				try {
-					final GMetaOrganizations gmo = Api.getInstance().gson.fromJson(response.httpResponse.responseBody, GMetaOrganizations.class);
+					final GMetaOrganizations gmo = Api.getInstance().gson.fromJson(response.responseBody, GMetaOrganizations.class);
 					return gmo.organizations[0].save().get();
 				} catch (final Exception e) {
 					throw new ApiException(e);
@@ -879,9 +800,9 @@ public class Api {
 					url = Api.getInstance().buildUrlPath("organizations", U.toCSV(organizationIds));
 				}
 
-				final ApiResponse response = Api.getInstance().doRequest(Method.GET, url, null, null);
+				final HttpResponse response = Api.getInstance().doRequest(HttpMethod.GET, url);
 				try {
-					final GMetaOrganizations gmo = Api.getInstance().gson.fromJson(response.httpResponse.responseBody, GMetaOrganizations.class);
+					final GMetaOrganizations gmo = Api.getInstance().gson.fromJson(response.responseBody, GMetaOrganizations.class);
 					return gmo.save().get();
 				} catch (final Exception e) {
 					Log.e("Exception", e.getMessage(), e);
@@ -912,10 +833,10 @@ public class Api {
 				final String url = Api.getInstance().buildUrlPath("roles", personId + ".json");
 
 				final HttpParams params = new HttpParams();
-				params.put("_method", "put");
-				params.put("role", role);
+				params.add("_method", "put");
+				params.add("role", role);
 
-				Api.getInstance().doRequest(Method.POST, url, null, params);
+				Api.getInstance().doRequest(HttpMethod.POST, url, params);
 				return true;
 			}
 		};
@@ -941,16 +862,15 @@ public class Api {
 		final Callable<String> callable = new Callable<String>() {
 			@Override
 			public String call() throws Exception {
-				Session.getInstance().getAccessToken();
-				Session.getInstance().getOrganizationId();
 
-				final HttpParams params = new HttpParams();
-				params.put("access_token", Session.getInstance().getAccessToken());
-				params.put("org_id", Session.getInstance().getOrganizationId());
-				params.put("mobile", "1");
-				Api.getInstance().appendLoggingParams(params);
+				final URIBuilder builder = new URIBuilder(Configuration.getSurveyUrl());
+				builder.addParameter("access_token", Session.getInstance().getAccessToken());
+				builder.addParameter("org_id", String.valueOf(Session.getInstance().getOrganizationId()));
+				builder.addParameter("mobile", "1");
 
-				return Configuration.getSurveyUrl() + "?" + params.getParamString();
+				Api.getInstance().appendLoggingParams(builder);
+
+				return builder.build().toURL().toString();
 			}
 		};
 		final FutureTask<String> task = new FutureTask<String>(callable);
@@ -972,17 +892,18 @@ public class Api {
 		final Callable<GAuthTokenDone> callable = new Callable<GAuthTokenDone>() {
 			@Override
 			public GAuthTokenDone call() throws Exception {
-				final HttpParams params = new HttpParams();
-				params.put("client_id", Configuration.getOauthClientId());
-				params.put("client_secret", Configuration.getOauthClientSecret());
-				params.put("code", code);
-				params.put("grant_type", "authorization_code");
-				params.put("scope", Configuration.getOauthScope());
-				params.put("redirect_uri", Configuration.getOauthUrl() + "/done.json");
 
-				final ApiResponse response = Api.getInstance().doRequest(Method.POST, Configuration.getOauthUrl() + "/access_token", null, params, false, -1);
+				final HttpParams params = new HttpParams();
+				params.add("client_id", Configuration.getOauthClientId());
+				params.add("client_secret", Configuration.getOauthClientSecret());
+				params.add("code", code);
+				params.add("grant_type", "authorization_code");
+				params.add("scope", Configuration.getOauthScope());
+				params.add("redirect_uri", Configuration.getOauthUrl() + "/done.json");
+
+				final HttpResponse response = Api.getInstance().doRequest(HttpMethod.POST, Configuration.getOauthUrl() + "/access_token", null, params, false);
 				try {
-					final GAuthTokenDone done = Api.getInstance().gson.fromJson(response.httpResponse.responseBody, GAuthTokenDone.class);
+					final GAuthTokenDone done = Api.getInstance().gson.fromJson(response.responseBody, GAuthTokenDone.class);
 					return done;
 				} catch (final Exception e) {
 					throw new ApiException(e);

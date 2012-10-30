@@ -26,8 +26,10 @@ public class GMetaContact {
 					public List<Person> call() throws Exception {
 						final List<Person> people = new ArrayList<Person>();
 
-						for (final GContact contact : contacts) {
-							people.add(contact.save(false).get());
+						if (contacts != null) {
+							for (final GContact contact : contacts) {
+								people.add(contact.save(false).get());
+							}
 						}
 
 						return people;

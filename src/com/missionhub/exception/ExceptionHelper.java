@@ -6,6 +6,9 @@ import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
 import android.webkit.WebViewClient;
 
+import com.missionhub.api.ApiException;
+import com.missionhub.network.NetworkUnavailableException;
+
 /** Helps display error dialogs from exceptions */
 public class ExceptionHelper {
 
@@ -164,7 +167,7 @@ public class ExceptionHelper {
 				setMessage("Either your internet connection is very slow or the MissionHub servers are not currently responding. Please try again in a few minutes.");
 				break;
 			case WebViewClient.ERROR_HOST_LOOKUP:
-				setException(new OfflineException());
+				setException(new NetworkUnavailableException());
 				return;
 			default:
 				setMessage(mException.getMessage() + "\nweb view client code: " + ((WebViewException) mException).getCode());
