@@ -202,7 +202,7 @@ public class HttpClient {
 					} else {
 						response.responseBodyRaw = EntityUtils.toByteArray(responseEntity);
 					}
-					EntityUtils.consumeQuietly(mResponse.getEntity());
+					EntityUtils.consumeQuietly(responseEntity);
 				}
 			} finally {
 				shutdown();

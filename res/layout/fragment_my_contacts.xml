@@ -2,6 +2,14 @@
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/fragment_my_contacts_container"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent" >
+        android:layout_height="fill_parent" xmlns:missionhub="http://schemas.android.com/apk/res/com.missionhub">
+
+        <com.missionhub.ui.widget.ContactListView
+            android:id="@+id/contactListView1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            missionhub:item_layout_resource="@layout/item_contact"
+         >
+        </com.missionhub.ui.widget.ContactListView>
 
     </FrameLayout>

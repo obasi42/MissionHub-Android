@@ -42,6 +42,9 @@ public class Application extends android.app.Application {
 	/** database name */
 	private static final String DB_NAME = "missionhub.db";
 
+	/** the generic (context-less!) object store */
+	private static final ObjectStore mObjectStore = ObjectStore.getInstance();
+
 	/**
 	 * called when the application is created.
 	 */
@@ -199,4 +202,12 @@ public class Application extends android.app.Application {
 	public static void unregisterEventSubscriber(final Object subscriber, final Class<?>... eventTypes) {
 		EventBus.getDefault().unregister(subscriber, eventTypes);
 	}
+
+	/**
+	 * Returns the context-less store for objects
+	 */
+	public static ObjectStore getObjectStore() {
+		return mObjectStore;
+	}
+
 }

@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     
+   <declare-styleable name="ContactListView">
+       <attr name="item_layout_resource" format="reference" />
+   </declare-styleable>
+    
    <declare-styleable name="DrawableStateList">
        <attr name="state_support_activated" format="boolean" />
    </declare-styleable>

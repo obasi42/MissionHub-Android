@@ -10,6 +10,7 @@ import com.actionbarsherlock.app.ActionBar;
 import com.missionhub.R;
 import com.missionhub.application.Session;
 import com.missionhub.fragment.AllContactsFragment;
+import com.missionhub.fragment.ContactListFragment;
 import com.missionhub.fragment.DirectoryFragment;
 import com.missionhub.fragment.GroupsFragment;
 import com.missionhub.fragment.MyContactsFragment;
@@ -80,7 +81,7 @@ public class HostActivity extends BaseAuthenticatedMenuActivity {
 		if (fragment == null) {
 			switch (hostedFragment) {
 			case MY_CONTACTS:
-				fragment = new MyContactsFragment();
+				fragment = new ContactListFragment();
 				break;
 			case ALL_CONTACTS:
 				fragment = new AllContactsFragment();
