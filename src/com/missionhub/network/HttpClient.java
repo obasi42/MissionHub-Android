@@ -153,14 +153,14 @@ public class HttpClient {
 			try {
 				callable.abort();
 				callable.shutdown();
-			} catch (final Exception ignore) { /* ignore */ }
+			} catch (final Exception ignore) { /* ignore */}
 			return super.cancel(mayInterruptIfRunning);
 		}
 
 		public void abort() {
 			try {
 				callable.abort();
-			} catch (final Exception ignore) { /* ignore */ }
+			} catch (final Exception ignore) { /* ignore */}
 		}
 	}
 

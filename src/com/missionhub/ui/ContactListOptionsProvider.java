@@ -8,7 +8,6 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import roboguice.util.SafeAsyncTask;
-
 import android.util.Log;
 
 import com.missionhub.api.Api;
@@ -16,30 +15,30 @@ import com.missionhub.api.Api.ContactListOptions;
 import com.missionhub.model.Person;
 
 public class ContactListOptionsProvider extends ContactListProvider {
-	
+
 	/** the logging tag */
 	public static final String TAG = ContactListOptionsProvider.class.getSimpleName();
-	
+
 	/** Single thread executor to ensure sequential results */
-	private Executor mExecutor = Executors.newSingleThreadExecutor();
-	
+	private final Executor mExecutor = Executors.newSingleThreadExecutor();
+
 	/** the contact list options item */
 	private ContactListOptions mOptions;
-	
+
 	/** the future task for fetching more contacts */
 	private FutureTask<Void> mTask;
-	
+
 	/** the future task for the api request such that is can be canceled */
 	private FutureTask<List<Person>> mApiTask;
 
 	/** true when the provider is doing work in the background */
-	private AtomicBoolean mWorking = new AtomicBoolean(false);
-	
+	private final AtomicBoolean mWorking = new AtomicBoolean(false);
+
 	public ContactListOptionsProvider() {
 		mOptions = new ContactListOptions();
 	}
-	
-	public ContactListOptionsProvider(ContactListOptions options) {
+
+	public ContactListOptionsProvider(final ContactListOptions options) {
 		mOptions = options;
 	}
 
@@ -47,18 +46,18 @@ public class ContactListOptionsProvider extends ContactListProvider {
 	public void getMore() {
 		if (mWorking.get()) return;
 		mWorking.set(true);
-		
+
 		mTask = (new SafeAsyncTask<List<Person>>() {
 			@Override
 			public List<Person> call() throws Exception {
 				if (mOptions == null) return null;
-				
+
 				mApiTask = Api.getContactList(mOptions);
-				
+
 				final List<Person> people = mApiTask.get();
-				
+
 				if (future.isCancelled()) return null;
-				
+
 				// set up the options for the next run
 				if (people.size() < mOptions.getLimit()) {
 					mOptions.setIsAtEnd(true);
@@ -66,42 +65,42 @@ public class ContactListOptionsProvider extends ContactListProvider {
 				} else {
 					mOptions.advanceStart();
 				}
-				
+
 				return people;
 			}
-			
+
 			@Override
 			protected void onPreExecute() {
 				notifyWorking();
 			}
-		    
-		    @Override 
-		    protected void onSuccess(List<Person> people) {
-		    	if (people == null) return;
-		    	addPeople(people);
-		    } 
-		    
-		    @Override 
-		    protected void onException(Exception e) {
-		    	if (e instanceof InterruptedException || e instanceof CancellationException) {
-		    		return;
-		    	}
-		    	onError(e);
-		    } 
-		    
-		    @Override 
-		    protected void onFinally() {
-		    	mWorking.set(false);
-		    	notifyWorking();
-		    } 
-		    
-		    @Override
-		    protected void onInterrupted(Exception e) {
-		    	// allows for cancel(true);
-		    }
-			
+
+			@Override
+			protected void onSuccess(final List<Person> people) {
+				if (people == null) return;
+				addPeople(people);
+			}
+
+			@Override
+			protected void onException(final Exception e) {
+				if (e instanceof InterruptedException || e instanceof CancellationException) {
+					return;
+				}
+				onError(e);
+			}
+
+			@Override
+			protected void onFinally() {
+				mWorking.set(false);
+				notifyWorking();
+			}
+
+			@Override
+			protected void onInterrupted(final Exception e) {
+				// allows for cancel(true);
+			}
+
 		}).future();
-		
+
 		mExecutor.execute(mTask);
 	}
 
@@ -123,19 +122,19 @@ public class ContactListOptionsProvider extends ContactListProvider {
 		}
 		mWorking.set(false);
 	}
-	
+
 	public ContactListOptions getOptions() {
 		return mOptions;
 	}
-	
-	public void setOptions(ContactListOptions options) {
+
+	public void setOptions(final ContactListOptions options) {
 		cancelTasksQuietly();
 		mOptions = options;
 		clearPeople();
 		getMore();
 	}
-	
-	public void onError(Exception e) {
+
+	public void onError(final Exception e) {
 		Log.e(TAG, e.getMessage(), e);
 	}
 }

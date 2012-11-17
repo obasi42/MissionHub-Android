@@ -53,7 +53,7 @@ public class ObjectStore {
 		storeObject(key, object);
 		return key;
 	}
-	
+
 	/**
 	 * Stores and object and returns the key
 	 * 
@@ -65,7 +65,6 @@ public class ObjectStore {
 		storeObject(key, object);
 		return key;
 	}
-	
 
 	/**
 	 * Stores an object in the object store

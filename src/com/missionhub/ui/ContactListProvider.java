@@ -122,7 +122,7 @@ public abstract class ContactListProvider {
 
 	public synchronized void removeLastPerson() {
 		if (mPeople.size() - 1 < 0) return;
-		
+
 		mPeople.remove(mPeople.size() - 1);
 		notifyChanged();
 	}
@@ -137,7 +137,7 @@ public abstract class ContactListProvider {
 			}
 		}
 	}
-	
+
 	public void notifyWorking() {
 		if (mListener != null) {
 			final ContactListProviderListener listener = mListener.get();
@@ -160,7 +160,7 @@ public abstract class ContactListProvider {
 
 	/** returns whether or not all of the available contacts are in the list */
 	public abstract boolean hasMore();
-	
+
 	/** returns true while the provider is working on a request */
 	public abstract boolean isWorking();
 
@@ -168,7 +168,7 @@ public abstract class ContactListProvider {
 	public static interface ContactListProviderListener {
 
 		public void onContactsChanged();
-		
+
 		public void onProviderWorkingChanged();
 
 	}

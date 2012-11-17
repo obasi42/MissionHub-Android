@@ -14,7 +14,7 @@ import android.widget.BaseAdapter;
  * An "super" array adapter for generic objects
  */
 public abstract class ObjectArrayAdapter extends BaseAdapter {
-	
+
 	/** the context for generating view */
 	private Context mContext;
 
@@ -32,22 +32,22 @@ public abstract class ObjectArrayAdapter extends BaseAdapter {
 
 	/** notify on all changes to the list */
 	private boolean mNotify = true;
-	
+
 	/** the types of views */
 	private final List<Class<? extends Object>> mTypes = new ArrayList<Class<? extends Object>>();
-	
+
 	/** the max number of view types */
 	private final int mMaxViewTypes;
-	
-	public ObjectArrayAdapter(Context context) {
+
+	public ObjectArrayAdapter(final Context context) {
 		this(context, 10);
 	}
-	
-	public ObjectArrayAdapter(Context context, int maxViewTypes) {
+
+	public ObjectArrayAdapter(final Context context, final int maxViewTypes) {
 		mContext = context;
 		mMaxViewTypes = maxViewTypes;
 	}
-	
+
 	@Override
 	public int getCount() {
 		return mActiveObjects.size();
@@ -63,58 +63,58 @@ public abstract class ObjectArrayAdapter extends BaseAdapter {
 		final Object object = mActiveObjects.get(position);
 		if (object != null && object instanceof ItemIdProvider) {
 			return ((ItemIdProvider) object).getItemId();
-		}		
+		}
 		return 0;
 	}
-	
+
 	@Override
 	public int getViewTypeCount() {
 		return mMaxViewTypes;
 	}
-	
+
 	public int getActualViewTypeCount() {
 		return mTypes.size();
 	}
-	
-	private void addType(Class<? extends Object> clss) {
+
+	private void addType(final Class<? extends Object> clss) {
 		if (!mTypes.contains(clss)) {
 			mTypes.add(clss);
 		}
 		if (mTypes.size() > mMaxViewTypes) {
 			throw new RuntimeException("Max view types limit reached.");
 		}
-		
+
 	}
-	
+
 	@Override
-	public int getItemViewType(int position) {
-		Object object = getItem(position);
+	public int getItemViewType(final int position) {
+		final Object object = getItem(position);
 		if (object == null) return IGNORE_ITEM_VIEW_TYPE;
 		return mTypes.indexOf(object.getClass());
 	}
 
 	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
-		View view = getSupportView(position, convertView, parent);
+	public View getView(final int position, final View convertView, final ViewGroup parent) {
+		final View view = getSupportView(position, convertView, parent);
 		runSupportFilters(view, position, parent);
 		return view;
 	}
 
 	@Override
-	public View getDropDownView(int position, View convertView, ViewGroup parent) {
-		View view = getSupportDropDownView(position, convertView, parent);
+	public View getDropDownView(final int position, final View convertView, final ViewGroup parent) {
+		final View view = getSupportDropDownView(position, convertView, parent);
 		runSupportFilters(view, position, parent);
 		return view;
 	}
 
-	private void runSupportFilters(View view, int position, ViewGroup parent) {
+	private void runSupportFilters(final View view, final int position, final ViewGroup parent) {
 		// TODO: if needed
 	}
-	
+
 	public abstract View getSupportView(int position, View convertView, ViewGroup parent);
-	
+
 	public abstract View getSupportDropDownView(int position, View convertView, ViewGroup parent);
-	
+
 	public interface ItemIdProvider {
 		long getItemId();
 	}
@@ -253,21 +253,21 @@ public abstract class ObjectArrayAdapter extends BaseAdapter {
 		Collections.sort(mActiveObjects, comparator);
 		maybeNotify();
 	}
-	
+
 	@Override
 	public boolean isEmpty() {
 		return mActiveObjects.isEmpty();
 	}
-	
+
 	@Override
-	public boolean isEnabled(int position) {
-		Object object = getItem(position);
+	public boolean isEnabled(final int position) {
+		final Object object = getItem(position);
 		if (object != null && object instanceof SupportEnable) {
 			return ((SupportEnable) object).isEnabled();
 		}
 		return true;
 	}
-	
+
 	@Override
 	public boolean areAllItemsEnabled() {
 		for (int i = 0; i < getCount(); i++) {
@@ -277,22 +277,23 @@ public abstract class ObjectArrayAdapter extends BaseAdapter {
 		}
 		return super.areAllItemsEnabled();
 	}
-	
+
 	public interface SupportEnable {
 		public boolean isEnabled();
 	}
-	
+
 	/**
 	 * Sets the context for the adapter. Ideally this should be set before the adapter is attached to the adapter view.
+	 * 
 	 * @param context
 	 */
-	public void setContext(Context context) {
-		synchronized(mLock) {
+	public void setContext(final Context context) {
+		synchronized (mLock) {
 			mContext = context;
 			notifyDataSetChanged();
 		}
 	}
-	
+
 	public Context getContext() {
 		return mContext;
 	}

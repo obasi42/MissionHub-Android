@@ -69,7 +69,7 @@ public class Session implements OnAccountsUpdateListener {
 
 	/** the user's labels */
 	private SetMultimap<Long, String> mLabels; // organizationId, label
-	
+
 	/** the cached organization hierarchy */
 	private TreeDataStructure<Long> mOrganizationHierarchy;
 
@@ -241,7 +241,7 @@ public class Session implements OnAccountsUpdateListener {
 
 					// update the organizations
 					Application.postEvent(new SessionResumeStatusEvent(Application.getContext().getString(R.string.init_updating_orgs)));
-					//TODO: uncomment Api.getOrganizations(null).get();
+					// TODO: uncomment Api.getOrganizations(null).get();
 
 					updateLabels();
 					getOrganizationHierarchy();
@@ -386,7 +386,7 @@ public class Session implements OnAccountsUpdateListener {
 		if (mOrganizationHierarchy != null) {
 			return mOrganizationHierarchy;
 		}
-		
+
 		final QueryBuilder<OrganizationalRole> builder = Application.getDb().getOrganizationalRoleDao().queryBuilder();
 		final List<String> adminRoles = new ArrayList<String>();
 		adminRoles.add(LABEL_ADMIN);
@@ -396,13 +396,13 @@ public class Session implements OnAccountsUpdateListener {
 
 		// build a tree from organization ancestry
 		final TreeDataStructure<Long> tree = new TreeDataStructure<Long>(0l);
-		
+
 		final Iterator<OrganizationalRole> roleItr = roles.iterator();
 		while (roleItr.hasNext()) {
 			final OrganizationalRole role = roleItr.next();
 			role.refresh();
 			final Organization org = role.getOrganization();
-			org.refresh();			
+			org.refresh();
 			if (role.getOrganization().getAncestry() != null) {
 				TreeDataStructure<Long> parent = tree;
 				for (final String ancestor : role.getOrganization().getAncestry().trim().split("/")) {
@@ -420,9 +420,9 @@ public class Session implements OnAccountsUpdateListener {
 				tree.addLeaf(org.getId());
 			}
 		}
-		
+
 		mOrganizationHierarchy = tree;
-		
+
 		return tree;
 	}
 

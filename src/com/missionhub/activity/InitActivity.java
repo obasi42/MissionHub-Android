@@ -66,7 +66,7 @@ public class InitActivity extends BaseActivity {
 		super.onCreate(savedInstanceState);
 
 		mVersion.setText(Application.getVersionName());
-		
+
 		mLogin.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(final View v) {
@@ -77,10 +77,11 @@ public class InitActivity extends BaseActivity {
 				}
 			}
 		});
-		
+
 		showLogin();
 
-		Application.registerEventSubscriber(this, SessionResumeSuccessEvent.class, SessionResumeErrorEvent.class, SessionResumeStatusEvent.class, SessionPickAccountEvent.class, AccountPickedEvent.class);
+		Application.registerEventSubscriber(this, SessionResumeSuccessEvent.class, SessionResumeErrorEvent.class, SessionResumeStatusEvent.class, SessionPickAccountEvent.class,
+				AccountPickedEvent.class);
 
 		Session.getInstance().resumeSession();
 	}

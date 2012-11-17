@@ -56,26 +56,29 @@ public class IntentHelper {
 			Toast.makeText(Application.getContext(), getString(R.string.intent_helper_no_sms), Toast.LENGTH_LONG).show();
 		}
 	}
-	
+
 	/**
 	 * Sends an email
+	 * 
 	 * @param address
 	 */
 	public static void sendEmail(final String address) {
 		sendEmail(address, null);
 	}
-	
+
 	/**
 	 * Sends an email
+	 * 
 	 * @param address
 	 * @param subject
 	 */
 	public static void sendEmail(final String address, final String subject) {
 		sendEmail(address, subject, null);
 	}
-	
+
 	/**
 	 * Sends an email
+	 * 
 	 * @param address
 	 * @param subject
 	 * @param body
@@ -92,12 +95,12 @@ public class IntentHelper {
 				intent.putExtra(android.content.Intent.EXTRA_SUBJECT, subject);
 			}
 			if (!U.isNullEmpty(body)) {
-				intent.putExtra(android.content.Intent.EXTRA_TEXT, body);  
+				intent.putExtra(android.content.Intent.EXTRA_TEXT, body);
 			}
-			
+
 			final Intent chooser = Intent.createChooser(intent, getString(R.string.intent_helper_send_email));
 			addTaskFlags(chooser);
-			
+
 			Application.getContext().startActivity(chooser);
 		} catch (final Exception e) {
 			Toast.makeText(Application.getContext(), getString(R.string.intent_helper_no_browser), Toast.LENGTH_LONG).show();
@@ -112,8 +115,8 @@ public class IntentHelper {
 	private static void addTaskFlags(final Intent intent) {
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
 	}
-	
-	private static String getString(int resId) {
+
+	private static String getString(final int resId) {
 		return Application.getContext().getString(resId);
 	}
 }

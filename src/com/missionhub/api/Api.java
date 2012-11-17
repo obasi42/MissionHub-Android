@@ -112,7 +112,7 @@ public class Api {
 			response = future.get();
 
 			return response;
-		} catch (final Exception e) {			
+		} catch (final Exception e) {
 			// check for authentication errors
 			if (e instanceof IOException) {
 				if ((response != null && response.statusCode == 401) || e.getMessage().contains("authentication")) {
@@ -609,12 +609,12 @@ public class Api {
 		public void advanceStart() {
 			this.start += this.limit;
 		}
-		
+
 		public void resetPosition() {
 			this.start = 0;
 			this.atEnd = false;
 		}
-		
+
 	}
 
 	// **********************************//

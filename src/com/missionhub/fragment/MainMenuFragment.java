@@ -104,7 +104,7 @@ public class MainMenuFragment extends BaseFragment implements OnItemClickListene
 					holder.divider = view.findViewById(R.id.divider);
 					holder.icon = (ImageView) view.findViewById(R.id.icon);
 					holder.title = (TextView) view.findViewById(R.id.title);
-					
+
 				} else if (item instanceof MainMenuDivider) {
 					view = inflater.inflate(R.layout.item_main_menu_divider, null);
 					holder.title = (TextView) view.findViewById(R.id.title);
@@ -149,11 +149,11 @@ public class MainMenuFragment extends BaseFragment implements OnItemClickListene
 		public View getSupportDropDownView(final int position, final View convertView, final ViewGroup parent) {
 			return getSupportView(position, convertView, parent);
 		}
-		
+
 		class ViewHolder {
 			View divider;
 			ImageView icon;
-			TextView title;     
+			TextView title;
 		}
 	}
 
@@ -172,11 +172,11 @@ public class MainMenuFragment extends BaseFragment implements OnItemClickListene
 		public MainMenuItem(final int id, final String title) {
 			this(id, title, 0);
 		}
-		
+
 		public MainMenuItem(final int id, final int title) {
 			this(id, Application.getContext().getString(title), 0);
 		}
-		
+
 		public MainMenuItem(final int id, final int title, final int iconResourceId) {
 			this(id, Application.getContext().getString(title), iconResourceId);
 		}
@@ -200,7 +200,7 @@ public class MainMenuFragment extends BaseFragment implements OnItemClickListene
 		String title;
 
 		public MainMenuDivider() {}
-		
+
 		public MainMenuDivider(final int title) {
 			this(Application.getContext().getString(title));
 		}

@@ -8,13 +8,13 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.missionhub.R;
-
 import android.content.Context;
 import android.util.Log;
 import android.util.TypedValue;
+
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.missionhub.R;
 
 public class U {
 
@@ -155,9 +155,10 @@ public class U {
 
 	/**
 	 * resets the action bar to a "clean slate"
+	 * 
 	 * @param sherlockActivity
 	 */
-	public static void resetActionBar(SherlockFragmentActivity sherlockActivity) {
+	public static void resetActionBar(final SherlockFragmentActivity sherlockActivity) {
 		sherlockActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		sherlockActivity.getSupportActionBar().setDisplayShowCustomEnabled(false);
 		sherlockActivity.getSupportActionBar().setDisplayShowHomeEnabled(true);

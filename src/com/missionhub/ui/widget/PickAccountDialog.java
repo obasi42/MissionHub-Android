@@ -12,9 +12,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.missionhub.R;
 import com.missionhub.application.Application;
@@ -30,35 +30,35 @@ public class PickAccountDialog extends DialogFragment implements OnItemClickList
 	private AccountManager mAccountManager;
 	private ListView mListView;
 	private ObjectArrayAdapter mAdapter;
-	
+
 	@Override
-	public Dialog onCreateDialog(Bundle savedInstanceState) {
-	    mAdapter = new PickAccountArrayAdapter(getActivity());
-	    
-	    LayoutInflater inflater = getActivity().getLayoutInflater();
-	    View view = inflater.inflate(R.layout.dialog_pick_account, null);
-	    
-	    mListView = (ListView) view.findViewById(R.id.listview);
+	public Dialog onCreateDialog(final Bundle savedInstanceState) {
+		mAdapter = new PickAccountArrayAdapter(getActivity());
+
+		final LayoutInflater inflater = getActivity().getLayoutInflater();
+		final View view = inflater.inflate(R.layout.dialog_pick_account, null);
+
+		mListView = (ListView) view.findViewById(R.id.listview);
 		mListView.setAdapter(mAdapter);
 		mListView.setOnItemClickListener(this);
-	    
-		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+		final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setTitle(getString(R.string.init_choose_account));
-	    builder.setView(view); 
-	    return builder.create();
+		builder.setView(view);
+		return builder.create();
 	}
-	
+
 	private class PickAccountArrayAdapter extends ObjectArrayAdapter {
 
-		public PickAccountArrayAdapter(Context context) {
+		public PickAccountArrayAdapter(final Context context) {
 			super(context, 2);
 		}
 
 		@Override
-		public View getSupportView(int position, View convertView, ViewGroup parent) {
+		public View getSupportView(final int position, final View convertView, final ViewGroup parent) {
 			final Object item = getItem(position);
 			View view = convertView;
-			
+
 			ViewHolder holder = null;
 			if (view == null) {
 				final LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -68,18 +68,18 @@ public class PickAccountDialog extends DialogFragment implements OnItemClickList
 					holder.name = (TextView) view.findViewById(R.id.name);
 					holder.organization = (TextView) view.findViewById(R.id.organization);
 					view.setTag(holder);
-				} else if (item instanceof NewAccountItem){
+				} else if (item instanceof NewAccountItem) {
 					view = inflater.inflate(R.layout.item_account_new, null);
 				}
 			} else {
 				holder = (ViewHolder) view.getTag();
 			}
-			
+
 			if (item instanceof AccountItem) {
-				AccountItem aitem = (AccountItem) item;
+				final AccountItem aitem = (AccountItem) item;
 				if (aitem.person != null) {
 					holder.name.setText(aitem.person.getName());
-					
+
 					final Organization org = Application.getDb().getOrganizationDao().load(SettingsManager.getSessionOrganizationId(aitem.person.getId()));
 					if (org != null) {
 						holder.organization.setText(org.getName());
@@ -89,43 +89,43 @@ public class PickAccountDialog extends DialogFragment implements OnItemClickList
 					}
 				}
 			}
-			
+
 			return view;
 		}
 
 		@Override
-		public View getSupportDropDownView(int position, View convertView, ViewGroup parent) {
+		public View getSupportDropDownView(final int position, final View convertView, final ViewGroup parent) {
 			return getSupportView(position, convertView, parent);
 		}
-		
+
 		public class ViewHolder {
 			TextView name;
 			TextView organization;
 		}
-		
+
 	}
-	
+
 	@Override
 	public void onResume() {
 		super.onResume();
-		
+
 		mAccountManager = AccountManager.get(getActivity());
 		mAccountManager.addOnAccountsUpdatedListener(this, null, false);
-		
+
 		refreshAccounts();
 	}
-	
+
 	@Override
 	public void onPause() {
 		mAccountManager.removeOnAccountsUpdatedListener(this);
-		
+
 		super.onPause();
 	}
-	
+
 	private void refreshAccounts() {
 		mAdapter.setNotifyOnChange(false);
 		mAdapter.clear();
-		
+
 		final Account[] accounts = mAccountManager.getAccountsByType(Authenticator.ACCOUNT_TYPE);
 		for (final Account account : accounts) {
 			final Long personId = Long.parseLong(mAccountManager.getUserData(account, Authenticator.KEY_PERSON_ID));
@@ -135,15 +135,15 @@ public class PickAccountDialog extends DialogFragment implements OnItemClickList
 			}
 		}
 		mAdapter.add(new NewAccountItem());
-		
+
 		mAdapter.notifyDataSetChanged();
 	}
 
 	@Override
-	public void onAccountsUpdated(Account[] accounts) {
+	public void onAccountsUpdated(final Account[] accounts) {
 		refreshAccounts();
 	}
-	
+
 	@Override
 	public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id) {
 		final Object item = parent.getItemAtPosition(position);
@@ -154,15 +154,15 @@ public class PickAccountDialog extends DialogFragment implements OnItemClickList
 		}
 		dismiss();
 	}
-	
+
 	private static class AccountItem {
 		public final Person person;
-		
-		public AccountItem(Person person) {
+
+		public AccountItem(final Person person) {
 			this.person = person;
 		}
 	}
-	
+
 	private static class NewAccountItem {}
 
 	public static class AccountPickedEvent {

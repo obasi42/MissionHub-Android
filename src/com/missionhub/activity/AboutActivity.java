@@ -14,39 +14,40 @@ import com.missionhub.util.IntentHelper;
 
 @ContentView(R.layout.activity_about)
 public class AboutActivity extends BaseActivity {
-	
+
 	@InjectView(R.id.version) private TextView mVersion;
-	
-	public void onCreate(Bundle savedInstanceState) {
+
+	@Override
+	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-		
+
 		mVersion.setText(Application.getVersionName());
 	}
-	
+
 	@Override
-	public boolean onMenuItemSelected(int featureId, MenuItem item) {
+	public boolean onMenuItemSelected(final int featureId, final MenuItem item) {
 		if (item.getItemId() == android.R.id.home) {
 			finish();
 			return true;
 		}
 		return super.onMenuItemSelected(featureId, item);
 	}
-	
-	public void clickFeedback(View view) {
+
+	public void clickFeedback(final View view) {
 		IntentHelper.sendEmail(getString(R.string.about_feedback_email));
 	}
-	
-	public void clickLicenses(View view) {
-		Intent intent = new Intent(this, LicensesActivity.class);
+
+	public void clickLicenses(final View view) {
+		final Intent intent = new Intent(this, LicensesActivity.class);
 		startActivity(intent);
 	}
-	
-	public void clickPrivacy(View view) {
+
+	public void clickPrivacy(final View view) {
 		IntentHelper.openUrl(getString(R.string.about_privacy_url));
 	}
-	
-	public void clickTerms(View view) {
+
+	public void clickTerms(final View view) {
 		IntentHelper.openUrl(getString(R.string.about_terms_url));
 	}
 }

@@ -102,7 +102,7 @@ public class MainActivity extends BaseAuthenticatedMenuActivity {
 	}
 
 	public void openPreferences() {
-		Intent intent = new Intent(this, PreferencesActivity.class);
+		final Intent intent = new Intent(this, PreferencesActivity.class);
 		startActivity(intent);
 	}
 
@@ -110,7 +110,7 @@ public class MainActivity extends BaseAuthenticatedMenuActivity {
 	 * Opens the About MissionHub Activity
 	 */
 	public void openAbout() {
-		Intent intent = new Intent(this, AboutActivity.class);
+		final Intent intent = new Intent(this, AboutActivity.class);
 		startActivity(intent);
 	}
 

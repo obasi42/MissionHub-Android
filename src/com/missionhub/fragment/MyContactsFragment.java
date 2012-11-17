@@ -85,7 +85,7 @@ public class MyContactsFragment extends MainFragment {
 	}
 
 	public class MyContactsContactListFragment extends ContactListFragment {
-		
+
 	}
 
 	@Override

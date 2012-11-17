@@ -189,10 +189,10 @@ public class ExceptionHelper {
 		}
 	}
 
-	private String getString(int resId) {
+	private String getString(final int resId) {
 		return Application.getContext().getString(resId);
 	}
-	
+
 	/** sets the positive button */
 	public void setPositiveButton(final DialogButton button) {
 		mPositive = button;
