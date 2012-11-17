@@ -11,11 +11,6 @@ import com.missionhub.model.DaoMaster.OpenHelper;
 import com.missionhub.model.DaoSession;
 import com.missionhub.model.MissionHubOpenHelper;
 import com.missionhub.util.ErrbitNotifier;
-import com.nostra13.universalimageloader.cache.disc.impl.LimitedAgeDiscCache;
-import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.utils.StorageUtils;
 
 import de.greenrobot.event.EventBus;
 
@@ -58,16 +53,6 @@ public class Application extends android.app.Application {
 
 		// set the last last version id for future upgrades
 		SettingsManager.setApplicationLastVersionId(getVersionCode());
-
-		// set up the image loader
-		final ImageLoader imageLoader = ImageLoader.getInstance();
-		final ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext()).memoryCache(new WeakMemoryCache())
-				.discCache(new LimitedAgeDiscCache(StorageUtils.getIndividualCacheDirectory(this), 3600 * 24 * 7)) // cache
-																													// for
-																													// a
-																													// week
-				.threadPoolSize(3).threadPriority(Thread.MIN_PRIORITY + 2).offOutOfMemoryHandling().build();
-		imageLoader.init(config);
 	}
 
 	/**

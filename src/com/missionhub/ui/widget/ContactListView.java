@@ -36,7 +36,7 @@ public class ContactListView extends SelectableListView implements ContactListPr
 	/** the logging tag */
 	public static final String TAG = ContactListView.class.getSimpleName();
 
-	/** the adapter backing the listview */
+	/** the adapter backing the list view */
 	private final ItemAdapter mAdapter;
 
 	/** the on contact checked listener */
@@ -113,9 +113,8 @@ public class ContactListView extends SelectableListView implements ContactListPr
 		super.setOnScrollListener(new OnScrollListener() {
 			@Override
 			public void onScroll(final AbsListView view, final int firstVisibleItem, final int visibleItemCount, final int totalItemCount) {
-				if (mProvider != null && !mProvider.isAtEnd() && (totalItemCount - firstVisibleItem < 2.5 * visibleItemCount || totalItemCount == 0)) {
-					mProvider.getMoreAsync();
-					updateProgressItem();
+				if (mProvider != null && mProvider.hasMore() && (totalItemCount - firstVisibleItem < 2.5 * visibleItemCount || totalItemCount == 0)) {
+					mProvider.getMore();
 				}
 			}
 
@@ -283,7 +282,7 @@ public class ContactListView extends SelectableListView implements ContactListPr
 	public Parcelable onSaveInstanceState() {
 		final Bundle bundle = new Bundle();
 		bundle.putParcelable("superState", super.onSaveInstanceState());
-		bundle.putString("mProvider", ObjectStore.getInstance().storeObject(mProvider));
+		bundle.putString("mProvider", ObjectStore.getInstance().storeObject(mProvider, this));
 		return bundle;
 	}
 
@@ -298,17 +297,32 @@ public class ContactListView extends SelectableListView implements ContactListPr
 		super.onRestoreInstanceState(state);
 	}
 
+	/**
+	 * Sets the contact list provider
+	 */
 	public void setProvider(final ContactListProvider provider) {
-		mProvider = provider;
-		mProvider.setContactListProviderListener(this);
+		if (provider != null) {
+			mProvider = provider;
+			mProvider.setContactListProviderListener(this);
+		}
 	}
 
+	/**
+	 * Returns the current contact list provider
+	 */
 	public ContactListProvider getProvider() {
 		return mProvider;
 	}
 
+	/**
+	 * Called when the contact list provider is updated
+	 */
 	@Override
-	public void onContactsChanged(final List<Person> people) {
+	public synchronized void onContactsChanged() {
+		if (mProvider == null) return;
+		
+		final List<Person> people = mProvider.getAllPeople();
+		
 		if (people == null) return;
 
 		mAdapter.setNotifyOnChange(false);
@@ -316,27 +330,30 @@ public class ContactListView extends SelectableListView implements ContactListPr
 
 		for (final Person person : people) {
 			ContactListItem item = mPersonItemMap.get(person);
-
 			if (item == null) {
 				item = new ContactListItem(person, mContactItemViewResource);
 				mPersonItemMap.put(person, item);
 			}
-
 			mAdapter.add(item);
 		}
-
-		updateProgressItem();
-
+		
 		mAdapter.notifyDataSetChanged();
 	}
 
-	public void updateProgressItem() {
+	/**
+	 * Called when the contact list provider changes its working state
+	 */
+	@Override
+	public void onProviderWorkingChanged() {
 		if (mProvider == null) return;
-
+		
+		mAdapter.setNotifyOnChange(false);
+		
 		mAdapter.remove(mProgressItem);
-
-		if (mProvider.isGettingMore()) {
+		if (mProvider.isWorking()) {
 			mAdapter.add(mProgressItem);
 		}
+		
+		mAdapter.notifyDataSetChanged();
 	}
 }

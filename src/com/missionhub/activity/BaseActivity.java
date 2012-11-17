@@ -9,7 +9,7 @@ import com.missionhub.util.EasyTracker;
  * The base missionhub activity. Extends RoboSherlockFragmentActivity to provide Roboguice and ActionBarSherlock.
  * Manages the life of the EasyTracker.
  */
-public class BaseActivity extends RoboSherlockFragmentActivity {
+public abstract class BaseActivity extends RoboSherlockFragmentActivity {
 
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {

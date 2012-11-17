@@ -8,6 +8,10 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.missionhub.R;
+
 import android.content.Context;
 import android.util.Log;
 import android.util.TypedValue;
@@ -147,5 +151,23 @@ public class U {
 	 */
 	public static float dpToPixel(final float dip, final Context context) {
 		return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dip, context.getResources().getDisplayMetrics());
+	}
+
+	/**
+	 * resets the action bar to a "clean slate"
+	 * @param sherlockActivity
+	 */
+	public static void resetActionBar(SherlockFragmentActivity sherlockActivity) {
+		sherlockActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		sherlockActivity.getSupportActionBar().setDisplayShowCustomEnabled(false);
+		sherlockActivity.getSupportActionBar().setDisplayShowHomeEnabled(true);
+		sherlockActivity.getSupportActionBar().setDisplayShowTitleEnabled(true);
+		sherlockActivity.getSupportActionBar().setDisplayUseLogoEnabled(false);
+		sherlockActivity.getSupportActionBar().setHomeButtonEnabled(true);
+		sherlockActivity.getSupportActionBar().setIcon(R.drawable.ic_launcher);
+		sherlockActivity.getSupportActionBar().setListNavigationCallbacks(null, null);
+		sherlockActivity.getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+		sherlockActivity.getSupportActionBar().setSubtitle(null);
+		sherlockActivity.getSupportActionBar().setTitle("MissionHub");
 	}
 }

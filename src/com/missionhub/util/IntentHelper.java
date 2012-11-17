@@ -2,6 +2,7 @@ package com.missionhub.util;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.missionhub.application.Application;
@@ -55,20 +56,51 @@ public class IntentHelper {
 			Toast.makeText(Application.getContext(), "No sms client available.", Toast.LENGTH_LONG).show();
 		}
 	}
-
+	
 	/**
 	 * Sends an email
-	 * 
 	 * @param address
 	 */
 	public static void sendEmail(final String address) {
+		sendEmail(address, null);
+	}
+	
+	/**
+	 * Sends an email
+	 * @param address
+	 * @param subject
+	 */
+	public static void sendEmail(final String address, final String subject) {
+		sendEmail(address, subject, null);
+	}
+	
+	/**
+	 * Sends an email
+	 * @param address
+	 * @param subject
+	 * @param body
+	 */
+	public static void sendEmail(final String address, final String subject, final String body) {
 		try {
 			final Intent intent = new Intent(android.content.Intent.ACTION_SEND);
 			addTaskFlags(intent);
 			intent.setType("plain/text");
-			intent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[] { address });
-			Application.getContext().startActivity(Intent.createChooser(intent, "Send Email"));
+			if (!U.isNullEmpty(address)) {
+				intent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[] { address });
+			}
+			if (!U.isNullEmpty(subject)) {
+				intent.putExtra(android.content.Intent.EXTRA_SUBJECT, subject);
+			}
+			if (!U.isNullEmpty(body)) {
+				intent.putExtra(android.content.Intent.EXTRA_TEXT, body);  
+			}
+			
+			final Intent chooser = Intent.createChooser(intent, "Send Email");
+			addTaskFlags(chooser);
+			
+			Application.getContext().startActivity(chooser);
 		} catch (final Exception e) {
+			Log.e("IntentHelper", e.getMessage(), e);
 			Toast.makeText(Application.getContext(), "No email client available.", Toast.LENGTH_LONG).show();
 		}
 	}

@@ -1,9 +1,9 @@
 package com.missionhub.application;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.missionhub.application.Application.OnLowMemoryEvent;
 
@@ -19,7 +19,7 @@ public class ObjectStore {
 	private static ObjectStore mObjectStoreInstance;
 
 	/** Synchronized map that holds the objects */
-	private final Map<String, ObjectHolder> mObjectStore = Collections.synchronizedMap(new HashMap<String, ObjectHolder>());
+	private final Map<String, ObjectHolder> mObjectStore = Collections.synchronizedMap(new ConcurrentHashMap<String, ObjectHolder>());
 
 	/** the default number of milliseconds to keep an object in the cache */
 	private final long mDefaultExpires = 2 * 60 * 1000; // 2 minutes
@@ -53,6 +53,19 @@ public class ObjectStore {
 		storeObject(key, object);
 		return key;
 	}
+	
+	/**
+	 * Stores and object and returns the key
+	 * 
+	 * @param mProvider
+	 * @return
+	 */
+	public String storeObject(final Object object, final Object context) {
+		final String key = context.getClass().getName() + "@" + object.getClass().getName() + '@' + Integer.toHexString(object.hashCode());
+		storeObject(key, object);
+		return key;
+	}
+	
 
 	/**
 	 * Stores an object in the object store

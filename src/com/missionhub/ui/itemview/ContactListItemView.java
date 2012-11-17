@@ -17,8 +17,6 @@ import com.missionhub.ui.item.ContactListItem;
 import com.missionhub.ui.item.Item;
 import com.missionhub.ui.widget.SelectableListView.SupportActivatable;
 import com.missionhub.util.U;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
 
 public class ContactListItemView extends LinearLayout implements LayoutItemView, SupportActivatable, Checkable {
 
@@ -32,18 +30,12 @@ public class ContactListItemView extends LinearLayout implements LayoutItemView,
 	private boolean mChecked = false;
 	private boolean mActivated = false;
 
-	private final DisplayImageOptions mImageOptions = new DisplayImageOptions.Builder().showStubImage(R.drawable.default_contact).cacheInMemory().cacheOnDisc().build();
-
 	public ContactListItemView(final Context context) {
 		super(context);
 	}
 
 	public ContactListItemView(final Context context, final AttributeSet attrs) {
 		super(context, attrs);
-	}
-
-	public ContactListItemView(final Context context, final AttributeSet attrs, final int defStyle) {
-		super(context, attrs, defStyle);
 	}
 
 	@Override
@@ -61,7 +53,8 @@ public class ContactListItemView extends LinearLayout implements LayoutItemView,
 
 			if (mPicture != null) {
 				if (!U.isNullEmpty(person.getPicture())) {
-					ImageLoader.getInstance().displayImage(person.getPicture(), mPicture, mImageOptions);
+					//TODO: set picture
+					//ImageLoader.getInstance().displayImage(person.getPicture(), mPicture, mImageOptions);
 				} else {
 					mPicture.setImageDrawable(DrawableCache.getDrawable(R.drawable.default_contact));
 				}

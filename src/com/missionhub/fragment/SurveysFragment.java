@@ -2,7 +2,7 @@ package com.missionhub.fragment;
 
 import roboguice.inject.InjectView;
 import roboguice.util.RoboAsyncTask;
-import android.app.Activity;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,29 +15,40 @@ import android.webkit.WebViewClient;
 
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import com.missionhub.R;
 import com.missionhub.api.Api;
 import com.missionhub.application.Application;
+import com.missionhub.exception.ExceptionHelper;
+import com.missionhub.exception.ExceptionHelper.DialogButton;
+import com.missionhub.exception.WebViewException;
+import com.missionhub.util.U;
 
-public class SurveysFragment extends BaseFragment {
+public class SurveysFragment extends MainFragment {
 
 	@InjectView(R.id.container) ViewGroup mContainer;
 
 	private WebView mWebView;
 
 	@Override
-	public void onAttach(final Activity activity) {
-		super.onAttach(activity);
-
-		getSherlockActivity().getSupportActionBar().setTitle("Surveys");
-	}
-
-	@Override
 	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
 		setRetainInstance(true);
 		setHasOptionsMenu(true);
+	}
+	
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		menu.add(Menu.NONE, R.id.menu_item_restart, Menu.NONE, "Restart").setIcon(R.drawable.ic_action_restart).setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		if (item.getItemId() == R.id.menu_item_restart) {
+			goInitialUrl();
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
 	}
 
 	@Override
@@ -64,6 +75,7 @@ public class SurveysFragment extends BaseFragment {
 			mWebView.setScrollbarFadingEnabled(true);
 			mWebView.setWebChromeClient(new ProgressChromeClient());
 			mWebView.setWebViewClient(new InternalWebViewClient());
+			mWebView.setVisibility(View.GONE);
 			goInitialUrl();
 		}
 
@@ -75,8 +87,11 @@ public class SurveysFragment extends BaseFragment {
 	}
 
 	@Override
-	public void onCreateOptionsMenu(final Menu menu, final MenuInflater inflater) {
+	public void onActivityCreated(final Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
 
+		U.resetActionBar(getSherlockActivity());
+		getSherlockActivity().getSupportActionBar().setTitle("Surveys");
 	}
 
 	public void goInitialUrl() {
@@ -94,7 +109,7 @@ public class SurveysFragment extends BaseFragment {
 
 			@Override
 			protected void onException(final Exception e) {
-				// do this in the UI thread if call() threw an exception
+				displayError(e);
 			}
 		};
 		Application.getExecutor().execute(task.future());
@@ -113,6 +128,7 @@ public class SurveysFragment extends BaseFragment {
 			}
 			if (progress == 100) {
 				if (getSherlockActivity() != null) {
+					mWebView.setVisibility(View.VISIBLE);
 					getSherlockActivity().setSupportProgressBarIndeterminateVisibility(Boolean.FALSE);
 				}
 			}
@@ -123,8 +139,45 @@ public class SurveysFragment extends BaseFragment {
 
 		@Override
 		public void onReceivedError(final WebView view, final int errorCode, final String description, final String failingUrl) {
-
+			onError(new WebViewException(errorCode, description, failingUrl));
 		}
+
+		public void onError(final Exception e) {
+			mWebView.stopLoading();
+			mWebView.loadData("", "text/plain; charset=UTF-8", null);
+			mWebView.setVisibility(View.GONE);
+
+			displayError(e);
+		}
+	}
+
+	/** displays an error dialog */
+	private void displayError(final Exception e) {
+		final ExceptionHelper eh = new ExceptionHelper(getActivity(), e);
+		eh.setPositiveButton(new DialogButton() {
+			@Override
+			public String getTitle() {
+				return "Retry";
+			}
+
+			@Override
+			public void onClick(final DialogInterface dialog, final int whichButton) {
+				mWebView.setVisibility(View.VISIBLE);
+				mWebView.reload();
+			}
+		});
+		eh.setNegativeButton(new DialogButton() {
+			@Override
+			public String getTitle() {
+				return "Cancel";
+			}
+
+			@Override
+			public void onClick(final DialogInterface dialog, final int whichButton) {
+				dialog.dismiss();
+			}
+		});
+		eh.show();
 	}
 
 	@Override

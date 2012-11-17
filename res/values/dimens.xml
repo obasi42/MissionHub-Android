@@ -1,5 +1,5 @@
 <resources>
-    <dimen name="menu_width">280dp</dimen>
+    <dimen name="main_menu_width">280dp</dimen>
     <dimen name="listview_item_padding">8.0dip</dimen>
     <dimen name="listview_item_min_height">48.0dip</dimen>
 </resources>

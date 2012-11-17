@@ -1,12 +1,13 @@
 package com.missionhub.ui.widget;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.accounts.OnAccountsUpdateListener;
+import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
+import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -21,50 +22,68 @@ import com.missionhub.ui.item.AccountItem;
 import com.missionhub.ui.item.Item;
 import com.missionhub.util.U;
 
-public class PickAccountDialog extends Dialog implements OnItemClickListener {
+public class PickAccountDialog extends DialogFragment implements OnItemClickListener, OnAccountsUpdateListener {
 
-	private final ListView mListView;
-	private final ItemAdapter mAdapter;
-	private List<Item> mItems;
-
-	public PickAccountDialog(final Context context) {
-		super(context);
-		setTitle("Choose a MissionHub account");
-		setContentView(R.layout.dialog_pick_account);
-
-		mListView = (ListView) findViewById(R.id.listview);
-
-		mAdapter = new ItemAdapter(context);
-		if (mItems == null) {
-			mItems = new ArrayList<Item>();
-			addAccounts();
-		}
-
-		for (final Item item : mItems) {
-			mAdapter.add(item);
-		}
-
+	private AccountManager mAccountManager;
+	private ListView mListView;
+	private ItemAdapter mAdapter;
+	
+	@Override
+	public Dialog onCreateDialog(Bundle savedInstanceState) {
+	    mAdapter = new ItemAdapter(getActivity());
+	    
+	    LayoutInflater inflater = getActivity().getLayoutInflater();
+	    View view = inflater.inflate(R.layout.dialog_pick_account, null);
+	    
+	    mListView = (ListView) view.findViewById(R.id.listview);
 		mListView.setAdapter(mAdapter);
 		mListView.setOnItemClickListener(this);
+	    
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+		builder.setTitle("Choose account...");
+	    builder.setView(view); 
+	    return builder.create();
 	}
-
-	private void addAccounts() {
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		
+		mAccountManager = AccountManager.get(getActivity());
+		mAccountManager.addOnAccountsUpdatedListener(this, null, false);
+		
+		refreshAccounts();
+	}
+	
+	@Override
+	public void onPause() {
+		mAccountManager.removeOnAccountsUpdatedListener(this);
+		
+		super.onPause();
+	}
+	
+	private void refreshAccounts() {
 		mAdapter.setNotifyOnChange(false);
-
-		final AccountManager am = AccountManager.get(Application.getContext());
-		final Account[] accounts = am.getAccountsByType(Authenticator.ACCOUNT_TYPE);
+		mAdapter.clear();
+		
+		final Account[] accounts = mAccountManager.getAccountsByType(Authenticator.ACCOUNT_TYPE);
 		for (final Account account : accounts) {
-			final Long personId = Long.parseLong(am.getUserData(account, Authenticator.KEY_PERSON_ID));
+			final Long personId = Long.parseLong(mAccountManager.getUserData(account, Authenticator.KEY_PERSON_ID));
 			final Person person = Application.getDb().getPersonDao().load(personId);
 			if (!U.isNull(account, person)) {
-				mItems.add(new AccountItem(account, person));
+				mAdapter.add(new AccountItem(account, person));
 			}
 		}
-		mItems.add(new AccountItem.NewAccountItem());
-
+		mAdapter.add(new AccountItem.NewAccountItem());
+		
 		mAdapter.notifyDataSetChanged();
 	}
 
+	@Override
+	public void onAccountsUpdated(Account[] accounts) {
+		refreshAccounts();
+	}
+	
 	@Override
 	public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id) {
 		final Item item = (Item) mAdapter.getItem(position);

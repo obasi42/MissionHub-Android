@@ -1,5 +1,7 @@
 package com.missionhub.exception;
 
+import java.util.concurrent.ExecutionException;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -15,8 +17,8 @@ public class ExceptionHelper {
 	/** the context in which to display the error */
 	private final Context mContext;
 
-	/** the exception that contains the error data */
-	private Exception mException;
+	/** the throwable that contains the error data */
+	private Throwable mThrowable;
 
 	/** the title of the error */
 	private String mTitle = "Error";
@@ -136,29 +138,37 @@ public class ExceptionHelper {
 		return mMessage;
 	}
 
-	/** returns the exception */
-	public Exception getException() {
-		return mException;
+	/** returns the throwable */
+	public Throwable getThrowable() {
+		return mThrowable;
 	}
 
 	/** sets the exception and rebuilds the dialog if needed */
-	public void setException(final Exception e) {
-		mException = e;
+	public void setException(final Throwable throwable) {
+		mThrowable = throwable;
+
+		// find the initial issue if it was wrapped in an ExecutionException
+		if (mThrowable instanceof ExecutionException) {
+			final Throwable it = ((ExecutionException) mThrowable).getCause();
+			if (it != null) {
+				mThrowable = it;
+			}
+		}
 
 		// calculate the title and message from the exception
-		if (e instanceof ExceptionHelperException) {
-			setTitle(((ExceptionHelperException) mException).getDialogTitle());
-			setMessage(((ExceptionHelperException) mException).getDialogMessage());
-			final int icon = ((ExceptionHelperException) mException).getDialogIconId();
+		if (mThrowable instanceof ExceptionHelperException) {
+			setTitle(((ExceptionHelperException) mThrowable).getDialogTitle());
+			setMessage(((ExceptionHelperException) mThrowable).getDialogMessage());
+			final int icon = ((ExceptionHelperException) mThrowable).getDialogIconId();
 			if (icon != 0 && icon != -1) {
 				setIcon(icon);
 			}
-		} else if (e instanceof ApiException) {
-			setTitle(((ApiException) mException).getTitle());
-			setMessage(mException.getMessage() + "\ncode: " + ((ApiException) mException).getCode());
-		} else if (e instanceof WebViewException) {
+		} else if (mThrowable instanceof ApiException) {
+			setTitle(((ApiException) mThrowable).getTitle());
+			setMessage(mThrowable.getMessage() + "\ncode: " + ((ApiException) mThrowable).getCode());
+		} else if (mThrowable instanceof WebViewException) {
 			setTitle("Network Error");
-			final int code = ((WebViewException) mException).getCode();
+			final int code = ((WebViewException) mThrowable).getCode();
 			switch (code) {
 			case WebViewClient.ERROR_CONNECT:
 				setMessage("The MissionHub server is currently down. Please try again in a few minutes.");
@@ -170,10 +180,10 @@ public class ExceptionHelper {
 				setException(new NetworkUnavailableException());
 				return;
 			default:
-				setMessage(mException.getMessage() + "\nweb view client code: " + ((WebViewException) mException).getCode());
+				setMessage(mThrowable.getMessage() + "\nweb view client code: " + ((WebViewException) mThrowable).getCode());
 			}
 		} else {
-			setMessage(mException.getMessage());
+			setMessage(mThrowable.getMessage());
 		}
 	}
 

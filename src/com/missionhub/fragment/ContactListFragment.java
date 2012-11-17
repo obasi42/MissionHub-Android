@@ -1,46 +1,31 @@
 package com.missionhub.fragment;
 
-import java.util.List;
-
 import roboguice.inject.InjectView;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 
-import com.WazaBe.HoloEverywhere.widget.Toast;
 import com.missionhub.R;
-import com.missionhub.api.Api;
-import com.missionhub.api.Api.ContactListOptions;
-import com.missionhub.model.Person;
 import com.missionhub.ui.ContactListProvider;
 import com.missionhub.ui.widget.ContactListView;
-import com.missionhub.ui.widget.ContactListView.OnContactCheckedListener;
-import com.missionhub.ui.widget.ContactListView.OnContactClickListener;
-import com.missionhub.ui.widget.ContactListView.OnContactLongClickListener;
-
-public class ContactListFragment extends BaseFragment implements OnContactCheckedListener, OnContactClickListener, OnContactLongClickListener {
+public abstract class ContactListFragment extends BaseFragment {
 
 	/** the logging tag */
 	public static final String TAG = ContactListFragment.class.getSimpleName();
 
-	/** the list provider */
-	private ContactListProvider mProvider;
-
+	/** the contact list view */
 	@InjectView(R.id.contact_list) private ContactListView mListView;
+
+	/** the list provider handle */
+	private ContactListProvider mProvider;
 
 	public ContactListFragment() {}
 
+	/** returns the listview */
 	public ContactListView getListView() {
 		return mListView;
-	}
-
-	@Override
-	public void onCreate(final Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		// setRetainInstance(true);
 	}
 
 	@Override
@@ -57,84 +42,37 @@ public class ContactListFragment extends BaseFragment implements OnContactChecke
 	@Override
 	public void onActivityCreated(final Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-
+		
 		if (savedInstanceState == null) {
-			mProvider = new ContactListProvider() {
-
-				public ContactListOptions options = new ContactListOptions();
-
-				@Override
-				public List<Person> getMore() throws Exception {
-					options.setFilter("assigned_to", "me");
-
-					final List<Person> people = Api.getContactList(options).get();
-
-					// set up the options for the next run
-					if (people.size() < options.getLimit()) {
-						options.setIsAtEnd(true);
-						options.incrementStart(people.size());
-					} else {
-						options.advanceStart();
-					}
-
-					return people;
-				}
-
-				@Override
-				public boolean isAtEnd() {
-					return options.isAtEnd();
-				}
-
-				@Override
-				public void onError(final Exception e) {
-					Log.e(TAG, e.getMessage(), e);
-				}
-			};
+			mProvider = onCreateProvider();
 			mListView.setProvider(mProvider);
 		}
-		mListView.setOnContactClickListener(this);
-		mListView.setOnContactCheckedListener(this);
-		mListView.setOnContactLongClickListener(this);
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
+		
 		mProvider = mListView.getProvider();
 	}
 
-	@Override
-	public boolean onContactLongClick(final Person person, final int position, final long id) {
+	/**
+	 * Called when the list provider is created for the first time
+	 */
+	public abstract ContactListProvider onCreateProvider();
 
-		Toast.makeText(getActivity(), "Long Click: " + person.getName(), Toast.LENGTH_SHORT).show();
-
-		// TODO Auto-generated method stub
-		return true;
+	/**
+	 * Returns the list provider
+	 */
+	public ContactListProvider getProvider() {
+		return mProvider;
 	}
 
-	@Override
-	public void onContactClick(final Person person, final int position, final long id) {
-
-		Toast.makeText(getActivity(), "Click: " + person.getName(), Toast.LENGTH_SHORT).show();
-
-		// TODO Auto-generated method stub
-
+	/**
+	 * Sets the contact list provider
+	 */
+	public void setProvider(final ContactListProvider provider) {
+		mProvider = provider;
+		mListView.setProvider(mProvider);
 	}
-
-	@Override
-	public void onContactChecked(final Person person, final int position, final boolean checked) {
-		// TODO Auto-generated method stub
-
-		Toast.makeText(getActivity(), "Checked: " + person.getName(), Toast.LENGTH_SHORT).show();
-
-	}
-
-	@Override
-	public void onAllContactsUnchecked() {
-		// TODO Auto-generated method stub
-
-		Toast.makeText(getActivity(), "Unchecked All", Toast.LENGTH_SHORT).show();
-
-	}
-
 }

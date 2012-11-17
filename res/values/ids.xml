@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <item name="menu_container" type="id"/>
+    
+    <item name="menu_item_dashboard" type="id"/>
     <item name="menu_item_my_contacts" type="id"/>
     <item name="menu_item_all_contacts" type="id"/>
-    <item name="menu_item_directory" type="id"/>
     <item name="menu_item_surveys" type="id"/>
     <item name="menu_item_groups" type="id"/>
+    <item name="menu_item_preferences" type="id"/>
     <item name="menu_item_logout" type="id"/>
+    <item name="menu_item_about" type="id" />
+    <item name="menu_item_help" type="id"/>
+    
+    <item name="menu_item_restart" type="id" />
 
 </resources>

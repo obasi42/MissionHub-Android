@@ -113,10 +113,10 @@ public class Api {
 			response = future.get();
 
 			return response;
-		} catch (final Exception e) {
+		} catch (final Exception e) {			
 			// check for authentication errors
 			if (e instanceof IOException) {
-				if (response.statusCode == 401 || e.getMessage().contains("authentication")) {
+				if ((response != null && response.statusCode == 401) || e.getMessage().contains("authentication")) {
 					Session.getInstance().reportInvalidAccessToken();
 					throw new AccessTokenException(e);
 				}
@@ -124,7 +124,7 @@ public class Api {
 
 			// check for api errors if the response was a string
 			if (responseType == ResponseType.STRING) {
-				if (!U.isNullEmpty(response.responseBody)) {
+				if (response != null && !U.isNullEmpty(response.responseBody)) {
 					try {
 						final ApiErrorGson error = gson.fromJson(response.responseBody, ApiErrorGson.class);
 						if (error != null) {
@@ -614,6 +614,12 @@ public class Api {
 		public void advanceStart() {
 			this.start += this.limit;
 		}
+		
+		public void resetPosition() {
+			this.start = 0;
+			this.atEnd = false;
+		}
+		
 	}
 
 	// **********************************//

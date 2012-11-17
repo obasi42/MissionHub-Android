@@ -5,8 +5,8 @@
     android:versionName="2.0.x" >
 
     <uses-sdk
-        android:minSdkVersion="7"
-        android:targetSdkVersion="16" />
+        android:minSdkVersion="8"
+        android:targetSdkVersion="17" />
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -18,7 +18,6 @@
     <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
-    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_SYNC_STATS" />
     <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
@@ -26,6 +25,7 @@
 
     <application
         android:name=".application.Application"
+        android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/Theme.MissionHub" >
@@ -46,6 +46,7 @@
             android:name=".activity.InitActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
             android:label="@string/app_name"
+            android:launchMode="singleTop"
             android:theme="@style/Theme.MissionHubDark.NoActionBar" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -53,14 +54,34 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.HostActivity" >
-        </activity>
+        <activity
+            android:name=".activity.MainActivity"
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.MissionHub.MainActivity" />
+        <activity
+            android:name=".activity.PreferenceActivity"
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.MissionHub" />
         <activity
             android:name=".authenticator.AuthenticatorActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
             android:excludeFromRecents="true"
             android:label="@string/ui_title_authenticator"
             android:theme="@style/Theme.MissionHubDark" />
+        <activity
+            android:name=".activity.LicensesActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:label="Open source licenses"
+            android:theme="@style/Theme.MissionHub" />
+        <activity
+            android:name=".activity.AboutActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:label="About MissionHub"
+            android:theme="@style/Theme.MissionHub" />
+        <activity
+            android:name=".activity.PreferencesActivity"
+            android:label="Preferences"
+            android:theme="@style/Theme.MissionHub" />
     </application>
 
 </manifest>

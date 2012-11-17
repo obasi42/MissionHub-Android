@@ -1,0 +1,115 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="15.0dip"
+        android:paddingLeft="15.0dip"
+        android:paddingRight="15.0dip"
+        android:paddingTop="15.0dip" >
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15.0dip"
+            android:background="@drawable/well"
+            android:orientation="vertical"
+            android:padding="15.0dip" >
+
+            <ImageView
+                android:id="@+id/logo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="15.0dip"
+                android:src="@drawable/logo" />
+
+            <TextView
+                android:id="@+id/tag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="15.0dip"
+                android:gravity="center_horizontal"
+                android:text="We&apos;re here to make it easier for you to care for the people who need you most." />
+
+            <TextView
+                android:id="@+id/licenses"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="15.0dip"
+                android:clickable="true"
+                android:focusable="true"
+                android:onClick="clickLicenses"
+                android:text="Open source licenses"
+                android:textColor="@color/light_blue" />
+
+            <TextView
+                android:id="@+id/privacy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="15.0dip"
+                android:clickable="true"
+                android:focusable="true"
+                android:onClick="clickPrivacy"
+                android:text="Privacy Policy"
+                android:textColor="@color/light_blue" />
+
+            <TextView
+                android:id="@+id/terms"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="15.0dip"
+                android:clickable="true"
+                android:focusable="true"
+                android:onClick="clickTerms"
+                android:text="Terms and Conditions"
+                android:textColor="@color/light_blue" />
+
+            <View
+                android:id="@+id/divider"
+                android:layout_width="fill_parent"
+                android:layout_height="2.0dip"
+                android:layout_marginBottom="15.0dip"
+                android:background="@color/blue" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="Have a problem? Want a new feature?" />
+
+            <TextView
+                android:id="@+id/feedback"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:clickable="true"
+                android:focusable="true"
+                android:onClick="clickFeedback"
+                android:text="Contact Us"
+                android:textColor="@color/light_blue" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/version"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="Version #" />
+
+        <TextView
+            android:id="@+id/copyright"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="© 2012 Cru Global" />
+    </LinearLayout>
+
+</ScrollView>

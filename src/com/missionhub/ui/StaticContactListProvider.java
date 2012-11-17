@@ -1,22 +1,17 @@
 package com.missionhub.ui;
 
-import java.util.List;
-
-import com.missionhub.model.Person;
 
 public class StaticContactListProvider extends ContactListProvider {
+	@Override
+	public void getMore() {}
 
 	@Override
-	public List<Person> getMore() throws Exception {
-		return null;
+	public boolean hasMore() {
+		return false;
 	}
 
 	@Override
-	public boolean isAtEnd() {
-		return true;
+	public boolean isWorking() {
+		return false;
 	}
-
-	@Override
-	public void onError(final Exception e) {}
-
 }

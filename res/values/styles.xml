@@ -5,7 +5,7 @@
     
     <style name="MissionHub.ListView">
         <item name="android:divider">@drawable/abs__list_divider_holo_light</item>
-    	<item name="android:dividerHeight">1px</item>
+    	<item name="android:dividerHeight">1.0dip</item>
     </style>
     
     <style name="MissionHub.ListItem">
@@ -13,7 +13,5 @@
         <item name="android:padding">@dimen/listview_item_padding</item>
         <item name="android:minHeight">@dimen/listview_item_min_height</item>
     </style>
-    
-    <style name="MissionHub.ListItem.Contact"> </style>
 
 </resources>

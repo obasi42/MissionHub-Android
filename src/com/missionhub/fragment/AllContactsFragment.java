@@ -6,13 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-public class AllContactsFragment extends BaseFragment {
-
-	@Override
-	public void onCreate(final Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setRetainInstance(true);
-	}
+public class AllContactsFragment extends MainFragment {
 
 	@Override
 	public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
@@ -20,5 +14,4 @@ public class AllContactsFragment extends BaseFragment {
 		tv.setText("All Contacts Fragment");
 		return tv;
 	}
-
 }

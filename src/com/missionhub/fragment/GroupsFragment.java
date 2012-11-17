@@ -6,13 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-public class GroupsFragment extends BaseFragment {
-
-	@Override
-	public void onCreate(final Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setRetainInstance(true);
-	}
+public class GroupsFragment extends MainFragment {
 
 	@Override
 	public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
