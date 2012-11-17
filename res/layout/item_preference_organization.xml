@@ -5,5 +5,4 @@
     android:layout_gravity="center_vertical"
     android:gravity="center_vertical"
     android:padding="8.0dip"
-    android:text="organization name"
     android:textSize="18.0dip" />

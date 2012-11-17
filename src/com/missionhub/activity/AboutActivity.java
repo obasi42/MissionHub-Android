@@ -34,7 +34,7 @@ public class AboutActivity extends BaseActivity {
 	}
 	
 	public void clickFeedback(View view) {
-		IntentHelper.sendEmail("support@missionhub.com");
+		IntentHelper.sendEmail(getString(R.string.about_feedback_email));
 	}
 	
 	public void clickLicenses(View view) {
@@ -43,10 +43,10 @@ public class AboutActivity extends BaseActivity {
 	}
 	
 	public void clickPrivacy(View view) {
-		IntentHelper.openUrl("https://www.missionhub.com/privacy");
+		IntentHelper.openUrl(getString(R.string.about_privacy_url));
 	}
 	
 	public void clickTerms(View view) {
-		IntentHelper.openUrl("https://www.missionhub.com/terms");
+		IntentHelper.openUrl(getString(R.string.about_terms_url));
 	}
 }

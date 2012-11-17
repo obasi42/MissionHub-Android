@@ -95,7 +95,7 @@ public class PreferencesFragment extends BaseFragment {
 		}
 
 		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
+		public View getSupportView(int position, View convertView, ViewGroup parent) {
 			OrganizationItem item = (OrganizationItem) getItem(position);
 			View view = convertView;
 			
@@ -129,8 +129,8 @@ public class PreferencesFragment extends BaseFragment {
 		}
 
 		@Override
-		public View getDropDownView(int position, View convertView, ViewGroup parent) {
-			View view = getView(position, convertView, parent);
+		public View getSupportDropDownView(int position, View convertView, ViewGroup parent) {
+			View view = getSupportView(position, convertView, parent);
 			OrganizationItem item = (OrganizationItem) getItem(position);
 			
 			ViewHolder holder = (ViewHolder) view.getTag();

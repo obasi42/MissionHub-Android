@@ -47,7 +47,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:text="Resuming session..."
+                android:text="@string/init_resuming"
                 android:textSize="18.0dip"
                 android:textStyle="bold"
                 android:visibility="visible" />
@@ -59,7 +59,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:gravity="center"
-            android:text="@string/login"
+            android:text="@string/action_login"
             android:textSize="22.0dip"
             android:visibility="visible" />
 
@@ -70,7 +70,6 @@
             android:layout_gravity="bottom|center_horizontal"
             android:layout_marginBottom="20.0dip"
             android:clickable="true"
-            android:text="version 2.x.x"
             android:textSize="12.0dip" />
     </FrameLayout>
 

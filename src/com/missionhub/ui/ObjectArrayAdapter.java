@@ -36,8 +36,16 @@ public abstract class ObjectArrayAdapter extends BaseAdapter {
 	/** the types of views */
 	private final List<Class<? extends Object>> mTypes = new ArrayList<Class<? extends Object>>();
 	
+	/** the max number of view types */
+	private final int mMaxViewTypes;
+	
 	public ObjectArrayAdapter(Context context) {
+		this(context, 10);
+	}
+	
+	public ObjectArrayAdapter(Context context, int maxViewTypes) {
 		mContext = context;
+		mMaxViewTypes = maxViewTypes;
 	}
 	
 	@Override
@@ -61,6 +69,10 @@ public abstract class ObjectArrayAdapter extends BaseAdapter {
 	
 	@Override
 	public int getViewTypeCount() {
+		return mMaxViewTypes;
+	}
+	
+	public int getActualViewTypeCount() {
 		return mTypes.size();
 	}
 	
@@ -68,6 +80,10 @@ public abstract class ObjectArrayAdapter extends BaseAdapter {
 		if (!mTypes.contains(clss)) {
 			mTypes.add(clss);
 		}
+		if (mTypes.size() > mMaxViewTypes) {
+			throw new RuntimeException("Max view types limit reached.");
+		}
+		
 	}
 	
 	@Override
@@ -76,13 +92,29 @@ public abstract class ObjectArrayAdapter extends BaseAdapter {
 		if (object == null) return IGNORE_ITEM_VIEW_TYPE;
 		return mTypes.indexOf(object.getClass());
 	}
+
+	@Override
+	public View getView(int position, View convertView, ViewGroup parent) {
+		View view = getSupportView(position, convertView, parent);
+		runSupportFilters(view, position, parent);
+		return view;
+	}
+
+	@Override
+	public View getDropDownView(int position, View convertView, ViewGroup parent) {
+		View view = getSupportDropDownView(position, convertView, parent);
+		runSupportFilters(view, position, parent);
+		return view;
+	}
+
+	private void runSupportFilters(View view, int position, ViewGroup parent) {
+		// TODO: if needed
+	}
 	
-	@Override
-	public abstract View getView(int position, View convertView, ViewGroup parent);
-
-	@Override
-	public abstract View getDropDownView(int position, View convertView, ViewGroup parent);
-
+	public abstract View getSupportView(int position, View convertView, ViewGroup parent);
+	
+	public abstract View getSupportDropDownView(int position, View convertView, ViewGroup parent);
+	
 	public interface ItemIdProvider {
 		long getItemId();
 	}
@@ -234,6 +266,16 @@ public abstract class ObjectArrayAdapter extends BaseAdapter {
 			return ((SupportEnable) object).isEnabled();
 		}
 		return true;
+	}
+	
+	@Override
+	public boolean areAllItemsEnabled() {
+		for (int i = 0; i < getCount(); i++) {
+			if (!isEnabled(i)) {
+				return false;
+			}
+		}
+		return super.areAllItemsEnabled();
 	}
 	
 	public interface SupportEnable {

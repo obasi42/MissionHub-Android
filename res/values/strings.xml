@@ -3,15 +3,87 @@
 
     <string name="app_name">MissionHub</string>
     
-    <string name="ui_title_authenticator">Add a MissionHub account</string>
-    <string name="tap_to_retry">Tap to Retry</string>
-    <string name="internet_required">Internet Required</string>
-    <string name="network_error">Network Error</string>
+    <!-- Actions -->
+    <string name="action_search">Search</string>
+    <string name="action_login">Login</string>
+    <string name="action_close">Close</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_retry">Retry</string>
+    <string name="action_restart">Restart</string>
     
-    <!--  Login Screen -->
-    <string name="resources_and_help">Resources and Help</string>
-    <string name="login">Login</string>
+    <!-- Main Menu -->
+    <string name="menu_dashboard">Dashboard</string>
+    <string name="menu_my_contacts">My Contacts</string>
+    <string name="menu_all_contacts">All Contacts</string>
+    <string name="menu_groups">Groups</string>
+    <string name="menu_surveys">Surveys</string>
+    <string name="menu_div_account">Account</string>
+    <string name="menu_preferences">Preferences</string>
+    <string name="menu_logout">Logout</string>
+    <string name="menu_div_missionhub">MissionHub</string>
+    <string name="menu_about">About</string>
+    <string name="menu_help_center">Help Center</string>
     
+    <!-- My Contacts Fragment -->
+    <string name="my_contacts_title">My Contacts</string>
+    <string name="my_contacts_all">All</string>
+    <string name="my_contacts_in_progress">In-Progress</string>
+    <string name="my_contacts_completed">Completed</string>
     
+    <!-- About Activity -->
+    <string name="about_activity_title">About MissionHub</string>
+    <string name="about_tag">We\'re here to make it easier for you to care for the people who need you most.</string>
+    <string name="about_licenses">Open source licenses</string>
+    <string name="about_privacy">Privacy Policy</string>
+    <string name="about_terms">Terms and Conditions</string>
+    <string name="about_feedback">Have a problem? Want a new feature?</string>
+    <string name="about_contact_us">Contact Us</string>
+    <string name="about_copyright">© 2012 Cru Global</string>
+    <string name="about_feedback_email">support@missionhub.com</string>
+    <string name="about_privacy_url">https://www.missionhub.com/privacy</string>
+    <string name="about_terms_url">https://www.missionhub.com/terms</string>
+    
+    <!-- Main Activity -->
+    <string name="main_help_url">http://blog.missionhub.com</string>
+    <string name="main_logged_out">You have been logged out of MissionHub.</string>
+    <string name="main_invalid_token">Your MissionHub authentication token is invaild. Please login again.</string>
+    
+    <!--  Init Activity -->
+    <string name="init_resuming">Resuming session…</string>
+    <string name="init_updating_person">Updating person…</string>
+    <string name="init_updating_orgs">Updating organizations…</string>
+    <string name="init_add_account">Add Account</string>
+    <string name="init_choose_account">Choose account…</string>
+    
+    <!-- Session -->
+    <string name="session_no_longer_admin">You are no longer an admin or leader in your preferred organization. Selecting your primary.</string>
+    <string name="session_not_admin">You are not an admin or leader in this organization.</string>
+    
+    <!-- Preferences Activity -->
+    <string name="pref_activity_title">Preferences</string>
+    <string name="pref_organization">Organization:</string>
+    
+    <!-- Authenticator -->
+    <string name="auth_activity_title">Add a MissionHub account</string>
+    <string name="auth_fetching_account_info">Fetching Account Information…</string>
+    <string name="auth_duplicate_account">Account for %1$s already exists.</string>
+    
+    <!--  Exceptions -->
+    <string name="exception_helper_support">Email support@missionhub.com if the problem persists.</string>
+    <string name="exception_helper_network_error">Network Error</string>
+    <string name="exception_helper_mh_down">The MissionHub server is currently down. Please try again in a few minutes.</string>
+    <string name="exception_helper_mh_not_responding">Either your internet connection is very slow or the MissionHub servers are not currently responding. Please try again in a few minutes.</string>
+    <string name="no_person_exception">No person in SQLite DB</string>
+    <string name="no_account_exception">No MissionHub Account Found</string>
+    <string name="unexpected_data">The MissionHub server returned unexpected data.</string>
+    <string name="network_unavailable_exception">MissionHub is currently working offline. Check your internet connection and retry.</string>
+    <string name="network_unavailable_exception_title">Offline Error</string>
+    
+    <!-- Intent Helper -->
+    <string name="intent_helper_no_browser">No web browser available.</string>
+    <string name="intent_helper_no_calling">No calling client available.</string>
+    <string name="intent_helper_no_sms">No sms client available.</string>
+    <string name="intent_helper_send_email">Send Email</string>
+    <string name="intent_helper_no_email">No email client available.</string>
     
 </resources>

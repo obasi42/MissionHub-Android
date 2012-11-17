@@ -2,9 +2,9 @@ package com.missionhub.util;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.util.Log;
 import android.widget.Toast;
 
+import com.missionhub.R;
 import com.missionhub.application.Application;
 
 public class IntentHelper {
@@ -20,7 +20,7 @@ public class IntentHelper {
 			addTaskFlags(intent);
 			Application.getContext().startActivity(intent);
 		} catch (final Exception e) {
-			Toast.makeText(Application.getContext(), "No web browser available.", Toast.LENGTH_LONG).show();
+			Toast.makeText(Application.getContext(), getString(R.string.intent_helper_no_browser), Toast.LENGTH_LONG).show();
 		}
 	}
 
@@ -36,7 +36,7 @@ public class IntentHelper {
 			intent.setData(Uri.parse("tel:" + number));
 			Application.getContext().startActivity(intent);
 		} catch (final Exception e) {
-			Toast.makeText(Application.getContext(), "No calling client available.", Toast.LENGTH_LONG).show();
+			Toast.makeText(Application.getContext(), getString(R.string.intent_helper_no_calling), Toast.LENGTH_LONG).show();
 		}
 	}
 
@@ -53,7 +53,7 @@ public class IntentHelper {
 			intent.setType("vnd.android-dir/mms-sms");
 			Application.getContext().startActivity(intent);
 		} catch (final Exception e) {
-			Toast.makeText(Application.getContext(), "No sms client available.", Toast.LENGTH_LONG).show();
+			Toast.makeText(Application.getContext(), getString(R.string.intent_helper_no_sms), Toast.LENGTH_LONG).show();
 		}
 	}
 	
@@ -95,13 +95,12 @@ public class IntentHelper {
 				intent.putExtra(android.content.Intent.EXTRA_TEXT, body);  
 			}
 			
-			final Intent chooser = Intent.createChooser(intent, "Send Email");
+			final Intent chooser = Intent.createChooser(intent, getString(R.string.intent_helper_send_email));
 			addTaskFlags(chooser);
 			
 			Application.getContext().startActivity(chooser);
 		} catch (final Exception e) {
-			Log.e("IntentHelper", e.getMessage(), e);
-			Toast.makeText(Application.getContext(), "No email client available.", Toast.LENGTH_LONG).show();
+			Toast.makeText(Application.getContext(), getString(R.string.intent_helper_no_browser), Toast.LENGTH_LONG).show();
 		}
 	}
 
@@ -112,5 +111,9 @@ public class IntentHelper {
 	 */
 	private static void addTaskFlags(final Intent intent) {
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+	}
+	
+	private static String getString(int resId) {
+		return Application.getContext().getString(resId);
 	}
 }

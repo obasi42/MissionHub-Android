@@ -16,7 +16,6 @@ import org.json.JSONObject;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.os.Build;
-import android.util.Log;
 import ch.boye.httpclientandroidlib.client.utils.URIBuilder;
 
 import com.google.common.collect.HashMultimap;
@@ -273,7 +272,6 @@ public class Api {
 					}
 					return persons;
 				} catch (final Exception e) {
-					Log.e("Exception", e.getMessage(), e);
 					throw new ApiException(e);
 				}
 			}
@@ -395,12 +393,10 @@ public class Api {
 					final GMetaContact contacts = Api.getInstance().gson.fromJson(response.responseBody, GMetaContact.class);
 					final List<Person> persons = new ArrayList<Person>();
 					for (final GContact contact : contacts.contacts) {
-						Log.e("HERE", "HERE" + contact.person.name);
 						persons.add(contact.save().get());
 					}
 					return persons;
 				} catch (final Exception e) {
-					Log.e("Exception", e.getMessage(), e);
 					throw new ApiException(e);
 				}
 			}
@@ -434,7 +430,6 @@ public class Api {
 					final List<Person> people = contacts.save().get();
 					return people;
 				} catch (final Exception e) {
-					Log.e("Exception", e.getMessage(), e);
 					throw new ApiException(e);
 				}
 			}
@@ -644,7 +639,6 @@ public class Api {
 
 					return comments.save().get();
 				} catch (final Exception e) {
-					Log.e("Exception", e.getMessage(), e);
 					throw new ApiException(e);
 				}
 			}
@@ -811,7 +805,6 @@ public class Api {
 					final GMetaOrganizations gmo = Api.getInstance().gson.fromJson(response.responseBody, GMetaOrganizations.class);
 					return gmo.save().get();
 				} catch (final Exception e) {
-					Log.e("Exception", e.getMessage(), e);
 					throw new ApiException(e);
 				}
 			}

@@ -115,7 +115,7 @@ public class MainActivity extends BaseAuthenticatedMenuActivity {
 	}
 
 	public void openHelp() {
-		IntentHelper.openUrl("http://blog.missionhub.com/");
+		IntentHelper.openUrl(getString(R.string.main_help_url));
 	}
 
 	/**
@@ -125,7 +125,7 @@ public class MainActivity extends BaseAuthenticatedMenuActivity {
 	 */
 	@Override
 	public void onEventMainThread(final SessionInvalidatedEvent event) {
-		Toast.makeText(this, "You have been logged out of MissionHub.", Toast.LENGTH_LONG).show();
+		Toast.makeText(this, getString(R.string.main_logged_out), Toast.LENGTH_LONG).show();
 		startInitActivity();
 	}
 
@@ -136,7 +136,7 @@ public class MainActivity extends BaseAuthenticatedMenuActivity {
 	 */
 	@Override
 	public void onEventMainThread(final SessionInvalidTokenEvent event) {
-		Toast.makeText(this, "You MissionHub authentication token is invaild. Please login again.", Toast.LENGTH_LONG).show();
+		Toast.makeText(this, getString(R.string.main_invalid_token), Toast.LENGTH_LONG).show();
 		startInitActivity();
 	}
 

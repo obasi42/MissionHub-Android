@@ -34,7 +34,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginBottom="15.0dip"
                 android:gravity="center_horizontal"
-                android:text="We&apos;re here to make it easier for you to care for the people who need you most." />
+                android:text="@string/about_tag" />
 
             <TextView
                 android:id="@+id/licenses"
@@ -45,7 +45,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:onClick="clickLicenses"
-                android:text="Open source licenses"
+                android:text="@string/about_licenses"
                 android:textColor="@color/light_blue" />
 
             <TextView
@@ -57,7 +57,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:onClick="clickPrivacy"
-                android:text="Privacy Policy"
+                android:text="@string/about_privacy"
                 android:textColor="@color/light_blue" />
 
             <TextView
@@ -69,7 +69,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:onClick="clickTerms"
-                android:text="Terms and Conditions"
+                android:text="@string/about_terms"
                 android:textColor="@color/light_blue" />
 
             <View
@@ -83,7 +83,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:text="Have a problem? Want a new feature?" />
+                android:text="@string/about_feedback" />
 
             <TextView
                 android:id="@+id/feedback"
@@ -93,7 +93,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:onClick="clickFeedback"
-                android:text="Contact Us"
+                android:text="@string/about_contact_us"
                 android:textColor="@color/light_blue" />
         </LinearLayout>
 
@@ -102,14 +102,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:text="Version #" />
+            />
 
         <TextView
             android:id="@+id/copyright"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:text="© 2012 Cru Global" />
+            android:text="@string/about_copyright" />
     </LinearLayout>
 
 </ScrollView>

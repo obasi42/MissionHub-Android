@@ -123,7 +123,7 @@ public class InitActivity extends BaseActivity {
 		eh.setPositiveButton(new DialogButton() {
 			@Override
 			public String getTitle() {
-				return "Close";
+				return getString(R.string.action_close);
 			}
 
 			@Override

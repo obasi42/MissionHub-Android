@@ -37,7 +37,7 @@ public class Application extends android.app.Application {
 	/** database name */
 	private static final String DB_NAME = "missionhub.db";
 
-	/** the generic (context-less!) object store */
+	/** the generic (context-less!) object store - this is to hold on to the object as long as the application is alive */
 	private static final ObjectStore mObjectStore = ObjectStore.getInstance();
 
 	/**

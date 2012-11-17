@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    
+    <!-- The Main Menu Items -->
     <item name="menu_item_dashboard" type="id"/>
     <item name="menu_item_my_contacts" type="id"/>
     <item name="menu_item_all_contacts" type="id"/>
@@ -10,7 +10,7 @@
     <item name="menu_item_logout" type="id"/>
     <item name="menu_item_about" type="id" />
     <item name="menu_item_help" type="id"/>
-    
+    <!-- Navigation Bar Items -->
     <item name="menu_item_restart" type="id" />
 
 </resources>

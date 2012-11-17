@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.missionhub.R;
 import com.missionhub.activity.MainActivity;
+import com.missionhub.application.Application;
 import com.missionhub.application.ObjectStore;
 import com.missionhub.application.Session;
 import com.missionhub.ui.ObjectArrayAdapter;
@@ -52,19 +53,19 @@ public class MainMenuFragment extends BaseFragment implements OnItemClickListene
 		if (mAdapter == null) {
 			mAdapter = new MainMenuAdapter();
 
-			mAdapter.add(new MainMenuItem(R.id.menu_item_dashboard, "Dashboard"));
-			mAdapter.add(new MainMenuItem(R.id.menu_item_my_contacts, "My Contacts", R.drawable.ic_main_menu_card));
-			mAdapter.add(new MainMenuItem(R.id.menu_item_all_contacts, "All Contacts", R.drawable.ic_main_menu_contacts));
-			mAdapter.add(new MainMenuItem(R.id.menu_item_groups, "Groups"));
-			mAdapter.add(new MainMenuItem(R.id.menu_item_surveys, "Surveys", R.drawable.ic_main_menu_survey));
+			mAdapter.add(new MainMenuItem(R.id.menu_item_dashboard, R.string.menu_dashboard));
+			mAdapter.add(new MainMenuItem(R.id.menu_item_my_contacts, R.string.menu_my_contacts, R.drawable.ic_main_menu_card));
+			mAdapter.add(new MainMenuItem(R.id.menu_item_all_contacts, R.string.menu_all_contacts, R.drawable.ic_main_menu_contacts));
+			mAdapter.add(new MainMenuItem(R.id.menu_item_groups, R.string.menu_groups));
+			mAdapter.add(new MainMenuItem(R.id.menu_item_surveys, R.string.menu_surveys, R.drawable.ic_main_menu_survey));
 
-			mAdapter.add(new MainMenuDivider("Account"));
-			mAdapter.add(new MainMenuItem(R.id.menu_item_preferences, "Preferences"));
-			mAdapter.add(new MainMenuItem(R.id.menu_item_logout, "Logout"));
+			mAdapter.add(new MainMenuDivider(R.string.menu_div_account));
+			mAdapter.add(new MainMenuItem(R.id.menu_item_preferences, R.string.menu_preferences));
+			mAdapter.add(new MainMenuItem(R.id.menu_item_logout, R.string.menu_logout));
 
-			mAdapter.add(new MainMenuDivider("MissionHub"));
-			mAdapter.add(new MainMenuItem(R.id.menu_item_about, "About"));
-			mAdapter.add(new MainMenuItem(R.id.menu_item_help, "Help Center"));
+			mAdapter.add(new MainMenuDivider(R.string.menu_div_missionhub));
+			mAdapter.add(new MainMenuItem(R.id.menu_item_about, R.string.menu_about));
+			mAdapter.add(new MainMenuItem(R.id.menu_item_help, R.string.menu_help_center));
 		}
 		mAdapter.setContext(getActivity());
 
@@ -89,7 +90,7 @@ public class MainMenuFragment extends BaseFragment implements OnItemClickListene
 		}
 
 		@Override
-		public View getView(final int position, final View convertView, final ViewGroup parent) {
+		public View getSupportView(final int position, final View convertView, final ViewGroup parent) {
 
 			final Object item = getItem(position);
 			View view = convertView;
@@ -145,8 +146,8 @@ public class MainMenuFragment extends BaseFragment implements OnItemClickListene
 		}
 
 		@Override
-		public View getDropDownView(final int position, final View convertView, final ViewGroup parent) {
-			return null; // not used
+		public View getSupportDropDownView(final int position, final View convertView, final ViewGroup parent) {
+			return getSupportView(position, convertView, parent);
 		}
 		
 		class ViewHolder {
@@ -171,6 +172,14 @@ public class MainMenuFragment extends BaseFragment implements OnItemClickListene
 		public MainMenuItem(final int id, final String title) {
 			this(id, title, 0);
 		}
+		
+		public MainMenuItem(final int id, final int title) {
+			this(id, Application.getContext().getString(title), 0);
+		}
+		
+		public MainMenuItem(final int id, final int title, final int iconResourceId) {
+			this(id, Application.getContext().getString(title), iconResourceId);
+		}
 
 		public MainMenuItem(final int id, final String title, final int iconResourceId) {
 			this.id = id;
@@ -191,6 +200,10 @@ public class MainMenuFragment extends BaseFragment implements OnItemClickListene
 		String title;
 
 		public MainMenuDivider() {}
+		
+		public MainMenuDivider(final int title) {
+			this(Application.getContext().getString(title));
+		}
 
 		public MainMenuDivider(final String title) {
 			this.title = title;

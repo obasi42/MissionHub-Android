@@ -8,7 +8,9 @@ import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
 import android.webkit.WebViewClient;
 
+import com.missionhub.R;
 import com.missionhub.api.ApiException;
+import com.missionhub.application.Application;
 import com.missionhub.network.NetworkUnavailableException;
 
 /** Helps display error dialogs from exceptions */
@@ -120,7 +122,7 @@ public class ExceptionHelper {
 	/** sets the message of the dialog. safe to call after the dialog is showing */
 	public void setMessage(String message) {
 		if (mAppendSupport) {
-			message += "\n\nEmail support@missionhub.com if the problem persists.";
+			message += "\n\n" + getString(R.string.exception_helper_support);
 		}
 		if (mDialog != null) {
 			mDialog.setMessage(message);
@@ -167,14 +169,14 @@ public class ExceptionHelper {
 			setTitle(((ApiException) mThrowable).getTitle());
 			setMessage(mThrowable.getMessage() + "\ncode: " + ((ApiException) mThrowable).getCode());
 		} else if (mThrowable instanceof WebViewException) {
-			setTitle("Network Error");
+			setTitle(getString(R.string.exception_helper_network_error));
 			final int code = ((WebViewException) mThrowable).getCode();
 			switch (code) {
 			case WebViewClient.ERROR_CONNECT:
-				setMessage("The MissionHub server is currently down. Please try again in a few minutes.");
+				setMessage(getString(R.string.exception_helper_mh_down));
 				break;
 			case WebViewClient.ERROR_TIMEOUT:
-				setMessage("Either your internet connection is very slow or the MissionHub servers are not currently responding. Please try again in a few minutes.");
+				setMessage(getString(R.string.exception_helper_mh_not_responding));
 				break;
 			case WebViewClient.ERROR_HOST_LOOKUP:
 				setException(new NetworkUnavailableException());
@@ -187,6 +189,10 @@ public class ExceptionHelper {
 		}
 	}
 
+	private String getString(int resId) {
+		return Application.getContext().getString(resId);
+	}
+	
 	/** sets the positive button */
 	public void setPositiveButton(final DialogButton button) {
 		mPositive = button;

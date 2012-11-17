@@ -1,12 +1,10 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/scrollView1"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" >
 
     <LinearLayout
-        android:id="@+id/wrap"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="15.0dip" >
 
@@ -30,7 +28,6 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginLeft="15.0dip"
-                android:text="Some Contact"
                 android:textSize="20.0dip" />
         </LinearLayout>
 
@@ -40,19 +37,16 @@
             android:orientation="vertical" >
 
             <TextView
-                android:id="@+id/name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Organization:"
+                android:text="@string/pref_organization"
                 android:textSize="18.0dip" />
 
             <Spinner
                 android:id="@+id/organizations"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                 />
+                android:layout_height="wrap_content" />
         </LinearLayout>
-
     </LinearLayout>
 
 </ScrollView>

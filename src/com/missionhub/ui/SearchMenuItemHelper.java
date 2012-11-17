@@ -96,7 +96,7 @@ public class SearchMenuItemHelper implements OnQueryTextListener, OnFocusChangeL
     	mSearchMenu = menu.addSubMenu("Search");
 		
     	mSearchMenu.getItem()
-        	.setIcon(R.drawable.ic_search)
+        	.setIcon(R.drawable.ic_action_search)
         	.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 		
     	mQuickSearchItem = mSearchMenu.add("Quick");

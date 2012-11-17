@@ -1,96 +1,110 @@
 package com.missionhub.fragment;
 
-import com.missionhub.R;
-import com.missionhub.ui.ContactListProvider;
-import com.missionhub.util.U;
-
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+
+import com.missionhub.R;
+import com.missionhub.ui.ContactListProvider;
+import com.missionhub.util.U;
 
 public class MyContactsFragment extends MainFragment {
-	
+
+	/** the view pager */
+	private ViewPager mPager;
+
+	/** the view pager adapter */
+	private FragmentStatePagerAdapter mAdapter;
+
+	/** the all contacts fragment */
+	private MyContactsContactListFragment mAll;
+
+	/** the in-progress contacts fragment */
+	private MyContactsContactListFragment mInProgress;
+
+	/** the completed contacts fragment */
+	private MyContactsContactListFragment mCompleted;
+
+	/** the all contacts data provider */
+	private ContactListProvider mInProgressProvider;
+
+	/** the in-progress contacts data provider */
+	private ContactListProvider mAllProvider;
+
+	/** the completed contacts data provider */
+	private ContactListProvider mCompletedProvider;
+
+	@Override
+	public void onCreate(final Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setRetainInstance(true);
+
+		mAdapter = new FragmentStatePagerAdapter(getChildFragmentManager()) {
+			@Override
+			public Fragment getItem(final int index) {
+				switch (index) {
+				case 0:
+					mAll = new MyContactsContactListFragment();
+					mAll.setProvider(mAllProvider);
+					return mAll;
+				case 1:
+					mInProgress = new MyContactsContactListFragment();
+					mInProgress.setProvider(mInProgressProvider);
+					return mInProgress;
+				case 2:
+					mCompleted = new MyContactsContactListFragment();
+					mCompleted.setProvider(mCompletedProvider);
+					return mCompleted;
+				}
+				throw new RuntimeException("Invalid pager index.");
+			}
+
+			@Override
+			public String getPageTitle(final int index) {
+				switch (index) {
+				case 0:
+					return getString(R.string.my_contacts_all);
+				case 1:
+					return getString(R.string.my_contacts_in_progress);
+				case 2:
+					return getString(R.string.my_contacts_completed);
+				default:
+					return "Page " + index;
+				}
+			}
+
+			@Override
+			public int getCount() {
+				return 3;
+			}
+		};
+	}
+
+	public class MyContactsContactListFragment extends ContactListFragment {
+		
+	}
+
+	@Override
+	public void onActivityCreated(final Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+
+		U.resetActionBar(getSherlockActivity());
+		getSherlockActivity().getSupportActionBar().setTitle(R.string.my_contacts_title);
+	}
+
 	@Override
 	public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
-		final TextView tv = new TextView(inflater.getContext());
-		tv.setText("My Contacts Fragment");
-		return tv;
+		final View v = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_my_contacts, null);
+		mPager = (ViewPager) v.findViewById(R.id.pager);
+		mPager.setOffscreenPageLimit(2);
+		mPager.setAdapter(mAdapter);
+		mPager.setCurrentItem(1);
+		return v;
 	}
-	
-
-//	/** the view pager */
-//	private ViewPager mPager;
-//	
-//	/** the view pager adapter */
-//	private FragmentStatePagerAdapter mAdapter;
-//	
-//	/** the all contacts fragment */
-//	//private AllContactListFragment mAllContacts;
-//	
-//	/** the in-progress contacts fragment */
-//	//private InProgressContactListFragment mInProgressContacts;
-//	
-//	/** the completed contacts fragment */
-//	//private CompletedContactListFragment mCompletedContacts;
-//	
-//	@Override
-//	public void onCreate(Bundle savedInstanceState) {
-//		super.onCreate(savedInstanceState);
-//		setRetainInstance(true);
-//		
-//		mAdapter = new FragmentStatePagerAdapter(getChildFragmentManager()) {
-//			@Override
-//			public Fragment getItem(int index) {
-//				switch(index) {
-////					case 0: mAllContacts = new AllContactListFragment(); return mAllContacts;
-////					case 1: mInProgressContacts = new InProgressContactListFragment(); return mInProgressContacts;
-////					case 2: mCompletedContacts = new CompletedContactListFragment(); return mCompletedContacts;
-//				}
-//				throw new RuntimeException("Invalid pager index.");
-//			}
-//
-//			@Override
-//			public String getPageTitle(int index) {
-//				switch(index) {
-//					case 0: return "All";
-//					case 1: return "In-Progress";
-//					case 2: return "Completed";
-//					default: return "Page " + index;
-//				}
-//			}
-//
-//			@Override
-//			public int getCount() {
-//				return 3;
-//			}
-//		};
-//	}
-//	
-//	@Override
-//	public void onActivityCreated(Bundle savedInstanceState) {
-//		super.onActivityCreated(savedInstanceState);
-//		
-//		U.resetActionBar(getSherlockActivity());
-//		getSherlockActivity().getSupportActionBar().setTitle("My Contacts");
-//	}
-//	
-//
-//	@Override
-//	public View onCreateView(LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
-//		View v = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_my_contacts, null);
-//		mPager = (ViewPager) v.findViewById(R.id.pager);
-//		mPager.setOffscreenPageLimit(2);
-//		mPager.setAdapter(mAdapter);
-//		mPager.setCurrentItem(1);
-//		return v;
-//	}
-	
 
 	// /** the search menu item helper */
 	// private SearchMenuItemHelper mSearchMenuItemHelper;

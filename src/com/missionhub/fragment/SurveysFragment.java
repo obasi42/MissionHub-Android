@@ -39,7 +39,7 @@ public class SurveysFragment extends MainFragment {
 	
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		menu.add(Menu.NONE, R.id.menu_item_restart, Menu.NONE, "Restart").setIcon(R.drawable.ic_action_restart).setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+		menu.add(Menu.NONE, R.id.menu_item_restart, Menu.NONE, getString(R.string.action_restart)).setIcon(R.drawable.ic_action_restart).setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 	}
 	
 	@Override

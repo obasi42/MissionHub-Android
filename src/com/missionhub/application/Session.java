@@ -11,12 +11,12 @@ import android.accounts.AccountManager;
 import android.accounts.AuthenticatorException;
 import android.accounts.OnAccountsUpdateListener;
 import android.accounts.OperationCanceledException;
-import android.util.Log;
 
 import com.WazaBe.HoloEverywhere.widget.Toast;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
+import com.missionhub.R;
 import com.missionhub.api.Api;
 import com.missionhub.authenticator.Authenticator;
 import com.missionhub.exception.MissionHubException;
@@ -200,7 +200,7 @@ public class Session implements OnAccountsUpdateListener {
 	 * Attempts to resume the previous user's session
 	 */
 	public synchronized void resumeSession() {
-		Application.postEvent(new SessionResumeStatusEvent("Resuming session..."));
+		Application.postEvent(new SessionResumeStatusEvent(Application.getContext().getString(R.string.init_resuming)));
 
 		long personId = SettingsManager.getSessionLastUserId();
 		if (personId >= 0) {
@@ -231,7 +231,7 @@ public class Session implements OnAccountsUpdateListener {
 			public void run() {
 				try {
 					// update the person
-					Application.postEvent(new SessionResumeStatusEvent("Updating Person..."));
+					Application.postEvent(new SessionResumeStatusEvent(Application.getContext().getString(R.string.init_updating_person)));
 
 					final Person p = Api.getPersonMe().get();
 
@@ -240,7 +240,7 @@ public class Session implements OnAccountsUpdateListener {
 					mAccountManager.setUserData(mAccount, AccountManager.KEY_ACCOUNT_NAME, p.getName());
 
 					// update the organizations
-					Application.postEvent(new SessionResumeStatusEvent("Updating Organizations..."));
+					Application.postEvent(new SessionResumeStatusEvent(Application.getContext().getString(R.string.init_updating_orgs)));
 					//TODO: uncomment Api.getOrganizations(null).get();
 
 					updateLabels();
@@ -278,7 +278,7 @@ public class Session implements OnAccountsUpdateListener {
 	public Person getPerson() throws NoPersonException {
 		final Person p = Application.getDb().getPersonDao().load(getPersonId());
 		if (p == null) {
-			throw new NoPersonException("no person in sqlite db");
+			throw new NoPersonException(Application.getContext().getString(R.string.no_person_exception));
 		}
 		return p;
 	}
@@ -373,7 +373,7 @@ public class Session implements OnAccountsUpdateListener {
 
 		if (!isAdminOrLeader(getOrganizationId())) {
 			setOrganizationId(mPrimaryOrganizationId);
-			Toast.makeText(Application.getContext(), "You are no longer an admin or leader in your prefered organization. Selecting your primary.", Toast.LENGTH_LONG).show();
+			Toast.makeText(Application.getContext(), Application.getContext().getString(R.string.session_no_longer_admin), Toast.LENGTH_LONG).show();
 		}
 	}
 
@@ -402,13 +402,8 @@ public class Session implements OnAccountsUpdateListener {
 			final OrganizationalRole role = roleItr.next();
 			role.refresh();
 			final Organization org = role.getOrganization();
-			org.refresh();
-			
-			Log.e(TAG, org.getName() + " " + org.getAncestry());
-			
+			org.refresh();			
 			if (role.getOrganization().getAncestry() != null) {
-				Log.e(TAG, "Has Ancestry: " + org.getName());
-				
 				TreeDataStructure<Long> parent = tree;
 				for (final String ancestor : role.getOrganization().getAncestry().trim().split("/")) {
 					final Long a = Long.parseLong(ancestor);
@@ -553,7 +548,7 @@ public class Session implements OnAccountsUpdateListener {
 			SettingsManager.setSessionOrganizationId(getPersonId(), mOrganizationId);
 			Application.postEvent(new SessionOrganizationIdChanged(organizationId));
 		} else {
-			Toast.makeText(Application.getContext(), "You are not an admin or leader in this organization.", Toast.LENGTH_LONG).show();
+			Toast.makeText(Application.getContext(), Application.getContext().getString(R.string.session_not_admin), Toast.LENGTH_LONG).show();
 		}
 	}
 
@@ -647,7 +642,7 @@ public class Session implements OnAccountsUpdateListener {
 		private static final long serialVersionUID = 1L;
 
 		public NoAccountException() {
-			super("No MissionHub Account Found");
+			super(Application.getContext().getString(R.string.no_account_exception));
 		}
 	}
 

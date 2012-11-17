@@ -141,7 +141,7 @@ public class AuthenticatorActivity extends RoboSherlockAccountAuthenticatorActiv
 
 				// prevent the mission hub server from being dumb
 				if (!uri.getPath().contains("/users") && !uri.getPath().contains(oauthUri.getPath())) {
-					onError(new Exception("The MissionHub server returned unexpected data. Please try again."));
+					onError(new Exception(getString(R.string.unexpected_data)));
 					return;
 				}
 
@@ -253,7 +253,7 @@ public class AuthenticatorActivity extends RoboSherlockAccountAuthenticatorActiv
 	private void addAccountFromCode(final String code) {
 		if (mAuthTask != null) return;
 
-		showProgress("Fetching Account Information...");
+		showProgress(getString(R.string.auth_fetching_account_info));
 
 		final RoboAsyncTask<GAuthTokenDone> task = new RoboAsyncTask<GAuthTokenDone>(this) {
 			@Override
@@ -281,7 +281,7 @@ public class AuthenticatorActivity extends RoboSherlockAccountAuthenticatorActiv
 					final long personId = Long.parseLong(mAccountManager.getUserData(account, Authenticator.KEY_PERSON_ID));
 					if (personId == done.person.id) {
 						// we have a duplicate, show a toast and cancel the authenticator
-						Toast.makeText(getContext(), "Account for " + done.person.name + " already exists.", Toast.LENGTH_LONG).show();
+						Toast.makeText(getContext(), String.format(getString(R.string.auth_duplicate_account), done.person.name), Toast.LENGTH_LONG).show();
 						finishActivity(RESULT_DUPLICATE, account, personId);
 						return;
 					}
@@ -351,7 +351,7 @@ public class AuthenticatorActivity extends RoboSherlockAccountAuthenticatorActiv
 		eh.setPositiveButton(new DialogButton() {
 			@Override
 			public String getTitle() {
-				return "Retry";
+				return getString(R.string.action_retry);
 			}
 
 			@Override
@@ -362,7 +362,7 @@ public class AuthenticatorActivity extends RoboSherlockAccountAuthenticatorActiv
 		eh.setNegativeButton(new DialogButton() {
 			@Override
 			public String getTitle() {
-				return "Cancel";
+				return getString(R.string.action_cancel);
 			}
 
 			@Override
