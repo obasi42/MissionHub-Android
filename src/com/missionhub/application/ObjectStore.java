@@ -34,7 +34,7 @@ public class ObjectStore {
 	 * 
 	 * @return
 	 */
-	public static ObjectStore getInstance() {
+	public synchronized static ObjectStore getInstance() {
 		if (mObjectStoreInstance == null) {
 			mObjectStoreInstance = new ObjectStore();
 			Application.registerEventSubscriber(mObjectStoreInstance, OnLowMemoryEvent.class);

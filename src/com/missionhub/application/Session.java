@@ -84,7 +84,7 @@ public class Session implements OnAccountsUpdateListener {
 	/**
 	 * @return the singleton instance of the session
 	 */
-	public static Session getInstance() {
+	public synchronized static Session getInstance() {
 		if (sSession == null) {
 			sSession = new Session();
 		}

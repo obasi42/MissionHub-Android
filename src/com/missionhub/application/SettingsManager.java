@@ -20,7 +20,7 @@ public class SettingsManager {
 	private SettingsManager() {}
 
 	/** creates and returns the SettingsManager */
-	public static SettingsManager getInstance() {
+	public synchronized static SettingsManager getInstance() {
 		if (sSettingsManager == null) {
 			sSettingsManager = new SettingsManager();
 			sSettingsManager.sd = Application.getDb().getSettingDao();

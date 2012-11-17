@@ -56,7 +56,7 @@ public class EasyTracker {
 
 	private static EasyTracker instance;
 
-	public static EasyTracker getTracker() {
+	public synchronized static EasyTracker getTracker() {
 		if (instance == null) {
 			instance = new EasyTracker();
 		}

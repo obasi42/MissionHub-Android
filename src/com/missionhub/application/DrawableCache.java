@@ -18,7 +18,7 @@ public class DrawableCache {
 	private WeakHashMap<Integer, Drawable> mCache;
 
 	/** returns or creates the instance of the cache */
-	public static DrawableCache getInstance() {
+	public synchronized static DrawableCache getInstance() {
 		if (sDrawableCache == null) {
 			sDrawableCache = new DrawableCache();
 			sDrawableCache.mCache = new WeakHashMap<Integer, Drawable>();

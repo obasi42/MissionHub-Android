@@ -1,6 +1,7 @@
 package com.missionhub.application;
 
 import java.io.IOException;
+import java.util.Locale;
 import java.util.Properties;
 
 import android.content.Context;
@@ -48,7 +49,7 @@ public class Configuration {
 
 	public static Environment getEnvironment() {
 		final String env = Configuration.getInstance().sProperties.getProperty("ENVIRONMENT", Environment.PRODUCTION.name());
-		return Environment.valueOf(env.toUpperCase());
+		return Environment.valueOf(env.toUpperCase(Locale.US));
 	}
 
 	public static enum Market {
@@ -57,7 +58,7 @@ public class Configuration {
 
 	public static Market getMarket() {
 		final String market = Configuration.getInstance().sProperties.getProperty("MARKET", Market.ANDROID.name());
-		return Market.valueOf(market.toUpperCase());
+		return Market.valueOf(market.toUpperCase(Locale.US));
 	}
 
 	public static String getApiUrl() {

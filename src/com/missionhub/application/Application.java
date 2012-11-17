@@ -44,7 +44,7 @@ public class Application extends android.app.Application {
 	 * called when the application is created.
 	 */
 	@Override
-	public void onCreate() {
+	public synchronized void onCreate() {
 		super.onCreate();
 		sApplication = this;
 
@@ -58,7 +58,7 @@ public class Application extends android.app.Application {
 	/**
 	 * @return the singleton instance of the application
 	 */
-	public static Application getInstance() {
+	public synchronized static Application getInstance() {
 		return sApplication;
 	}
 
@@ -74,7 +74,7 @@ public class Application extends android.app.Application {
 	 * 
 	 * @return
 	 */
-	public static ExecutorService getExecutor() {
+	public synchronized static ExecutorService getExecutor() {
 		if (sExecutorService == null) {
 			sExecutorService = Executors.newCachedThreadPool();
 		}
@@ -98,7 +98,7 @@ public class Application extends android.app.Application {
 	/**
 	 * @return the raw sqlite database for the application context
 	 */
-	public static SQLiteDatabase getRawDb() {
+	public synchronized static SQLiteDatabase getRawDb() {
 		if (mDb == null) {
 			final OpenHelper helper = new MissionHubOpenHelper(Application.getContext(), DB_NAME, null);
 			mDb = helper.getWritableDatabase();
@@ -109,7 +109,7 @@ public class Application extends android.app.Application {
 	/**
 	 * @return the database database session for the application context
 	 */
-	public static DaoSession getDb() {
+	public synchronized static DaoSession getDb() {
 		if (mDaoSession == null) {
 			final DaoMaster daoMaster = new DaoMaster(getRawDb());
 			mDaoSession = daoMaster.newSession();

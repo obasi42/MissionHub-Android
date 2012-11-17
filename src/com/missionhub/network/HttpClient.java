@@ -83,6 +83,8 @@ public class HttpClient {
 		case TRACE:
 			request = new HttpTrace();
 			break;
+		default:
+			request = new HttpGet();
 		}
 
 		// create the uri builder from the url
@@ -151,14 +153,14 @@ public class HttpClient {
 			try {
 				callable.abort();
 				callable.shutdown();
-			} catch (final Exception ignore) {}
+			} catch (final Exception ignore) { /* ignore */ }
 			return super.cancel(mayInterruptIfRunning);
 		}
 
 		public void abort() {
 			try {
 				callable.abort();
-			} catch (final Exception ignore) {}
+			} catch (final Exception ignore) { /* ignore */ }
 		}
 	}
 

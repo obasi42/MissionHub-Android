@@ -41,7 +41,7 @@ public class U {
 	 * @return date object
 	 */
 	public static Date parseUTC(String s) {
-		final java.text.DateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
+		final java.text.DateFormat df = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
 		df.setTimeZone(java.util.TimeZone.getTimeZone("Zulu"));
 		s = s.replace("UTC", "");
 

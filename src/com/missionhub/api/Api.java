@@ -65,7 +65,7 @@ public class Api {
 	 * 
 	 * @return instance of the api
 	 */
-	public static Api getInstance() {
+	public synchronized static Api getInstance() {
 		if (sApi == null) {
 			sApi = new Api();
 		}
@@ -154,7 +154,7 @@ public class Api {
 			params.add("platform_product", Build.PRODUCT);
 			params.add("platform_release", android.os.Build.VERSION.RELEASE);
 			params.add("app", Application.getVersionCode());
-		} catch (final Exception ignore) { /* logging is really not that important */}
+		} catch (final Exception ignore) { /* ignore */}
 	}
 
 	/**
@@ -168,7 +168,7 @@ public class Api {
 			builder.addParameter("platform_product", Build.PRODUCT);
 			builder.addParameter("platform_release", android.os.Build.VERSION.RELEASE);
 			builder.addParameter("app", String.valueOf(Application.getVersionCode()));
-		} catch (final Exception ignore) { /* logging is really not that important */}
+		} catch (final Exception ignore) { /* ignore */}
 	}
 
 	/**
