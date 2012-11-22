@@ -241,7 +241,7 @@ public class Session implements OnAccountsUpdateListener {
 
 					// update the organizations
 					Application.postEvent(new SessionResumeStatusEvent(Application.getContext().getString(R.string.init_updating_orgs)));
-					// TODO: uncomment Api.getOrganizations(null).get();
+					//Api.getOrganizations(null).get();
 
 					updateLabels();
 					getOrganizationHierarchy();

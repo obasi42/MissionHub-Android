@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- The Main Menu Items -->
     <item name="menu_item_dashboard" type="id"/>
     <item name="menu_item_my_contacts" type="id"/>
@@ -10,7 +10,12 @@
     <item name="menu_item_logout" type="id"/>
     <item name="menu_item_about" type="id" />
     <item name="menu_item_help" type="id"/>
+    
     <!-- Navigation Bar Items -->
     <item name="menu_item_restart" type="id" />
+    <item name="menu_item_refresh" type="id" />
+    <item name="menu_item_comment" type="id" />
+    <item name="menu_item_assign" type="id" />
+    <item name="menu_item_permissions" type="id" />
 
 </resources>

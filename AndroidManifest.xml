@@ -79,6 +79,10 @@
             android:name=".activity.PreferencesActivity"
             android:label="@string/pref_activity_title"
             android:theme="@style/Theme.MissionHub" />
+        <activity
+            android:name=".activity.ContactActivity"
+            android:label="@string/contact_activity_title"
+            android:theme="@style/Theme.MissionHub" />
     </application>
 
 </manifest>

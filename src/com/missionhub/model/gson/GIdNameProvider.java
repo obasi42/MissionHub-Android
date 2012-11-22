@@ -1,5 +1,7 @@
 package com.missionhub.model.gson;
 
+import java.util.concurrent.Callable;
+
 import com.missionhub.application.Application;
 import com.missionhub.model.Interest;
 import com.missionhub.model.InterestDao;
@@ -18,36 +20,47 @@ public class GIdNameProvider {
 	public String category;
 
 	/**
-	 * Saves the generic id name provider Note: this method does not use transactions. Be sure to wrap in a transaction
-	 * if used directly.
+	 * Saves the generic id name provider if used directly.
 	 * 
 	 * @param clss
 	 * @param location
 	 * @param p
+	 * @throws Exception
 	 */
-	public static void save(final Class<?> clss, final GIdNameProvider provider, final Person p) {
+	public static void save(final Class<?> clss, final GIdNameProvider provider, final Person p, final boolean inTx) throws Exception {
 		if (U.isNull(clss, provider, p)) return;
 
-		save(clss, new GIdNameProvider[] { provider }, p);
+		save(clss, new GIdNameProvider[] { provider }, p, inTx);
 	}
 
 	/**
-	 * Saves the generic id name provider Note: this method does not use transactions. Be sure to wrap in a transaction
-	 * if used directly.
+	 * Saves the generic id name provider
 	 * 
 	 * @param clss
 	 * @param interests
 	 * @param p
+	 * @throws Exception
 	 */
-	public static void save(final Class<?> clss, final GIdNameProvider[] provider, final Person p) {
+	public static void save(final Class<?> clss, final GIdNameProvider[] provider, final Person p, final boolean inTx) throws Exception {
 		if (clss == null || provider == null || provider.length == 0 || p == null) return;
+		final Callable<Void> callable = new Callable<Void>() {
 
-		if (clss == Location.class) {
-			saveLocations(provider, p);
-		} else if (clss == Interest.class) {
-			saveInterests(provider, p);
+			@Override
+			public Void call() throws Exception {
+				if (clss == Location.class) {
+					saveLocations(provider, p);
+				} else if (clss == Interest.class) {
+					saveInterests(provider, p);
+				} else {
+					throw new RuntimeException(clss.getName() + " is not saveable");
+				}
+				return null;
+			}
+		};
+		if (!inTx) {
+			Application.getDb().callInTx(callable);
 		} else {
-			throw new RuntimeException(clss.getName() + " is not saveable");
+			callable.call();
 		}
 	}
 

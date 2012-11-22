@@ -83,7 +83,6 @@ public abstract class ObjectArrayAdapter extends BaseAdapter {
 		if (mTypes.size() > mMaxViewTypes) {
 			throw new RuntimeException("Max view types limit reached.");
 		}
-
 	}
 
 	@Override
@@ -93,27 +92,9 @@ public abstract class ObjectArrayAdapter extends BaseAdapter {
 		return mTypes.indexOf(object.getClass());
 	}
 
-	@Override
-	public View getView(final int position, final View convertView, final ViewGroup parent) {
-		final View view = getSupportView(position, convertView, parent);
-		runSupportFilters(view, position, parent);
-		return view;
-	}
+	public abstract View getView(int position, View convertView, ViewGroup parent);
 
-	@Override
-	public View getDropDownView(final int position, final View convertView, final ViewGroup parent) {
-		final View view = getSupportDropDownView(position, convertView, parent);
-		runSupportFilters(view, position, parent);
-		return view;
-	}
-
-	private void runSupportFilters(final View view, final int position, final ViewGroup parent) {
-		// TODO: if needed
-	}
-
-	public abstract View getSupportView(int position, View convertView, ViewGroup parent);
-
-	public abstract View getSupportDropDownView(int position, View convertView, ViewGroup parent);
+	public abstract View getDropDownView(int position, View convertView, ViewGroup parent);
 
 	public interface ItemIdProvider {
 		long getItemId();
@@ -194,7 +175,6 @@ public abstract class ObjectArrayAdapter extends BaseAdapter {
 			mObjects.clear();
 			mActiveObjects.clear();
 			mHiddenObjects.clear();
-			mTypes.clear();
 		}
 		maybeNotify();
 	}

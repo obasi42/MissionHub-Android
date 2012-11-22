@@ -39,6 +39,22 @@ public class IntentHelper {
 			Toast.makeText(Application.getContext(), getString(R.string.intent_helper_no_calling), Toast.LENGTH_LONG).show();
 		}
 	}
+	
+	/**
+	 * "Views" a telephone number
+	 * 
+	 * @param number
+	 */
+	public static void viewNumber(final String number) {
+		try {
+			final Intent intent = new Intent(Intent.ACTION_VIEW);
+			addTaskFlags(intent);
+			intent.setData(Uri.parse("tel:" + number));
+			Application.getContext().startActivity(intent);
+		} catch (final Exception e) {
+			Toast.makeText(Application.getContext(), getString(R.string.intent_helper_no_calling), Toast.LENGTH_LONG).show();
+		}
+	}
 
 	/**
 	 * Sends an sms
@@ -119,4 +135,26 @@ public class IntentHelper {
 	private static String getString(final int resId) {
 		return Application.getContext().getString(resId);
 	}
+
+	/**
+	 * Opens a Facebook profile in the Facebook app if available, otherwise in a web browser.
+	 * 
+	 * @param fbId
+	 */
+	public static void openFacebookProfile(final long fbId) {
+		try {
+			final Intent intent = new Intent(Intent.ACTION_VIEW);
+			addTaskFlags(intent);
+			intent.setClassName("com.facebook.katana", "com.facebook.katana.ProfileTabHostActivity");
+			intent.putExtra("extra_user_id", fbId);
+			Application.getContext().startActivity(intent);
+		} catch (final Exception e) {
+			try {
+				openUrl("http://www.facebook.com/profile.php?id=" + fbId);
+			} catch (final Exception f) {
+				Toast.makeText(Application.getContext(), R.string.intent_helper_no_facebook, Toast.LENGTH_LONG).show();
+			}
+		}
+	}
+
 }

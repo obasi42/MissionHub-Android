@@ -1,7 +1,6 @@
 package com.missionhub.model.gson;
 
 import java.util.concurrent.Callable;
-import java.util.concurrent.FutureTask;
 
 import com.missionhub.application.Application;
 import com.missionhub.model.Group;
@@ -26,66 +25,44 @@ public class GGroup {
 	/**
 	 * Saves a group to the local db.
 	 */
-	public FutureTask<Group> save() {
-		return save(true);
-	}
-
-	/**
-	 * Saves a group to the local db. This is not called in a transaction. Be sure to wrap in a tx block for
-	 * performance.
-	 */
-	public FutureTask<Group> save(final boolean threaded) {
-		final FutureTask<Group> task = new FutureTask<Group>(new Callable<Group>() {
+	public Group save(final boolean inTx) throws Exception {
+		final Callable<Group> callable = new Callable<Group>() {
 			@Override
 			public Group call() throws Exception {
+				final GroupDao gd = Application.getDb().getGroupDao();
 
-				final Callable<Group> callable = new Callable<Group>() {
-					@Override
-					public Group call() throws Exception {
-						final GroupDao gd = Application.getDb().getGroupDao();
-
-						Group g = gd.load(id);
-						if (g == null) {
-							g = new Group();
-							g.setId(id);
-							gd.insert(g);
-						}
-
-						if (!U.isNullEmpty(name)) g.setName(name);
-						if (!U.isNullEmpty(location)) g.setLocation(location);
-						if (!U.isNullEmpty(meets)) g.setMeets(meets);
-						if (!U.isNullEmptyNegative(start_time)) g.setStart_time(start_time);
-						if (!U.isNullEmptyNegative(end_time)) g.setEnd_time(end_time);
-						if (!U.isNullEmptyNegative(organization_id)) g.setOrganization_id(organization_id);
-						if (!U.isNullEmpty(created_at)) g.setCreated_at(U.parseUTC(created_at));
-						if (!U.isNullEmpty(updated_at)) g.setCreated_at(U.parseUTC(updated_at));
-						g.setList_publicly(list_publicly);
-						g.setApprove_join_requests(approve_join_requests);
-
-						GGroupLabel.save(labels, g);
-
-						gd.update(g);
-
-						Application.postEvent(new GroupUpdatedEvent(g));
-
-						return g;
-					}
-				};
-				if (threaded) {
-					// since we are executing this, it is safe to assume it is the top call,
-					// so we should wrap it in a transaction for performance
-					return Application.getDb().callInTx(callable);
-				} else {
-					return callable.call();
+				Group g = gd.load(id);
+				if (g == null) {
+					g = new Group();
+					g.setId(id);
+					gd.insert(g);
 				}
+
+				if (!U.isNullEmpty(name)) g.setName(name);
+				if (!U.isNullEmpty(location)) g.setLocation(location);
+				if (!U.isNullEmpty(meets)) g.setMeets(meets);
+				if (!U.isNullEmptyNegative(start_time)) g.setStart_time(start_time);
+				if (!U.isNullEmptyNegative(end_time)) g.setEnd_time(end_time);
+				if (!U.isNullEmptyNegative(organization_id)) g.setOrganization_id(organization_id);
+				if (!U.isNullEmpty(created_at)) g.setCreated_at(U.parseUTC(created_at));
+				if (!U.isNullEmpty(updated_at)) g.setCreated_at(U.parseUTC(updated_at));
+				g.setList_publicly(list_publicly);
+				g.setApprove_join_requests(approve_join_requests);
+
+				GGroupLabel.save(labels, g, true);
+
+				gd.update(g);
+
+				// Application.postEvent(new GroupUpdatedEvent(g));
+
+				return g;
 			}
-		});
-		if (threaded) {
-			Application.getExecutor().execute(task);
+		};
+		if (!inTx) {
+			return Application.getDb().callInTx(callable);
 		} else {
-			task.run();
+			return callable.call();
 		}
-		return task;
 	}
 
 	/**

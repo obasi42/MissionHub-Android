@@ -1,5 +1,7 @@
 package com.missionhub.model.gson;
 
+import java.util.concurrent.Callable;
+
 import com.missionhub.application.Application;
 import com.missionhub.model.Organization;
 import com.missionhub.model.OrganizationDao;
@@ -18,18 +20,31 @@ public class GOrgGeneric {
 	public String role;
 
 	/**
-	 * Saves the generic orgs. This method does not use transactions and should be called with in a transaction runnable
-	 * block.
+	 * Saves the generic orgs block.
 	 * 
 	 * @param clss
 	 * @param generics
 	 * @param p
+	 * @throws Exception
 	 */
-	public static void save(final Class<?> clss, final GOrgGeneric[] generics, final Person p) {
-		if (clss == OrganizationalRole.class) {
-			saveOrganizationRales(generics, p);
-		} else if (clss == Organization.class) {
-			saveOrganizations(generics, p);
+	public static void save(final Class<?> clss, final GOrgGeneric[] generics, final Person p, final boolean inTx) throws Exception {
+		final Callable<Void> callable = new Callable<Void>() {
+
+			@Override
+			public Void call() throws Exception {
+				if (clss == OrganizationalRole.class) {
+					saveOrganizationRales(generics, p);
+				} else if (clss == Organization.class) {
+					saveOrganizations(generics, p);
+				}
+				return null;
+			}
+
+		};
+		if (!inTx) {
+			Application.getDb().callInTx(callable);
+		} else {
+			callable.call();
 		}
 	}
 

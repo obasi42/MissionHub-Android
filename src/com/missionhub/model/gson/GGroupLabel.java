@@ -1,5 +1,7 @@
 package com.missionhub.model.gson;
 
+import java.util.concurrent.Callable;
+
 import com.missionhub.application.Application;
 import com.missionhub.model.Group;
 import com.missionhub.model.GroupLabel;
@@ -22,51 +24,61 @@ public class GGroupLabel {
 	public int group_labelings_count;
 
 	/**
-	 * Saves the labels for a group Make sure to wrap this in a transaction for performance
+	 * Saves the labels for a group
 	 * 
 	 * @param labels
 	 * @param g
 	 */
-	public static void save(final GGroupLabel[] labels, final Group g) {
-		if (labels == null || labels.length == 0 || g == null) return;
+	public static void save(final GGroupLabel[] labels, final Group g, final boolean inTx) throws Exception {
 
-		final GroupLabelsDao glsd = Application.getDb().getGroupLabelsDao();
-		final GroupLabelDao gld = Application.getDb().getGroupLabelDao();
+		final Callable<Void> callable = new Callable<Void>() {
 
-		// delete the current group <--> group labels join
-		final LazyList<GroupLabels> delGroupLabels = glsd.queryBuilder().where(com.missionhub.model.GroupLabelsDao.Properties.Group_id.eq(g.getId())).listLazyUncached();
-		final CloseableListIterator<GroupLabels> itr = delGroupLabels.listIteratorAutoClose();
-		while (itr.hasNext()) {
-			glsd.delete(itr.next());
-		}
+			@Override
+			public Void call() throws Exception {
+				if (labels == null || labels.length == 0 || g == null) return null;
 
-		for (final GGroupLabel label : labels) {
-			if (label == null) continue;
+				final GroupLabelsDao glsd = Application.getDb().getGroupLabelsDao();
+				final GroupLabelDao gld = Application.getDb().getGroupLabelDao();
 
-			GroupLabel gl = gld.load(label.id);
+				// delete the current group <--> group labels join
+				final LazyList<GroupLabels> delGroupLabels = glsd.queryBuilder().where(com.missionhub.model.GroupLabelsDao.Properties.Group_id.eq(g.getId())).listLazyUncached();
+				final CloseableListIterator<GroupLabels> itr = delGroupLabels.listIteratorAutoClose();
+				while (itr.hasNext()) {
+					glsd.delete(itr.next());
+				}
 
-			if (gl == null) {
-				gl = new GroupLabel();
+				for (final GGroupLabel label : labels) {
+					if (label == null) continue;
+
+					GroupLabel gl = gld.load(label.id);
+
+					if (gl == null) {
+						gl = new GroupLabel();
+					}
+
+					// create/update label
+					if (!U.isNullEmptyNegative(label.id)) gl.setId(label.id);
+					if (!U.isNullEmptyNegative(label.organization_id)) gl.setOrganization_id(label.organization_id);
+					if (!U.isNullEmpty(label.name)) gl.setName(label.name);
+					if (!U.isNullEmpty(label.ancestry)) gl.setAncestry(label.ancestry);
+					if (!U.isNullEmpty(label.created_at)) gl.setCreated_at(U.parseUTC(label.created_at));
+					if (!U.isNullEmpty(label.updated_at)) gl.setUpdated_at(U.parseUTC(label.updated_at));
+					if (!U.isNullEmpty(label.group_labelings_count)) gl.setGroup_labelings_count(label.group_labelings_count);
+					gld.insertOrReplace(gl);
+
+					// a reference to group
+					final GroupLabels gls = new GroupLabels();
+					gls.setGroup_id(g.getId());
+					gls.setLabel_id(gl.getId());
+					glsd.insert(gls);
+				}
+				return null;
 			}
-
-			// create/update label
-			if (!U.isNullEmptyNegative(label.id)) gl.setId(label.id);
-			if (!U.isNullEmptyNegative(label.organization_id)) gl.setOrganization_id(label.organization_id);
-			if (!U.isNullEmpty(label.name)) gl.setName(label.name);
-			if (!U.isNullEmpty(label.ancestry)) gl.setAncestry(label.ancestry);
-			if (!U.isNullEmpty(label.created_at)) gl.setCreated_at(U.parseUTC(label.created_at));
-			if (!U.isNullEmpty(label.updated_at)) gl.setUpdated_at(U.parseUTC(label.updated_at));
-			if (!U.isNullEmpty(label.group_labelings_count)) gl.setGroup_labelings_count(label.group_labelings_count);
-			gld.insertOrReplace(gl);
-
-			// a reference to group
-			final GroupLabels gls = new GroupLabels();
-			gls.setGroup_id(g.getId());
-			gls.setLabel_id(gl.getId());
-			glsd.insert(gls);
+		};
+		if (!inTx) {
+			Application.getDb().callInTx(callable);
+		} else {
+			callable.call();
 		}
-
-		// TODO:
 	}
-
 }

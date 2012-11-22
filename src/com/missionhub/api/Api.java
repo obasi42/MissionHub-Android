@@ -16,6 +16,7 @@ import org.json.JSONObject;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.os.Build;
+import android.util.Log;
 import ch.boye.httpclientandroidlib.client.utils.URIBuilder;
 
 import com.google.common.collect.HashMultimap;
@@ -27,7 +28,6 @@ import com.missionhub.application.Session.NoAccountException;
 import com.missionhub.model.FollowupComment;
 import com.missionhub.model.Organization;
 import com.missionhub.model.Person;
-import com.missionhub.model.Rejoicable;
 import com.missionhub.model.gson.GAuthTokenDone;
 import com.missionhub.model.gson.GContact;
 import com.missionhub.model.gson.GMetaCommentTop;
@@ -206,7 +206,7 @@ public class Api {
 	 * @param personId
 	 * @return the person identified by the given personId
 	 */
-	public static FutureTask<Person> getPerson(final int personId) {
+	public static FutureTask<Person> getPerson(final long personId) {
 		final Callable<Person> callable = new Callable<Person>() {
 			@Override
 			public Person call() throws Exception {
@@ -214,7 +214,7 @@ public class Api {
 				final HttpResponse response = Api.getInstance().doRequest(HttpMethod.GET, url);
 				try {
 					final GMetaPeople gmp = Api.getInstance().gson.fromJson(response.responseBody, GMetaPeople.class);
-					final Person p = gmp.people[0].save().get();
+					final Person p = gmp.people[0].save(false);
 					return p;
 				} catch (final Exception e) {
 					throw new ApiException(e);
@@ -240,7 +240,7 @@ public class Api {
 				final HttpResponse response = Api.getInstance().doRequest(HttpMethod.GET, url);
 				try {
 					final GMetaPeople gmp = Api.getInstance().gson.fromJson(response.responseBody, GMetaPeople.class);
-					final Person p = gmp.people[0].save().get();
+					final Person p = gmp.people[0].save(false);
 					return p;
 				} catch (final Exception e) {
 					throw new ApiException(e);
@@ -268,7 +268,7 @@ public class Api {
 					final GMetaPeople gmp = Api.getInstance().gson.fromJson(response.responseBody, GMetaPeople.class);
 					final List<Person> persons = new ArrayList<Person>();
 					for (final GPerson gperson : gmp.people) {
-						persons.add(gperson.save().get());
+						persons.add(gperson.save(false));
 					}
 					return persons;
 				} catch (final Exception e) {
@@ -365,7 +365,7 @@ public class Api {
 				try {
 					final GMetaContact contacts = Api.getInstance().gson.fromJson(response.responseBody, GMetaContact.class);
 					// we should only have one result, so just return the first one
-					return contacts.contacts[0].save().get();
+					return contacts.contacts[0].save(false);
 				} catch (final Exception e) {
 					throw new ApiException(e);
 				}
@@ -393,7 +393,7 @@ public class Api {
 					final GMetaContact contacts = Api.getInstance().gson.fromJson(response.responseBody, GMetaContact.class);
 					final List<Person> persons = new ArrayList<Person>();
 					for (final GContact contact : contacts.contacts) {
-						persons.add(contact.save().get());
+						persons.add(contact.save(false));
 					}
 					return persons;
 				} catch (final Exception e) {
@@ -427,7 +427,7 @@ public class Api {
 				final HttpResponse response = Api.getInstance().doRequest(HttpMethod.GET, url, params);
 				try {
 					final GMetaContact contacts = Api.getInstance().gson.fromJson(response.responseBody, GMetaContact.class);
-					final List<Person> people = contacts.save().get();
+					final List<Person> people = contacts.save(false);
 					return people;
 				} catch (final Exception e) {
 					throw new ApiException(e);
@@ -637,7 +637,7 @@ public class Api {
 				try {
 					final GMetaCommentTop comments = Api.getInstance().gson.fromJson(response.responseBody, GMetaCommentTop.class);
 
-					return comments.save().get();
+					return comments.save(false);
 				} catch (final Exception e) {
 					throw new ApiException(e);
 				}
@@ -656,7 +656,7 @@ public class Api {
 	 * @param rejoicables
 	 * @return
 	 */
-	public static FutureTask<Boolean> addComment(final long personId, final FollowupComment comment, final List<Rejoicable> rejoicables) {
+	public static FutureTask<Boolean> addComment(final JsonComment comment) {
 		final Callable<Boolean> callable = new Callable<Boolean>() {
 			@Override
 			public Boolean call() throws Exception {
@@ -664,36 +664,36 @@ public class Api {
 
 				final JSONObject jsonComment = new JSONObject();
 
-				if (comment.getOrganization_id() <= 0) {
-					comment.setOrganization_id(Session.getInstance().getOrganizationId());
+				if (comment.organizationId < 0) {
+					comment.organizationId = Session.getInstance().getOrganizationId();
 				}
 
-				if (comment.getCommenter_id() <= 0) {
-					comment.setCommenter_id(Session.getInstance().getPerson().getId());
+				if (comment.commenterId < 0) {
+					comment.commenterId = Session.getInstance().getPerson().getId();
 				}
 
-				if (U.isNullEmpty(comment.getStatus())) {
-					comment.setStatus("");
+				if (U.isNullEmpty(comment.status)) {
+					comment.status = "";
 				}
 
-				if (U.isNullEmpty(comment.getComment())) {
-					comment.setComment("");
+				if (U.isNullEmpty(comment.comment)) {
+					comment.comment = "";
 				}
 
-				jsonComment.put("organization_id", comment.getOrganization_id());
-				jsonComment.put("contact_id", personId);
-				jsonComment.put("commenter_id", comment.getCommenter_id());
-				jsonComment.put("comment", comment.getComment());
-				jsonComment.put("status", comment.getStatus());
+				jsonComment.put("organization_id", comment.organizationId);
+				jsonComment.put("contact_id", comment.personId);
+				jsonComment.put("commenter_id", comment.commenterId);
+				jsonComment.put("comment", comment.comment);
+				jsonComment.put("status", comment.status);
 
 				final JSONArray jsonRejoicables = new JSONArray();
-				final Iterator<Rejoicable> itr = rejoicables.iterator();
-				while (itr.hasNext()) {
-					final String what = itr.next().getWhat();
-					if (U.isNullEmpty(what)) continue;
-					jsonRejoicables.put(what);
+				if (comment.rejoicables != null) {
+					for(String rejoicable : comment.rejoicables) {
+						if (U.isNullEmpty(rejoicable)) continue;
+						jsonRejoicables.put(rejoicable);
+					}
 				}
-
+				
 				final JSONObject json = new JSONObject();
 				json.put("followup_comment", jsonComment);
 				json.put("rejoicables", jsonRejoicables);
@@ -708,6 +708,24 @@ public class Api {
 		final FutureTask<Boolean> task = new FutureTask<Boolean>(callable);
 		Application.getExecutor().execute(task);
 		return task;
+	}
+	
+	public static class JsonComment {
+		
+		public long personId = -1;
+		public long commenterId = -1;
+		public long organizationId = -1;
+		public String comment;
+		public String status;
+		public List<String> rejoicables;
+		
+		public JsonComment(long personId, String comment, String status, List<String> rejoicables) {
+			this.personId = personId;
+			this.comment = comment;
+			this.status = status;
+			this.rejoicables = rejoicables;
+		}
+		
 	}
 
 	/**
@@ -770,7 +788,7 @@ public class Api {
 				final HttpResponse response = Api.getInstance().doRequest(HttpMethod.GET, url);
 				try {
 					final GMetaOrganizations gmo = Api.getInstance().gson.fromJson(response.responseBody, GMetaOrganizations.class);
-					return gmo.organizations[0].save().get();
+					return gmo.organizations[0].save(false);
 				} catch (final Exception e) {
 					throw new ApiException(e);
 				}
@@ -803,7 +821,7 @@ public class Api {
 				final HttpResponse response = Api.getInstance().doRequest(HttpMethod.GET, url);
 				try {
 					final GMetaOrganizations gmo = Api.getInstance().gson.fromJson(response.responseBody, GMetaOrganizations.class);
-					return gmo.save().get();
+					return gmo.save(false);
 				} catch (final Exception e) {
 					throw new ApiException(e);
 				}

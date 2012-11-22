@@ -78,7 +78,7 @@ public class InitActivity extends BaseActivity {
 			}
 		});
 
-		showLogin();
+		showLoginButton();
 
 		Application.registerEventSubscriber(this, SessionResumeSuccessEvent.class, SessionResumeErrorEvent.class, SessionResumeStatusEvent.class, SessionPickAccountEvent.class,
 				AccountPickedEvent.class);
@@ -102,7 +102,7 @@ public class InitActivity extends BaseActivity {
 		}
 	}
 
-	private void showLogin() {
+	private void showLoginButton() {
 		hideProgress();
 		mLogin.setVisibility(View.VISIBLE);
 	}
@@ -114,7 +114,7 @@ public class InitActivity extends BaseActivity {
 	}
 
 	public void onEventMainThread(final SessionResumeErrorEvent event) {
-		showLogin();
+		showLoginButton();
 
 		if (event.exception instanceof NoAccountException) {
 			return;
@@ -140,12 +140,12 @@ public class InitActivity extends BaseActivity {
 	}
 
 	public void onEventMainThread(final SessionPickAccountEvent event) {
-		showLogin();
+		showLoginButton();
 		showAccountPicker();
 	}
 
 	private void showAccountPicker() {
-		showLogin();
+		showLoginButton();
 		if (mAccountDialog == null) {
 			mAccountDialog = new PickAccountDialog();
 			mAccountDialog.setCancelable(false);
@@ -181,7 +181,7 @@ public class InitActivity extends BaseActivity {
 			if (resultCode == Activity.RESULT_OK) {
 				Session.getInstance().resumeSession();
 			} else {
-				showLogin();
+				showLoginButton();
 			}
 		}
 	}

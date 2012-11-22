@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="24.0dip"
+    android:background="@drawable/item_background" >
+
+    <ImageView
+        android:id="@+id/avatar"
+        android:layout_width="40.0dip"
+        android:layout_height="40.0dip"
+        android:layout_marginLeft="9.0dip"
+        android:layout_marginTop="9.0dip"
+        android:adjustViewBounds="true"
+        android:scaleType="fitXY"
+        android:src="@drawable/default_contact" />
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/avatar"
+        android:layout_toRightOf="@+id/avatar"
+        android:paddingLeft="5.0dip"
+        android:paddingRight="5.0dip"
+        android:paddingTop="2.0dip"
+        android:textColor="@color/dark_gray"
+        android:textSize="12.0sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/name"
+        android:layout_below="@+id/name"
+        android:paddingLeft="5.0dip"
+        android:paddingTop="4.0dip"
+        android:text="Nov 16 at 6:04 pm"
+        android:textColor="@color/gray"
+        android:textSize="10.0sp" />
+
+    <TextView
+        android:id="@+id/comment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/avatar"
+        android:layout_below="@+id/avatar"
+        android:paddingBottom="5.0dip"
+        android:paddingTop="5.0dip"
+        android:textSize="12.0sp" />
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/comment"
+        android:background="@color/light_gray" >
+
+        <TextView
+            android:id="@+id/status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:padding="5.0dip"
+            android:textColor="@color/dark_gray"
+            android:textSize="12.0sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:id="@+id/rejoiceables"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true" >
+
+            <ImageView
+                android:id="@+id/rejoice_christ"
+                android:layout_width="16.0dip"
+                android:layout_height="16.0dip"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="3.0dip"
+                android:layout_marginRight="3.0dip"
+                android:src="@drawable/ic_rejoice_christ" />
+
+            <ImageView
+                android:id="@+id/rejoice_gospel"
+                android:layout_width="16.0dip"
+                android:layout_height="16.0dip"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="3.0dip"
+                android:layout_marginRight="3.0dip"
+                android:src="@drawable/ic_rejoice_gospel" />
+
+            <ImageView
+                android:id="@+id/rejoice_convo"
+                android:layout_width="16.0dip"
+                android:layout_height="16.0dip"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="3.0dip"
+                android:layout_marginRight="3.0dip"
+                android:src="@drawable/ic_rejoice_convo" />
+        </LinearLayout>
+    </RelativeLayout>
+
+</RelativeLayout>

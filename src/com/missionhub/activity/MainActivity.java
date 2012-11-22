@@ -7,6 +7,7 @@ import com.WazaBe.HoloEverywhere.widget.Toast;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.Window;
 import com.missionhub.R;
+import com.missionhub.application.Session;
 import com.missionhub.application.Session.SessionInvalidTokenEvent;
 import com.missionhub.application.Session.SessionInvalidatedEvent;
 import com.missionhub.fragment.MainFragment;
@@ -51,6 +52,12 @@ public class MainActivity extends BaseAuthenticatedMenuActivity {
 			mMenuFragment = new MainMenuFragment();
 			setFragment(mFragment);
 			setMenuFragment(mMenuFragment);
+		}
+		
+		if (savedInstanceState == null) {
+			Intent intent = new Intent(this, ContactActivity.class);
+			intent.putExtra("personId", Session.getInstance().getPersonId());
+			startActivity(intent);
 		}
 	}
 

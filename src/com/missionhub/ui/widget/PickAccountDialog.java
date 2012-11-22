@@ -55,7 +55,7 @@ public class PickAccountDialog extends DialogFragment implements OnItemClickList
 		}
 
 		@Override
-		public View getSupportView(final int position, final View convertView, final ViewGroup parent) {
+		public View getView(final int position, final View convertView, final ViewGroup parent) {
 			final Object item = getItem(position);
 			View view = convertView;
 
@@ -94,8 +94,8 @@ public class PickAccountDialog extends DialogFragment implements OnItemClickList
 		}
 
 		@Override
-		public View getSupportDropDownView(final int position, final View convertView, final ViewGroup parent) {
-			return getSupportView(position, convertView, parent);
+		public View getDropDownView(final int position, final View convertView, final ViewGroup parent) {
+			return getView(position, convertView, parent);
 		}
 
 		public class ViewHolder {

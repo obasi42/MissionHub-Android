@@ -10,6 +10,7 @@ import roboguice.inject.InjectView;
 import roboguice.util.RoboAsyncTask;
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -45,6 +46,7 @@ import com.missionhub.util.U;
 /**
  * Activity which displays login screen to the user.
  */
+@SuppressLint("SetJavaScriptEnabled")
 @ContentView(R.layout.activity_authenticator)
 public class AuthenticatorActivity extends RoboSherlockAccountAuthenticatorActivity {
 
@@ -261,9 +263,8 @@ public class AuthenticatorActivity extends RoboSherlockAccountAuthenticatorActiv
 				// request the access token from the code
 				final GAuthTokenDone done = Api.getAccessToken(code).get();
 
-				// save the person to the local database for access later. call .get to ensure the save process has
-				// finished.
-				done.person.save().get();
+				// save the person to the local database for access later.
+				done.person.save(false);
 
 				// return the done object
 				return done;

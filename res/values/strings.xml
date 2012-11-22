@@ -10,6 +10,12 @@
     <string name="action_cancel">Cancel</string>
     <string name="action_retry">Retry</string>
     <string name="action_restart">Restart</string>
+    <string name="action_comment">Comment</string>
+    <string name="action_refresh">Refresh</string>
+    <string name="action_promote">Promote to Leader</string>
+    <string name="action_demote">Demote to Contact</string>
+    <string name="action_assign">Assign</string>
+    <string name="action_delete">Delete</string>
     
     <!-- Main Menu -->
     <string name="menu_dashboard">Dashboard</string>
@@ -29,6 +35,20 @@
     <string name="my_contacts_all">All</string>
     <string name="my_contacts_in_progress">In-Progress</string>
     <string name="my_contacts_completed">Completed</string>
+    
+    <!-- Contact -->
+    <string name="contact_activity_title">Contact</string>
+    <string name="contact_nav_info">Information</string>
+    <string name="contact_nav_surveys">Surveys</string>
+    <string name="contact_info_expand">Show More</string>
+    <string name="contact_info_collapse">Show Less</string>
+    <string name="contact_add_comment">Add a comment</string>
+    <string name="contact_comment_actions">Comment Actions</string>
+    <string name="contact_comment_deleted">Comment deleted</string>
+    <string name="contact_cannot_delete_comment">Could not delete comment.</string>
+    <string name="contact_cannot_comment">Please set a comment, status, or rejoicable before saving.</string>
+    <string name="contact_comment_saved">Comment saved</string>
+    <string name="contact_comment_failed_to_save">Failed to save comment</string>
     
     <!-- About Activity -->
     <string name="about_activity_title">About MissionHub</string>
@@ -85,5 +105,36 @@
     <string name="intent_helper_no_sms">No sms client available.</string>
     <string name="intent_helper_send_email">Send Email</string>
     <string name="intent_helper_no_email">No email client available.</string>
+    <string name="intent_helper_no_facebook">Could not open Facebook profile.</string>
+    
+    <!--  Status Labels -->
+    <string name="rejoice_spiritual_conversation">Spiritual Conversation</string>
+    <string name="rejoice_prayed_to_receive">Prayed To Receive Christ</string>
+    <string name="rejoice_gospel_presentation">Gospel Presentation</string>  
+    <string name="status_uncontacted">Uncontacted</string>
+    <string name="status_attempted_contact">Attempted Contact</string>
+    <string name="status_contacted">Contacted</string>
+    <string name="status_completed">Completed</string>
+    <string name="status_do_not_contact">Do Not Contact</string>
+    
+    <!-- Rejoicibles -->
+    <string name="rejoicable_christ">Prayed To Receive Christ </string>
+    <string name="rejoicable_gospel">Gospel Presentation</string>
+    <string name="rejoicable_convo">Spiritual Conversation</string>
+    
+    <!-- Time Ago -->
+    <string name="time_ago_hour">about an hour</string>
+    <string name="time_ago_hours">{0} hours</string>
+    <string name="time_ago_minute">about a minute</string>
+    <string name="time_ago_minutes">{0} minutes</string>
+    <string name="time_ago_seconds">less than a minute</string>
+    <string name="time_ago_month">about a month</string>
+    <string name="time_ago_months">{0} months</string>
+    <string name="time_ago_day">a day</string>
+    <string name="time_ago_days">{0} days</string>
+    <string name="time_ago_year">about a year</string>
+    <string name="time_ago_years">{0} years</string>
+    <string name="time_ago_ago">ago</string>
+    <string name="time_ago_from_now">from now</string>
     
 </resources>

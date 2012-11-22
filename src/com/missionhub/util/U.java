@@ -2,6 +2,7 @@ package com.missionhub.util;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -9,12 +10,14 @@ import java.util.Iterator;
 import java.util.List;
 
 import android.content.Context;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.util.TypedValue;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.missionhub.R;
+import com.missionhub.application.Application;
 
 public class U {
 
@@ -170,5 +173,64 @@ public class U {
 		sherlockActivity.getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 		sherlockActivity.getSupportActionBar().setSubtitle(null);
 		sherlockActivity.getSupportActionBar().setTitle("MissionHub");
+	}
+
+	public static List<String> getStatuses() {
+		final List<String> s = new ArrayList<String>();
+		s.add("uncontacted");
+		s.add("attempted_contact");
+		s.add("contacted");
+		s.add("completed");
+		s.add("do_not_contact");
+		return s;
+	}
+
+	public static CharSequence translateStatus(final String status) {
+		if (status.equalsIgnoreCase("uncontacted")) {
+			return getString(R.string.status_uncontacted);
+		} else if (status.equalsIgnoreCase("attempted_contact")) {
+			return getString(R.string.status_attempted_contact);
+		} else if (status.equalsIgnoreCase("contacted")) {
+			return getString(R.string.status_contacted);
+		} else if (status.equalsIgnoreCase("completed")) {
+			return getString(R.string.status_completed);
+		} else if (status.equalsIgnoreCase("do_not_contact")) {
+			return getString(R.string.status_do_not_contact);
+		}
+		return "";
+	}
+
+	private static String getString(final int resource) {
+		return Application.getContext().getString(resource);
+	}
+
+	public static String formatPhoneNumber(String phoneNumber) {
+		String fNum = null;
+		phoneNumber = phoneNumber.replaceAll("[^0-9]", "");
+
+		if (11 == phoneNumber.length()) {
+			fNum = "+" + phoneNumber.substring(0, 1);
+			fNum += " (" + phoneNumber.substring(1, 4) + ")";
+			fNum += " " + phoneNumber.substring(4, 7);
+			fNum += "-" + phoneNumber.substring(7, 11);
+		} else if (10 == phoneNumber.length()) {
+			fNum = "(" + phoneNumber.substring(0, 3) + ")";
+			fNum += " " + phoneNumber.substring(3, 6);
+			fNum += "-" + phoneNumber.substring(6, 10);
+		} else if (7 == phoneNumber.length()) {
+			fNum = phoneNumber.substring(0, 3);
+			fNum += "-" + phoneNumber.substring(4, 7);
+		} else {
+			return "Invalid Phone Number.";
+		}
+
+		return fNum;
+	}
+
+	public static boolean hasPhoneAbility(final Context ctx) {
+		final TelephonyManager telephonyManager = (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
+		if (telephonyManager.getPhoneType() == TelephonyManager.PHONE_TYPE_NONE) return false;
+
+		return true;
 	}
 }
