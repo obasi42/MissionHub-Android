@@ -92,8 +92,10 @@ public abstract class ObjectArrayAdapter extends BaseAdapter {
 		return mTypes.indexOf(object.getClass());
 	}
 
+	@Override
 	public abstract View getView(int position, View convertView, ViewGroup parent);
 
+	@Override
 	public abstract View getDropDownView(int position, View convertView, ViewGroup parent);
 
 	public interface ItemIdProvider {

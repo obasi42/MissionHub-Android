@@ -16,6 +16,7 @@
     <string name="action_demote">Demote to Contact</string>
     <string name="action_assign">Assign</string>
     <string name="action_delete">Delete</string>
+    <string name="action_no_permissions">You do not have the required permissions to perform this action.</string>
     
     <!-- Main Menu -->
     <string name="menu_dashboard">Dashboard</string>
@@ -49,6 +50,15 @@
     <string name="contact_cannot_comment">Please set a comment, status, or rejoicable before saving.</string>
     <string name="contact_comment_saved">Comment saved</string>
     <string name="contact_comment_failed_to_save">Failed to save comment</string>
+    <string name="contact_already_contact">This person is already a contact</string>
+    <string name="contact_already_leader">This person is already a leader</string>
+    <string name="contact_role_changed">Role changed</string>
+    <string name="contact_role_failed">Failed to change role</string>
+    <string name="contact_label_personal">Personal Info</string>
+    <string name="contact_label_birthday">Birthday</string>
+    <string name="contact_label_gender">Gender</string>
+    <string name="contact_label_links">Links</string>
+    <string name="contact_label_address">Address</string>       
     
     <!-- About Activity -->
     <string name="about_activity_title">About MissionHub</string>
@@ -136,5 +146,8 @@
     <string name="time_ago_years">{0} years</string>
     <string name="time_ago_ago">ago</string>
     <string name="time_ago_from_now">from now</string>
+    
+    <!-- Proper -->
+   	<string name="facebook">Facebook</string>
     
 </resources>

@@ -85,14 +85,14 @@ public class ContactFragment extends BaseFragment implements OnNavigationListene
 	@Override
 	public void onAttach(final Activity activity) {
 		super.onAttach(activity);
-		
-		Person oldPerson = mPerson;
-		
+
+		final Person oldPerson = mPerson;
+
 		if (getArguments() != null) {
 			mPersonId = getArguments().getLong("personId", -1);
 			mPerson = Application.getDb().getPersonDao().load(mPersonId);
 		}
-		
+
 		if (mPersonId < 0 || mPerson == null) {
 			if (mContactTask != null) {
 				mContactTask.cancel(true);
@@ -100,7 +100,7 @@ public class ContactFragment extends BaseFragment implements OnNavigationListene
 			Toast.makeText(getActivity(), "No person provided for this fragment.", Toast.LENGTH_SHORT).show();
 			activity.finish();
 		}
-		
+
 		if (oldPerson == null) {
 			refreshContact();
 		}
@@ -112,7 +112,7 @@ public class ContactFragment extends BaseFragment implements OnNavigationListene
 
 		// create the refreshing actionbar view
 		mRefreshingView = (ImageView) inflater.inflate(R.layout.refresh_icon, null);
-		
+
 		mPager = (LockedViewPager) view.findViewById(R.id.pager);
 
 		if (mAdapter == null) {
@@ -202,12 +202,12 @@ public class ContactFragment extends BaseFragment implements OnNavigationListene
 		if (mSurveysFragment != null && mPage == 1) {
 			mSurveysFragment.onCreateOptionsMenu(menu, inflater);
 		}
-		
+
 		mRefreshItem = menu.add(Menu.NONE, R.id.menu_item_refresh, Menu.NONE, R.string.action_refresh).setIcon(R.drawable.ic_action_refresh)
 				.setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
-		
+
 		updateRefreshIcon();
-		
+
 		super.onCreateOptionsMenu(menu, inflater);
 	}
 
@@ -272,14 +272,14 @@ public class ContactFragment extends BaseFragment implements OnNavigationListene
 		updateRefreshIcon();
 		Application.getExecutor().execute(mContactTask.future());
 	}
-	
+
 	public boolean isInfoWorking() {
 		if (mInfoFragment != null) {
 			return mInfoFragment.isWorking();
 		}
 		return false;
 	}
-	
+
 	public boolean isSurveysWorking() {
 		if (mSurveysFragment != null) {
 			return mSurveysFragment.isWorking();
@@ -287,7 +287,6 @@ public class ContactFragment extends BaseFragment implements OnNavigationListene
 		return false;
 	}
 
-	
 	/**
 	 * Updates the refresh icon based on the tasks
 	 */

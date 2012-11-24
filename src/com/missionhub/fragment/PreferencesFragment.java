@@ -144,7 +144,11 @@ public class PreferencesFragment extends BaseFragment {
 		@Override
 		public void onItemSelected(final AdapterView<?> spinner, final View view, final int position, final long id) {
 			final OrganizationItem item = (OrganizationItem) spinner.getItemAtPosition(position);
-			Session.getInstance().setOrganizationId(item.organization.getId());
+			try {
+				Session.getInstance().setOrganizationId(item.organization.getId());
+			} catch (final NoPersonException e) {
+				/** ignore, shouldn't be possible to get here */
+			}
 		}
 
 		@Override
@@ -165,17 +169,21 @@ public class PreferencesFragment extends BaseFragment {
 		mOrganizationsAdapter.setNotifyOnChange(false);
 		mOrganizationsAdapter.clear();
 
-		rebuildOrganizationListR(Session.getInstance().getOrganizationHierarchy(), 0);
+		try {
+			rebuildOrganizationListR(Session.getInstance().getPerson().getOrganizationHierarchy(), 0);
+		} catch (final NoPersonException e) {
+			/** shouldn't be possible to get here */
+		}
 
 		mOrganizationsAdapter.notifyDataSetChanged();
 		mOrganizations.setSelection(mDefaultSpinnerIndex);
 	}
 
-	private synchronized void rebuildOrganizationListR(final TreeDataStructure<Long> tree, final int depth) {
+	private synchronized void rebuildOrganizationListR(final TreeDataStructure<Long> tree, final int depth) throws NoPersonException {
 		for (final TreeDataStructure<Long> subTree : tree.getSubTrees()) {
 			final long organizationId = subTree.getHead();
 			final Organization org = Application.getDb().getOrganizationDao().load(organizationId);
-			if (org != null && Session.getInstance().isAdminOrLeader(org.getId())) {
+			if (org != null && Session.getInstance().getPerson().isAdminOrLeader(org.getId())) {
 				mOrganizationsAdapter.add(new OrganizationItem(org, depth));
 				if (org.getId() == Session.getInstance().getOrganizationId()) {
 					mDefaultSpinnerIndex = mOrganizationsAdapter.getCount() - 1;

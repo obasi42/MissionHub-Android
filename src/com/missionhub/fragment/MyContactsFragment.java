@@ -101,7 +101,7 @@ public class MyContactsFragment extends MainFragment {
 		final View v = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_my_contacts, null);
 		mPager = (ViewPager) v.findViewById(R.id.pager);
 		mPager.setOffscreenPageLimit(2);
-		//mPager.setAdapter(mAdapter);
+		// mPager.setAdapter(mAdapter);
 		mPager.setCurrentItem(1);
 		return v;
 	}

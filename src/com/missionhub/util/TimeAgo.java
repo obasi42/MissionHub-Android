@@ -31,16 +31,14 @@ import com.missionhub.R;
 import com.missionhub.application.Application;
 
 /**
- *
- * Time ago class that converts long millisecond and {@link Date} objects to
- * time ago/from now {@link String} objects.
+ * 
+ * Time ago class that converts long millisecond and {@link Date} objects to time ago/from now {@link String} objects.
  * <p>
- * This class uses the messages from {@link Messages} by default but those can
- * be changed after creation through one of the setter methods for a specified
- * time string.
+ * This class uses the messages from {@link Messages} by default but those can be changed after creation through one of
+ * the setter methods for a specified time string.
  */
 public class TimeAgo {
-	
+
 	private String prefixAgo = null;
 
 	private String prefixFromNow = null;
@@ -71,10 +69,9 @@ public class TimeAgo {
 
 	private String years = Application.getContext().getString(R.string.time_ago_years);
 
-	
 	/**
 	 * Get time until specified date
-	 *
+	 * 
 	 * @param date
 	 * @return time string
 	 */
@@ -84,7 +81,7 @@ public class TimeAgo {
 
 	/**
 	 * Get time ago that date occurred
-	 *
+	 * 
 	 * @param date
 	 * @return time string
 	 */
@@ -94,7 +91,7 @@ public class TimeAgo {
 
 	/**
 	 * Get time until specified milliseconds date
-	 *
+	 * 
 	 * @param millis
 	 * @return time string
 	 */
@@ -104,7 +101,7 @@ public class TimeAgo {
 
 	/**
 	 * Get time ago that milliseconds date occurred
-	 *
+	 * 
 	 * @param millis
 	 * @return time string
 	 */
@@ -114,7 +111,7 @@ public class TimeAgo {
 
 	/**
 	 * Get time string for milliseconds distance
-	 *
+	 * 
 	 * @param distanceMillis
 	 * @param allowFuture
 	 * @return time string
@@ -138,26 +135,16 @@ public class TimeAgo {
 		final double years = days / 365;
 
 		final String time;
-		if (seconds < 45)
-			time = this.seconds;
-		else if (seconds < 90)
-			time = this.minute;
-		else if (minutes < 45)
-			time = MessageFormat.format(this.minutes, Math.round(minutes));
-		else if (minutes < 90)
-			time = this.hour;
-		else if (hours < 24)
-			time = MessageFormat.format(this.hours, Math.round(hours));
-		else if (hours < 48)
-			time = this.day;
-		else if (days < 30)
-			time = MessageFormat.format(this.days, Math.floor(days));
-		else if (days < 60)
-			time = this.month;
-		else if (days < 365)
-			time = MessageFormat.format(this.months, Math.floor(days / 30));
-		else if (years < 2)
-			time = this.year;
+		if (seconds < 45) time = this.seconds;
+		else if (seconds < 90) time = this.minute;
+		else if (minutes < 45) time = MessageFormat.format(this.minutes, Math.round(minutes));
+		else if (minutes < 90) time = this.hour;
+		else if (hours < 24) time = MessageFormat.format(this.hours, Math.round(hours));
+		else if (hours < 48) time = this.day;
+		else if (days < 30) time = MessageFormat.format(this.days, Math.floor(days));
+		else if (days < 60) time = this.month;
+		else if (days < 365) time = MessageFormat.format(this.months, Math.floor(days / 30));
+		else if (years < 2) time = this.year;
 		else
 			time = MessageFormat.format(this.years, Math.floor(years));
 
@@ -165,22 +152,19 @@ public class TimeAgo {
 	}
 
 	/**
-	 * Join time string with prefix and suffix. The prefix and suffix are only
-	 * joined with the time if they are non-null and non-empty
-	 *
+	 * Join time string with prefix and suffix. The prefix and suffix are only joined with the time if they are non-null
+	 * and non-empty
+	 * 
 	 * @param prefix
 	 * @param time
 	 * @param suffix
 	 * @return non-null joined string
 	 */
-	public String join(final String prefix, final String time,
-			final String suffix) {
-		StringBuilder joined = new StringBuilder();
-		if (prefix != null && prefix.length() > 0)
-			joined.append(prefix).append(' ');
+	public String join(final String prefix, final String time, final String suffix) {
+		final StringBuilder joined = new StringBuilder();
+		if (prefix != null && prefix.length() > 0) joined.append(prefix).append(' ');
 		joined.append(time);
-		if (suffix != null && suffix.length() > 0)
-			joined.append(' ').append(suffix);
+		if (suffix != null && suffix.length() > 0) joined.append(' ').append(suffix);
 		return joined.toString();
 	}
 
@@ -400,7 +384,7 @@ public class TimeAgo {
 	 *            months value
 	 * @return this instance
 	 */
-	public TimeAgo setMonths(String months) {
+	public TimeAgo setMonths(final String months) {
 		this.months = months;
 		return this;
 	}
@@ -417,7 +401,7 @@ public class TimeAgo {
 	 *            year value
 	 * @return this instance
 	 */
-	public TimeAgo setYear(String year) {
+	public TimeAgo setYear(final String year) {
 		this.year = year;
 		return this;
 	}
@@ -434,7 +418,7 @@ public class TimeAgo {
 	 *            years value
 	 * @return this instance
 	 */
-	public TimeAgo setYears(String years) {
+	public TimeAgo setYears(final String years) {
 		this.years = years;
 		return this;
 	}

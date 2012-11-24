@@ -15,7 +15,6 @@ import android.widget.TextView;
 import com.missionhub.R;
 import com.missionhub.activity.MainActivity;
 import com.missionhub.application.Application;
-import com.missionhub.application.ObjectStore;
 import com.missionhub.application.Session;
 import com.missionhub.ui.ObjectArrayAdapter;
 import com.missionhub.ui.ObjectArrayAdapter.ItemIdProvider;
@@ -45,13 +44,8 @@ public class MainMenuFragment extends BaseFragment implements OnItemClickListene
 	public void onViewCreated(final View view, final Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 
-		if (savedInstanceState != null) {
-			try {
-				mAdapter = (MainMenuAdapter) ObjectStore.getInstance().retrieveObject(savedInstanceState.getString("mAdapter"));
-			} catch (final Exception e) { /* ignore */}
-		}
 		if (mAdapter == null) {
-			mAdapter = new MainMenuAdapter();
+			mAdapter = new MainMenuAdapter(getActivity());
 
 			mAdapter.add(new MainMenuItem(R.id.menu_item_dashboard, R.string.menu_dashboard));
 			mAdapter.add(new MainMenuItem(R.id.menu_item_my_contacts, R.string.menu_my_contacts, R.drawable.ic_main_menu_card));
@@ -66,18 +60,12 @@ public class MainMenuFragment extends BaseFragment implements OnItemClickListene
 			mAdapter.add(new MainMenuDivider(R.string.menu_div_missionhub));
 			mAdapter.add(new MainMenuItem(R.id.menu_item_about, R.string.menu_about));
 			mAdapter.add(new MainMenuItem(R.id.menu_item_help, R.string.menu_help_center));
+		} else {
+			mAdapter.setContext(getActivity());
 		}
-		mAdapter.setContext(getActivity());
 
 		mListView.setAdapter(mAdapter);
 		mListView.setOnItemClickListener(this);
-	}
-
-	@Override
-	public void onSaveInstanceState(final Bundle outState) {
-		super.onSaveInstanceState(outState);
-		mAdapter.setContext(null);
-		outState.putString("mAdapter", ObjectStore.getInstance().storeObject(mAdapter));
 	}
 
 	/**
@@ -85,8 +73,8 @@ public class MainMenuFragment extends BaseFragment implements OnItemClickListene
 	 */
 	public class MainMenuAdapter extends ObjectArrayAdapter {
 
-		public MainMenuAdapter() {
-			super(MainMenuFragment.this.getActivity());
+		public MainMenuAdapter(final Context context) {
+			super(context);
 		}
 
 		@Override

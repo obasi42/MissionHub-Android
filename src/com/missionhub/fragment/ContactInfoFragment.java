@@ -15,14 +15,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -74,6 +71,9 @@ public class ContactInfoFragment extends BaseFragment {
 	/** task used to save comment/status change */
 	private RoboAsyncTask<Boolean> mSaveTask;
 
+	/** task used to change roles (promote/demote) */
+	private RoboAsyncTask<Boolean> mRoleTask;
+
 	/** the progress item */
 	private final ProgressItem mProgressItem = new ProgressItem();
 
@@ -119,6 +119,18 @@ public class ContactInfoFragment extends BaseFragment {
 	/** the more info collapse/expand text */
 	private TextView mHeaderMoreText;
 
+	/** the more info gender */
+	private View mInfoGender;
+
+	/** the more info birthday */
+	private View mInfoBirthday;
+
+	/** the more info address */
+	private View mInfoAddress;
+
+	/** the more info facebook link */
+	private View mInfoFacebook;
+
 	/** the comment data holder */
 	private final CommentData mComment = new CommentData();
 
@@ -145,7 +157,7 @@ public class ContactInfoFragment extends BaseFragment {
 
 	/** the dialog usesed for comment actions */
 	private AlertDialog mCommentActionDialog;
-	
+
 	/** true when layout is completed */
 	private boolean mLayoutComplete = false;
 
@@ -173,7 +185,7 @@ public class ContactInfoFragment extends BaseFragment {
 		final Bundle arguments = getArguments();
 		mPersonId = arguments.getLong("personId", -1);
 		mPerson = Application.getDb().getPersonDao().load(mPersonId);
-		
+
 		refreshComments();
 	}
 
@@ -204,9 +216,9 @@ public class ContactInfoFragment extends BaseFragment {
 
 		// set the comment long click listener
 		mListView.setOnItemLongClickListener(new CommentLongClickListener());
-		
+
 		mLayoutComplete = true;
-		
+
 		// sets the data in the header and add comment box
 		notifyPersonUpdated();
 
@@ -214,10 +226,10 @@ public class ContactInfoFragment extends BaseFragment {
 		if (mAdapter.isEmpty()) {
 			notifyCommentsUpdated();
 		}
-		
+
 		return view;
 	}
-	
+
 	/**
 	 * Sets the header view variables and sets up listeners
 	 * 
@@ -245,6 +257,22 @@ public class ContactInfoFragment extends BaseFragment {
 					mMoreShowing = true;
 				}
 				updateMoreShowing();
+			}
+		});
+		mInfoGender = mHeaderMore.findViewById(R.id.gender);
+		mInfoBirthday = mHeaderMore.findViewById(R.id.birthday);
+		mInfoAddress = mHeaderMore.findViewById(R.id.address);
+		mInfoAddress.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+				openAddress();
+			}
+		});
+		mInfoFacebook = mHeaderMore.findViewById(R.id.facebook);
+		mInfoFacebook.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+				IntentHelper.openFacebookProfile(Long.parseLong(mPerson.getFb_id()));
 			}
 		});
 	}
@@ -290,7 +318,7 @@ public class ContactInfoFragment extends BaseFragment {
 		});
 		mCommentStatus = (Spinner) view.findViewById(R.id.status);
 		if (mCommentStatusAdapter == null) {
-			mCommentStatusAdapter = new CommentStatusAdapter(getActivity(), mPerson);
+			mCommentStatusAdapter = new CommentStatusAdapter(getActivity());
 			for (final String status : U.getStatuses()) {
 				mCommentStatusAdapter.add(status);
 			}
@@ -310,7 +338,7 @@ public class ContactInfoFragment extends BaseFragment {
 			Toast.makeText(Application.getContext(), description, Toast.LENGTH_SHORT).show();
 		}
 	}
-	
+
 	@Override
 	public void onResume() {
 		super.onResume();
@@ -320,9 +348,9 @@ public class ContactInfoFragment extends BaseFragment {
 	@Override
 	public void onDestroyView() {
 		mLayoutComplete = false;
-		
+
 		updateCommentStateData();
-		
+
 		// avoid leaking context on rotation
 		if (mCommentActionDialog != null && mCommentActionDialog.isShowing()) {
 			mCommentActionDialog.dismiss();
@@ -432,28 +460,40 @@ public class ContactInfoFragment extends BaseFragment {
 			mHeaderContainerEmail.setVisibility(View.GONE);
 		}
 
-		// generate the more info view
-		final LinearLayout layout = new LinearLayout(getActivity());
-		layout.setOrientation(LinearLayout.VERTICAL);
+		// set the "more info" view
+		if (!U.isNullEmpty(mPerson.getGender())) {
+			((TextView) mInfoGender.findViewById(android.R.id.text1)).setText(mPerson.getGender());
+			mInfoGender.setVisibility(View.VISIBLE);
+		} else {
+			mInfoGender.setVisibility(View.GONE);
+		}
 
-		final TextView tv1 = new TextView(getActivity());
-		tv1.setText("TEST1");
-		final TextView tv2 = new TextView(getActivity());
-		tv2.setText("TEST2");
-		final TextView tv3 = new TextView(getActivity());
-		tv3.setText("TEST3");
-		layout.addView(tv1);
-		layout.addView(tv2);
-		layout.addView(tv3);
+		if (!U.isNullEmpty(mPerson.getBirthday())) {
 
-		// swap the more views
-		mHeaderMore.removeAllViews();
-		mHeaderMore.addView(layout);
+			try {
+				final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+				final Date dateStr = formatter.parse(mPerson.getBirthday());
+				final SimpleDateFormat formatter2 = new SimpleDateFormat("MMMM dd", Locale.US);
+				((TextView) mInfoBirthday.findViewById(android.R.id.text1)).setText(formatter2.format(dateStr));
+			} catch (final Exception e) {
+				((TextView) mInfoBirthday.findViewById(android.R.id.text1)).setText(mPerson.getBirthday());
+			}
+			mInfoBirthday.setVisibility(View.VISIBLE);
+		} else {
+			mInfoBirthday.setVisibility(View.GONE);
+		}
+
+		mInfoBirthday.findViewById(R.id.divider).setVisibility(View.GONE);
+		mInfoAddress.setVisibility(View.GONE);
+		mInfoAddress.findViewById(R.id.divider).setVisibility(View.GONE);
 
 		updateMoreShowing();
 
 		// the comment view
 		updateCommentBox();
+
+		// updates the promotion/demotion menu item
+		updatePromoteDemote();
 	}
 
 	/**
@@ -487,9 +527,11 @@ public class ContactInfoFragment extends BaseFragment {
 	private void updateMoreShowing() {
 		if (mMoreShowing) {
 			mHeaderMore.setVisibility(View.VISIBLE);
+			mHeaderMoreText.setText(R.string.contact_info_collapse);
 			mHeaderMoreText.setCompoundDrawablesWithIntrinsicBounds(null, null, DrawableCache.getDrawable(R.drawable.ic_action_collapse), null);
 		} else {
 			mHeaderMore.setVisibility(View.GONE);
+			mHeaderMoreText.setText(R.string.contact_info_expand);
 			mHeaderMoreText.setCompoundDrawablesWithIntrinsicBounds(null, null, DrawableCache.getDrawable(R.drawable.ic_action_expand), null);
 		}
 	}
@@ -683,6 +725,7 @@ public class ContactInfoFragment extends BaseFragment {
 	public void onCreateOptionsMenu(final Menu menu, final MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
 		mPromoteItem = menu.add(Menu.NONE, R.id.menu_item_permissions, Menu.NONE, R.string.action_promote).setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_NEVER);
+		updatePromoteDemote();
 	}
 
 	@Override
@@ -691,6 +734,9 @@ public class ContactInfoFragment extends BaseFragment {
 		case R.id.menu_item_refresh:
 			refreshContact();
 			refreshComments();
+			return true;
+		case R.id.menu_item_permissions:
+			togglePromoteDemote();
 			return true;
 		}
 
@@ -750,17 +796,17 @@ public class ContactInfoFragment extends BaseFragment {
 		} else {
 			mAdapter.remove(mProgressItem);
 		}
-		
+
 		getParent().updateRefreshIcon();
 	}
-	
+
 	/**
 	 * Called by the parent fragment to see if this frament is busy
 	 */
 	public boolean isWorking() {
-		return mCommentTask != null || mSaveTask != null;
+		return mCommentTask != null || mSaveTask != null || mRoleTask != null;
 	}
-	
+
 	/**
 	 * The long click listener for the comment list that generates context menu like dialogs.
 	 */
@@ -933,11 +979,8 @@ public class ContactInfoFragment extends BaseFragment {
 	 */
 	private static class CommentStatusAdapter extends ObjectArrayAdapter {
 
-		private Person mPerson;
-
-		public CommentStatusAdapter(final Context context, final Person person) {
+		public CommentStatusAdapter(final Context context) {
 			super(context);
-			mPerson = person;
 		}
 
 		@Override
@@ -1049,8 +1092,130 @@ public class ContactInfoFragment extends BaseFragment {
 			rejoicables = new ArrayList<String>();
 		}
 	}
-	
+
 	public ContactFragment getParent() {
 		return (ContactFragment) getParentFragment();
 	}
+
+	/**
+	 * Toggles the contact's role between leader and contact
+	 */
+	private void togglePromoteDemote() {
+		if (mPerson.isLeader(Session.getInstance().getOrganizationId())) {
+			demotePerson();
+		} else {
+			promotePerson();
+		}
+	}
+
+	/**
+	 * Promotes the current person
+	 */
+	private void promotePerson() {
+		if (!Session.getInstance().isAdmin() || mPerson.isAdmin(Session.getInstance().getOrganizationId())) {
+			Toast.makeText(getActivity(), R.string.action_no_permissions, Toast.LENGTH_LONG).show();
+			return;
+		}
+		if (mPerson.isAdminOrLeader(Session.getInstance().getOrganizationId())) {
+			Toast.makeText(getActivity(), R.string.contact_already_leader, Toast.LENGTH_LONG).show();
+			return;
+		}
+
+		changeRole(Person.LABEL_LEADER);
+	}
+
+	/**
+	 * Demotes a the current person
+	 */
+	private void demotePerson() {
+		if (!Session.getInstance().isAdmin() || mPerson.isAdmin(Session.getInstance().getOrganizationId())) {
+			Toast.makeText(getActivity(), R.string.action_no_permissions, Toast.LENGTH_LONG).show();
+			return;
+		}
+		if (!mPerson.isLeader(Session.getInstance().getOrganizationId()) && !mPerson.isAdmin(Session.getInstance().getOrganizationId())) {
+			Toast.makeText(getActivity(), R.string.contact_already_contact, Toast.LENGTH_LONG).show();
+			return;
+		}
+
+		changeRole(Person.LABEL_CONTACT);
+	}
+
+	/**
+	 * Updates the promotion menu item
+	 */
+	public void updatePromoteDemote() {
+		if (mPerson == null || mPromoteItem == null) return;
+
+		if (Session.getInstance().isAdmin() && !mPerson.isAdmin(Session.getInstance().getOrganizationId())) {
+			if (mPerson.isLeader(Session.getInstance().getOrganizationId())) {
+				mPromoteItem.setTitle(R.string.action_demote);
+			} else {
+				mPromoteItem.setTitle(R.string.action_promote);
+			}
+			mPromoteItem.setVisible(true);
+			mPromoteItem.setEnabled(true);
+		} else {
+			mPromoteItem.setVisible(false);
+		}
+	}
+
+	/**
+	 * Changes a contact's role
+	 * 
+	 * @param role
+	 */
+	private void changeRole(final String role) {
+		if (mRoleTask != null) {
+			mRoleTask.cancel(true);
+		}
+
+		if (mPromoteItem != null) {
+			mPromoteItem.setEnabled(false);
+		}
+
+		mRoleTask = new RoboAsyncTask<Boolean>(Application.getContext()) {
+
+			@Override
+			public Boolean call() throws Exception {
+				return Api.changeRole(mPersonId, role).get();
+			}
+
+			@Override
+			public void onSuccess(final Boolean success) {
+				if (success) {
+					Toast.makeText(Application.getContext(), R.string.contact_role_changed, Toast.LENGTH_SHORT).show();
+					refreshContact();
+				} else {
+					showError();
+				}
+			}
+
+			@Override
+			public void onFinally() {
+				mRoleTask = null;
+				updateRefreshIcon();
+			}
+
+			@Override
+			public void onException(final Exception e) {
+				showError();
+			}
+
+			@Override
+			public void onInterrupted(final Exception e) {
+				showError();
+			}
+
+			public void showError() {
+				Toast.makeText(getContext(), R.string.contact_role_failed, Toast.LENGTH_SHORT).show();
+			}
+
+		};
+		Application.getExecutor().execute(mRoleTask.future());
+	}
+
+	public void openAddress() {
+		// TODO:
+	}
+
 }

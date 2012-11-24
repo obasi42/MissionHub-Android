@@ -39,7 +39,7 @@ public class IntentHelper {
 			Toast.makeText(Application.getContext(), getString(R.string.intent_helper_no_calling), Toast.LENGTH_LONG).show();
 		}
 	}
-	
+
 	/**
 	 * "Views" a telephone number
 	 * 
@@ -143,10 +143,9 @@ public class IntentHelper {
 	 */
 	public static void openFacebookProfile(final long fbId) {
 		try {
-			final Intent intent = new Intent(Intent.ACTION_VIEW);
+			Application.getContext().getPackageManager().getPackageInfo("com.facebook.katana", 0);
+			final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("fb://profile/" + fbId));
 			addTaskFlags(intent);
-			intent.setClassName("com.facebook.katana", "com.facebook.katana.ProfileTabHostActivity");
-			intent.putExtra("extra_user_id", fbId);
 			Application.getContext().startActivity(intent);
 		} catch (final Exception e) {
 			try {

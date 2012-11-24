@@ -2,16 +2,71 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <style name="MissionHub"></style>
-    
+
     <style name="MissionHub.ListView">
         <item name="android:divider">@drawable/abs__list_divider_holo_light</item>
-    	<item name="android:dividerHeight">1.0dip</item>
+        <item name="android:dividerHeight">1.0dip</item>
     </style>
-    
+
     <style name="MissionHub.ListItem">
         <item name="android:background">@drawable/list_item_background</item>
         <item name="android:padding">@dimen/listview_item_padding</item>
         <item name="android:minHeight">@dimen/listview_item_min_height</item>
+    </style>
+
+    <style name="MissionHub.Divider">
+        <item name="android:layout_gravity">right</item>
+        <item name="android:background">?android:listDivider</item>
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">1.0dip</item>
+    </style>
+
+    <style name="MissionHub.ContactInfoSectionLabel">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingTop">8.0dip</item>
+        <item name="android:paddingBottom">4.0dip</item>
+        <item name="android:paddingLeft">8.0dip</item>
+        <item name="android:paddingRight">8.0dip</item>
+        <item name="android:textSize">12.0dip</item>
+		<item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/gray</item>
+        <item name="android:ellipsize">marquee</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
+    <style name="MissionHub.ContactInfoSection">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">vertical</item>
+    </style>
+
+    <style name="MissionHub.ContactInfoContent">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:minHeight">56.0dip</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:paddingBottom">4.0dip</item>
+        <item name="android:paddingLeft">8.0dip</item>
+        <item name="android:paddingRight">8.0dip</item>
+        <item name="android:paddingTop">4.0dip</item>
+    </style>
+
+    <style name="MissionHub.ContactInfoItem">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textAppearance">?android:textAppearanceMedium</item>
+    </style>
+
+    <style name="MissionHub.ContactInfoItemLabel">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:textSize">12.0dip</item>
+        <item name="android:textColor">#ff999999</item>
+        <item name="android:ellipsize">marquee</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textAllCaps">true</item>
     </style>
 
 </resources>

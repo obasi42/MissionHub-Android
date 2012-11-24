@@ -16,7 +16,6 @@ import org.json.JSONObject;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.os.Build;
-import android.util.Log;
 import ch.boye.httpclientandroidlib.client.utils.URIBuilder;
 
 import com.google.common.collect.HashMultimap;
@@ -688,12 +687,12 @@ public class Api {
 
 				final JSONArray jsonRejoicables = new JSONArray();
 				if (comment.rejoicables != null) {
-					for(String rejoicable : comment.rejoicables) {
+					for (final String rejoicable : comment.rejoicables) {
 						if (U.isNullEmpty(rejoicable)) continue;
 						jsonRejoicables.put(rejoicable);
 					}
 				}
-				
+
 				final JSONObject json = new JSONObject();
 				json.put("followup_comment", jsonComment);
 				json.put("rejoicables", jsonRejoicables);
@@ -709,23 +708,23 @@ public class Api {
 		Application.getExecutor().execute(task);
 		return task;
 	}
-	
+
 	public static class JsonComment {
-		
+
 		public long personId = -1;
 		public long commenterId = -1;
 		public long organizationId = -1;
 		public String comment;
 		public String status;
 		public List<String> rejoicables;
-		
-		public JsonComment(long personId, String comment, String status, List<String> rejoicables) {
+
+		public JsonComment(final long personId, final String comment, final String status, final List<String> rejoicables) {
 			this.personId = personId;
 			this.comment = comment;
 			this.status = status;
 			this.rejoicables = rejoicables;
 		}
-		
+
 	}
 
 	/**

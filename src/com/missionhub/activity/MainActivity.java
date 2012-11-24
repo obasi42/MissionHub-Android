@@ -53,9 +53,9 @@ public class MainActivity extends BaseAuthenticatedMenuActivity {
 			setFragment(mFragment);
 			setMenuFragment(mMenuFragment);
 		}
-		
+
 		if (savedInstanceState == null) {
-			Intent intent = new Intent(this, ContactActivity.class);
+			final Intent intent = new Intent(this, ContactActivity.class);
 			intent.putExtra("personId", Session.getInstance().getPersonId());
 			startActivity(intent);
 		}

@@ -19,7 +19,7 @@ public class ContactActivity extends BaseAuthenticatedActivity {
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 		setContentView(R.layout.content_frame);
-		
+
 		mPersonId = getIntent().getExtras().getLong("personId", -1);
 
 		if (savedInstanceState != null) {

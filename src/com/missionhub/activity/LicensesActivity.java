@@ -1,6 +1,7 @@
 package com.missionhub.activity;
 
 import android.os.Bundle;
+import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -18,6 +19,7 @@ public class LicensesActivity extends BaseActivity {
 
 		mWebView = new WebView(this);
 		mWebView.setBackgroundColor(0xFFEEEEEE);
+		mWebView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
 		mWebView.setWebViewClient(new WebViewClient() {
 			@Override
 			public boolean shouldOverrideUrlLoading(final WebView view, final String url) {

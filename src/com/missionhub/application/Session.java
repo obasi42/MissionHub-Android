@@ -1,9 +1,6 @@
 package com.missionhub.application;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.accounts.Account;
@@ -13,20 +10,11 @@ import android.accounts.OnAccountsUpdateListener;
 import android.accounts.OperationCanceledException;
 
 import com.WazaBe.HoloEverywhere.widget.Toast;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimaps;
-import com.google.common.collect.SetMultimap;
 import com.missionhub.R;
 import com.missionhub.api.Api;
 import com.missionhub.authenticator.Authenticator;
 import com.missionhub.exception.MissionHubException;
-import com.missionhub.model.Organization;
-import com.missionhub.model.OrganizationalRole;
-import com.missionhub.model.OrganizationalRoleDao;
 import com.missionhub.model.Person;
-import com.missionhub.util.TreeDataStructure;
-
-import de.greenrobot.dao.QueryBuilder;
 
 public class Session implements OnAccountsUpdateListener {
 
@@ -36,14 +24,14 @@ public class Session implements OnAccountsUpdateListener {
 	/** the singleton instance of the session */
 	private static Session sSession;
 
+	/** the person object */
+	private Person mPerson;
+
 	/** the person id */
 	private long mPersonId = -1;
 
 	/** the oragnization id */
 	private long mOrganizationId = -1;
-
-	/** the user's primary organization id */
-	private long mPrimaryOrganizationId = -1;
 
 	/** the android account manager */
 	private final AccountManager mAccountManager;
@@ -59,19 +47,6 @@ public class Session implements OnAccountsUpdateListener {
 
 	/** true if the session is being refreshed */
 	private final AtomicBoolean mResuming = new AtomicBoolean(false);
-
-	/** system labels. */
-	public static final String LABEL_ADMIN = "admin";
-	public static final String LABEL_CONTACT = "contact";
-	public static final String LABEL_INVOLVED = "involved";
-	public static final String LABEL_LEADER = "leader";
-	public static final String LABEL_ALUMNI = "alumni";
-
-	/** the user's labels */
-	private SetMultimap<Long, String> mLabels; // organizationId, label
-
-	/** the cached organization hierarchy */
-	private TreeDataStructure<Long> mOrganizationHierarchy;
 
 	/**
 	 * Creates a new session object and sets up the account manager
@@ -106,8 +81,11 @@ public class Session implements OnAccountsUpdateListener {
 	 * @return
 	 */
 	public synchronized long getOrganizationId() {
-		if (mOrganizationId < 0) return getPrimaryOrganizationId();
-
+		if (mOrganizationId < 0) try {
+			return getPerson().getPrimaryOrganizationId();
+		} catch (final NoPersonException e) {
+			return -1;
+		}
 		return mOrganizationId;
 	}
 
@@ -115,9 +93,10 @@ public class Session implements OnAccountsUpdateListener {
 	 * Returns the user's primary organization
 	 * 
 	 * @return
+	 * @throws NoPersonException
 	 */
-	public synchronized long getPrimaryOrganizationId() {
-		return mPrimaryOrganizationId;
+	public synchronized long getPrimaryOrganizationId() throws NoPersonException {
+		return getPerson().getPrimaryOrganizationId();
 	}
 
 	/**
@@ -184,7 +163,7 @@ public class Session implements OnAccountsUpdateListener {
 			public void run() {
 				try {
 					Api.getOrganizations(null).get();
-					getOrganizationHierarchy();
+					getPerson().getOrganizationHierarchy();
 					Application.postEvent(new SessionUpdateOrganizationsSuccessEvent());
 				} catch (final Exception e) {
 					Application.postEvent(new SessionUpdateOrganizationsErrorEvent(e));
@@ -241,10 +220,10 @@ public class Session implements OnAccountsUpdateListener {
 
 					// update the organizations
 					Application.postEvent(new SessionResumeStatusEvent(Application.getContext().getString(R.string.init_updating_orgs)));
-					//Api.getOrganizations(null).get();
+					// Api.getOrganizations(null).get();
 
 					updateLabels();
-					getOrganizationHierarchy();
+					getPerson().getOrganizationHierarchy();
 
 					Application.postEvent(new SessionResumeSuccessEvent());
 				} catch (final Exception e) {
@@ -262,11 +241,9 @@ public class Session implements OnAccountsUpdateListener {
 	 */
 	private synchronized void resetSession() {
 		mPersonId = -1;
+		mPerson = null;
 		mOrganizationId = -1;
 		mAccount = null;
-		mPrimaryOrganizationId = -1;
-		mLabels = null;
-		mOrganizationHierarchy = null;
 
 		Application.postEvent(new SessionInvalidatedEvent());
 	}
@@ -276,11 +253,11 @@ public class Session implements OnAccountsUpdateListener {
 	 * @throws NoPersonException
 	 */
 	public Person getPerson() throws NoPersonException {
-		final Person p = Application.getDb().getPersonDao().load(getPersonId());
-		if (p == null) {
+		mPerson = Application.getDb().getPersonDao().load(getPersonId());
+		if (mPerson == null) {
 			throw new NoPersonException(Application.getContext().getString(R.string.no_person_exception));
 		}
-		return p;
+		return mPerson;
 	}
 
 	@Override
@@ -358,192 +335,22 @@ public class Session implements OnAccountsUpdateListener {
 	 * @throws NoPersonException
 	 */
 	public synchronized void updateLabels() throws NoPersonException {
-		final SetMultimap<Long, String> labelsTemp = Multimaps.synchronizedSetMultimap(HashMultimap.<Long, String> create());
-		getPerson().resetOrganizationalRoleList();
-		final List<OrganizationalRole> roles = getPerson().getOrganizationalRoleList();
-		for (final OrganizationalRole role : roles) {
-			role.refresh();
-			labelsTemp.put(role.getOrganization_id(), role.getRole());
+		getPerson().resetLabels();
 
-			if (role.getPrimary() || mPrimaryOrganizationId < 0) {
-				mPrimaryOrganizationId = role.getOrganization_id();
-			}
-		}
-		mLabels = labelsTemp;
-
-		if (!isAdminOrLeader(getOrganizationId())) {
-			setOrganizationId(mPrimaryOrganizationId);
+		if (!getPerson().isAdminOrLeader(getOrganizationId())) {
+			setOrganizationId(getPerson().getPrimaryOrganizationId());
 			Toast.makeText(Application.getContext(), Application.getContext().getString(R.string.session_no_longer_admin), Toast.LENGTH_LONG).show();
 		}
-	}
-
-	/**
-	 * Returns a tree of the user's organizations
-	 * 
-	 * @return
-	 */
-	public synchronized TreeDataStructure<Long> getOrganizationHierarchy() {
-		if (mOrganizationHierarchy != null) {
-			return mOrganizationHierarchy;
-		}
-
-		final QueryBuilder<OrganizationalRole> builder = Application.getDb().getOrganizationalRoleDao().queryBuilder();
-		final List<String> adminRoles = new ArrayList<String>();
-		adminRoles.add(LABEL_ADMIN);
-		adminRoles.add(LABEL_LEADER);
-		builder.where(OrganizationalRoleDao.Properties.Person_id.eq(getPersonId()), OrganizationalRoleDao.Properties.Role.in(adminRoles));
-		final List<OrganizationalRole> roles = builder.where(OrganizationalRoleDao.Properties.Person_id.eq(getPersonId()), OrganizationalRoleDao.Properties.Role.in(adminRoles)).list();
-
-		// build a tree from organization ancestry
-		final TreeDataStructure<Long> tree = new TreeDataStructure<Long>(0l);
-
-		final Iterator<OrganizationalRole> roleItr = roles.iterator();
-		while (roleItr.hasNext()) {
-			final OrganizationalRole role = roleItr.next();
-			role.refresh();
-			final Organization org = role.getOrganization();
-			org.refresh();
-			if (role.getOrganization().getAncestry() != null) {
-				TreeDataStructure<Long> parent = tree;
-				for (final String ancestor : role.getOrganization().getAncestry().trim().split("/")) {
-					final Long a = Long.parseLong(ancestor);
-					if (parent.getTree(a) == null) {
-						parent = parent.addLeaf(a);
-					} else {
-						parent = parent.getTree(a);
-					}
-				}
-				if (parent.getTree(org.getId()) == null) {
-					parent.addLeaf(org.getId());
-				}
-			} else {
-				tree.addLeaf(org.getId());
-			}
-		}
-
-		mOrganizationHierarchy = tree;
-
-		return tree;
-	}
-
-	/**
-	 * Checks if a user has one of the given labels (role)
-	 * 
-	 * @param label
-	 * @return true if they have the label
-	 */
-	public synchronized boolean hasLabel(final String... label) {
-		return hasLabel(getOrganizationId(), label);
-	}
-
-	/**
-	 * Checks if a user has one of the given labels (role)
-	 * 
-	 * @param label
-	 * @param organizationId
-	 * @return true if they have the label
-	 */
-	public synchronized boolean hasLabel(final long organizationId, final String... label) {
-		boolean has = false;
-		for (final String l : label) {
-			if (mLabels.containsEntry(organizationId, l)) {
-				has = true;
-			}
-		}
-		return has;
-	}
-
-	/**
-	 * Checks if a user has all of the given labels (role)
-	 * 
-	 * @param label
-	 * @return true if they have the label
-	 */
-	public synchronized boolean hasLabels(final String... label) {
-		return hasLabels(getOrganizationId(), label);
-	}
-
-	/**
-	 * Checks if a user has all of the given labels (role)
-	 * 
-	 * @param label
-	 * @param organizationId
-	 * @return true if they have the label
-	 */
-	public synchronized boolean hasLabels(final long organizationId, final String... label) {
-		boolean has = true;
-		for (final String l : label) {
-			if (!mLabels.containsEntry(organizationId, l)) {
-				has = false;
-			}
-		}
-		return has;
-	}
-
-	/**
-	 * Returns true if the user is an admin or leader in current organization
-	 * 
-	 * @return
-	 */
-	public synchronized boolean isAdminOrLeader() {
-		return isAdmin() || isLeader();
-	}
-
-	/**
-	 * Returns true if the user is an admin or leader in the given organizationId
-	 * 
-	 * @param organizationId
-	 * @return
-	 */
-	public synchronized boolean isAdminOrLeader(final long organizationId) {
-		return isAdmin(organizationId) || isLeader(organizationId);
-	}
-
-	/**
-	 * Returns true if the user is an admin in the current organization
-	 * 
-	 * @return
-	 */
-	public synchronized boolean isAdmin() {
-		return isAdmin(getOrganizationId());
-	}
-
-	/**
-	 * Returns true if the user is an admin in the given organizationId
-	 * 
-	 * @param organizationId
-	 * @return
-	 */
-	public synchronized boolean isAdmin(final long organizationId) {
-		return hasLabel(organizationId, LABEL_ADMIN);
-	}
-
-	/**
-	 * Returns true if the user is a leader in the current organization
-	 * 
-	 * @return
-	 */
-	public synchronized boolean isLeader() {
-		return isLeader(getOrganizationId());
-	}
-
-	/**
-	 * Returns true if the user is a leader in the given organization
-	 * 
-	 * @param organizationId
-	 * @return
-	 */
-	public synchronized boolean isLeader(final long organizationId) {
-		return hasLabel(organizationId, LABEL_LEADER);
 	}
 
 	/**
 	 * Sets the user's organization id
 	 * 
 	 * @param organizationId
+	 * @throws NoPersonException
 	 */
-	public synchronized void setOrganizationId(final long organizationId) {
-		if (isAdminOrLeader(organizationId)) {
+	public synchronized void setOrganizationId(final long organizationId) throws NoPersonException {
+		if (getPerson().isAdminOrLeader(organizationId)) {
 			mOrganizationId = organizationId;
 			SettingsManager.setSessionOrganizationId(getPersonId(), mOrganizationId);
 			Application.postEvent(new SessionOrganizationIdChanged(organizationId));
@@ -655,4 +462,40 @@ public class Session implements OnAccountsUpdateListener {
 		}
 	}
 
+	/**
+	 * Returns true of the current person is an admin in the current organization
+	 * 
+	 * @return
+	 */
+	public boolean isAdmin() {
+		try {
+			return getPerson().isAdmin(getOrganizationId());
+		} catch (final NoPersonException e) {
+			return false;
+		}
+	}
+
+	/**
+	 * Returns true of the current person is an admin in the current organization
+	 * 
+	 * @return
+	 */
+	public boolean isLeader() {
+		try {
+			return getPerson().isLeader(getOrganizationId());
+		} catch (final NoPersonException e) {
+			return false;
+		}
+	}
+
+	/**
+	 * Return true if the current person is an admin or leader in the current organization
+	 */
+	public boolean isAdminOrLeader() {
+		try {
+			return getPerson().isAdminOrLeader(getOrganizationId());
+		} catch (final NoPersonException e) {
+			return false;
+		}
+	}
 }
