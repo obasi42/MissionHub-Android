@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <style name="Theme.MissionHub" parent="Holo.Theme.Sherlock.Light.DarkActionBar">
+    <style name="Theme.MissionHub" parent="Holo.Theme.Light.DarkActionBar">
         <item name="android:listSelector">@drawable/abs__list_selector_holo_light</item>
         <item name="android:listDivider">@drawable/abs__list_divider_holo_light</item>
         
@@ -14,7 +14,7 @@
         <item name="android:windowNoTitle">true</item>
     </style>
 
-    <style name="Theme.MissionHubDark" parent="Holo.Theme.Sherlock">
+    <style name="Theme.MissionHubDark" parent="Holo.Theme">
         <item name="android:listSelector">@drawable/abs__list_selector_holo_light</item>
         <item name="android:listDivider">@drawable/abs__list_divider_holo_light</item>
     </style>

@@ -19,7 +19,7 @@ public class FQL {
 			final HttpResponse response = future.get();
 			final Gson gson = new Gson();
 			final GFQLData data = gson.fromJson(response.responseBody, GFQLData.class);
-			return data.data.pic_crop;
+			return data.data[0].pic_crop;
 		} catch (final Exception e) {
 			Log.e("FQL", e.getMessage(), e);
 		}

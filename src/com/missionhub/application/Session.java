@@ -9,7 +9,7 @@ import android.accounts.AuthenticatorException;
 import android.accounts.OnAccountsUpdateListener;
 import android.accounts.OperationCanceledException;
 
-import com.WazaBe.HoloEverywhere.widget.Toast;
+import org.holoeverywhere.widget.Toast;
 import com.missionhub.R;
 import com.missionhub.api.Api;
 import com.missionhub.authenticator.Authenticator;
@@ -163,7 +163,7 @@ public class Session implements OnAccountsUpdateListener {
 			public void run() {
 				try {
 					Api.getOrganizations(null).get();
-					getPerson().getOrganizationHierarchy();
+					getPerson().resetOrganizationHierarchy();
 					Application.postEvent(new SessionUpdateOrganizationsSuccessEvent());
 				} catch (final Exception e) {
 					Application.postEvent(new SessionUpdateOrganizationsErrorEvent(e));
@@ -220,10 +220,10 @@ public class Session implements OnAccountsUpdateListener {
 
 					// update the organizations
 					Application.postEvent(new SessionResumeStatusEvent(Application.getContext().getString(R.string.init_updating_orgs)));
-					// Api.getOrganizations(null).get();
+					Api.getOrganizations(null).get();
 
 					updateLabels();
-					getPerson().getOrganizationHierarchy();
+					getPerson().resetOrganizationHierarchy();
 
 					Application.postEvent(new SessionResumeSuccessEvent());
 				} catch (final Exception e) {

@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.webkit.WebViewClient;
 
 import com.missionhub.R;
@@ -147,6 +148,9 @@ public class ExceptionHelper {
 
 	/** sets the exception and rebuilds the dialog if needed */
 	public void setException(final Throwable throwable) {
+		
+		Log.e("ExceptionHelper", throwable.getMessage(), throwable);
+		
 		mThrowable = throwable;
 
 		// find the initial issue if it was wrapped in an ExecutionException

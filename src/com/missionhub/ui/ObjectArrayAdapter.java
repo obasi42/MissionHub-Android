@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import android.content.Context;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -278,5 +279,16 @@ public abstract class ObjectArrayAdapter extends BaseAdapter {
 
 	public Context getContext() {
 		return mContext;
+	}
+	
+	public LayoutInflater getLayoutInflater() {
+		return (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+	}
+	
+	public abstract static class DisabledItem implements SupportEnable {
+		@Override
+		public boolean isEnabled() {
+			return false;
+		}
 	}
 }

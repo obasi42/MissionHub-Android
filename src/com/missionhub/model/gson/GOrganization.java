@@ -36,12 +36,16 @@ public class GOrganization {
 				if (!U.isNullEmpty(name)) org.setName(name);
 				if (!U.isNullEmpty(ancestry)) org.setAncestry(ancestry);
 
-				for (final GPerson person : leaders) {
-					person.save(true);
+				if (leaders != null) {
+					for (final GPerson person : leaders) {
+						person.save(true);
+					}
 				}
 
-				for (final GKeyword keyword : keywords) {
-					keyword.save(id, true);
+				if (keywords != null) {
+					for (final GKeyword keyword : keywords) {
+						keyword.save(id, true);
+					}
 				}
 
 				od.insertOrReplace(org);

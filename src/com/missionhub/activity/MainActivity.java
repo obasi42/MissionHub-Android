@@ -3,7 +3,7 @@ package com.missionhub.activity;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.WazaBe.HoloEverywhere.widget.Toast;
+import org.holoeverywhere.widget.Toast;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.Window;
 import com.missionhub.R;

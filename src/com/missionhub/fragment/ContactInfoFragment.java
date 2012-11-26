@@ -6,7 +6,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import org.holoeverywhere.widget.Toast;
+
 import roboguice.util.RoboAsyncTask;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -24,8 +27,6 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.WazaBe.HoloEverywhere.app.AlertDialog;
-import com.WazaBe.HoloEverywhere.widget.Toast;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
@@ -44,6 +45,8 @@ import com.missionhub.ui.ObjectArrayAdapter.SupportEnable;
 import com.missionhub.util.IntentHelper;
 import com.missionhub.util.TimeAgo;
 import com.missionhub.util.U;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.assist.OnScrollSmartOptions;
 
 public class ContactInfoFragment extends BaseFragment {
 
@@ -204,11 +207,15 @@ public class ContactInfoFragment extends BaseFragment {
 		initCommentView(comment);
 		mListView.addHeaderView(comment);
 
+		final OnScrollSmartOptions smartOptions = new OnScrollSmartOptions(Application.getImageLoaderOptions());
+		mListView.setOnScrollListener(smartOptions);
+
 		// setup the adapter if needed
 		if (mAdapter == null) {
-			mAdapter = new CommentArrayAdapter(getActivity());
+			mAdapter = new CommentArrayAdapter(getActivity(), smartOptions.getOptions());
 		} else {
 			mAdapter.setContext(getActivity());
+			mAdapter.setImageOptions(smartOptions.getOptions());
 		}
 
 		// set the list adapter
@@ -220,7 +227,7 @@ public class ContactInfoFragment extends BaseFragment {
 		mLayoutComplete = true;
 
 		// sets the data in the header and add comment box
-		notifyPersonUpdated();
+		notifyContactUpdated();
 
 		// build the comment list from sql if the adapter is empty
 		if (mAdapter.isEmpty()) {
@@ -361,7 +368,7 @@ public class ContactInfoFragment extends BaseFragment {
 	/**
 	 * Updates the data in the header and add comment box
 	 */
-	public void notifyPersonUpdated() {
+	public void notifyContactUpdated() {
 		if (mPerson == null) return;
 		if (!mLayoutComplete) return;
 
@@ -400,7 +407,11 @@ public class ContactInfoFragment extends BaseFragment {
 
 		// avatar
 		if (!U.isNullEmpty(mPerson.getPicture())) {
-			// TODO: load image
+			if (mPerson.getPicture().contains("facebook.com") && !U.isNullEmpty(mPerson.getFb_id())) {
+				Application.getImageLoader().displayImage("fb://" + mPerson.getFb_id(), mHeaderAvatar, Application.getImageLoaderOptions());
+			} else {
+				Application.getImageLoader().displayImage(mPerson.getPicture(), mHeaderAvatar, Application.getImageLoaderOptions());
+			}
 		} else {
 			mHeaderAvatar.setImageDrawable(DrawableCache.getDrawable(R.drawable.default_contact));
 		}
@@ -601,8 +612,16 @@ public class ContactInfoFragment extends BaseFragment {
 		/** date used for comparisons */
 		private static final Date sWeekAgo = new Date(System.currentTimeMillis() - (7 * 1000 * 60 * 60 * 24));
 
-		public CommentArrayAdapter(final Context context) {
+		/** image display options */
+		private DisplayImageOptions mImageScrollOptions;
+
+		public CommentArrayAdapter(final Context context, final DisplayImageOptions options) {
 			super(context);
+			setImageOptions(options);
+		}
+
+		public void setImageOptions(final DisplayImageOptions options) {
+			mImageScrollOptions = options;
 		}
 
 		@Override
@@ -646,7 +665,7 @@ public class ContactInfoFragment extends BaseFragment {
 							holder.name.setVisibility(View.GONE);
 						}
 						if (!U.isNullEmpty(i.getCommenter().getPicture())) {
-							// TODO set picture
+							Application.getImageLoader().displayImage(i.getCommenter().getPicture(), holder.avatar, mImageScrollOptions);
 						} else {
 							holder.avatar.setImageDrawable(DrawableCache.getDrawable(R.drawable.default_contact));
 						}
@@ -989,8 +1008,7 @@ public class ContactInfoFragment extends BaseFragment {
 			View view = convertView;
 
 			if (view == null) {
-				final LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-				view = inflater.inflate(R.layout.item_simple_status, null);
+				view = getLayoutInflater().inflate(R.layout.item_simple_status, null);
 			}
 
 			final TextView tv = (TextView) view.findViewById(R.id.text);

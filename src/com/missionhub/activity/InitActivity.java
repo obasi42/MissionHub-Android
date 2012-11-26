@@ -10,9 +10,9 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
 
-import com.WazaBe.HoloEverywhere.widget.Button;
-import com.WazaBe.HoloEverywhere.widget.ProgressBar;
-import com.WazaBe.HoloEverywhere.widget.TextView;
+import org.holoeverywhere.widget.Button;
+import org.holoeverywhere.widget.ProgressBar;
+import org.holoeverywhere.widget.TextView;
 import com.missionhub.R;
 import com.missionhub.application.Application;
 import com.missionhub.application.Session;

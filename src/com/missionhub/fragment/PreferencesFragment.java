@@ -20,6 +20,7 @@ import com.missionhub.application.Session.NoPersonException;
 import com.missionhub.application.Session.SessionOrganizationIdChanged;
 import com.missionhub.model.Organization;
 import com.missionhub.ui.ObjectArrayAdapter;
+import com.missionhub.util.Profiler;
 import com.missionhub.util.TreeDataStructure;
 
 public class PreferencesFragment extends BaseFragment {
@@ -62,14 +63,12 @@ public class PreferencesFragment extends BaseFragment {
 	@Override
 	public void onViewCreated(final View view, final Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-
-		if (savedInstanceState != null) {
-			mOrganizationsAdapter = (OrganizationsAdapter) ObjectStore.getInstance().retrieveObject(savedInstanceState.getString("mOrganizationsAdapter"));
-		}
+		
 		if (mOrganizationsAdapter == null) {
 			mOrganizationsAdapter = new OrganizationsAdapter(getActivity());
+		} else {
+			mOrganizationsAdapter.setContext(getActivity());
 		}
-		mOrganizationsAdapter.setContext(getActivity());
 
 		mOrganizations.setAdapter(mOrganizationsAdapter);
 		rebuildOrganizationList();
@@ -84,8 +83,6 @@ public class PreferencesFragment extends BaseFragment {
 	@Override
 	public void onSaveInstanceState(final Bundle outState) {
 		super.onSaveInstanceState(outState);
-		mOrganizationsAdapter.setContext(null);
-		outState.putString("mOrganizationsAdapter", ObjectStore.getInstance().storeObject(mOrganizationsAdapter));
 	}
 
 	private static class OrganizationsAdapter extends ObjectArrayAdapter {
@@ -101,9 +98,8 @@ public class PreferencesFragment extends BaseFragment {
 
 			ViewHolder holder = null;
 			if (view == null) {
-				final LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 				holder = new ViewHolder();
-				view = inflater.inflate(R.layout.item_preference_organization, null);
+				view = getLayoutInflater().inflate(R.layout.item_preference_organization, null);
 				holder.text = (TextView) view.findViewById(R.id.text);
 				view.setTag(holder);
 			} else {

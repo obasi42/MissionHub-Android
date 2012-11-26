@@ -59,6 +59,10 @@
     <string name="contact_label_gender">Gender</string>
     <string name="contact_label_links">Links</string>
     <string name="contact_label_address">Address</string>       
+    <string name="contact_surveys_no_key">Unknown Keyword</string> 
+    <string name="contact_surveys_no_q">Unknown Question</string> 
+    <string name="contact_surveys_no_a">Not answered</string> 
+    <string name="contact_surveys_updating_org">Updating organization keywords and questions</string>
     
     <!-- About Activity -->
     <string name="about_activity_title">About MissionHub</string>

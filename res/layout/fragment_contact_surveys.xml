@@ -1,12 +1,23 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/fragment_contact_surveys"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" >
 
     <ListView
-        android:id="@+id/contact_surveys_listview"
+        android:id="@+id/listview"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent" >
+        android:layout_height="wrap_content"
+        android:layout_margin="4.0dip"
+        android:layout_marginTop="5.0dip"
+        android:animateLayoutChanges="true"
+        android:background="@drawable/item_background"
+        android:cacheColorHint="@color/transparent"
+        android:divider="@color/light_gray"
+        android:dividerHeight="1.0dip"
+        tools:listheader="@layout/item_contact_surveys_keyword"
+        tools:listitem="@layout/item_contact_surveys_qa" >
+
     </ListView>
 
 </FrameLayout>

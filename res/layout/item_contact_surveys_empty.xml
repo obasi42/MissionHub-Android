@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:padding="15.0dip" >
+
+    <TextView
+        android:id="@+id/no_surveys"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="9.0dip"
+        android:gravity="center"
+        android:text="No Survey Answers"
+        android:textColor="@color/dark_gray"
+        android:textSize="14.0sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/no_surveys_details"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/no_surveys"
+        android:gravity="center"
+        android:text="This person has not yet answered any survey question in your current organization."
+        android:textColor="@color/dark_gray"
+        android:textSize="12.0sp" />
+
+</LinearLayout>

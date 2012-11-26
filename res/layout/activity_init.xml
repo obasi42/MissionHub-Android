@@ -35,14 +35,14 @@
             android:layout_marginBottom="22.0dip"
              >
 
-            <com.WazaBe.HoloEverywhere.widget.ProgressBar
+            <org.holoeverywhere.widget.ProgressBar
                 android:id="@+id/loading"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:visibility="visible" />
 
-            <com.WazaBe.HoloEverywhere.widget.TextView
+            <org.holoeverywhere.widget.TextView
                 android:id="@+id/status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -53,7 +53,7 @@
                 android:visibility="visible" />
         </LinearLayout>
 
-        <com.WazaBe.HoloEverywhere.widget.Button
+        <org.holoeverywhere.widget.Button
             android:id="@+id/btn_login"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -63,7 +63,7 @@
             android:textSize="22.0dip"
             android:visibility="visible" />
 
-        <com.WazaBe.HoloEverywhere.widget.TextView
+        <org.holoeverywhere.widget.TextView
             android:id="@+id/version"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

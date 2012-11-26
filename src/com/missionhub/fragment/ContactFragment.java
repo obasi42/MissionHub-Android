@@ -1,5 +1,7 @@
 package com.missionhub.fragment;
 
+import org.holoeverywhere.widget.Toast;
+
 import roboguice.util.RoboAsyncTask;
 import android.app.Activity;
 import android.os.Bundle;
@@ -15,7 +17,6 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
-import com.WazaBe.HoloEverywhere.widget.Toast;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
 import com.actionbarsherlock.view.Menu;
@@ -28,6 +29,7 @@ import com.missionhub.model.Person;
 import com.missionhub.ui.NavigationSpinnerAdapter;
 import com.missionhub.ui.widget.LockedViewPager;
 import com.missionhub.util.U;
+import com.missionhub.util.facebook.FacebookImageDownloader;
 
 public class ContactFragment extends BaseFragment implements OnNavigationListener, OnPageChangeListener {
 
@@ -244,11 +246,12 @@ public class ContactFragment extends BaseFragment implements OnNavigationListene
 			public void onSuccess(final Person person) {
 				mPersonId = person.getId();
 				mPerson = person;
+				FacebookImageDownloader.removeFromCache(mPerson);
 				if (mInfoFragment != null) {
-					mInfoFragment.notifyPersonUpdated();
+					mInfoFragment.notifyContactUpdated();
 				}
 				if (mSurveysFragment != null) {
-					mSurveysFragment.notifyPersonUpdated();
+					mSurveysFragment.notifyContactUpdated();
 				}
 			}
 
