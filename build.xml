@@ -85,7 +85,7 @@
 		update project"
 	-->
 
-	<taskdef name="xmltask" classname="com.oopsconsultancy.xmltask.ant.XmlTask" />
+	<taskdef name="xmltask" classname="com.oopsconsultancy.xmltask.ant.XmlTask" classpath="libs-ext/xmltask.jar"/>
 	
 	<target name="increment-manifest-version">
 		<buildnumber />
@@ -98,29 +98,17 @@
 
 	<target name="config">
 		<property name="config-source"
-			value="${source.dir}/com/missionhub/config/Config.tpl" />
+			value="${missionhub.properties}" />
 		<property name="config-target"
-			value="${source.dir}/com/missionhub/config/Config.java" />
+			value="${source.dir}/assets/missionhub.properties" />
 
 		<!-- Copy the configuration file, replacing tokens in the file. -->
 		<copy file="${config-source}" tofile="${config-target}"
 			overwrite="true" failonerror="true" encoding="utf-8">
-			<filterset>
-				<filter token="config.mh.debug" value="${config.mh.debug}" />
-				<filter token="config.mh.use_cache" value="${config.mh.use_cache}" />
-				<filter token="config.mh.auto_login_token" value="${config.mh.auto_login_token}" />
-				<filter token="config.mh.market" value="${config.mh.market}" />
-				<filter token="config.mh.base_url" value="${config.mh.base_url}" />
-				<filter token="config.mh.api.version" value="${config.mh.api.version}" />
-				<filter token="config.mh.api.client_id" value="${config.mh.api.client_id}" />
-				<filter token="config.mh.api.client_secret" value="${config.mh.api.client_secret}" />
-				<filter token="config.mh.api.client_scope" value="${config.mh.api.client_scope}" />
-				<filter token="config.mh.ganalytics_key" value="${config.mh.ganalytics_key}" />
-			</filterset>
 		</copy>
 	</target>
 
-	<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" />
+<!-- 	<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" />
 
 	<target name="findbugs">
 		<mkdir dir="reports" />
@@ -129,7 +117,7 @@
 			<auxClasspath path="${android.jar}" />
 			<class location="${out.dir}" />
 		</findbugs>
-	</target>
+	</target> -->
 
 	<!-- version-tag: 1 -->
 	<import file="${sdk.dir}/tools/ant/build.xml" />
