@@ -3,13 +3,14 @@ package com.missionhub.application;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.holoeverywhere.widget.Toast;
+
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AuthenticatorException;
 import android.accounts.OnAccountsUpdateListener;
 import android.accounts.OperationCanceledException;
 
-import org.holoeverywhere.widget.Toast;
 import com.missionhub.R;
 import com.missionhub.api.Api;
 import com.missionhub.authenticator.Authenticator;
@@ -212,15 +213,17 @@ public class Session implements OnAccountsUpdateListener {
 					// update the person
 					Application.postEvent(new SessionResumeStatusEvent(Application.getContext().getString(R.string.init_updating_person)));
 
-					final Person p = Api.getPersonMe().get();
+					if (!Configuration.isSkipSessionUpdate()) {
+						final Person p = Api.getPersonMe().get();
 
-					// update the account information
-					mAccountManager.setUserData(mAccount, Authenticator.KEY_PERSON_ID, String.valueOf(p.getId()));
-					mAccountManager.setUserData(mAccount, AccountManager.KEY_ACCOUNT_NAME, p.getName());
+						// update the account information
+						mAccountManager.setUserData(mAccount, Authenticator.KEY_PERSON_ID, String.valueOf(p.getId()));
+						mAccountManager.setUserData(mAccount, AccountManager.KEY_ACCOUNT_NAME, p.getName());
 
-					// update the organizations
-					Application.postEvent(new SessionResumeStatusEvent(Application.getContext().getString(R.string.init_updating_orgs)));
-					Api.getOrganizations(null).get();
+						// update the organizations
+						Application.postEvent(new SessionResumeStatusEvent(Application.getContext().getString(R.string.init_updating_orgs)));
+						Api.getOrganizations(null).get();
+					}
 
 					updateLabels();
 					getPerson().resetOrganizationHierarchy();

@@ -14,13 +14,11 @@ import android.widget.TextView;
 
 import com.missionhub.R;
 import com.missionhub.application.Application;
-import com.missionhub.application.ObjectStore;
 import com.missionhub.application.Session;
 import com.missionhub.application.Session.NoPersonException;
 import com.missionhub.application.Session.SessionOrganizationIdChanged;
 import com.missionhub.model.Organization;
 import com.missionhub.ui.ObjectArrayAdapter;
-import com.missionhub.util.Profiler;
 import com.missionhub.util.TreeDataStructure;
 
 public class PreferencesFragment extends BaseFragment {
@@ -63,7 +61,7 @@ public class PreferencesFragment extends BaseFragment {
 	@Override
 	public void onViewCreated(final View view, final Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		
+
 		if (mOrganizationsAdapter == null) {
 			mOrganizationsAdapter = new OrganizationsAdapter(getActivity());
 		} else {

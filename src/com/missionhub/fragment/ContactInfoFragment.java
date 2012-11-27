@@ -21,6 +21,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -36,6 +37,9 @@ import com.missionhub.api.Api.JsonComment;
 import com.missionhub.application.Application;
 import com.missionhub.application.DrawableCache;
 import com.missionhub.application.Session;
+import com.missionhub.fragment.ContactAssignmentDialog.ContactAssignmentListener;
+import com.missionhub.model.Assignment;
+import com.missionhub.model.AssignmentDao;
 import com.missionhub.model.FollowupComment;
 import com.missionhub.model.FollowupCommentDao;
 import com.missionhub.model.Person;
@@ -48,7 +52,7 @@ import com.missionhub.util.U;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.assist.OnScrollSmartOptions;
 
-public class ContactInfoFragment extends BaseFragment {
+public class ContactInfoFragment extends BaseFragment implements ContactAssignmentListener {
 
 	/** the logging tag */
 	public static final String TAG = ContactInfoFragment.class.getName();
@@ -115,6 +119,12 @@ public class ContactInfoFragment extends BaseFragment {
 
 	/** the contact's email address */
 	private TextView mHeaderEmail;
+
+	/** the contact assignment container */
+	private View mHeaderContainerAssignment;
+
+	/** the contact assignment button */
+	private Button mHeaderAssignment;
 
 	/** the container for the more inforation view */
 	private ViewGroup mHeaderMore;
@@ -253,6 +263,15 @@ public class ContactInfoFragment extends BaseFragment {
 		mHeaderContainerEmail = view.findViewById(R.id.email_container);
 		mHeaderPhone = (TextView) view.findViewById(R.id.phone);
 		mHeaderEmail = (TextView) view.findViewById(R.id.email);
+		mHeaderContainerAssignment = view.findViewById(R.id.assign_container);
+		mHeaderAssignment = (Button) view.findViewById(R.id.assign);
+		mHeaderAssignment.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+				final ContactAssignmentDialog dialog = ContactAssignmentDialog.show(getFragmentManager(), mPerson);
+				dialog.setAssignmentListener(ContactInfoFragment.this);
+			}
+		});
 		mHeaderMore = (ViewGroup) view.findViewById(R.id.more);
 		mHeaderMoreText = (TextView) view.findViewById(R.id.expand);
 		mHeaderMoreText.setOnClickListener(new OnClickListener() {
@@ -469,6 +488,22 @@ public class ContactInfoFragment extends BaseFragment {
 		} else {
 			mHeaderEmail.setVisibility(View.GONE);
 			mHeaderContainerEmail.setVisibility(View.GONE);
+		}
+
+		// assignment
+		final Assignment assignment = Application.getDb().getAssignmentDao().queryBuilder()
+				.where(AssignmentDao.Properties.Person_id.eq(mPerson.getId()), AssignmentDao.Properties.Organization_id.eq(Session.getInstance().getOrganizationId())).limit(1).unique();
+
+		if (assignment == null) {
+			mHeaderAssignment.setText("Unassigned");
+		} else {
+			final Person assignedTo = Application.getDb().getPersonDao().load(assignment.getAssigned_to_id());
+
+			if (!U.isNullEmpty(assignedTo.getName())) {
+				mHeaderAssignment.setText(assignedTo.getName());
+			} else {
+				mHeaderAssignment.setText("Assignment Unknown");
+			}
 		}
 
 		// set the "more info" view
@@ -1234,6 +1269,17 @@ public class ContactInfoFragment extends BaseFragment {
 
 	public void openAddress() {
 		// TODO:
+	}
+
+	@Override
+	public void onAssignmentCompleted() {
+		notifyContactUpdated();
+	}
+
+	@Override
+	public void onAssignmentCanceled() {
+		// TODO Auto-generated method stub
+
 	}
 
 }

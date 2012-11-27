@@ -10,14 +10,18 @@ import java.util.Iterator;
 import java.util.List;
 
 import android.content.Context;
+import android.support.v4.app.Fragment;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.util.TypedValue;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.google.common.collect.Ordering;
+import com.google.common.collect.TreeMultimap;
 import com.missionhub.R;
 import com.missionhub.application.Application;
+import com.missionhub.model.Person;
 
 public class U {
 
@@ -232,5 +236,32 @@ public class U {
 		if (telephonyManager.getPhoneType() == TelephonyManager.PHONE_TYPE_NONE) return false;
 
 		return true;
+	}
+
+	public static boolean superGetRetainInstance(final Fragment fragment) {
+		Fragment parentFragment = fragment.getParentFragment();
+		while (parentFragment != null) {
+			if (parentFragment.getRetainInstance()) {
+				return true;
+			}
+			parentFragment = parentFragment.getParentFragment();
+		}
+
+		return fragment.getRetainInstance();
+	}
+
+	public static ArrayList<Person> sortPeople(final Collection<Person> people, final boolean asc) {
+		final TreeMultimap<String, Person> sorted = TreeMultimap.create(Ordering.natural(), Ordering.usingToString());
+
+		for (final Person person : people) {
+			String name = "";
+			if (!U.isNullEmpty(person.getName())) {
+				name = person.getName();
+			}
+
+			sorted.put(name, person);
+		}
+
+		return new ArrayList<Person>(sorted.values());
 	}
 }

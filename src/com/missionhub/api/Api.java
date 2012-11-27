@@ -16,7 +16,6 @@ import org.json.JSONObject;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.os.Build;
-import android.util.Log;
 import ch.boye.httpclientandroidlib.client.utils.URIBuilder;
 
 import com.google.common.collect.HashMultimap;
@@ -786,7 +785,6 @@ public class Api {
 			public Organization call() throws Exception {
 				final String url = Api.getInstance().buildUrlPath("organizations", organizationId);
 				final HttpResponse response = Api.getInstance().doRequest(HttpMethod.GET, url);
-				Log.e(TAG, response.responseBody);
 				try {
 					final GMetaOrganizations gmo = Api.getInstance().gson.fromJson(response.responseBody, GMetaOrganizations.class);
 					return gmo.organizations[0].save(false);

@@ -59,7 +59,7 @@ public class GKeyword {
 					for (final QuestionChoice c : question.getChoices()) {
 						qcd.delete(c);
 					}
-					
+
 					if (q.choices != null) {
 						for (final String c : q.choices) {
 							if (U.isNullEmpty(c)) continue;

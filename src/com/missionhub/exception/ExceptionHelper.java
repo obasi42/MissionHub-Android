@@ -148,9 +148,9 @@ public class ExceptionHelper {
 
 	/** sets the exception and rebuilds the dialog if needed */
 	public void setException(final Throwable throwable) {
-		
+
 		Log.e("ExceptionHelper", throwable.getMessage(), throwable);
-		
+
 		mThrowable = throwable;
 
 		// find the initial issue if it was wrapped in an ExecutionException

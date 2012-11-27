@@ -1,9 +1,10 @@
 package com.missionhub.activity;
 
+import org.holoeverywhere.widget.Toast;
+
 import android.content.Intent;
 import android.os.Bundle;
 
-import org.holoeverywhere.widget.Toast;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.Window;
 import com.missionhub.R;

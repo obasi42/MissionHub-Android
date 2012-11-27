@@ -140,6 +140,11 @@ public class Configuration {
 		return Configuration.getInstance().sProperties.getProperty("ERRBIT_API_KEY", "");
 	}
 
+	public static boolean isSkipSessionUpdate() {
+		final String cache = Configuration.getInstance().sProperties.getProperty("SKIP_SESSION_UPDATE", "false");
+		return Boolean.parseBoolean(cache);
+	}
+
 	@Override
 	public String toString() {
 		return Configuration.getInstance().sProperties.toString();

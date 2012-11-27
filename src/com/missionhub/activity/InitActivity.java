@@ -1,5 +1,9 @@
 package com.missionhub.activity;
 
+import org.holoeverywhere.widget.Button;
+import org.holoeverywhere.widget.ProgressBar;
+import org.holoeverywhere.widget.TextView;
+
 import roboguice.inject.ContentView;
 import roboguice.inject.InjectView;
 import android.app.Activity;
@@ -10,9 +14,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
 
-import org.holoeverywhere.widget.Button;
-import org.holoeverywhere.widget.ProgressBar;
-import org.holoeverywhere.widget.TextView;
 import com.missionhub.R;
 import com.missionhub.application.Application;
 import com.missionhub.application.Session;

@@ -18,7 +18,7 @@ public class FacebookImageDownloader extends URLConnectionImageDownloader {
 			try {
 				final GFQLPicCrop crop = FQL.getPicCrop(Integer.parseInt(uri.getHost()));
 				return getStreamFromNetwork(URI.create(crop.uri));
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				/* ignore */
 			}
 		}

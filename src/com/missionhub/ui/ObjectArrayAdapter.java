@@ -280,11 +280,11 @@ public abstract class ObjectArrayAdapter extends BaseAdapter {
 	public Context getContext() {
 		return mContext;
 	}
-	
+
 	public LayoutInflater getLayoutInflater() {
 		return (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	}
-	
+
 	public abstract static class DisabledItem implements SupportEnable {
 		@Override
 		public boolean isEnabled() {

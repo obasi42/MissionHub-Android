@@ -1,0 +1,26 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="58.0dip" >
+
+    <ImageView
+        android:id="@android:id/icon"
+        android:layout_width="42.0dip"
+        android:layout_height="42.0dip"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="8.0dip"
+        android:src="@drawable/default_contact" />
+
+    <TextView
+        android:id="@android:id/text1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_margin="8.0dip"
+        android:layout_toRightOf="@android:id/icon"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textSize="20.0dip" />
+
+</RelativeLayout>
