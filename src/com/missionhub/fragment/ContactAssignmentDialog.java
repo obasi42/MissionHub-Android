@@ -18,7 +18,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,6 +36,7 @@ import com.missionhub.application.Application;
 import com.missionhub.application.DrawableCache;
 import com.missionhub.application.Session;
 import com.missionhub.application.Session.NoPersonException;
+import com.missionhub.exception.ExceptionHelper;
 import com.missionhub.model.Assignment;
 import com.missionhub.model.AssignmentDao;
 import com.missionhub.model.Group;
@@ -709,7 +709,7 @@ public class ContactAssignmentDialog extends RoboSherlockDialogFragment implemen
 					Toast.makeText(getContext(), "Assignment complete", Toast.LENGTH_SHORT).show();
 					dismiss();
 				} else {
-					onException(new Exception("Failed to assign contact(s)."));
+					onException(new Exception("Server returned error."));
 				}
 
 			}
@@ -721,13 +721,15 @@ public class ContactAssignmentDialog extends RoboSherlockDialogFragment implemen
 
 			@Override
 			public void onException(final Exception e) {
-				Log.e("ContactAssignmentDialog", e.getMessage(), e);
-				Toast.makeText(getContext(), "Assignment failed.", Toast.LENGTH_SHORT).show();
+				final ExceptionHelper eh = new ExceptionHelper(getContext(), e);
+				eh.makeToast("Failed to assign contact(s).");
+
+				ContactAssignmentDialog.this.cancel();
 			}
 
 			@Override
 			public void onInterrupted(final Exception e) {
-				onException(e);
+
 			}
 
 		};

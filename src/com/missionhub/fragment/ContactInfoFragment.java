@@ -13,7 +13,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -37,6 +36,7 @@ import com.missionhub.api.Api.JsonComment;
 import com.missionhub.application.Application;
 import com.missionhub.application.DrawableCache;
 import com.missionhub.application.Session;
+import com.missionhub.exception.ExceptionHelper;
 import com.missionhub.fragment.ContactAssignmentDialog.ContactAssignmentListener;
 import com.missionhub.model.Assignment;
 import com.missionhub.model.AssignmentDao;
@@ -119,9 +119,6 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 
 	/** the contact's email address */
 	private TextView mHeaderEmail;
-
-	/** the contact assignment container */
-	private View mHeaderContainerAssignment;
 
 	/** the contact assignment button */
 	private Button mHeaderAssignment;
@@ -263,7 +260,6 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 		mHeaderContainerEmail = view.findViewById(R.id.email_container);
 		mHeaderPhone = (TextView) view.findViewById(R.id.phone);
 		mHeaderEmail = (TextView) view.findViewById(R.id.email);
-		mHeaderContainerAssignment = view.findViewById(R.id.assign_container);
 		mHeaderAssignment = (Button) view.findViewById(R.id.assign);
 		mHeaderAssignment.setOnClickListener(new OnClickListener() {
 			@Override
@@ -620,8 +616,8 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 
 			@Override
 			public void onException(final Exception e) {
-				Log.e(TAG, e.getMessage(), e);
-				// TODO: display error
+				final ExceptionHelper eh = new ExceptionHelper(getContext(), e);
+				eh.makeToast("Failed to refresh comments.");
 			}
 
 			@Override
@@ -936,23 +932,20 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 						Toast.makeText(Application.getContext(), R.string.contact_comment_deleted, Toast.LENGTH_SHORT).show();
 						refreshComments();
 					} else {
-						showError();
+						onException(new Exception("Server returned error."));
 					}
 				}
 			}
 
 			@Override
 			public void onException(final Exception e) {
-				showError();
+				final ExceptionHelper eh = new ExceptionHelper(getContext(), e);
+				eh.makeToast(R.string.contact_cannot_delete_comment);
 			}
 
 			@Override
 			public void onInterrupted(final Exception e) {
-				showError();
-			}
 
-			public void showError() {
-				Toast.makeText(Application.getContext(), R.string.contact_cannot_delete_comment, Toast.LENGTH_SHORT).show();
 			}
 		};
 		Application.getExecutor().execute(task.future());
@@ -1000,7 +993,7 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 					refreshContact();
 					refreshComments();
 				} else {
-					showError();
+					onException(new Exception("Server returned error."));
 				}
 			}
 
@@ -1012,16 +1005,13 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 
 			@Override
 			public void onException(final Exception e) {
-				showError();
+				final ExceptionHelper eh = new ExceptionHelper(getContext(), e);
+				eh.makeToast(R.string.contact_comment_failed_to_save);
 			}
 
 			@Override
 			public void onInterrupted(final Exception e) {
-				showError();
-			}
 
-			public void showError() {
-				Toast.makeText(Application.getContext(), R.string.contact_comment_failed_to_save, Toast.LENGTH_SHORT).show();
 			}
 		};
 		updateRefreshIcon();
@@ -1239,7 +1229,7 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 					Toast.makeText(Application.getContext(), R.string.contact_role_changed, Toast.LENGTH_SHORT).show();
 					refreshContact();
 				} else {
-					showError();
+					onException(new Exception("Server returned error."));
 				}
 			}
 
@@ -1251,16 +1241,13 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 
 			@Override
 			public void onException(final Exception e) {
-				showError();
+				final ExceptionHelper eh = new ExceptionHelper(getContext(), e);
+				eh.makeToast(R.string.contact_role_failed);
 			}
 
 			@Override
 			public void onInterrupted(final Exception e) {
-				showError();
-			}
 
-			public void showError() {
-				Toast.makeText(getContext(), R.string.contact_role_failed, Toast.LENGTH_SHORT).show();
 			}
 
 		};

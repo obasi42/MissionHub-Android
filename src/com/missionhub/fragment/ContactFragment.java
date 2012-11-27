@@ -25,6 +25,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.missionhub.R;
 import com.missionhub.api.Api;
 import com.missionhub.application.Application;
+import com.missionhub.exception.ExceptionHelper;
 import com.missionhub.model.Person;
 import com.missionhub.ui.NavigationSpinnerAdapter;
 import com.missionhub.ui.widget.LockedViewPager;
@@ -263,13 +264,13 @@ public class ContactFragment extends BaseFragment implements OnNavigationListene
 
 			@Override
 			public void onException(final Exception e) {
-				Log.e("ContactFragment", e.getMessage(), e);
-				// TODO: display error
+				ExceptionHelper eh = new ExceptionHelper(getContext(), e);
+				eh.makeToast("Failed to refresh contact.");
 			}
 
 			@Override
 			public void onInterrupted(final Exception e) {
-				onException(e);
+				
 			}
 		};
 		updateRefreshIcon();

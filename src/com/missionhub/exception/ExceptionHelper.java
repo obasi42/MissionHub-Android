@@ -2,6 +2,8 @@ package com.missionhub.exception;
 
 import java.util.concurrent.ExecutionException;
 
+import org.holoeverywhere.widget.Toast;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -266,5 +268,28 @@ public class ExceptionHelper {
 	/** set whether or not the missionhub support information is appended to the message */
 	public void setAppendSupport(final boolean appendSupport) {
 		mAppendSupport = appendSupport;
+	}
+	
+	/**
+	 * Shows a toast with the data from the exception
+	 */
+	public void makeToast() {
+		Toast.makeText(mContext, getTitle() + "\n\n" + getMessage(), Toast.LENGTH_LONG).show();
+	}
+	
+	/**
+	 * Shows a toast with the data from the exception
+	 * @param failure a failure message to be displayed with the exception data.
+	 */
+	public void makeToast(String failure) {
+		Toast.makeText(mContext, failure + "\n" + getTitle() + "\n\n" + getMessage(), Toast.LENGTH_LONG).show();
+	}
+
+	/**
+	 * Shows a toast with the data from the exception
+	 * @param failure a failure message to be displayed before the exception data.
+	 */
+	public void makeToast(int contactCannotDeleteComment) {
+		makeToast(mContext.getString(contactCannotDeleteComment));
 	}
 }
