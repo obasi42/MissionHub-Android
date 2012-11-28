@@ -36,7 +36,6 @@
         android:layout_below="@+id/name"
         android:paddingLeft="5.0dip"
         android:paddingTop="4.0dip"
-        android:text="Nov 16 at 6:04 pm"
         android:textColor="@color/gray"
         android:textSize="10.0sp" />
 
@@ -46,6 +45,7 @@
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/avatar"
         android:layout_below="@+id/avatar"
+        android:layout_marginRight="9.0dip"
         android:paddingBottom="5.0dip"
         android:paddingTop="5.0dip"
         android:textSize="12.0sp" />

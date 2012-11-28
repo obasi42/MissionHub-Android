@@ -59,12 +59,22 @@ public abstract class ObjectArrayAdapter extends BaseAdapter {
 		return mActiveObjects.get(position);
 	}
 
+	public int indexOf(final Object object) {
+		return mActiveObjects.indexOf(object);
+	}
+
+	public boolean contains(final Object object) {
+		return mActiveObjects.contains(object);
+	}
+
 	@Override
 	public long getItemId(final int position) {
-		final Object object = mActiveObjects.get(position);
-		if (object != null && object instanceof ItemIdProvider) {
-			return ((ItemIdProvider) object).getItemId();
-		}
+		try {
+			final Object object = mActiveObjects.get(position);
+			if (object != null && object instanceof ItemIdProvider) {
+				return ((ItemIdProvider) object).getItemId();
+			}
+		} catch (Exception e) { /* ignore */}
 		return 0;
 	}
 
@@ -97,7 +107,9 @@ public abstract class ObjectArrayAdapter extends BaseAdapter {
 	public abstract View getView(int position, View convertView, ViewGroup parent);
 
 	@Override
-	public abstract View getDropDownView(int position, View convertView, ViewGroup parent);
+	public View getDropDownView(int position, View convertView, ViewGroup parent) {
+		return null;
+	}
 
 	public interface ItemIdProvider {
 		long getItemId();

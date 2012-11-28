@@ -1,14 +1,16 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:background="@color/orange" >
+    android:background="@color/orange" 
+    android:paddingLeft="16.0dip"
+    android:paddingRight="16.0dip"
+    
+    >
 
     <TextView
         android:id="@+id/keyword"
         android:layout_width="fill_parent"
         android:layout_height="60.0dip"
-        android:layout_marginLeft="16.0dip"
-        android:layout_marginRight="16.0dip"
         android:background="@color/orange"
         android:ellipsize="end"
         android:gravity="center_vertical"

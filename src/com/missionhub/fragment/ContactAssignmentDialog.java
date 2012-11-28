@@ -14,6 +14,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnKeyListener;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -46,6 +47,10 @@ import com.missionhub.model.Person;
 import com.missionhub.ui.ObjectArrayAdapter;
 import com.missionhub.ui.widget.LockedViewPager;
 import com.missionhub.util.U;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.PauseOnScrollListener;
+import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 
 public class ContactAssignmentDialog extends RoboSherlockDialogFragment implements OnKeyListener, OnItemClickListener {
 
@@ -121,6 +126,8 @@ public class ContactAssignmentDialog extends RoboSherlockDialogFragment implemen
 				mPeople = new HashSet<Person>(people);
 			}
 		}
+
+		setStyle(DialogFragment.STYLE_NORMAL, R.style.Theme_Sherlock_Light_Dialog);
 	}
 
 	@Override
@@ -264,8 +271,13 @@ public class ContactAssignmentDialog extends RoboSherlockDialogFragment implemen
 
 	public static class ContactAssignmentAdapter extends ObjectArrayAdapter {
 
+		final DisplayImageOptions mImageLoaderOptions;
+
 		public ContactAssignmentAdapter(final Context context) {
 			super(context);
+
+			mImageLoaderOptions = new DisplayImageOptions.Builder().displayer(new FadeInBitmapDisplayer(200)).showImageForEmptyUri(R.drawable.default_contact)
+					.showStubImage(R.drawable.default_contact).cacheInMemory().cacheOnDisc().build();
 		}
 
 		@Override
@@ -298,9 +310,7 @@ public class ContactAssignmentDialog extends RoboSherlockDialogFragment implemen
 				holder.text1.setText(item.leader.getName());
 
 				if (!U.isNullEmpty(item.leader.getPicture())) {
-					Application.getImageLoader().displayImage(item.leader.getPicture(), holder.icon, Application.getImageLoaderOptions());
-				} else {
-					holder.icon.setImageDrawable(DrawableCache.getDrawable(R.drawable.default_contact));
+					ImageLoader.getInstance().displayImage(item.leader.getPicture(), holder.icon, mImageLoaderOptions);
 				}
 			} else if (object instanceof GroupItem) {
 				final GroupItem item = (GroupItem) object;
@@ -319,9 +329,7 @@ public class ContactAssignmentDialog extends RoboSherlockDialogFragment implemen
 				final AssignMeItem item = (AssignMeItem) object;
 				holder.text1.setText("Me");
 				if (!U.isNullEmpty(item.me.getPicture())) {
-					Application.getImageLoader().displayImage(item.me.getPicture(), holder.icon, Application.getImageLoaderOptions());
-				} else {
-					holder.icon.setImageDrawable(DrawableCache.getDrawable(R.drawable.default_contact));
+					ImageLoader.getInstance().displayImage(item.me.getPicture(), holder.icon, mImageLoaderOptions);
 				}
 			} else if (object instanceof AssignNoneItem) {
 				// nothing to do here
@@ -456,6 +464,7 @@ public class ContactAssignmentDialog extends RoboSherlockDialogFragment implemen
 			final View view = inflater.inflate(R.layout.fragment_assignment_dialog_selection, null);
 
 			mListView = (ListView) view.findViewById(R.id.listview);
+			mListView.setOnScrollListener(new PauseOnScrollListener(false, true));
 
 			if (mLeaderAdapter == null) {
 				mLeaderAdapter = new ContactAssignmentAdapter(getActivity());
@@ -687,7 +696,6 @@ public class ContactAssignmentDialog extends RoboSherlockDialogFragment implemen
 				}
 
 				boolean status = false;
-				Api.getPeople(personIds);
 
 				if (leader == null) {
 					status = Api.deleteContactAssigment(personIds).get();
@@ -700,6 +708,7 @@ public class ContactAssignmentDialog extends RoboSherlockDialogFragment implemen
 				if (status) {
 					Api.getPeople(personIds).get();
 				}
+
 				return status;
 			}
 

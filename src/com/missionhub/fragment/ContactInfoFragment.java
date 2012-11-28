@@ -50,7 +50,9 @@ import com.missionhub.util.IntentHelper;
 import com.missionhub.util.TimeAgo;
 import com.missionhub.util.U;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.assist.OnScrollSmartOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.PauseOnScrollListener;
+import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 
 public class ContactInfoFragment extends BaseFragment implements ContactAssignmentListener {
 
@@ -119,11 +121,11 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 
 	/** the contact's email address */
 	private TextView mHeaderEmail;
-
+	
 	/** the contact assignment button */
 	private Button mHeaderAssignment;
 
-	/** the container for the more inforation view */
+	/** the container for the more information view */
 	private ViewGroup mHeaderMore;
 
 	/** the more info collapse/expand text */
@@ -171,6 +173,9 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 	/** true when layout is completed */
 	private boolean mLayoutComplete = false;
 
+	/** image loader options for the avatar */
+	private DisplayImageOptions mImageLoaderOptions;
+
 	/**
 	 * Creates a new ContactInfoFragment with a person id
 	 * 
@@ -196,6 +201,13 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 		mPersonId = arguments.getLong("personId", -1);
 		mPerson = Application.getDb().getPersonDao().load(mPersonId);
 
+		mImageLoaderOptions = new DisplayImageOptions.Builder()
+		.displayer(new FadeInBitmapDisplayer(200))
+		.showImageForEmptyUri(R.drawable.default_contact)
+        .cacheInMemory()
+        .cacheOnDisc()
+        .build();
+		
 		refreshComments();
 	}
 
@@ -203,6 +215,7 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 	public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
 		final ViewGroup view = (ViewGroup) inflater.inflate(R.layout.fragment_contact_info, null);
 		mListView = (ListView) view.findViewById(R.id.listview);
+		mListView.setOnScrollListener(new PauseOnScrollListener(false, true));
 
 		// the header
 		final View header = inflater.inflate(R.layout.fragment_contact_info_header, null);
@@ -214,15 +227,11 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 		initCommentView(comment);
 		mListView.addHeaderView(comment);
 
-		final OnScrollSmartOptions smartOptions = new OnScrollSmartOptions(Application.getImageLoaderOptions());
-		mListView.setOnScrollListener(smartOptions);
-
 		// setup the adapter if needed
 		if (mAdapter == null) {
-			mAdapter = new CommentArrayAdapter(getActivity(), smartOptions.getOptions());
+			mAdapter = new CommentArrayAdapter(getActivity());
 		} else {
 			mAdapter.setContext(getActivity());
-			mAdapter.setImageOptions(smartOptions.getOptions());
 		}
 
 		// set the list adapter
@@ -423,11 +432,13 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 		// avatar
 		if (!U.isNullEmpty(mPerson.getPicture())) {
 			if (mPerson.getPicture().contains("facebook.com") && !U.isNullEmpty(mPerson.getFb_id())) {
-				Application.getImageLoader().displayImage("fb://" + mPerson.getFb_id(), mHeaderAvatar, Application.getImageLoaderOptions());
+				ImageLoader.getInstance().displayImage("fb://" + mPerson.getFb_id(), mHeaderAvatar, mImageLoaderOptions);
 			} else {
-				Application.getImageLoader().displayImage(mPerson.getPicture(), mHeaderAvatar, Application.getImageLoaderOptions());
+				ImageLoader.getInstance().displayImage(mPerson.getPicture(), mHeaderAvatar, mImageLoaderOptions);
 			}
 		} else {
+			ImageLoader.getInstance().displayImage(null, mHeaderAvatar, mImageLoaderOptions);
+			
 			mHeaderAvatar.setImageDrawable(DrawableCache.getDrawable(R.drawable.default_contact));
 		}
 
@@ -643,16 +654,18 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 		/** date used for comparisons */
 		private static final Date sWeekAgo = new Date(System.currentTimeMillis() - (7 * 1000 * 60 * 60 * 24));
 
-		/** image display options */
-		private DisplayImageOptions mImageScrollOptions;
-
-		public CommentArrayAdapter(final Context context, final DisplayImageOptions options) {
+		private DisplayImageOptions mImageLoaderOptions;
+		
+		public CommentArrayAdapter(final Context context) {
 			super(context);
-			setImageOptions(options);
-		}
-
-		public void setImageOptions(final DisplayImageOptions options) {
-			mImageScrollOptions = options;
+			
+			mImageLoaderOptions = new DisplayImageOptions.Builder()
+			.displayer(new FadeInBitmapDisplayer(200))
+			.showImageForEmptyUri(R.drawable.default_contact)
+			.showStubImage(R.drawable.default_contact)
+	        .cacheInMemory()
+	        .cacheOnDisc()
+	        .build();
 		}
 
 		@Override
@@ -695,11 +708,7 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 						} else {
 							holder.name.setVisibility(View.GONE);
 						}
-						if (!U.isNullEmpty(i.getCommenter().getPicture())) {
-							Application.getImageLoader().displayImage(i.getCommenter().getPicture(), holder.avatar, mImageScrollOptions);
-						} else {
-							holder.avatar.setImageDrawable(DrawableCache.getDrawable(R.drawable.default_contact));
-						}
+						ImageLoader.getInstance().displayImage(i.getCommenter().getPicture(), holder.avatar, mImageLoaderOptions);
 					}
 
 					if (!U.isNullEmpty(i.comment.getUpdated_at())) {
@@ -1045,7 +1054,7 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 		@Override
 		public View getDropDownView(final int position, final View convertView, final ViewGroup parent) {
 			final View view = getView(position, convertView, parent);
-			final int padding = Math.round(U.dpToPixel(12, getContext()));
+			final int padding = Math.round(U.dpToPixel(12));
 			view.setPadding(padding, padding, padding, padding);
 			return view;
 		}

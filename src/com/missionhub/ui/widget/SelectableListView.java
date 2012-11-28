@@ -31,7 +31,7 @@ public class SelectableListView extends ListView {
 	private int mSelectionSide = SIDE_RIGHT;
 
 	/** the current selection width */
-	private int mSelectionWidth = (int) U.dpToPixel(56, getContext());
+	private int mSelectionWidth = (int) U.dpToPixel(56);
 
 	/** state variable for determining if a press is in selection mode */
 	private boolean mSelectionMode = false;
@@ -200,7 +200,7 @@ public class SelectableListView extends ListView {
 	 * @param width
 	 */
 	public void setSelectionWidth(final int widthDip) {
-		mSelectionWidth = (int) U.dpToPixel(widthDip, getContext());
+		mSelectionWidth = (int) U.dpToPixel(widthDip);
 	}
 
 	/**

@@ -8,7 +8,6 @@ import android.os.Bundle;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.Window;
 import com.missionhub.R;
-import com.missionhub.application.Session;
 import com.missionhub.application.Session.SessionInvalidTokenEvent;
 import com.missionhub.application.Session.SessionInvalidatedEvent;
 import com.missionhub.fragment.MainFragment;
@@ -39,7 +38,7 @@ public class MainActivity extends BaseAuthenticatedMenuActivity {
 		getSlidingMenu().setBehindScrollScale(1f);
 		getSlidingMenu().setBehindWidthRes(R.dimen.main_menu_width);
 		getSlidingMenu().setShadowDrawable(R.drawable.main_menu_shadow);
-		getSlidingMenu().setShadowWidth(Math.round(U.dpToPixel(2, this)));
+		getSlidingMenu().setShadowWidth(Math.round(U.dpToPixel(2)));
 		setBehindContentView(R.layout.menu_frame);
 
 		// show the up button to access the menu
@@ -53,12 +52,6 @@ public class MainActivity extends BaseAuthenticatedMenuActivity {
 			mMenuFragment = new MainMenuFragment();
 			setFragment(mFragment);
 			setMenuFragment(mMenuFragment);
-		}
-
-		if (savedInstanceState == null) {
-			final Intent intent = new Intent(this, ContactActivity.class);
-			intent.putExtra("personId", Session.getInstance().getPersonId());
-			startActivity(intent);
 		}
 	}
 

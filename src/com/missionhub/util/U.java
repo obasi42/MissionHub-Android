@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;
@@ -48,7 +49,7 @@ public class U {
 	 * @return date object
 	 */
 	public static Date parseUTC(String s) {
-		final java.text.DateFormat df = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
+		final java.text.DateFormat df = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss", Locale.US);
 		df.setTimeZone(java.util.TimeZone.getTimeZone("Zulu"));
 		s = s.replace("UTC", "");
 
@@ -72,7 +73,7 @@ public class U {
 			return ISO8601.parse(iso8601String).getTime();
 		} catch (final Exception e) {
 			try {
-				final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+				final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US);
 				return df.parse(iso8601String);
 			} catch (final Exception e2) {
 				Log.w(TAG, "Could not parse date", e);
@@ -156,8 +157,12 @@ public class U {
 	 * @param context
 	 * @return
 	 */
-	public static float dpToPixel(final float dip, final Context context) {
-		return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dip, context.getResources().getDisplayMetrics());
+	public static float dpToPixel(final float dip) {
+		return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dip, Application.getContext().getResources().getDisplayMetrics());
+	}
+
+	public static float pixelToDp(final float px) {
+		return px / (Application.getContext().getResources().getDisplayMetrics().densityDpi / 160f);
 	}
 
 	/**

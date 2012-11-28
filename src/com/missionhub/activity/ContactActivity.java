@@ -1,5 +1,7 @@
 package com.missionhub.activity;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
@@ -7,6 +9,7 @@ import android.util.Log;
 import com.actionbarsherlock.view.MenuItem;
 import com.missionhub.R;
 import com.missionhub.fragment.ContactFragment;
+import com.missionhub.model.Person;
 
 public class ContactActivity extends BaseAuthenticatedActivity {
 
@@ -55,6 +58,16 @@ public class ContactActivity extends BaseAuthenticatedActivity {
 	public void onRestoreInstanceState(final Bundle savedInstanceState) {
 		super.onRestoreInstanceState(savedInstanceState);
 		mPersonId = savedInstanceState.getLong("mPersonId");
+	}
+
+	public static void start(final Context context, final long personId) {
+		final Intent intent = new Intent(context, ContactActivity.class);
+		intent.putExtra("personId", personId);
+		context.startActivity(intent);
+	}
+
+	public static void start(final Context context, final Person p) {
+		start(context, p.getId());
 	}
 
 }

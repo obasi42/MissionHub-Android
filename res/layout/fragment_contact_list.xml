@@ -1,12 +1,27 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
+    android:layout_height="fill_parent"
+    android:animateLayoutChanges="true" >
 
-<!--     <com.missionhub.ui.widget.ContactListView
-        android:id="@+id/contact_list"
+    <com.missionhub.contactlist.ContactListView
+        android:id="@android:id/list"
+        android:background="@drawable/item_background"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        missionhub:item_layout_resource="@layout/item_contact" >
-    </com.missionhub.ui.widget.ContactListView> -->
+        android:layout_height="wrap_content"
+        android:animateLayoutChanges="true" />
+
+    <RelativeLayout
+        android:id="@android:id/empty"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" >
+
+        <TextView
+            android:id="@android:id/text1"
+            android:layout_centerInParent="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No Contacts"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+    </RelativeLayout>
 
 </FrameLayout>

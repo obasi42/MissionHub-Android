@@ -2,11 +2,7 @@ package com.missionhub.api;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 
@@ -18,7 +14,6 @@ import android.accounts.OperationCanceledException;
 import android.os.Build;
 import ch.boye.httpclientandroidlib.client.utils.URIBuilder;
 
-import com.google.common.collect.HashMultimap;
 import com.google.gson.Gson;
 import com.missionhub.application.Application;
 import com.missionhub.application.Configuration;
@@ -95,7 +90,9 @@ public class Api {
 			if (headers == null) {
 				headers = new HttpHeaders();
 			}
-			headers.setHeader("Accept", "application/vnd.missionhub-v" + Configuration.getApiVersion() + "+json");
+			if (headers.getHeaders("Accept").size() <= 0) {
+				headers.setHeader("Accept", "application/vnd.missionhub-v" + Configuration.getApiVersion() + "+json");
+			}
 
 			// add oauth token to the request if needed
 			if (authenticated) {
@@ -305,11 +302,14 @@ public class Api {
 				final String url = Api.getInstance().buildUrlPath("contact_assignments.json");
 
 				final HttpParams params = new HttpParams();
-				params.add("id", U.toCSV(personIds));
-				params.add("type", type.name());
-				params.add("assign_to_id", U.toCSV(toIds));
+				params.add("ids", U.toCSV(personIds));
+				//params.add("type", type.name());
+				params.add("assign_to", U.toCSV(toIds));
+				
+				HttpHeaders headers= new HttpHeaders();
+				headers.setHeader("Accept", "application/vnd.missionhub-v1+json");
 
-				Api.getInstance().doRequest(HttpMethod.POST, url, params);
+				Api.getInstance().doRequest(HttpMethod.POST, url, headers, params);
 				return true;
 			}
 		};
@@ -329,14 +329,25 @@ public class Api {
 		final Callable<Boolean> callable = new Callable<Boolean>() {
 			@Override
 			public Boolean call() throws Exception {
-				final String url = Api.getInstance().buildUrlPath("contact_assignments", U.toCSV(personIds) + ".json");
+				for(Long id : personIds) {
+					final String url = Api.getInstance().buildUrlPath("contact_assignments", id + ".json");
 
-				final HttpParams params = new HttpParams();
-				params.add("ids", U.toCSV(personIds));
-				params.add("_method", "delete");
+					final HttpParams params = new HttpParams();
+					params.add("ids", id);
+					params.add("_method", "delete");
 
-				Api.getInstance().doRequest(HttpMethod.POST, url, params);
+					Api.getInstance().doRequest(HttpMethod.POST, url, params);
+				}
 				return true;
+//				
+//				final String url = Api.getInstance().buildUrlPath("contact_assignments", U.toCSV(personIds) + ".json");
+//
+//				final HttpParams params = new HttpParams();
+//				params.add("ids", U.toCSV(personIds));
+//				params.add("_method", "delete");
+//
+//				Api.getInstance().doRequest(HttpMethod.POST, url, params);
+//				return true;
 			}
 		};
 		final FutureTask<Boolean> task = new FutureTask<Boolean>(callable);
@@ -412,16 +423,14 @@ public class Api {
 	 *            the options used to create the search query
 	 * @return
 	 */
-	public static FutureTask<List<Person>> getContactList(final ContactListOptions options) {
+	public static FutureTask<List<Person>> getContactList(final ApiContactListOptions options) {
 		final Callable<List<Person>> callable = new Callable<List<Person>>() {
 			@Override
 			public List<Person> call() throws Exception {
 				final String url = Api.getInstance().buildUrlPath("contacts.json");
 
 				final HttpParams params = new HttpParams();
-				options.appendLimits(params);
-				options.appendFiltersParams(params);
-				options.appendOrderByParam(params);
+				options.appendParams(params);
 
 				final HttpResponse response = Api.getInstance().doRequest(HttpMethod.GET, url, params);
 				try {
@@ -436,184 +445,6 @@ public class Api {
 		final FutureTask<List<Person>> task = new FutureTask<List<Person>>(callable);
 		Application.getExecutor().execute(task);
 		return task;
-	}
-
-	/**
-	 * Options for getContactList
-	 */
-	public static class ContactListOptions {
-
-		private int start = 0;
-		private int limit = 20;
-		private boolean atEnd = false;
-
-		private final HashMultimap<String, String> filters = HashMultimap.<String, String> create();
-		private final HashMap<String, String> orderBy = new HashMap<String, String>();
-
-		public ContactListOptions() {}
-
-		public int getStart() {
-			return start;
-		}
-
-		public void setStart(final int start) {
-			this.start = start;
-		}
-
-		public void incrementStart(final int num) {
-			this.start += num;
-		}
-
-		public int getLimit() {
-			return limit;
-		}
-
-		public void setLimit(final int limit) {
-			this.limit = limit;
-		}
-
-		protected HttpParams appendLimits(final HttpParams params) {
-			params.add("start", String.valueOf(start));
-			params.add("limit", String.valueOf(limit));
-			return params;
-		}
-
-		public HashMultimap<String, String> getFilters() {
-			return filters;
-		}
-
-		protected HttpParams appendFiltersParams(final HttpParams params) {
-			final Iterator<String> itr = filters.keySet().iterator();
-			while (itr.hasNext()) {
-				final String filter = itr.next();
-				final StringBuffer value = new StringBuffer();
-				final Iterator<String> itr2 = filters.get(filter).iterator();
-				while (itr2.hasNext()) {
-					final String val = itr2.next();
-					value.append(stripUnsafeChars(val));
-					if (itr2.hasNext()) {
-						value.append("|");
-					}
-				}
-				params.add("filters[" + stripUnsafeChars(filter) + "]", value.toString());
-			}
-			return params;
-		}
-
-		public void addFilter(final String filter, final String value) {
-			filters.put(filter, value);
-		}
-
-		public void setFilter(final String filter, final String value) {
-			removeFilter(filter);
-			addFilter(filter, value);
-		}
-
-		public void removeFilter(final String filter) {
-			filters.removeAll(filter);
-		}
-
-		public void removeFilterValue(final String filter, final String value) {
-			filters.remove(filter, value);
-		}
-
-		public boolean hasFilter(final String filter) {
-			return filters.containsKey(filter);
-		}
-
-		public boolean hasFilter(final String filter, final String value) {
-			return filters.containsEntry(filter, value);
-		}
-
-		public String getFilterValue(final String filter) {
-			final Iterator<String> itr = filters.get(filter).iterator();
-			while (itr.hasNext()) {
-				return itr.next();
-			}
-			return null;
-		}
-
-		public Set<String> getFilterValues(final String filter) {
-			return filters.get(filter);
-		}
-
-		public void clearFilters() {
-			filters.clear();
-		}
-
-		public HashMap<String, String> getOrderBy() {
-			return orderBy;
-		}
-
-		protected HttpParams appendOrderByParam(final HttpParams params) {
-			final StringBuffer sb = new StringBuffer();
-			final Iterator<Entry<String, String>> itr = orderBy.entrySet().iterator();
-			while (itr.hasNext()) {
-				final Entry<String, String> entry = itr.next();
-				sb.append(stripUnsafeChars(entry.getKey()) + "," + stripUnsafeChars(entry.getValue()));
-				if (itr.hasNext()) {
-					sb.append("|");
-				}
-			}
-
-			if (!orderBy.isEmpty()) params.add("order_by", sb.toString());
-
-			return params;
-		}
-
-		public void addOrderBy(final String value) {
-			orderBy.put(value, "asc");
-		}
-
-		public void addOrderBy(final String value, final String direction) {
-			orderBy.put(value, direction);
-		}
-
-		public void removeOrderBy(final String value) {
-			orderBy.remove(value);
-		}
-
-		public void clearOrderBy() {
-			orderBy.clear();
-		}
-
-		protected String getTag() {
-			final HttpParams params = new HttpParams();
-			this.appendFiltersParams(params);
-			this.appendOrderByParam(params);
-			return params.toString();
-		}
-
-		private String stripUnsafeChars(final String string) {
-			return string.replaceAll("[\\]\\[|=?]", "");
-		}
-
-		@Override
-		public String toString() {
-			final HttpParams params = new HttpParams();
-			this.appendFiltersParams(params);
-			this.appendLimits(params);
-			this.appendOrderByParam(params);
-			return params.toString();
-		}
-
-		public boolean isAtEnd() {
-			return atEnd;
-		}
-
-		public void setIsAtEnd(final boolean atEnd) {
-			this.atEnd = atEnd;
-		}
-
-		public void advanceStart() {
-			this.start += this.limit;
-		}
-
-		public void resetPosition() {
-			this.start = 0;
-			this.atEnd = false;
-		}
-
 	}
 
 	// **********************************//

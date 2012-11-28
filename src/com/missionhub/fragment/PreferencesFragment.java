@@ -20,6 +20,9 @@ import com.missionhub.application.Session.SessionOrganizationIdChanged;
 import com.missionhub.model.Organization;
 import com.missionhub.ui.ObjectArrayAdapter;
 import com.missionhub.util.TreeDataStructure;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 
 public class PreferencesFragment extends BaseFragment {
 
@@ -29,12 +32,20 @@ public class PreferencesFragment extends BaseFragment {
 
 	private OrganizationsAdapter mOrganizationsAdapter;
 	private int mDefaultSpinnerIndex = 0;
+	private DisplayImageOptions mImageLoaderOptions;
 
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setRetainInstance(true);
 		setHasOptionsMenu(true);
+		
+		mImageLoaderOptions = new DisplayImageOptions.Builder()
+		.displayer(new FadeInBitmapDisplayer(200))
+		.showImageForEmptyUri(R.drawable.default_contact)
+        .cacheInMemory()
+        .cacheOnDisc()
+        .build();
 	}
 
 	@Override
@@ -74,8 +85,10 @@ public class PreferencesFragment extends BaseFragment {
 
 		try {
 			mName.setText(Session.getInstance().getPerson().getName());
+			ImageLoader.getInstance().displayImage(Session.getInstance().getPerson().getPicture(), mPicture, mImageLoaderOptions);
 			// TODO: set picture;
 		} catch (final NoPersonException e) { /* this should be impossible */}
+		
 	}
 
 	@Override

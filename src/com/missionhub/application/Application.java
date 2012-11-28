@@ -6,7 +6,6 @@ import java.util.concurrent.Executors;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.missionhub.R;
 import com.missionhub.model.DaoMaster;
 import com.missionhub.model.DaoMaster.OpenHelper;
 import com.missionhub.model.DaoSession;
@@ -19,7 +18,6 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
-import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 import com.nostra13.universalimageloader.utils.StorageUtils;
 
 import de.greenrobot.event.EventBus;
@@ -50,12 +48,6 @@ public class Application extends android.app.Application {
 	/** the generic (context-less!) object store - this is to hold on to the object as long as the application is alive */
 	private static final ObjectStore mObjectStore = ObjectStore.getInstance();
 
-	/** the application-wide image loader */
-	private static ImageLoader mImageLoader;
-
-	/** the default display image options */
-	private static DisplayImageOptions mDisplayImageOptions;
-
 	/**
 	 * called when the application is created.
 	 */
@@ -69,6 +61,16 @@ public class Application extends android.app.Application {
 
 		// set the last last version id for future upgrades
 		SettingsManager.setApplicationLastVersionId(getVersionCode());
+
+		// setup the image loader
+		final DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder().cacheInMemory().cacheOnDisc().build();
+
+		final ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(Application.getContext()).threadPriority(Thread.NORM_PRIORITY - 2).memoryCacheSize(10 * 1024 * 1024)
+				.defaultDisplayImageOptions(defaultOptions).discCacheFileNameGenerator(new Md5FileNameGenerator())
+				.discCache(new UnlimitedDiscCache(StorageUtils.getOwnCacheDirectory(Application.getContext(), ".missionhub/cache"))).tasksProcessingOrder(QueueProcessingType.LIFO)
+				.imageDownloader(new FacebookImageDownloader()).build();
+
+		ImageLoader.getInstance().init(config);
 	}
 
 	/**
@@ -210,27 +212,4 @@ public class Application extends android.app.Application {
 	public static ObjectStore getObjectStore() {
 		return mObjectStore;
 	}
-
-	public static ImageLoader getImageLoader() {
-		if (mImageLoader == null) {
-			final ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(Application.getContext()).threadPriority(Thread.NORM_PRIORITY - 2).threadPoolSize(3).offOutOfMemoryHandling()
-					.memoryCacheSize(2 * 1024 * 1024).discCacheFileNameGenerator(new Md5FileNameGenerator())
-					.discCache(new UnlimitedDiscCache(StorageUtils.getOwnCacheDirectory(Application.getContext(), ".missionhub/cache"))).tasksProcessingOrder(QueueProcessingType.LIFO)
-					.imageDownloader(new FacebookImageDownloader()).build();
-
-			mImageLoader = ImageLoader.getInstance();
-			mImageLoader.init(config);
-		}
-		return mImageLoader;
-	}
-
-	public static DisplayImageOptions getImageLoaderOptions() {
-		if (mDisplayImageOptions == null) {
-
-			mDisplayImageOptions = new DisplayImageOptions.Builder().showStubImage(R.drawable.default_contact).showImageForEmptyUri(R.drawable.default_contact).cacheInMemory().cacheOnDisc()
-					.displayer(new FadeInBitmapDisplayer(200)).build();
-		}
-		return mDisplayImageOptions;
-	}
-
 }

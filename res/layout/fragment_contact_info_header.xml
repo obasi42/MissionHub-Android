@@ -183,7 +183,7 @@
         android:layout_height="37.0dip"
         android:layout_below="@id/middle"
         android:layout_marginLeft="16.0dip"
-        android:layout_marginRight="24.0dip"
+        android:layout_marginRight="16.0dip"
         android:layout_marginTop="16.0dip"
         android:gravity="center_vertical" >
 
@@ -191,7 +191,8 @@
             android:id="@+id/assign_container"
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
-            android:layout_alignParentLeft="true" >
+            android:layout_alignParentLeft="true"
+            android:layout_toLeftOf="@+id/expand" >
 
             <Button
                 android:id="@+id/assign"
@@ -199,8 +200,8 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
-                android:background="@drawable/gray_button"
-                android:text="Button" />
+                android:singleLine="true"
+                android:background="@drawable/gray_button" />
         </RelativeLayout>
 
         <TextView
@@ -212,7 +213,6 @@
             android:drawablePadding="12.0dip"
             android:drawableRight="@drawable/ic_action_expand"
             android:gravity="center_vertical"
-            android:minWidth="50.0dip"
             android:padding="8.0dip"
             android:text="@string/contact_info_expand"
             android:textColor="#ff999999"

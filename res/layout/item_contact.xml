@@ -1,0 +1,50 @@
+<com.missionhub.contactlist.ContactItemView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="64.0dip"
+    android:padding="8.0dip" 
+    android:background="@drawable/list_item_background"
+    >
+
+    <ImageView
+        android:id="@+id/avatar"
+        android:layout_width="50.0dip"
+        android:layout_height="50.0dip"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:src="@drawable/default_contact" />
+
+    <ImageView
+        android:id="@+id/checkmark"
+        android:layout_width="20.0dip"
+        android:layout_height="20.0dip"
+        android:layout_marginRight="4.0dip"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+         />
+
+    <LinearLayout
+        android:id="@+id/name_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="8.0dip"
+        android:layout_toLeftOf="@+id/checkmark"
+        android:layout_toRightOf="@+id/avatar"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Large Text"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <TextView
+            android:id="@+id/status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TextView" />
+    </LinearLayout>
+
+</com.missionhub.contactlist.ContactItemView>

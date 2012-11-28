@@ -12,7 +12,7 @@ import com.actionbarsherlock.view.SubMenu;
 import com.actionbarsherlock.widget.SearchView;
 import com.actionbarsherlock.widget.SearchView.OnQueryTextListener;
 import com.missionhub.R;
-import com.missionhub.fragment.ContactListFragment;
+import com.missionhub.contactlist.ContactListFragment;
 
 public class SearchMenuItemHelper implements OnQueryTextListener, OnFocusChangeListener {
 

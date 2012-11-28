@@ -47,10 +47,10 @@ public class MainMenuFragment extends BaseFragment implements OnItemClickListene
 		if (mAdapter == null) {
 			mAdapter = new MainMenuAdapter(getActivity());
 
-			mAdapter.add(new MainMenuItem(R.id.menu_item_dashboard, R.string.menu_dashboard));
+			//mAdapter.add(new MainMenuItem(R.id.menu_item_dashboard, R.string.menu_dashboard));
 			mAdapter.add(new MainMenuItem(R.id.menu_item_my_contacts, R.string.menu_my_contacts, R.drawable.ic_main_menu_card));
 			mAdapter.add(new MainMenuItem(R.id.menu_item_all_contacts, R.string.menu_all_contacts, R.drawable.ic_main_menu_contacts));
-			mAdapter.add(new MainMenuItem(R.id.menu_item_groups, R.string.menu_groups));
+			//mAdapter.add(new MainMenuItem(R.id.menu_item_groups, R.string.menu_groups));
 			mAdapter.add(new MainMenuItem(R.id.menu_item_surveys, R.string.menu_surveys, R.drawable.ic_main_menu_survey));
 
 			mAdapter.add(new MainMenuDivider(R.string.menu_div_account));
