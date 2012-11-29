@@ -5,6 +5,10 @@ import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.util.concurrent.FutureTask;
 
+import org.holoeverywhere.widget.ProgressBar;
+import org.holoeverywhere.widget.TextView;
+import org.holoeverywhere.widget.Toast;
+
 import roboguice.inject.ContentView;
 import roboguice.inject.InjectView;
 import roboguice.util.RoboAsyncTask;
@@ -22,9 +26,6 @@ import android.webkit.CookieSyncManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.webkit.WebViewDatabase;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
 import ch.boye.httpclientandroidlib.client.utils.URIBuilder;
 
 import com.actionbarsherlock.view.Window;

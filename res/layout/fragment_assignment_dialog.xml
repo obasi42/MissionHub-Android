@@ -11,7 +11,7 @@
         android:padding="16.0dip"
         android:visibility="gone" >
 
-        <ProgressBar
+        <org.holoeverywhere.widget.ProgressBar
             android:id="@+id/progress"
             style="@style/Holo.ProgressBar"
             android:layout_width="wrap_content"
@@ -19,7 +19,7 @@
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true" />
 
-        <TextView
+        <org.holoeverywhere.widget.TextView
             android:id="@android:id/text1"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"

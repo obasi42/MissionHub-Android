@@ -3,7 +3,7 @@
     android:layout_height="wrap_content"
     android:minHeight="58.0dip" >
 
-    <TextView
+    <org.holoeverywhere.widget.TextView
         android:id="@android:id/text1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -11,7 +11,7 @@
         android:layout_centerVertical="true"
         android:layout_marginLeft="8.0dip" />
 
-    <TextView
+    <org.holoeverywhere.widget.TextView
         android:id="@android:id/text1"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
