@@ -88,11 +88,10 @@
 	<taskdef name="xmltask" classname="com.oopsconsultancy.xmltask.ant.XmlTask" classpath="libs-ext/xmltask.jar"/>
 	
 	<target name="increment-manifest-version">
-		<buildnumber />
-
+		<property environment="env" /> 
 		<xmltask source="AndroidManifest.xml" dest="AndroidManifest.xml">
-			<replace path="manifest/@android:versionCode" withText="${build.number}" />
-			<regexp path="/manifest/@android:versionName" pattern="([x0-9]*).$" replace="${build.number}" casesensitive="false" />
+			<replace path="manifest/@android:versionCode" withText="${env.BUILD_NUMBER}" />
+			<regexp path="/manifest/@android:versionName" pattern="([x0-9]*).$" replace="${env.BUILD_NUMBER}" casesensitive="false" />
 		</xmltask>
 	</target>
 
