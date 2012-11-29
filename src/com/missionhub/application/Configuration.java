@@ -53,11 +53,11 @@ public class Configuration {
 	}
 
 	public static enum Market {
-		ANDROID, AMAZON, NOOK
+		PLAY, AMAZON, NOOK
 	}
 
 	public static Market getMarket() {
-		final String market = Configuration.getInstance().sProperties.getProperty("MARKET", Market.ANDROID.name());
+		final String market = Configuration.getInstance().sProperties.getProperty("MARKET", Market.PLAY.name());
 		return Market.valueOf(market.toUpperCase(Locale.US));
 	}
 

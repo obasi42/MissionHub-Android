@@ -1,8 +1,8 @@
 # the production mode. values development|test|production
 ENVIRONMENT=development
 
-# the market the application is deployed to. values: android|amazon|nook
-MARKET=android
+# the market the application is deployed to. values: play|amazon|nook
+MARKET=play
 
 # missionhub api
 API_URL=https://www.missionhub.com/api
@@ -18,7 +18,6 @@ OAUTH_CLIENT_SECRET=
 OAUTH_SCOPE=userinfo,contacts,contact_assignment,followup_comments,roles,organization_info,groups,communication
 
 # caching
-CACHE_HTTP_ENABLED=true
 CACHE_FILE_ENABLED=true
 CACHE_FILE_SIZE=10m
 
