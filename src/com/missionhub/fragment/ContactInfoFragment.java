@@ -773,8 +773,8 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 	@Override
 	public void onCreateOptionsMenu(final Menu menu, final MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
-		mPromoteItem = menu.add(Menu.NONE, R.id.menu_item_permissions, Menu.NONE, R.string.action_promote).setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_NEVER);
-		updatePromoteDemote();
+		//mPromoteItem = menu.add(Menu.NONE, R.id.menu_item_permissions, Menu.NONE, R.string.action_promote).setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_NEVER);
+		//updatePromoteDemote();
 	}
 
 	@Override
@@ -1219,7 +1219,11 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 
 			@Override
 			public Boolean call() throws Exception {
-				return Api.changeRole(mPersonId, role).get();
+				if (role == Person.LABEL_LEADER) {
+					return Api.addRole(mPersonId, Person.LABEL_LEADER).get();
+				} else {
+					return Api.removeRole(mPersonId, Person.LABEL_LEADER).get();
+				}
 			}
 
 			@Override
@@ -1234,6 +1238,9 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 
 			@Override
 			public void onFinally() {
+				if (mPromoteItem != null) {
+					mPromoteItem.setEnabled(true);
+				}
 				mRoleTask = null;
 				updateRefreshIcon();
 			}
@@ -1254,7 +1261,7 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 	}
 
 	public void openAddress() {
-		// TODO:
+		
 	}
 
 	@Override
@@ -1264,8 +1271,6 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 
 	@Override
 	public void onAssignmentCanceled() {
-		// TODO Auto-generated method stub
-
 	}
 
 }

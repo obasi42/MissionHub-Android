@@ -149,7 +149,7 @@ public class MyContactsFragment extends MainFragment implements OnPageChangeList
 			final ApiContactListOptions options = new ApiContactListOptions();
 			options.setFilterAssignedTo(Session.getInstance().getPersonId());
 
-			return new ApiContactListProvider(getActivity(), options, true);
+			return new ApiContactListProvider(getActivity(), options, false);
 		}
 	}
 
@@ -171,7 +171,7 @@ public class MyContactsFragment extends MainFragment implements OnPageChangeList
 			options.setFilterAssignedTo(Session.getInstance().getPersonId());
 			options.setFilterStatus(Status.completed);
 
-			return new ApiContactListProvider(getActivity(), options, true);
+			return new ApiContactListProvider(getActivity(), options, false);
 		}
 	}
 
@@ -201,7 +201,7 @@ public class MyContactsFragment extends MainFragment implements OnPageChangeList
 	public void onPageScrolled(final int position, final float positionOffset, final int positionOffsetPixels) {
 		final ContactListFragment fragment = getCurrentFragment();
 		if (fragment != null) {
-			((ApiContactListProvider) fragment.getProvider()).resume();
+			((ApiContactListProvider) fragment.getProvider()).start();
 			fragment.clearChecked();
 		}
 		if (mActionMode != null) {

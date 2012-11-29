@@ -82,7 +82,7 @@ public class Api {
 		return doRequest(method, url, headers, params, authenticated, ResponseType.STRING);
 	}
 
-	private HttpResponse doRequest(final HttpMethod method, final String url, HttpHeaders headers, final HttpParams params, final boolean authenticated, final ResponseType responseType)
+	private HttpResponse doRequest(final HttpMethod method, final String url, HttpHeaders headers, HttpParams params, final boolean authenticated, final ResponseType responseType)
 			throws Exception {
 		HttpResponse response = null;
 		try {
@@ -94,9 +94,17 @@ public class Api {
 				headers.setHeader("Accept", "application/vnd.missionhub-v" + Configuration.getApiVersion() + "+json");
 			}
 
+			if (params == null) {
+				params = new HttpParams();
+			}
+			
 			// add oauth token to the request if needed
 			if (authenticated) {
 				headers.setHeader("Authorization", "OAuth: " + Session.getInstance().getAccessToken());
+				
+				if (Session.getInstance().getOrganizationId() >= 0) {
+					params.add("org_id", Session.getInstance().getOrganizationId());
+				}
 			}
 
 			appendLoggingParams(params);
@@ -700,13 +708,13 @@ public class Api {
 	// **********************************//
 
 	/**
-	 * Change a person's role
+	 * Adds a role for a person
 	 * 
 	 * @param personId
 	 * @param role
 	 * @param return
 	 */
-	public static FutureTask<Boolean> changeRole(final long personId, final String role) {
+	public static FutureTask<Boolean> addRole(final long personId, final String role) {
 		final Callable<Boolean> callable = new Callable<Boolean>() {
 			@Override
 			public Boolean call() throws Exception {
@@ -714,6 +722,34 @@ public class Api {
 
 				final HttpParams params = new HttpParams();
 				params.add("_method", "put");
+				params.add("id", personId);
+				params.add("role", role);
+
+				Api.getInstance().doRequest(HttpMethod.POST, url, params);
+				return true;
+			}
+		};
+		final FutureTask<Boolean> task = new FutureTask<Boolean>(callable);
+		Application.getExecutor().execute(task);
+		return task;
+	}
+
+	/**
+	 * Removes a role from a person
+	 * 
+	 * @param personId
+	 * @param role
+	 * @param return
+	 */
+	public static FutureTask<Boolean> removeRole(final long personId, final String role) {
+		final Callable<Boolean> callable = new Callable<Boolean>() {
+			@Override
+			public Boolean call() throws Exception {
+				final String url = Api.getInstance().buildUrlPath("roles", personId + ".json");
+
+				final HttpParams params = new HttpParams();
+				params.add("_method", "delete");
+				params.add("id", personId);
 				params.add("role", role);
 
 				Api.getInstance().doRequest(HttpMethod.POST, url, params);

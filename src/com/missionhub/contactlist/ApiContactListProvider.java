@@ -20,6 +20,9 @@ public class ApiContactListProvider extends ContactListProvider {
 
 	/** true when all available contacts have been fetched */
 	private boolean mDone = false;
+	
+	/** true when the provider is started */
+	private boolean mStarted = false;
 
 	/** true if fetching contacts is paused */
 	private boolean mPaused = false;
@@ -37,28 +40,24 @@ public class ApiContactListProvider extends ContactListProvider {
 		super(context);
 	}
 
-	public ApiContactListProvider(final Context context, final boolean initPaused) {
+	public ApiContactListProvider(final Context context, final boolean start) {
 		super(context);
-		if (initPaused) {
-			mPaused = true;
-		}
+		mStarted = start;
 	}
 
 	public ApiContactListProvider(final Context context, final ApiContactListOptions options) {
-		this(context, options, false);
+		this(context, options, true);
 	}
 
-	public ApiContactListProvider(final Context context, final ApiContactListOptions options, final boolean initPaused) {
+	public ApiContactListProvider(final Context context, final ApiContactListOptions options, final boolean start) {
 		super(context);
-		if (initPaused) {
-			mPaused = true;
-		}
+		mStarted = start;
 		mOptions = options;
 	}
 
 	@Override
 	protected void afterCreate() {
-		setOptions(mOptions);
+		reload();
 	}
 
 	public void setOptions(final ApiContactListOptions options) {
@@ -72,7 +71,14 @@ public class ApiContactListProvider extends ContactListProvider {
 		}
 		return null;
 	}
-
+	
+	public void start() {
+		if (mStarted) return;
+		
+		mStarted = true;
+		fetchMore();
+	}
+	
 	public void resume() {
 		if (!mPaused) return;
 
@@ -88,7 +94,7 @@ public class ApiContactListProvider extends ContactListProvider {
 	}
 
 	private void fetchMore() {
-		if (mTask != null || mDone || mPaused || mOptions == null) return;
+		if (mTask != null || !mStarted || mDone || mPaused || mOptions == null) return;
 
 		Log.e("TAG", "fetching more contacts...");
 
@@ -117,6 +123,7 @@ public class ApiContactListProvider extends ContactListProvider {
 
 			@Override
 			public void onException(final Exception e) {
+				mPaused = true;
 				postException(e);
 			}
 
@@ -133,7 +140,7 @@ public class ApiContactListProvider extends ContactListProvider {
 
 	@Override
 	public void onScroll(final ContactListView contactListView, final int firstVisibleItem, final int visibleItemCount, final int totalItemCount) {
-		if (!mDone && (totalItemCount - firstVisibleItem < 2.5 * visibleItemCount || totalItemCount == 0)) {
+		if (!mDone && mStarted && !mPaused && (totalItemCount - firstVisibleItem < 2.5 * visibleItemCount || totalItemCount == 0)) {
 			fetchMore();
 		}
 	}
@@ -160,18 +167,22 @@ public class ApiContactListProvider extends ContactListProvider {
 
 		postWorking(isWorking());
 	}
-
+	
+	
 	@Override
 	public void reload() {
-		clearPeople();
-		if (mTask != null) {
-			mTask.cancel(true);
-			mTask = null;
+		if (mStarted) {
+			clearPeople();
+			if (mTask != null) {
+				mTask.cancel(true);
+				mTask = null;
+			}
+			if (mOptions != null) {
+				mOptions.resetPosition();
+			}
+			mDone = false;
+			mPaused = false;
+			fetchMore();
 		}
-		if (mOptions != null) {
-			mOptions.resetPosition();
-		}
-		mDone = false;
-		fetchMore();
 	}
 }
