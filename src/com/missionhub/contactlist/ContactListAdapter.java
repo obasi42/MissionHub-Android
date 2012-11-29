@@ -9,7 +9,6 @@ import android.widget.TextView;
 
 import com.missionhub.R;
 import com.missionhub.application.DrawableCache;
-import com.missionhub.application.Session.SessionOrganizationIdChanged;
 import com.missionhub.model.Person;
 import com.missionhub.ui.ObjectArrayAdapter;
 import com.missionhub.util.U;

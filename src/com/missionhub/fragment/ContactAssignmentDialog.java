@@ -396,8 +396,8 @@ public class ContactAssignmentDialog extends RoboSherlockDialogFragment implemen
 			mAdapter.setNotifyOnChange(false);
 			mAdapter.clear();
 
-			boolean showNone = true;
-			boolean showMe = true;
+			boolean showNone = false;
+			boolean showMe = false;
 			final boolean showLeaders = true;
 			final boolean showGroups = false;
 
@@ -409,12 +409,14 @@ public class ContactAssignmentDialog extends RoboSherlockDialogFragment implemen
 				if (assignments.size() > 0) {
 					for (final Assignment assignment : assignments) {
 						if (assignment.getAssigned_to_id().compareTo(Session.getInstance().getPersonId()) == 0) {
-							showMe = false;
-							break;
+							showNone = true;
+						}
+						if (assignment.getAssigned_to_id().compareTo(Session.getInstance().getPersonId()) != 0) {
+							showMe = true;
 						}
 					}
 				} else {
-					showNone = false;
+					showMe = true;
 				}
 			}
 

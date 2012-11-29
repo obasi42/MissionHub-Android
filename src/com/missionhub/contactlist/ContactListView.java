@@ -82,7 +82,7 @@ public class ContactListView extends SelectableListView implements OnItemChecked
 
 			@Override
 			public void onScrollStateChanged(final AbsListView view, final int scrollState) {
-				
+
 			}
 		}));
 	}

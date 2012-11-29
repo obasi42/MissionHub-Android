@@ -8,19 +8,19 @@ import android.widget.RelativeLayout;
 public class ContactItemView extends RelativeLayout implements Checkable {
 
 	private boolean mChecked = false;
-	
-	public ContactItemView(Context context) {
+
+	public ContactItemView(final Context context) {
 		super(context);
 	}
-	
-	public ContactItemView(Context context, AttributeSet attrs) {
+
+	public ContactItemView(final Context context, final AttributeSet attrs) {
 		super(context, attrs);
 	}
-	
-	public ContactItemView(Context context, AttributeSet attrs, int defStyle) {
+
+	public ContactItemView(final Context context, final AttributeSet attrs, final int defStyle) {
 		super(context, attrs, defStyle);
 	}
-	
+
 	@Override
 	public void toggle() {
 		setChecked(!mChecked);
@@ -47,6 +47,5 @@ public class ContactItemView extends RelativeLayout implements Checkable {
 		}
 		return drawableState;
 	}
-	
-	
+
 }

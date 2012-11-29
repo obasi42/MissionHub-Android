@@ -23,11 +23,13 @@ import com.missionhub.contactlist.ApiContactListProvider;
 import com.missionhub.contactlist.ContactListFragment;
 import com.missionhub.contactlist.ContactListFragment.ContactListFragmentListener;
 import com.missionhub.contactlist.ContactListProvider;
+import com.missionhub.exception.ExceptionHelper;
+import com.missionhub.fragment.AddContactDialog.AddContactListener;
 import com.missionhub.fragment.ContactAssignmentDialog.ContactAssignmentListener;
 import com.missionhub.model.Person;
 import com.missionhub.util.U;
 
-public class AllContactsFragment extends MainFragment implements ContactListFragmentListener, ActionMode.Callback, ContactAssignmentListener {
+public class AllContactsFragment extends MainFragment implements ContactListFragmentListener, ActionMode.Callback, ContactAssignmentListener, AddContactListener {
 
 	/** the contact list fragment */
 	ContactListFragment mFragment;
@@ -35,8 +37,10 @@ public class AllContactsFragment extends MainFragment implements ContactListFrag
 	/** the refresh menu item */
 	private MenuItem mRefreshItem;
 
+	/** view to set as action view while refreshing */
 	private ImageView mRefreshingView;
 
+	/** the action mode */
 	private ActionMode mActionMode;
 
 	@Override
@@ -68,8 +72,28 @@ public class AllContactsFragment extends MainFragment implements ContactListFrag
 	public void onCreateOptionsMenu(final Menu menu, final MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
 
+		menu.add(Menu.NONE, R.id.menu_item_add_contact, Menu.NONE, R.string.action_add_contact).setIcon(R.drawable.ic_action_add_contact)
+				.setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+
 		mRefreshItem = menu.add(Menu.NONE, R.id.menu_item_refresh, Menu.NONE, R.string.action_refresh).setIcon(R.drawable.ic_action_refresh)
 				.setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(final MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.menu_item_refresh:
+			if (mFragment != null) {
+				mFragment.reload();
+				return true;
+			}
+			break;
+		case R.id.menu_item_add_contact:
+			final AddContactDialog dialog = AddContactDialog.show(getChildFragmentManager(), false);
+			dialog.setAddContactListener(this);
+			break;
+		}
+		return super.onOptionsItemSelected(item);
 	}
 
 	/**
@@ -108,8 +132,8 @@ public class AllContactsFragment extends MainFragment implements ContactListFrag
 
 	@Override
 	public void onContactListProviderException(final ContactListFragment fragment, final Exception exception) {
-		// TODO Auto-generated method stub
-
+		final ExceptionHelper ex = new ExceptionHelper(getActivity(), exception);
+		ex.makeToast();
 	}
 
 	@Override
@@ -184,4 +208,15 @@ public class AllContactsFragment extends MainFragment implements ContactListFrag
 
 	@Override
 	public void onAssignmentCanceled() {}
+
+	@Override
+	public void onContactAdded(final Person contact) {
+		ContactActivity.start(getActivity(), contact);
+		mFragment.reload();
+	}
+
+	@Override
+	public void onAddContactCanceled() {
+
+	}
 }

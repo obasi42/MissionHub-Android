@@ -19,6 +19,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.missionhub.R;
 import com.missionhub.api.Api;
 import com.missionhub.application.Application;
+import com.missionhub.application.Session.SessionOrganizationIdChanged;
 import com.missionhub.exception.ExceptionHelper;
 import com.missionhub.exception.ExceptionHelper.DialogButton;
 import com.missionhub.exception.WebViewException;
@@ -85,6 +86,8 @@ public class SurveysFragment extends MainFragment {
 		}
 
 		mContainer.addView(mWebView);
+
+		Application.registerEventSubscriber(this, SessionOrganizationIdChanged.class);
 	}
 
 	@Override
@@ -190,6 +193,7 @@ public class SurveysFragment extends MainFragment {
 
 	@Override
 	public void onDestroyView() {
+		Application.unregisterEventSubscriber(this);
 		// remove the webview from the container
 		// purposely leak the context by storing mWebView
 		// webviews are evil.
@@ -205,6 +209,10 @@ public class SurveysFragment extends MainFragment {
 		mWebView = null;
 
 		super.onDestroy();
+	}
+
+	public void onEventMainThread(final SessionOrganizationIdChanged event) {
+		goInitialUrl();
 	}
 
 }

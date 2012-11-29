@@ -264,13 +264,13 @@ public class ContactFragment extends BaseFragment implements OnNavigationListene
 
 			@Override
 			public void onException(final Exception e) {
-				ExceptionHelper eh = new ExceptionHelper(getContext(), e);
+				final ExceptionHelper eh = new ExceptionHelper(getContext(), e);
 				eh.makeToast("Failed to refresh contact.");
 			}
 
 			@Override
 			public void onInterrupted(final Exception e) {
-				
+
 			}
 		};
 		updateRefreshIcon();

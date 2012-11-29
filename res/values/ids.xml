@@ -17,5 +17,6 @@
     <item name="menu_item_comment" type="id" />
     <item name="menu_item_assign" type="id" />
     <item name="menu_item_permissions" type="id" />
+    <item name="menu_item_add_contact" type="id" />
 
 </resources>

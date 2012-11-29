@@ -17,6 +17,8 @@
     <string name="action_assign">Assign</string>
     <string name="action_delete">Delete</string>
     <string name="action_no_permissions">You do not have the required permissions to perform this action.</string>
+    <string name="action_add_contact">Add Contact</string>
+    <string name="action_save">Save</string>
     
     <!-- Main Menu -->
     <string name="menu_dashboard">Dashboard</string>
@@ -135,6 +137,27 @@
     <string name="rejoicable_christ">Prayed To Receive Christ </string>
     <string name="rejoicable_gospel">Gospel Presentation</string>
     <string name="rejoicable_convo">Spiritual Conversation</string>
+    
+    <!-- Add Contact Dialog -->
+    <string name="add_contact_title">Add Contact</string>
+    <string name="add_contact_section_bio">Bio</string>
+    <string name="add_contact_section_phone">Phone</string>
+    <string name="add_contact_section_email">Email</string>
+    <string name="add_contact_section_address">Address</string>
+    <string name="add_contact_name">Name</string>
+    <string name="add_contact_gender">Gender</string>
+    <string name="add_contact_gender_male">Male</string>
+    <string name="add_contact_gender_female">Female</string>
+    <string name="add_contact_email">Email</string>
+    <string name="add_contact_phone">Phone</string>
+    <string name="add_contact_address_line1">Line 1</string>
+    <string name="add_contact_address_line2">Line 2</string>
+    <string name="add_contact_address_city">City</string>
+    <string name="add_contact_address_zip">Zip Code</string>
+    <string name="add_contact_name_required">Please enter a name for the contact</string>
+    <string name="add_contact_failed">Failed to create contact</string>
+    <string name="add_contact_progress">Please wait. Adding contact…</string>
+    
     
     <!-- Time Ago -->
     <string name="time_ago_hour">about an hour</string>

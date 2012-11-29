@@ -107,8 +107,14 @@ public class Api {
 			final HttpClientFuture future = client.doRequest(method, url, headers, params);
 			response = future.get();
 
+			throwApiException(response);
+
 			return response;
 		} catch (final Exception e) {
+			if (e instanceof ApiException) {
+				throw e;
+			}
+
 			// check for authentication errors
 			if (e instanceof IOException) {
 				if ((response != null && response.statusCode == 401) || e.getMessage().contains("authentication")) {
@@ -118,24 +124,27 @@ public class Api {
 			}
 
 			// check for api errors if the response was a string
-			if (responseType == ResponseType.STRING) {
-				if (response != null && !U.isNullEmpty(response.responseBody)) {
-					try {
-						final ApiErrorGson error = gson.fromJson(response.responseBody, ApiErrorGson.class);
-						if (error != null) {
-							if (error.error.code.equalsIgnoreCase("56")) {
-								Session.getInstance().reportInvalidAccessToken();
-								throw new AccessTokenException(error);
-							} else {
-								throw new ApiException(error);
-							}
-						}
-					} catch (final Exception ignore) {}
-				}
-			}
+			throwApiException(response);
 
 			// throw the original exception
 			throw e;
+		}
+	}
+
+	private void throwApiException(final HttpResponse response) throws ApiException {
+		if (response != null && !U.isNullEmpty(response.responseBody)) {
+			ApiErrorGson error = null;
+			try {
+				error = gson.fromJson(response.responseBody, ApiErrorGson.class);
+			} catch (final Exception e) { /* ignore */}
+			if (error != null && error.error != null) {
+				if (error.error.code.equalsIgnoreCase("56")) {
+					Session.getInstance().reportInvalidAccessToken();
+					throw new AccessTokenException(error);
+				} else {
+					throw new ApiException(error);
+				}
+			}
 		}
 	}
 
@@ -303,10 +312,10 @@ public class Api {
 
 				final HttpParams params = new HttpParams();
 				params.add("ids", U.toCSV(personIds));
-				//params.add("type", type.name());
+				// params.add("type", type.name());
 				params.add("assign_to", U.toCSV(toIds));
-				
-				HttpHeaders headers= new HttpHeaders();
+
+				final HttpHeaders headers = new HttpHeaders();
 				headers.setHeader("Accept", "application/vnd.missionhub-v1+json");
 
 				Api.getInstance().doRequest(HttpMethod.POST, url, headers, params);
@@ -329,7 +338,7 @@ public class Api {
 		final Callable<Boolean> callable = new Callable<Boolean>() {
 			@Override
 			public Boolean call() throws Exception {
-				for(Long id : personIds) {
+				for (final Long id : personIds) {
 					final String url = Api.getInstance().buildUrlPath("contact_assignments", id + ".json");
 
 					final HttpParams params = new HttpParams();
@@ -339,15 +348,16 @@ public class Api {
 					Api.getInstance().doRequest(HttpMethod.POST, url, params);
 				}
 				return true;
-//				
-//				final String url = Api.getInstance().buildUrlPath("contact_assignments", U.toCSV(personIds) + ".json");
-//
-//				final HttpParams params = new HttpParams();
-//				params.add("ids", U.toCSV(personIds));
-//				params.add("_method", "delete");
-//
-//				Api.getInstance().doRequest(HttpMethod.POST, url, params);
-//				return true;
+				//
+				// final String url = Api.getInstance().buildUrlPath("contact_assignments", U.toCSV(personIds) +
+				// ".json");
+				//
+				// final HttpParams params = new HttpParams();
+				// params.add("ids", U.toCSV(personIds));
+				// params.add("_method", "delete");
+				//
+				// Api.getInstance().doRequest(HttpMethod.POST, url, params);
+				// return true;
 			}
 		};
 		final FutureTask<Boolean> task = new FutureTask<Boolean>(callable);
@@ -443,6 +453,29 @@ public class Api {
 			}
 		};
 		final FutureTask<List<Person>> task = new FutureTask<List<Person>>(callable);
+		Application.getExecutor().execute(task);
+		return task;
+	}
+
+	public static FutureTask<Person> createContact(final ApiContact contact) {
+		final Callable<Person> callable = new Callable<Person>() {
+			@Override
+			public Person call() throws Exception {
+				final String url = Api.getInstance().buildUrlPath("contacts.json");
+
+				final HttpParams params = new HttpParams();
+				contact.appendParams(params);
+
+				final HttpResponse response = Api.getInstance().doRequest(HttpMethod.POST, url, params);
+				try {
+					final GPerson person = Api.getInstance().gson.fromJson(response.responseBody, GPerson.class);
+					return person.save(false);
+				} catch (final Exception e) {
+					throw new ApiException(e);
+				}
+			}
+		};
+		final FutureTask<Person> task = new FutureTask<Person>(callable);
 		Application.getExecutor().execute(task);
 		return task;
 	}

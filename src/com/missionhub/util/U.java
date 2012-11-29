@@ -171,6 +171,7 @@ public class U {
 	 * @param sherlockActivity
 	 */
 	public static void resetActionBar(final SherlockFragmentActivity sherlockActivity) {
+		sherlockActivity.setSupportProgressBarIndeterminateVisibility(false);
 		sherlockActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		sherlockActivity.getSupportActionBar().setDisplayShowCustomEnabled(false);
 		sherlockActivity.getSupportActionBar().setDisplayShowHomeEnabled(true);

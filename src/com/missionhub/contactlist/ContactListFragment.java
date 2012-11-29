@@ -109,8 +109,7 @@ public abstract class ContactListFragment extends BaseFragment implements OnCont
 		}
 		super.onDestroy();
 	}
-	
-	
+
 	public ProgressItem onCreateProgressItem() {
 		return new ProgressItem();
 	}
@@ -220,8 +219,7 @@ public abstract class ContactListFragment extends BaseFragment implements OnCont
 	}
 
 	public void clearChecked() {
-		if (mListView != null)
-			mListView.clearChecked();
+		if (mListView != null) mListView.clearChecked();
 	}
 
 	public static interface ContactListFragmentListener {

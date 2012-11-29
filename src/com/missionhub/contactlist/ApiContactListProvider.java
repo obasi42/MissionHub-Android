@@ -89,7 +89,7 @@ public class ApiContactListProvider extends ContactListProvider {
 
 	private void fetchMore() {
 		if (mTask != null || mDone || mPaused || mOptions == null) return;
-		
+
 		Log.e("TAG", "fetching more contacts...");
 
 		mTask = new RoboAsyncTask<List<Person>>(Application.getContext()) {
@@ -157,7 +157,7 @@ public class ApiContactListProvider extends ContactListProvider {
 			getAdapter().add(getProgressItem());
 		}
 		notifyDataSetChanged();
-		
+
 		postWorking(isWorking());
 	}
 

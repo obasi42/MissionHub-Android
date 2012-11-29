@@ -164,7 +164,7 @@ public abstract class BaseAuthenticatedMenuActivity extends BaseAuthenticatedAct
 	public void showSecondaryMenu() {
 		mHelper.showSecondaryMenu();
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 

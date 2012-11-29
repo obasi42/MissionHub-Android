@@ -269,27 +269,31 @@ public class ExceptionHelper {
 	public void setAppendSupport(final boolean appendSupport) {
 		mAppendSupport = appendSupport;
 	}
-	
+
 	/**
 	 * Shows a toast with the data from the exception
 	 */
 	public void makeToast() {
 		Toast.makeText(mContext, getTitle() + "\n\n" + getMessage(), Toast.LENGTH_LONG).show();
 	}
-	
+
 	/**
 	 * Shows a toast with the data from the exception
-	 * @param failure a failure message to be displayed with the exception data.
+	 * 
+	 * @param failure
+	 *            a failure message to be displayed with the exception data.
 	 */
-	public void makeToast(String failure) {
+	public void makeToast(final String failure) {
 		Toast.makeText(mContext, failure + "\n" + getTitle() + "\n\n" + getMessage(), Toast.LENGTH_LONG).show();
 	}
 
 	/**
 	 * Shows a toast with the data from the exception
-	 * @param failure a failure message to be displayed before the exception data.
+	 * 
+	 * @param failure
+	 *            a failure message to be displayed before the exception data.
 	 */
-	public void makeToast(int contactCannotDeleteComment) {
+	public void makeToast(final int contactCannotDeleteComment) {
 		makeToast(mContext.getString(contactCannotDeleteComment));
 	}
 }

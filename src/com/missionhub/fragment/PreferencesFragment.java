@@ -39,13 +39,8 @@ public class PreferencesFragment extends BaseFragment {
 		super.onCreate(savedInstanceState);
 		setRetainInstance(true);
 		setHasOptionsMenu(true);
-		
-		mImageLoaderOptions = new DisplayImageOptions.Builder()
-		.displayer(new FadeInBitmapDisplayer(200))
-		.showImageForEmptyUri(R.drawable.default_contact)
-        .cacheInMemory()
-        .cacheOnDisc()
-        .build();
+
+		mImageLoaderOptions = new DisplayImageOptions.Builder().displayer(new FadeInBitmapDisplayer(200)).showImageForEmptyUri(R.drawable.default_contact).cacheInMemory().cacheOnDisc().build();
 	}
 
 	@Override
@@ -88,7 +83,7 @@ public class PreferencesFragment extends BaseFragment {
 			ImageLoader.getInstance().displayImage(Session.getInstance().getPerson().getPicture(), mPicture, mImageLoaderOptions);
 			// TODO: set picture;
 		} catch (final NoPersonException e) { /* this should be impossible */}
-		
+
 	}
 
 	@Override

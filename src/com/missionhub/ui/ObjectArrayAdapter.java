@@ -74,7 +74,7 @@ public abstract class ObjectArrayAdapter extends BaseAdapter {
 			if (object != null && object instanceof ItemIdProvider) {
 				return ((ItemIdProvider) object).getItemId();
 			}
-		} catch (Exception e) { /* ignore */}
+		} catch (final Exception e) { /* ignore */}
 		return 0;
 	}
 
@@ -107,7 +107,7 @@ public abstract class ObjectArrayAdapter extends BaseAdapter {
 	public abstract View getView(int position, View convertView, ViewGroup parent);
 
 	@Override
-	public View getDropDownView(int position, View convertView, ViewGroup parent) {
+	public View getDropDownView(final int position, final View convertView, final ViewGroup parent) {
 		return null;
 	}
 

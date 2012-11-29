@@ -121,7 +121,7 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 
 	/** the contact's email address */
 	private TextView mHeaderEmail;
-	
+
 	/** the contact assignment button */
 	private Button mHeaderAssignment;
 
@@ -201,13 +201,8 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 		mPersonId = arguments.getLong("personId", -1);
 		mPerson = Application.getDb().getPersonDao().load(mPersonId);
 
-		mImageLoaderOptions = new DisplayImageOptions.Builder()
-		.displayer(new FadeInBitmapDisplayer(200))
-		.showImageForEmptyUri(R.drawable.default_contact)
-        .cacheInMemory()
-        .cacheOnDisc()
-        .build();
-		
+		mImageLoaderOptions = new DisplayImageOptions.Builder().displayer(new FadeInBitmapDisplayer(200)).showImageForEmptyUri(R.drawable.default_contact).cacheInMemory().cacheOnDisc().build();
+
 		refreshComments();
 	}
 
@@ -438,7 +433,7 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 			}
 		} else {
 			ImageLoader.getInstance().displayImage(null, mHeaderAvatar, mImageLoaderOptions);
-			
+
 			mHeaderAvatar.setImageDrawable(DrawableCache.getDrawable(R.drawable.default_contact));
 		}
 
@@ -654,18 +649,13 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 		/** date used for comparisons */
 		private static final Date sWeekAgo = new Date(System.currentTimeMillis() - (7 * 1000 * 60 * 60 * 24));
 
-		private DisplayImageOptions mImageLoaderOptions;
-		
+		private final DisplayImageOptions mImageLoaderOptions;
+
 		public CommentArrayAdapter(final Context context) {
 			super(context);
-			
-			mImageLoaderOptions = new DisplayImageOptions.Builder()
-			.displayer(new FadeInBitmapDisplayer(200))
-			.showImageForEmptyUri(R.drawable.default_contact)
-			.showStubImage(R.drawable.default_contact)
-	        .cacheInMemory()
-	        .cacheOnDisc()
-	        .build();
+
+			mImageLoaderOptions = new DisplayImageOptions.Builder().displayer(new FadeInBitmapDisplayer(200)).showImageForEmptyUri(R.drawable.default_contact)
+					.showStubImage(R.drawable.default_contact).cacheInMemory().cacheOnDisc().build();
 		}
 
 		@Override

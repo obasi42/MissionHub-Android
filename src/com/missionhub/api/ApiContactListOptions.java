@@ -264,8 +264,8 @@ public class ApiContactListOptions implements Cloneable {
 		this.appendOrderByParam(params);
 		return params.toString();
 	}
-	
-	protected void appendParams(HttpParams params) {
+
+	protected void appendParams(final HttpParams params) {
 		appendLimits(params);
 		appendFiltersParams(params);
 		appendOrderByParam(params);

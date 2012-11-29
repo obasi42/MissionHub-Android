@@ -27,10 +27,10 @@ public abstract class ContactListProvider {
 
 	/** the exception listener */
 	private WeakReference<OnContactListProviderExceptionListener> mOnContactListProviderExceptionListener;
-	
+
 	/** the working listener */
 	private WeakReference<OnContactListAdapterWorkingListener> mOnContactListAdapterWorkingListener;
-	
+
 	/** the progress item */
 	private ProgressItem mProgressItem;
 
@@ -52,7 +52,7 @@ public abstract class ContactListProvider {
 		if (adapter == null) throw new RuntimeException("The contact list adapter cannot be null");
 		mAdapter = adapter;
 	}
-	
+
 	protected void afterCreate() {}
 
 	/** sets the context of the array adapter */
@@ -136,7 +136,7 @@ public abstract class ContactListProvider {
 	}
 
 	public void onScroll(final ContactListView contactListView, final int firstVisibleItem, final int visibleItemCount, final int totalItemCount) {
-		
+
 	}
 
 	protected void setContactList(final ContactListView contactList) {
@@ -153,7 +153,7 @@ public abstract class ContactListProvider {
 	protected ContactListAdapter getAdapter() {
 		return mAdapter;
 	}
-	
+
 	/**
 	 * Interface definition for callbacks to be invoked when an exception is thrown in the provider
 	 */
@@ -184,27 +184,27 @@ public abstract class ContactListProvider {
 			}
 		});
 	}
-	
+
 	public ProgressItem getProgressItem() {
 		return mProgressItem;
 	}
 
-	public void setProgressItem(ProgressItem item) {
+	public void setProgressItem(final ProgressItem item) {
 		mProgressItem = item;
 	}
 
 	public boolean isWorking() {
 		return false;
 	}
-	
+
 	public static interface OnContactListAdapterWorkingListener {
 		public void onWorkingChanged(boolean working);
 	}
-	
-	public void setOnContactListWorkingListener(OnContactListAdapterWorkingListener listener) {
+
+	public void setOnContactListWorkingListener(final OnContactListAdapterWorkingListener listener) {
 		mOnContactListAdapterWorkingListener = new WeakReference<OnContactListAdapterWorkingListener>(listener);
 	}
-	
+
 	/**
 	 * Posts to working listener
 	 * 
@@ -226,7 +226,7 @@ public abstract class ContactListProvider {
 	}
 
 	public abstract void reload();
-	
+
 	public void onEventMainThread(final SessionOrganizationIdChanged event) {
 		reload();
 	}
