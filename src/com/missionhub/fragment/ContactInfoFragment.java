@@ -488,7 +488,7 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 			mHeaderEmail.setOnClickListener(listener);
 			mHeaderActionEmail.setOnClickListener(listener);
 		} else {
-			mHeaderEmail.setVisibility(View.GONE);
+			mHeaderActionEmail.setVisibility(View.GONE);
 			mHeaderContainerEmail.setVisibility(View.GONE);
 		}
 

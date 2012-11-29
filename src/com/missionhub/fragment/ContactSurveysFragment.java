@@ -7,7 +7,6 @@ import org.holoeverywhere.widget.Toast;
 import roboguice.util.RoboAsyncTask;
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -202,7 +201,6 @@ public class ContactSurveysFragment extends BaseFragment {
 			final Question q = a.getQuestion();
 			if (q == null || q.getKeyword() == null) {
 				updateOrg = true;
-				Log.e("TEST", a.getAnswer());
 				continue;
 			}
 
