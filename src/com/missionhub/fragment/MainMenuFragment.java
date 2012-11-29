@@ -238,6 +238,6 @@ public class MainMenuFragment extends BaseFragment implements OnItemClickListene
 			getMainActivity().openHelp();
 			break;
 		}
-		getMainActivity().showAbove();
+		getMainActivity().showContent();
 	}
 }

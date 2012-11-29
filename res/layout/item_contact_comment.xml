@@ -11,6 +11,7 @@
         android:layout_height="40.0dip"
         android:layout_marginLeft="9.0dip"
         android:layout_marginTop="9.0dip"
+        android:layout_marginBottom="9.0dip"
         android:adjustViewBounds="true"
         android:scaleType="fitXY"
         android:src="@drawable/default_contact" />

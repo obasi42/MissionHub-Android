@@ -61,7 +61,7 @@
 		If this is not done in place, override ${out.dex.input.absolute.dir} */
 	-->
 	<target name="-post-compile">
-		<antcall target="findbugs"></antcall>
+		<!-- <antcall target="findbugs"></antcall> -->
 	</target>
 
 	<!-- Import the actual build file.

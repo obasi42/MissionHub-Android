@@ -148,26 +148,23 @@ public abstract class BaseAuthenticatedMenuActivity extends BaseAuthenticatedAct
 		mHelper.toggle();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.slidingmenu.lib.app.SlidingActivityBase#showAbove()
-	 */
 	@Override
-	public void showAbove() {
-		mHelper.showAbove();
+	public void showContent() {
+		// TODO Auto-generated method stub
+		mHelper.showContent();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.slidingmenu.lib.app.SlidingActivityBase#showBehind()
-	 */
 	@Override
-	public void showBehind() {
-		mHelper.showBehind();
+	public void showMenu() {
+		// TODO Auto-generated method stub
+		mHelper.showMenu();
 	}
 
+	@Override
+	public void showSecondaryMenu() {
+		mHelper.showSecondaryMenu();
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
