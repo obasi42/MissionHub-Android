@@ -50,7 +50,6 @@
 		in between standard targets -->
 	<target name="-pre-build">
 		<antcall target="increment-manifest-version"></antcall>
-		<antcall target="config"></antcall>
 	</target>
 	<!--
 		<target name="-pre-compile">
@@ -93,18 +92,6 @@
 			<replace path="manifest/@android:versionCode" withText="${env.BUILD_NUMBER}" />
 			<regexp path="/manifest/@android:versionName" pattern="([x0-9]*).$" replace="${env.BUILD_NUMBER}" casesensitive="false" />
 		</xmltask>
-	</target>
-
-	<target name="config">
-		<property name="config-source"
-			value="${missionhub.properties}" />
-		<property name="config-target"
-			value="${source.dir}/assets/missionhub.properties" />
-
-		<!-- Copy the configuration file, replacing tokens in the file. -->
-		<copy file="${config-source}" tofile="${config-target}"
-			overwrite="true" failonerror="true" encoding="utf-8">
-		</copy>
 	</target>
 
 <!-- 	<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" />
