@@ -5,10 +5,10 @@
 
     <com.missionhub.contactlist.ContactListView
         android:id="@android:id/list"
-        android:background="@drawable/item_background"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:animateLayoutChanges="true" />
+        android:animateLayoutChanges="true"
+        android:background="@drawable/item_background" />
 
     <RelativeLayout
         android:id="@android:id/empty"
@@ -17,9 +17,9 @@
 
         <TextView
             android:id="@android:id/text1"
-            android:layout_centerInParent="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
             android:text="No Contacts"
             android:textAppearance="?android:attr/textAppearanceMedium" />
     </RelativeLayout>

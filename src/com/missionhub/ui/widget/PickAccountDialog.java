@@ -38,7 +38,7 @@ public class PickAccountDialog extends DialogFragment implements OnItemClickList
 		final LayoutInflater inflater = getActivity().getLayoutInflater();
 		final View view = inflater.inflate(R.layout.dialog_pick_account, null);
 
-		mListView = (ListView) view.findViewById(R.id.listview);
+		mListView = (ListView) view.findViewById(android.R.id.list);
 		mListView.setAdapter(mAdapter);
 		mListView.setOnItemClickListener(this);
 
@@ -65,8 +65,8 @@ public class PickAccountDialog extends DialogFragment implements OnItemClickList
 				holder = new ViewHolder();
 				if (item instanceof AccountItem) {
 					view = inflater.inflate(R.layout.item_account, null);
-					holder.name = (TextView) view.findViewById(R.id.name);
-					holder.organization = (TextView) view.findViewById(R.id.organization);
+					holder.name = (TextView) view.findViewById(android.R.id.text1);
+					holder.organization = (TextView) view.findViewById(android.R.id.text2);
 					view.setTag(holder);
 				} else if (item instanceof NewAccountItem) {
 					view = inflater.inflate(R.layout.item_account_new, null);

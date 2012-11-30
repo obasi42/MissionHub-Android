@@ -1,10 +1,9 @@
 <com.missionhub.contactlist.ContactItemView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:minHeight="64.0dip"
-    android:padding="8.0dip" 
     android:background="@drawable/list_item_background"
-    >
+    android:minHeight="64.0dip"
+    android:padding="8.0dip" >
 
     <ImageView
         android:id="@+id/avatar"
@@ -18,10 +17,9 @@
         android:id="@+id/checkmark"
         android:layout_width="20.0dip"
         android:layout_height="20.0dip"
-        android:layout_marginRight="4.0dip"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-         />
+        android:layout_marginRight="4.0dip" />
 
     <LinearLayout
         android:id="@+id/name_container"

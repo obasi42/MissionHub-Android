@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import org.holoeverywhere.widget.Spinner;
 import org.holoeverywhere.widget.Toast;
 
 import roboguice.inject.InjectView;
@@ -25,7 +26,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.actionbarsherlock.view.Menu;
@@ -216,7 +216,7 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 	@Override
 	public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_contact_info, null);
-		mListView = (ListView) view.findViewById(R.id.listview);
+		mListView = (ListView) view.findViewById(android.R.id.list);
 		
 		mHeaderComment = inflater.inflate(R.layout.fragment_contact_info_comment, null);
 		mHeader = inflater.inflate(R.layout.fragment_contact_info_header, null);
@@ -1023,7 +1023,7 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 				view = getLayoutInflater().inflate(R.layout.item_simple_status, null);
 			}
 
-			final TextView tv = (TextView) view.findViewById(R.id.text);
+			final TextView tv = (TextView) view.findViewById(android.R.id.text1);
 			tv.setText(U.translateStatus(status));
 
 			return view;

@@ -26,7 +26,7 @@ public class ExceptionHelper {
 	private Throwable mThrowable;
 
 	/** the title of the error */
-	private String mTitle = "Error";
+	private String mTitle;
 
 	/** the message of the error */
 	private String mMessage;
@@ -55,6 +55,7 @@ public class ExceptionHelper {
 	/** Creates a new ExceptionHelper object */
 	public ExceptionHelper(final Context context, final Exception exception) {
 		mContext = context;
+		mTitle = context.getString(R.string.exception_helper_error);
 		setException(exception);
 	}
 

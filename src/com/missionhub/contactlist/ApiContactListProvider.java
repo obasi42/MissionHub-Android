@@ -6,7 +6,6 @@ import java.util.concurrent.Executors;
 
 import roboguice.util.SafeAsyncTask;
 import android.content.Context;
-import android.util.Log;
 
 import com.missionhub.api.Api;
 import com.missionhub.api.ApiContactListOptions;
@@ -94,8 +93,6 @@ public class ApiContactListProvider extends ContactListProvider {
 
 	private void fetchMore() {
 		if (mTask != null || !mStarted || mDone || mPaused || mOptions == null) return;
-
-		Log.e("TAG", "fetching more contacts...");
 
 		mTask = new SafeAsyncTask<List<Person>>() {
 			@Override

@@ -24,7 +24,7 @@ import com.missionhub.util.U;
 public class MainMenuFragment extends BaseFragment implements OnItemClickListener {
 
 	/** the list view to hold the menu items */
-	@InjectView(R.id.list) private ListView mListView;
+	@InjectView(android.R.id.list) private ListView mListView;
 
 	/** the menu item adapter */
 	private MainMenuAdapter mAdapter;

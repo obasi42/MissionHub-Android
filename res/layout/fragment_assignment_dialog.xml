@@ -12,7 +12,7 @@
         android:visibility="gone" >
 
         <org.holoeverywhere.widget.ProgressBar
-            android:id="@+id/progress"
+            android:id="@android:id/progress"
             style="@style/Holo.ProgressBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -25,9 +25,9 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginLeft="8.0dip"
-            android:layout_toRightOf="@id/progress"
+            android:layout_toRightOf="@android:id/progress"
             android:gravity="center_vertical"
-            android:text="Please wait. Assigning contact(s)." />
+            android:text="@string/assignment_progress" />
     </RelativeLayout>
 
     <com.missionhub.ui.widget.LockedViewPager

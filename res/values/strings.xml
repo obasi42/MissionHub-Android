@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name">MissionHub</string>
-    
+
     <!-- Actions -->
     <string name="action_search">Search</string>
     <string name="action_login">Login</string>
@@ -19,7 +19,7 @@
     <string name="action_no_permissions">You do not have the required permissions to perform this action.</string>
     <string name="action_add_contact">Add Contact</string>
     <string name="action_save">Save</string>
-    
+
     <!-- Main Menu -->
     <string name="menu_dashboard">Dashboard</string>
     <string name="menu_my_contacts">My Contacts</string>
@@ -32,13 +32,13 @@
     <string name="menu_div_missionhub">MissionHub</string>
     <string name="menu_about">About</string>
     <string name="menu_help_center">Help Center</string>
-    
+
     <!-- My Contacts Fragment -->
     <string name="my_contacts_title">My Contacts</string>
     <string name="my_contacts_all">All</string>
     <string name="my_contacts_in_progress">In-Progress</string>
     <string name="my_contacts_completed">Completed</string>
-    
+
     <!-- Contact -->
     <string name="contact_activity_title">Contact</string>
     <string name="contact_nav_info">Information</string>
@@ -52,6 +52,7 @@
     <string name="contact_cannot_comment">Please set a comment, status, or rejoicable before saving.</string>
     <string name="contact_comment_saved">Comment saved</string>
     <string name="contact_comment_failed_to_save">Failed to save comment</string>
+    <string name="contact_comment_loading">Loading Comments…</string>
     <string name="contact_already_contact">This person is already a contact</string>
     <string name="contact_already_leader">This person is already a leader</string>
     <string name="contact_role_changed">Role changed</string>
@@ -60,12 +61,12 @@
     <string name="contact_label_birthday">Birthday</string>
     <string name="contact_label_gender">Gender</string>
     <string name="contact_label_links">Links</string>
-    <string name="contact_label_address">Address</string>       
-    <string name="contact_surveys_no_key">Unknown Keyword</string> 
-    <string name="contact_surveys_no_q">Unknown Question</string> 
-    <string name="contact_surveys_no_a">Not answered</string> 
+    <string name="contact_label_address">Address</string>
+    <string name="contact_surveys_no_key">Unknown Keyword</string>
+    <string name="contact_surveys_no_q">Unknown Question</string>
+    <string name="contact_surveys_no_a">Not answered</string>
     <string name="contact_surveys_updating_org">Updating organization keywords and questions</string>
-    
+
     <!-- About Activity -->
     <string name="about_activity_title">About MissionHub</string>
     <string name="about_tag">We\'re here to make it easier for you to care for the people who need you most.</string>
@@ -78,33 +79,34 @@
     <string name="about_feedback_email">support@missionhub.com</string>
     <string name="about_privacy_url">https://www.missionhub.com/privacy</string>
     <string name="about_terms_url">https://www.missionhub.com/terms</string>
-    
+
     <!-- Main Activity -->
     <string name="main_help_url">http://blog.missionhub.com</string>
     <string name="main_logged_out">You have been logged out of MissionHub.</string>
     <string name="main_invalid_token">Your MissionHub authentication token is invaild. Please login again.</string>
-    
-    <!--  Init Activity -->
+
+    <!-- Init Activity -->
     <string name="init_resuming">Resuming session…</string>
     <string name="init_updating_person">Updating person…</string>
     <string name="init_updating_orgs">Updating organizations…</string>
     <string name="init_add_account">Add Account</string>
     <string name="init_choose_account">Choose account…</string>
-    
+
     <!-- Session -->
     <string name="session_no_longer_admin">You are no longer an admin or leader in your preferred organization. Selecting your primary.</string>
     <string name="session_not_admin">You are not an admin or leader in this organization.</string>
-    
+
     <!-- Preferences Activity -->
     <string name="pref_activity_title">Preferences</string>
     <string name="pref_organization">Organization:</string>
-    
+
     <!-- Authenticator -->
     <string name="auth_activity_title">Add a MissionHub account</string>
     <string name="auth_fetching_account_info">Fetching Account Information…</string>
     <string name="auth_duplicate_account">Account for %1$s already exists.</string>
-    
-    <!--  Exceptions -->
+
+    <!-- Exceptions -->
+    <string name="exception_helper_error">Error</string>
     <string name="exception_helper_support">Email support@missionhub.com if the problem persists.</string>
     <string name="exception_helper_network_error">Network Error</string>
     <string name="exception_helper_mh_down">The MissionHub server is currently down. Please try again in a few minutes.</string>
@@ -114,7 +116,7 @@
     <string name="unexpected_data">The MissionHub server returned unexpected data.</string>
     <string name="network_unavailable_exception">MissionHub is currently working offline. Check your internet connection and retry.</string>
     <string name="network_unavailable_exception_title">Offline Error</string>
-    
+
     <!-- Intent Helper -->
     <string name="intent_helper_no_browser">No web browser available.</string>
     <string name="intent_helper_no_calling">No calling client available.</string>
@@ -122,22 +124,22 @@
     <string name="intent_helper_send_email">Send Email</string>
     <string name="intent_helper_no_email">No email client available.</string>
     <string name="intent_helper_no_facebook">Could not open Facebook profile.</string>
-    
-    <!--  Status Labels -->
+
+    <!-- Status Labels -->
     <string name="rejoice_spiritual_conversation">Spiritual Conversation</string>
     <string name="rejoice_prayed_to_receive">Prayed To Receive Christ</string>
-    <string name="rejoice_gospel_presentation">Gospel Presentation</string>  
+    <string name="rejoice_gospel_presentation">Gospel Presentation</string>
     <string name="status_uncontacted">Uncontacted</string>
     <string name="status_attempted_contact">Attempted Contact</string>
     <string name="status_contacted">Contacted</string>
     <string name="status_completed">Completed</string>
     <string name="status_do_not_contact">Do Not Contact</string>
-    
+
     <!-- Rejoicibles -->
     <string name="rejoicable_christ">Prayed To Receive Christ </string>
     <string name="rejoicable_gospel">Gospel Presentation</string>
     <string name="rejoicable_convo">Spiritual Conversation</string>
-    
+
     <!-- Add Contact Dialog -->
     <string name="add_contact_title">Add Contact</string>
     <string name="add_contact_section_bio">Bio</string>
@@ -157,8 +159,18 @@
     <string name="add_contact_name_required">Please enter a name for the contact</string>
     <string name="add_contact_failed">Failed to create contact</string>
     <string name="add_contact_progress">Please wait. Adding contact…</string>
-    
-    
+
+    <!-- Assignment Dialog -->
+    <string name="assignment_progress">Please wait. Assigning contact(s)…</string>
+    <string name="assignment_title">Assign To</string>
+	<string name="assignment_title_mass">Mass Assign To</string>
+	<string name="assignment_title_leader">Assign to Leader</string>
+    <string name="assignment_title_group">Assign to Group</string>
+    <string name="assignment_complete">Assignment complete</string>
+    <string name="assignment_server_error">Server returned error</string>
+    <string name="assignment_failed">Failed to assign contact(s)</string>
+    <string name="assignment_progress">Please wait. Performing assignment…</string>
+	
     <!-- Time Ago -->
     <string name="time_ago_hour">about an hour</string>
     <string name="time_ago_hours">{0} hours</string>
@@ -174,7 +186,10 @@
     <string name="time_ago_ago">ago</string>
     <string name="time_ago_from_now">from now</string>
     
+    <!-- Helper/Utility -->
+    <string name="u_invalid_phone">Invalid Phone Number</string>
+
     <!-- Proper -->
-   	<string name="facebook">Facebook</string>
-    
+    <string name="facebook">Facebook</string>
+
 </resources>

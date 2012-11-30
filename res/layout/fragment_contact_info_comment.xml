@@ -8,7 +8,7 @@
     android:background="@drawable/item_background"
     android:padding="9.0dip" >
 
-    <EditText
+    <org.holoeverywhere.widget.EditText
         android:id="@+id/comment"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -33,8 +33,8 @@
         android:layout_width="32.0dip"
         android:layout_height="32.0dip"
         android:layout_alignLeft="@+id/comment"
-        android:layout_centerVertical="true"
         android:layout_below="@id/comment"
+        android:layout_centerVertical="true"
         android:padding="6.0dip"
         android:src="@drawable/ic_rejoice_christ_gray" />
 
@@ -56,15 +56,15 @@
         android:padding="6.0dip"
         android:src="@drawable/ic_rejoice_gospel_gray" />
 
-    <Spinner
+    <org.holoeverywhere.widget.Spinner
         android:id="@+id/status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@id/rejoice_gospel"
+        android:layout_marginTop="-4.0dip"
         android:layout_toLeftOf="@id/save"
         android:layout_toRightOf="@id/rejoice_gospel"
         android:background="@drawable/gray_button"
-        android:layout_marginTop="-4.0dip"
         tools:listitem="@layout/item_simple_status" />
 
 </RelativeLayout>

@@ -1,13 +1,12 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/RelativeLayout1"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="@drawable/background"
     tools:context=".authenticator.AuthenticatorActivity" >
 
     <org.holoeverywhere.widget.ProgressBar
-        android:id="@+id/progress"
+        android:id="@android:id/progress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
@@ -18,7 +17,7 @@
         android:id="@+id/progress_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/progress"
+        android:layout_below="@android:id/progress"
         android:layout_centerHorizontal="true"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@color/light_gray"
@@ -28,7 +27,7 @@
         android:id="@+id/logo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/progress"
+        android:layout_above="@android:id/progress"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="60.0dip"
         android:paddingLeft="40.0dip"

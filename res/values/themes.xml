@@ -4,7 +4,6 @@
     <style name="Theme.MissionHub" parent="Holo.Theme.Light.DarkActionBar">
         <item name="android:listSelector">@drawable/abs__list_selector_holo_light</item>
         <item name="android:listDivider">@drawable/abs__list_divider_holo_light</item>
-        
         <item name="android:windowBackground">@color/background</item>
         <item name="android:colorBackground">@color/background</item>
     </style>

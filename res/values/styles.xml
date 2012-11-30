@@ -29,7 +29,7 @@
         <item name="android:paddingLeft">8.0dip</item>
         <item name="android:paddingRight">8.0dip</item>
         <item name="android:textSize">12.0dip</item>
-		<item name="android:textStyle">bold</item>
+        <item name="android:textStyle">bold</item>
         <item name="android:textColor">@color/gray</item>
         <item name="android:ellipsize">marquee</item>
         <item name="android:singleLine">true</item>
@@ -39,7 +39,7 @@
     <style name="MissionHub.CreateContactInfoSectionLabel" parent="MissionHub.ContactInfoSectionLabel">
         <item name="android:textColor">@color/holo_blue_light</item>
     </style>
-    
+
     <style name="MissionHub.ContactInfoSection">
         <item name="android:layout_width">fill_parent</item>
         <item name="android:layout_height">wrap_content</item>

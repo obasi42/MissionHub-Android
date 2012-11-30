@@ -116,11 +116,11 @@ public class ContactSurveysFragment extends BaseFragment {
 
 				if (object instanceof KeyItem) {
 					view = getLayoutInflater().inflate(R.layout.item_contact_surveys_keyword, null);
-					holder.keyword = (TextView) view.findViewById(R.id.keyword);
+					holder.keyword = (TextView) view.findViewById(android.R.id.text1);
 				} else if (object instanceof QAItem) {
 					view = getLayoutInflater().inflate(R.layout.item_contact_surveys_qa, null);
-					holder.question = (TextView) view.findViewById(R.id.question);
-					holder.answer = (TextView) view.findViewById(R.id.answer);
+					holder.question = (TextView) view.findViewById(android.R.id.text1);
+					holder.answer = (TextView) view.findViewById(android.R.id.text2);
 				} else if (object instanceof EmptyItem) {
 					view = getLayoutInflater().inflate(R.layout.item_contact_surveys_empty, null);
 				}

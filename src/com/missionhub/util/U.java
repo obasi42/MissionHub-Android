@@ -182,7 +182,7 @@ public class U {
 		sherlockActivity.getSupportActionBar().setListNavigationCallbacks(null, null);
 		sherlockActivity.getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 		sherlockActivity.getSupportActionBar().setSubtitle(null);
-		sherlockActivity.getSupportActionBar().setTitle("MissionHub");
+		sherlockActivity.getSupportActionBar().setTitle(R.string.app_name);
 	}
 
 	public static List<String> getStatuses() {
@@ -231,7 +231,7 @@ public class U {
 			fNum = phoneNumber.substring(0, 3);
 			fNum += "-" + phoneNumber.substring(4, 7);
 		} else {
-			return "Invalid Phone Number.";
+			return getString(R.string.u_invalid_phone);
 		}
 
 		return fNum;

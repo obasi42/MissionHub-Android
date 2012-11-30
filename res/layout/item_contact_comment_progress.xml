@@ -11,8 +11,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center" >
 
-        <ProgressBar
-            android:id="@+id/progress"
+        <org.holoeverywhere.widget.ProgressBar
+            android:id="@android:id/progress"
             android:layout_width="30.0dip"
             android:layout_height="30.0dip"
             android:layout_centerVertical="true"
@@ -23,9 +23,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_toRightOf="@id/progress"
+            android:layout_toRightOf="@android:id/progress"
             android:paddingLeft="5.0dip"
-            android:text="Loading Comments..."
+            android:text="@string/contact_comment_loading"
             android:textColor="@color/dark_gray"
             android:textSize="14.0sp"
             android:textStyle="bold" />

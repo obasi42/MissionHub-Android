@@ -51,7 +51,7 @@ public class NavigationSpinnerAdapter extends ObjectArrayAdapter {
 			final LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			holder = new ViewHolder();
 			view = inflater.inflate(mLayoutResource, null);
-			holder.text = (TextView) view.findViewById(R.id.text);
+			holder.text = (TextView) view.findViewById(android.R.id.text1);
 			view.setTag(holder);
 		} else {
 			holder = (ViewHolder) view.getTag();

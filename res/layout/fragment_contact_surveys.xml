@@ -17,7 +17,6 @@
         android:dividerHeight="1.0dip"
         tools:listheader="@layout/item_contact_surveys_keyword"
         tools:listitem="@layout/item_contact_surveys_qa" >
-
     </ListView>
 
 </FrameLayout>

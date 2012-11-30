@@ -205,9 +205,9 @@ public class ContactAssignmentDialog extends RoboSherlockDialogFragment implemen
 		mPager.setCurrentItem(0, animate);
 		if (getDialog() != null) {
 			if (mPeople.size() > 1) {
-				getDialog().setTitle("Mass Assign To:");
+				getDialog().setTitle(R.string.assignment_title_mass);
 			} else {
-				getDialog().setTitle("Assign To:");
+				getDialog().setTitle(R.string.assignment_title);
 			}
 		}
 	}
@@ -220,7 +220,7 @@ public class ContactAssignmentDialog extends RoboSherlockDialogFragment implemen
 		mPage = 1;
 		mPager.setCurrentItem(1, animate);
 		if (getDialog() != null) {
-			getDialog().setTitle("Assign to Group");
+			getDialog().setTitle(R.string.assignment_title_group);
 		}
 	}
 
@@ -232,7 +232,7 @@ public class ContactAssignmentDialog extends RoboSherlockDialogFragment implemen
 		mPage = 1;
 		mPager.setCurrentItem(1, animate);
 		if (getDialog() != null) {
-			getDialog().setTitle("Assign to Leader");
+			getDialog().setTitle(R.string.assignment_title_leader);
 		}
 	}
 
@@ -378,7 +378,7 @@ public class ContactAssignmentDialog extends RoboSherlockDialogFragment implemen
 		public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
 			final View view = inflater.inflate(R.layout.fragment_assignment_dialog_index, null);
 
-			mListView = (ListView) view.findViewById(R.id.listview);
+			mListView = (ListView) view.findViewById(android.R.id.list);
 
 			if (mAdapter == null) {
 				mAdapter = new ContactAssignmentAdapter(getActivity());
@@ -468,7 +468,7 @@ public class ContactAssignmentDialog extends RoboSherlockDialogFragment implemen
 		public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
 			final View view = inflater.inflate(R.layout.fragment_assignment_dialog_selection, null);
 
-			mListView = (ListView) view.findViewById(R.id.listview);
+			mListView = (ListView) view.findViewById(android.R.id.list);
 			mListView.setOnScrollListener(new PauseOnScrollListener(false, true));
 
 			if (mLeaderAdapter == null) {
@@ -720,10 +720,10 @@ public class ContactAssignmentDialog extends RoboSherlockDialogFragment implemen
 			@Override
 			public void onSuccess(final Boolean sucess) {
 				if (sucess) {
-					Toast.makeText(Application.getContext(), "Assignment complete", Toast.LENGTH_SHORT).show();
+					Toast.makeText(Application.getContext(), R.string.assignment_complete, Toast.LENGTH_SHORT).show();
 					dismiss();
 				} else {
-					onException(new Exception("Server returned error."));
+					onException(new Exception(Application.getContext().getString(R.string.assignment_server_error)));
 				}
 
 			}
@@ -736,7 +736,7 @@ public class ContactAssignmentDialog extends RoboSherlockDialogFragment implemen
 			@Override
 			public void onException(final Exception e) {
 				final ExceptionHelper eh = new ExceptionHelper(Application.getContext(), e);
-				eh.makeToast("Failed to assign contact(s).");
+				eh.makeToast(R.string.assignment_failed);
 
 				ContactAssignmentDialog.this.cancel();
 			}
@@ -749,7 +749,7 @@ public class ContactAssignmentDialog extends RoboSherlockDialogFragment implemen
 		};
 		Application.getExecutor().execute(mTask.future());
 
-		getDialog().setTitle("Performing assignment...");
+		getDialog().setTitle(R.string.assignment_progress);
 		showProgress();
 	}
 

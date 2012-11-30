@@ -106,7 +106,7 @@ public class PreferencesFragment extends BaseFragment {
 			if (view == null) {
 				holder = new ViewHolder();
 				view = getLayoutInflater().inflate(R.layout.item_preference_organization, null);
-				holder.text = (TextView) view.findViewById(R.id.text);
+				holder.text = (TextView) view.findViewById(android.R.id.text1);
 				view.setTag(holder);
 			} else {
 				holder = (ViewHolder) view.getTag();
