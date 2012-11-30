@@ -64,7 +64,7 @@ public class AuthenticatorActivity extends RoboSherlockAccountAuthenticatorActiv
 	@InjectView(R.id.webview) private WebView mWebView;
 
 	/** the progress bar */
-	@InjectView(R.id.progress) private ProgressBar mProgress;
+	@InjectView(android.R.id.progress) private ProgressBar mProgress;
 
 	/** text to display the current progress action */
 	@InjectView(R.id.progress_text) private TextView mProgressText;
