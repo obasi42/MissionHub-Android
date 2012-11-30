@@ -4,7 +4,8 @@ import java.util.HashMap;
 
 import org.holoeverywhere.widget.Toast;
 
-import roboguice.util.RoboAsyncTask;
+import roboguice.inject.InjectView;
+import roboguice.util.SafeAsyncTask;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -39,13 +40,13 @@ public class ContactSurveysFragment extends BaseFragment {
 	private Person mPerson;
 
 	/** the listview */
-	private ListView mListView;
+	@InjectView(android.R.id.list) private ListView mListView;
 
 	/** the listview adapter */
 	private SurveysArrayAdapter mAdapter;
 
 	/** task used to update organization */
-	private RoboAsyncTask<Organization> mOrganizationTask;
+	private SafeAsyncTask<Organization> mOrganizationTask;
 
 	/** updated organization */
 	private boolean mUpdatedOrganization = false;
@@ -72,8 +73,12 @@ public class ContactSurveysFragment extends BaseFragment {
 
 	@Override
 	public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
-		final View view = inflater.inflate(R.layout.fragment_contact_surveys, null);
-		mListView = (ListView) view.findViewById(R.id.listview);
+		return inflater.inflate(R.layout.fragment_contact_surveys, null);
+	}
+
+	@Override
+	public void onViewCreated(final View view, final Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
 
 		if (mAdapter == null) {
 			mAdapter = new SurveysArrayAdapter(getActivity());
@@ -86,8 +91,6 @@ public class ContactSurveysFragment extends BaseFragment {
 		if (mAdapter.isEmpty()) {
 			notifyContactUpdated();
 		}
-
-		return view;
 	}
 
 	public static class SurveysArrayAdapter extends ObjectArrayAdapter {
@@ -255,7 +258,7 @@ public class ContactSurveysFragment extends BaseFragment {
 			mOrganizationTask.cancel(true);
 		}
 
-		mOrganizationTask = new RoboAsyncTask<Organization>(Application.getContext()) {
+		mOrganizationTask = new SafeAsyncTask<Organization>() {
 
 			@Override
 			public Organization call() throws Exception {

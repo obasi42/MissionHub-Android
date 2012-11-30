@@ -3,6 +3,7 @@ package com.missionhub.fragment;
 import java.util.HashSet;
 import java.util.Set;
 
+import roboguice.inject.InjectView;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -38,7 +39,7 @@ import com.missionhub.util.U;
 public class MyContactsFragment extends MainFragment implements OnPageChangeListener, ContactListFragmentListener, ActionMode.Callback, ContactAssignmentListener, AddContactListener {
 
 	/** the view pager */
-	private ViewPager mPager;
+	@InjectView(R.id.pager) private ViewPager mPager;
 
 	/** the view pager adapter */
 	private FragmentStatePagerAdapter mAdapter;
@@ -111,17 +112,18 @@ public class MyContactsFragment extends MainFragment implements OnPageChangeList
 
 	@Override
 	public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
-		final View v = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_my_contacts, null);
-		mPager = (ViewPager) v.findViewById(R.id.pager);
+		mRefreshingView = (ImageView) inflater.inflate(R.layout.refresh_icon, null);
+		return LayoutInflater.from(getActivity()).inflate(R.layout.fragment_my_contacts, null);
+	}
+
+	@Override
+	public void onViewCreated(final View view, final Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+
 		mPager.setOffscreenPageLimit(2);
 		mPager.setOnPageChangeListener(this);
 		mPager.setAdapter(mAdapter);
 		mPager.setCurrentItem(mPage);
-
-		// create the refreshing actionbar view
-		mRefreshingView = (ImageView) inflater.inflate(R.layout.refresh_icon, null);
-
-		return v;
 	}
 
 	@Override
@@ -183,7 +185,9 @@ public class MyContactsFragment extends MainFragment implements OnPageChangeList
 
 		final ContactListFragment fragment = getCurrentFragment();
 
-		if (fragment != null && fragment.isWorking()) {
+		if (fragment == null || !fragment.isVisible()) return;
+
+		if (fragment.isWorking()) {
 			final Animation rotation = AnimationUtils.loadAnimation(getActivity(), R.anim.clockwise_refresh);
 			rotation.setRepeatCount(Animation.INFINITE);
 			mRefreshingView.startAnimation(rotation);

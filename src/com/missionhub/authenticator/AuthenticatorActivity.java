@@ -11,7 +11,7 @@ import org.holoeverywhere.widget.Toast;
 
 import roboguice.inject.ContentView;
 import roboguice.inject.InjectView;
-import roboguice.util.RoboAsyncTask;
+import roboguice.util.SafeAsyncTask;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.annotation.SuppressLint;
@@ -258,7 +258,7 @@ public class AuthenticatorActivity extends RoboSherlockAccountAuthenticatorActiv
 
 		showProgress(getString(R.string.auth_fetching_account_info));
 
-		final RoboAsyncTask<GAuthTokenDone> task = new RoboAsyncTask<GAuthTokenDone>(this) {
+		final SafeAsyncTask<GAuthTokenDone> task = new SafeAsyncTask<GAuthTokenDone>() {
 			@Override
 			public GAuthTokenDone call() throws Exception {
 				// request the access token from the code
@@ -283,7 +283,7 @@ public class AuthenticatorActivity extends RoboSherlockAccountAuthenticatorActiv
 					final long personId = Long.parseLong(mAccountManager.getUserData(account, Authenticator.KEY_PERSON_ID));
 					if (personId == done.person.id) {
 						// we have a duplicate, show a toast and cancel the authenticator
-						Toast.makeText(getContext(), String.format(getString(R.string.auth_duplicate_account), done.person.name), Toast.LENGTH_LONG).show();
+						Toast.makeText(Application.getContext(), String.format(getString(R.string.auth_duplicate_account), done.person.name), Toast.LENGTH_LONG).show();
 						finishActivity(RESULT_DUPLICATE, account, personId);
 						return;
 					}

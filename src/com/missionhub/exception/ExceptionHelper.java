@@ -69,7 +69,7 @@ public class ExceptionHelper {
 
 	/** Builds and returns the dialog for more modification before showing */
 	public AlertDialog getDialog() {
-		if (mDialog == null) {
+		if (mDialog == null && mContext != null) {
 			final AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 
 			builder.setTitle(mTitle);
@@ -274,7 +274,7 @@ public class ExceptionHelper {
 	 * Shows a toast with the data from the exception
 	 */
 	public void makeToast() {
-		Toast.makeText(mContext, getTitle() + "\n\n" + getMessage(), Toast.LENGTH_LONG).show();
+		if (mContext != null) Toast.makeText(mContext, getTitle() + "\n\n" + getMessage(), Toast.LENGTH_LONG).show();
 	}
 
 	/**
@@ -284,7 +284,7 @@ public class ExceptionHelper {
 	 *            a failure message to be displayed with the exception data.
 	 */
 	public void makeToast(final String failure) {
-		Toast.makeText(mContext, failure + "\n" + getTitle() + "\n\n" + getMessage(), Toast.LENGTH_LONG).show();
+		if (mContext != null) Toast.makeText(mContext, failure + "\n" + getTitle() + "\n\n" + getMessage(), Toast.LENGTH_LONG).show();
 	}
 
 	/**
@@ -293,7 +293,7 @@ public class ExceptionHelper {
 	 * @param failure
 	 *            a failure message to be displayed before the exception data.
 	 */
-	public void makeToast(final int contactCannotDeleteComment) {
-		makeToast(mContext.getString(contactCannotDeleteComment));
+	public void makeToast(final int failure) {
+		if (mContext != null) makeToast(mContext.getString(failure));
 	}
 }

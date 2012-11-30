@@ -9,7 +9,8 @@ import java.util.Set;
 import org.holoeverywhere.widget.TextView;
 import org.holoeverywhere.widget.Toast;
 
-import roboguice.util.RoboAsyncTask;
+import roboguice.inject.InjectView;
+import roboguice.util.SafeAsyncTask;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnKeyListener;
@@ -55,7 +56,7 @@ import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 public class ContactAssignmentDialog extends RoboSherlockDialogFragment implements OnKeyListener, OnItemClickListener {
 
 	/** the view pager */
-	private LockedViewPager mPager;
+	@InjectView(R.id.pager) private LockedViewPager mPager;
 
 	/** the view pager adapter */
 	private FragmentStatePagerAdapter mPagerAdapter;
@@ -79,10 +80,10 @@ public class ContactAssignmentDialog extends RoboSherlockDialogFragment implemen
 	private boolean mCanceled = false;
 
 	/** the task used to process assignments */
-	private RoboAsyncTask<Boolean> mTask;
+	private SafeAsyncTask<Boolean> mTask;
 
 	/** the progress view */
-	private View mProgress;
+	@InjectView(R.id.progress_container) private View mProgress;
 
 	public ContactAssignmentDialog() {}
 
@@ -132,11 +133,14 @@ public class ContactAssignmentDialog extends RoboSherlockDialogFragment implemen
 
 	@Override
 	public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
-		final View view = inflater.inflate(R.layout.fragment_assignment_dialog, null);
+		return inflater.inflate(R.layout.fragment_assignment_dialog, null);
+	}
+
+	@Override
+	public void onViewCreated(final View view, final Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
 
 		mCanceled = false;
-		mPager = (LockedViewPager) view.findViewById(R.id.pager);
-		mProgress = view.findViewById(R.id.progress_container);
 
 		if (mPagerAdapter == null) {
 			mPagerAdapter = new FragmentStatePagerAdapter(getChildFragmentManager()) {
@@ -184,7 +188,6 @@ public class ContactAssignmentDialog extends RoboSherlockDialogFragment implemen
 			showProgress();
 		}
 
-		return view;
 	}
 
 	@Override
@@ -688,7 +691,7 @@ public class ContactAssignmentDialog extends RoboSherlockDialogFragment implemen
 		if (mTask != null) {
 			mTask.cancel(true);
 		}
-		mTask = new RoboAsyncTask<Boolean>(Application.getContext()) {
+		mTask = new SafeAsyncTask<Boolean>() {
 
 			@Override
 			public Boolean call() throws Exception {
@@ -717,7 +720,7 @@ public class ContactAssignmentDialog extends RoboSherlockDialogFragment implemen
 			@Override
 			public void onSuccess(final Boolean sucess) {
 				if (sucess) {
-					Toast.makeText(getContext(), "Assignment complete", Toast.LENGTH_SHORT).show();
+					Toast.makeText(Application.getContext(), "Assignment complete", Toast.LENGTH_SHORT).show();
 					dismiss();
 				} else {
 					onException(new Exception("Server returned error."));
@@ -732,7 +735,7 @@ public class ContactAssignmentDialog extends RoboSherlockDialogFragment implemen
 
 			@Override
 			public void onException(final Exception e) {
-				final ExceptionHelper eh = new ExceptionHelper(getContext(), e);
+				final ExceptionHelper eh = new ExceptionHelper(Application.getContext(), e);
 				eh.makeToast("Failed to assign contact(s).");
 
 				ContactAssignmentDialog.this.cancel();

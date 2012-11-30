@@ -82,8 +82,7 @@ public class Api {
 		return doRequest(method, url, headers, params, authenticated, ResponseType.STRING);
 	}
 
-	private HttpResponse doRequest(final HttpMethod method, final String url, HttpHeaders headers, HttpParams params, final boolean authenticated, final ResponseType responseType)
-			throws Exception {
+	private HttpResponse doRequest(final HttpMethod method, final String url, HttpHeaders headers, HttpParams params, final boolean authenticated, final ResponseType responseType) throws Exception {
 		HttpResponse response = null;
 		try {
 			// create the headers object if needed and add the api version header
@@ -97,11 +96,11 @@ public class Api {
 			if (params == null) {
 				params = new HttpParams();
 			}
-			
+
 			// add oauth token to the request if needed
 			if (authenticated) {
 				headers.setHeader("Authorization", "OAuth: " + Session.getInstance().getAccessToken());
-				
+
 				if (Session.getInstance().getOrganizationId() >= 0) {
 					params.add("org_id", Session.getInstance().getOrganizationId());
 				}

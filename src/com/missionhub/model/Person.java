@@ -8,7 +8,9 @@ import de.greenrobot.dao.DaoException;
 
 // KEEP INCLUDES - put your custom includes here
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimaps;
@@ -542,14 +544,19 @@ public class Person {
 		adminRoles.add(Person.LABEL_LEADER);
 		builder.where(OrganizationalRoleDao.Properties.Person_id.eq(getId()), OrganizationalRoleDao.Properties.Role.in(adminRoles));
 		final List<OrganizationalRole> roles = builder.where(OrganizationalRoleDao.Properties.Person_id.eq(getId()), OrganizationalRoleDao.Properties.Role.in(adminRoles)).list();
-
+		
 		// build a tree from organization ancestry
 		final TreeDataStructure<Long> tree = new TreeDataStructure<Long>(0l);
+		
+		// store already add orgs
+		final Set<Long> organizations = new HashSet<Long>();
 
 		final Iterator<OrganizationalRole> roleItr = roles.iterator();
 		while (roleItr.hasNext()) {
 			final OrganizationalRole role = roleItr.next();
 			final Organization org = role.getOrganization();
+			if (organizations.contains(org.getId())) continue;
+			organizations.add(org.getId());
 			if (role.getOrganization().getAncestry() != null) {
 				TreeDataStructure<Long> parent = tree;
 				for (final String ancestor : role.getOrganization().getAncestry().trim().split("/")) {

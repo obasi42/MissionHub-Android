@@ -8,7 +8,8 @@ import java.util.Locale;
 
 import org.holoeverywhere.widget.Toast;
 
-import roboguice.util.RoboAsyncTask;
+import roboguice.inject.InjectView;
+import roboguice.util.SafeAsyncTask;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -66,7 +67,7 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 	private Person mPerson;
 
 	/** the list view */
-	private ListView mListView;
+	@InjectView(R.id.listview) private ListView mListView;
 
 	/** the list view adapter */
 	private CommentArrayAdapter mAdapter;
@@ -75,13 +76,13 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 	private MenuItem mPromoteItem;
 
 	/** task used to update the comments */
-	private RoboAsyncTask<List<FollowupComment>> mCommentTask;
+	private SafeAsyncTask<List<FollowupComment>> mCommentTask;
 
 	/** task used to save comment/status change */
-	private RoboAsyncTask<Boolean> mSaveTask;
+	private SafeAsyncTask<Boolean> mSaveTask;
 
 	/** task used to change roles (promote/demote) */
-	private RoboAsyncTask<Boolean> mRoleTask;
+	private SafeAsyncTask<Boolean> mRoleTask;
 
 	/** the progress item */
 	private final ProgressItem mProgressItem = new ProgressItem();
@@ -92,77 +93,83 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 	/** if the more view is open */
 	private boolean mMoreShowing = false;
 
+	/** the header view */
+	private View mHeader;
+
+	/** the add comment header view */
+	private View mHeaderComment;
+
 	/** the contact's given name */
-	private TextView mHeaderGivenName;
+	@InjectView(R.id.given_name) private TextView mHeaderGivenName;
 
 	/** the contact's family name */
-	private TextView mHeaderFamilyName;
+	@InjectView(R.id.family_name) private TextView mHeaderFamilyName;
 
 	/** the contact's avatar */
-	private ImageView mHeaderAvatar;
+	@InjectView(R.id.avatar_image) private ImageView mHeaderAvatar;
 
 	/** the call button */
-	private ImageView mHeaderActionCall;
+	@InjectView(R.id.action_call) private ImageView mHeaderActionCall;
 
 	/** the message button */
-	private ImageView mHeaderActionMessage;
+	@InjectView(R.id.action_message) private ImageView mHeaderActionMessage;
 
 	/** the email button */
-	private ImageView mHeaderActionEmail;
+	@InjectView(R.id.action_email) private ImageView mHeaderActionEmail;
 
 	/** the container for the phone number */
-	private View mHeaderContainerPhone;
+	@InjectView(R.id.phone_container) private View mHeaderContainerPhone;
 
 	/** the container for the email address */
-	private View mHeaderContainerEmail;
+	@InjectView(R.id.email_container) private View mHeaderContainerEmail;
 
 	/** the contact's phone number */
-	private TextView mHeaderPhone;
+	@InjectView(R.id.phone) private TextView mHeaderPhone;
 
 	/** the contact's email address */
-	private TextView mHeaderEmail;
+	@InjectView(R.id.email) private TextView mHeaderEmail;
 
 	/** the contact assignment button */
-	private Button mHeaderAssignment;
+	@InjectView(R.id.assign) private Button mHeaderAssignment;
 
 	/** the container for the more information view */
-	private ViewGroup mHeaderMore;
+	@InjectView(R.id.more) private ViewGroup mHeaderMore;
 
 	/** the more info collapse/expand text */
-	private TextView mHeaderMoreText;
+	@InjectView(R.id.expand) private TextView mHeaderMoreText;
 
 	/** the more info gender */
-	private View mInfoGender;
+	@InjectView(R.id.gender) private View mInfoGender;
 
 	/** the more info birthday */
-	private View mInfoBirthday;
+	@InjectView(R.id.birthday) private View mInfoBirthday;
 
 	/** the more info address */
-	private View mInfoAddress;
+	@InjectView(R.id.address) private View mInfoAddress;
 
 	/** the more info facebook link */
-	private View mInfoFacebook;
+	@InjectView(R.id.facebook) private View mInfoFacebook;
 
 	/** the comment data holder */
 	private final CommentData mComment = new CommentData();
 
 	/** the comment comment */
-	private EditText mCommentComment;
+	@InjectView(R.id.comment) private EditText mCommentComment;
 
 	/** the comment save button */
-	private View mCommentSave;
+	@InjectView(R.id.save) private View mCommentSave;
 
 	/** the comment received Christ rejoicable */
-	private ImageView mCommentRejoiceChrist;
+	@InjectView(R.id.rejoice_christ) private ImageView mCommentRejoiceChrist;
 
 	/** the comment gospel presentation rejoicable */
-	private ImageView mCommentRejoiceGospel;
+	@InjectView(R.id.rejoice_gospel) private ImageView mCommentRejoiceGospel;
 
 	/** the comment spiritual converstation rejoicable */
-	private ImageView mCommentRejoiceConvo;
+	@InjectView(R.id.rejoice_convo) private ImageView mCommentRejoiceConvo;
 
 	/** the comment status */
-	private Spinner mCommentStatus;
+	@InjectView(R.id.status) private Spinner mCommentStatus;
 
 	/** the comment status adapter */
 	private CommentStatusAdapter mCommentStatusAdapter;
@@ -208,19 +215,24 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 
 	@Override
 	public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
-		final ViewGroup view = (ViewGroup) inflater.inflate(R.layout.fragment_contact_info, null);
-		mListView = (ListView) view.findViewById(R.id.listview);
+		mHeaderComment = inflater.inflate(R.layout.fragment_contact_info_comment, null);
+		mHeader = inflater.inflate(R.layout.fragment_contact_info_header, null);
+		return inflater.inflate(R.layout.fragment_contact_info, null);
+	}
+
+	@Override
+	public void onViewCreated(final View view, final Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+
 		mListView.setOnScrollListener(new PauseOnScrollListener(false, true));
 
 		// the header
-		final View header = inflater.inflate(R.layout.fragment_contact_info_header, null);
-		initHeaderView(header);
-		mListView.addHeaderView(header);
+		initHeaderView(mHeader);
+		mListView.addHeaderView(mHeader);
 
 		// the add comment box
-		final View comment = inflater.inflate(R.layout.fragment_contact_info_comment, null);
-		initCommentView(comment);
-		mListView.addHeaderView(comment);
+		initCommentView(mHeaderComment);
+		mListView.addHeaderView(mHeaderComment);
 
 		// setup the adapter if needed
 		if (mAdapter == null) {
@@ -244,8 +256,6 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 		if (mAdapter.isEmpty()) {
 			notifyCommentsUpdated();
 		}
-
-		return view;
 	}
 
 	/**
@@ -254,17 +264,6 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 	 * @param view
 	 */
 	public void initHeaderView(final View view) {
-		mHeaderGivenName = (TextView) view.findViewById(R.id.given_name);
-		mHeaderFamilyName = (TextView) view.findViewById(R.id.family_name);
-		mHeaderAvatar = (ImageView) view.findViewById(R.id.avatar_image);
-		mHeaderActionCall = (ImageView) view.findViewById(R.id.action_call);
-		mHeaderActionMessage = (ImageView) view.findViewById(R.id.action_message);
-		mHeaderActionEmail = (ImageView) view.findViewById(R.id.action_email);
-		mHeaderContainerPhone = view.findViewById(R.id.phone_container);
-		mHeaderContainerEmail = view.findViewById(R.id.email_container);
-		mHeaderPhone = (TextView) view.findViewById(R.id.phone);
-		mHeaderEmail = (TextView) view.findViewById(R.id.email);
-		mHeaderAssignment = (Button) view.findViewById(R.id.assign);
 		mHeaderAssignment.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(final View v) {
@@ -272,8 +271,6 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 				dialog.setAssignmentListener(ContactInfoFragment.this);
 			}
 		});
-		mHeaderMore = (ViewGroup) view.findViewById(R.id.more);
-		mHeaderMoreText = (TextView) view.findViewById(R.id.expand);
 		mHeaderMoreText.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(final View v) {
@@ -285,16 +282,12 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 				updateMoreShowing();
 			}
 		});
-		mInfoGender = mHeaderMore.findViewById(R.id.gender);
-		mInfoBirthday = mHeaderMore.findViewById(R.id.birthday);
-		mInfoAddress = mHeaderMore.findViewById(R.id.address);
 		mInfoAddress.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(final View v) {
 				openAddress();
 			}
 		});
-		mInfoFacebook = mHeaderMore.findViewById(R.id.facebook);
 		mInfoFacebook.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(final View v) {
@@ -309,16 +302,13 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 	 * @param view
 	 */
 	public void initCommentView(final View view) {
-		mCommentComment = (EditText) view.findViewById(R.id.comment);
 		mCommentComment.clearFocus();
-		mCommentSave = view.findViewById(R.id.save);
 		mCommentSave.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(final View v) {
 				postComment();
 			}
 		});
-		mCommentRejoiceChrist = (ImageView) view.findViewById(R.id.rejoice_christ);
 		mCommentRejoiceChrist.setTag(false);
 		mCommentRejoiceChrist.setOnClickListener(new OnClickListener() {
 			@Override
@@ -326,7 +316,6 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 				toggleRejoicable(mCommentRejoiceChrist, R.drawable.ic_rejoice_christ, R.drawable.ic_rejoice_christ_gray, R.string.rejoicable_christ);
 			}
 		});
-		mCommentRejoiceGospel = (ImageView) view.findViewById(R.id.rejoice_gospel);
 		mCommentRejoiceGospel.setTag(false);
 		mCommentRejoiceGospel.setOnClickListener(new OnClickListener() {
 			@Override
@@ -334,7 +323,6 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 				toggleRejoicable(mCommentRejoiceGospel, R.drawable.ic_rejoice_gospel, R.drawable.ic_rejoice_gospel_gray, R.string.rejoicable_gospel);
 			}
 		});
-		mCommentRejoiceConvo = (ImageView) view.findViewById(R.id.rejoice_convo);
 		mCommentRejoiceConvo.setTag(false);
 		mCommentRejoiceConvo.setOnClickListener(new OnClickListener() {
 			@Override
@@ -342,7 +330,6 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 				toggleRejoicable(mCommentRejoiceConvo, R.drawable.ic_rejoice_convo, R.drawable.ic_rejoice_convo_gray, R.string.rejoicable_convo);
 			}
 		});
-		mCommentStatus = (Spinner) view.findViewById(R.id.status);
 		if (mCommentStatusAdapter == null) {
 			mCommentStatusAdapter = new CommentStatusAdapter(getActivity());
 			for (final String status : U.getStatuses()) {
@@ -433,8 +420,6 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 			}
 		} else {
 			ImageLoader.getInstance().displayImage(null, mHeaderAvatar, mImageLoaderOptions);
-
-			mHeaderAvatar.setImageDrawable(DrawableCache.getDrawable(R.drawable.default_contact));
 		}
 
 		// calling/messaging
@@ -602,7 +587,7 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 			mAdapter.remove(mEmptyItem);
 		}
 
-		mCommentTask = new RoboAsyncTask<List<FollowupComment>>(getActivity()) {
+		mCommentTask = new SafeAsyncTask<List<FollowupComment>>() {
 
 			@Override
 			public List<FollowupComment> call() throws Exception {
@@ -622,7 +607,7 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 
 			@Override
 			public void onException(final Exception e) {
-				final ExceptionHelper eh = new ExceptionHelper(getContext(), e);
+				final ExceptionHelper eh = new ExceptionHelper(Application.getContext(), e);
 				eh.makeToast("Failed to refresh comments.");
 			}
 
@@ -773,8 +758,9 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 	@Override
 	public void onCreateOptionsMenu(final Menu menu, final MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
-		//mPromoteItem = menu.add(Menu.NONE, R.id.menu_item_permissions, Menu.NONE, R.string.action_promote).setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_NEVER);
-		//updatePromoteDemote();
+		// mPromoteItem = menu.add(Menu.NONE, R.id.menu_item_permissions, Menu.NONE,
+		// R.string.action_promote).setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_NEVER);
+		// updatePromoteDemote();
 	}
 
 	@Override
@@ -914,7 +900,7 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 	 * @param item
 	 */
 	public void deleteComment(final CommentItem item) {
-		final RoboAsyncTask<Boolean> task = new RoboAsyncTask<Boolean>(getActivity()) {
+		final SafeAsyncTask<Boolean> task = new SafeAsyncTask<Boolean>() {
 
 			@Override
 			public Boolean call() throws Exception {
@@ -938,7 +924,7 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 
 			@Override
 			public void onException(final Exception e) {
-				final ExceptionHelper eh = new ExceptionHelper(getContext(), e);
+				final ExceptionHelper eh = new ExceptionHelper(Application.getContext(), e);
 				eh.makeToast(R.string.contact_cannot_delete_comment);
 			}
 
@@ -971,7 +957,7 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 			return;
 		}
 
-		mSaveTask = new RoboAsyncTask<Boolean>(getActivity()) {
+		mSaveTask = new SafeAsyncTask<Boolean>() {
 
 			@Override
 			public Boolean call() throws Exception {
@@ -1004,7 +990,7 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 
 			@Override
 			public void onException(final Exception e) {
-				final ExceptionHelper eh = new ExceptionHelper(getContext(), e);
+				final ExceptionHelper eh = new ExceptionHelper(Application.getContext(), e);
 				eh.makeToast(R.string.contact_comment_failed_to_save);
 			}
 
@@ -1215,7 +1201,7 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 			mPromoteItem.setEnabled(false);
 		}
 
-		mRoleTask = new RoboAsyncTask<Boolean>(Application.getContext()) {
+		mRoleTask = new SafeAsyncTask<Boolean>() {
 
 			@Override
 			public Boolean call() throws Exception {
@@ -1247,7 +1233,7 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 
 			@Override
 			public void onException(final Exception e) {
-				final ExceptionHelper eh = new ExceptionHelper(getContext(), e);
+				final ExceptionHelper eh = new ExceptionHelper(Application.getContext(), e);
 				eh.makeToast(R.string.contact_role_failed);
 			}
 
@@ -1261,7 +1247,7 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 	}
 
 	public void openAddress() {
-		
+
 	}
 
 	@Override
@@ -1270,7 +1256,6 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 	}
 
 	@Override
-	public void onAssignmentCanceled() {
-	}
+	public void onAssignmentCanceled() {}
 
 }

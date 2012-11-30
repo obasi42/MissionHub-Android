@@ -1,7 +1,8 @@
 package com.missionhub.fragment;
 
 import roboguice.inject.InjectView;
-import roboguice.util.RoboAsyncTask;
+import roboguice.util.SafeAsyncTask;
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,6 +26,7 @@ import com.missionhub.exception.ExceptionHelper.DialogButton;
 import com.missionhub.exception.WebViewException;
 import com.missionhub.util.U;
 
+@SuppressLint("SetJavaScriptEnabled")
 public class SurveysFragment extends MainFragment {
 
 	@InjectView(R.id.container) ViewGroup mContainer;
@@ -99,7 +101,7 @@ public class SurveysFragment extends MainFragment {
 	}
 
 	public void goInitialUrl() {
-		final RoboAsyncTask<String> task = new RoboAsyncTask<String>(Application.getContext()) {
+		final SafeAsyncTask<String> task = new SafeAsyncTask<String>() {
 			@Override
 			public String call() throws Exception {
 				return Api.getSurveyUrl().get();

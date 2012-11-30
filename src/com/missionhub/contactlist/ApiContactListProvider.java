@@ -4,13 +4,12 @@ import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-import roboguice.util.RoboAsyncTask;
+import roboguice.util.SafeAsyncTask;
 import android.content.Context;
 import android.util.Log;
 
 import com.missionhub.api.Api;
 import com.missionhub.api.ApiContactListOptions;
-import com.missionhub.application.Application;
 import com.missionhub.model.Person;
 
 /**
@@ -20,7 +19,7 @@ public class ApiContactListProvider extends ContactListProvider {
 
 	/** true when all available contacts have been fetched */
 	private boolean mDone = false;
-	
+
 	/** true when the provider is started */
 	private boolean mStarted = false;
 
@@ -34,7 +33,7 @@ public class ApiContactListProvider extends ContactListProvider {
 	private final Executor mExecutor = Executors.newSingleThreadExecutor();
 
 	/** the task used to fetch contacts */
-	private RoboAsyncTask<List<Person>> mTask;
+	private SafeAsyncTask<List<Person>> mTask;
 
 	public ApiContactListProvider(final Context context) {
 		super(context);
@@ -71,14 +70,14 @@ public class ApiContactListProvider extends ContactListProvider {
 		}
 		return null;
 	}
-	
+
 	public void start() {
 		if (mStarted) return;
-		
+
 		mStarted = true;
 		fetchMore();
 	}
-	
+
 	public void resume() {
 		if (!mPaused) return;
 
@@ -98,7 +97,7 @@ public class ApiContactListProvider extends ContactListProvider {
 
 		Log.e("TAG", "fetching more contacts...");
 
-		mTask = new RoboAsyncTask<List<Person>>(Application.getContext()) {
+		mTask = new SafeAsyncTask<List<Person>>() {
 			@Override
 			public List<Person> call() throws Exception {
 				return Api.getContactList(mOptions).get();
@@ -167,8 +166,7 @@ public class ApiContactListProvider extends ContactListProvider {
 
 		postWorking(isWorking());
 	}
-	
-	
+
 	@Override
 	public void reload() {
 		if (mStarted) {

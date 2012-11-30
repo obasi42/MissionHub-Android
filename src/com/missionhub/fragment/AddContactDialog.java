@@ -10,7 +10,7 @@ import org.holoeverywhere.widget.EditText;
 import org.holoeverywhere.widget.Spinner;
 import org.holoeverywhere.widget.Toast;
 
-import roboguice.util.RoboAsyncTask;
+import roboguice.util.SafeAsyncTask;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -35,7 +35,7 @@ import com.missionhub.util.U;
 public class AddContactDialog extends RoboSherlockDialogFragment {
 
 	/** the task used to add a contact */
-	private RoboAsyncTask<Person> mTask;
+	private SafeAsyncTask<Person> mTask;
 
 	/** the add contact listener interface */
 	private WeakReference<AddContactListener> mListener;
@@ -267,7 +267,7 @@ public class AddContactDialog extends RoboSherlockDialogFragment {
 
 		showProgress();
 
-		mTask = new RoboAsyncTask<Person>(Application.getContext()) {
+		mTask = new SafeAsyncTask<Person>() {
 
 			@Override
 			public Person call() throws Exception {
@@ -287,7 +287,7 @@ public class AddContactDialog extends RoboSherlockDialogFragment {
 
 			@Override
 			public void onException(final Exception e) {
-				final ExceptionHelper eh = new ExceptionHelper(getContext(), e);
+				final ExceptionHelper eh = new ExceptionHelper(Application.getContext(), e);
 				eh.makeToast(R.string.add_contact_failed);
 
 				hideProgress();

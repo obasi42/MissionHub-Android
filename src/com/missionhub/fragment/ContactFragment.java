@@ -2,7 +2,8 @@ package com.missionhub.fragment;
 
 import org.holoeverywhere.widget.Toast;
 
-import roboguice.util.RoboAsyncTask;
+import roboguice.inject.InjectView;
+import roboguice.util.SafeAsyncTask;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -44,7 +45,7 @@ public class ContactFragment extends BaseFragment implements OnNavigationListene
 	private int mPage = 0;
 
 	/** the view pager */
-	private LockedViewPager mPager;
+	@InjectView(R.id.pager) private LockedViewPager mPager;
 
 	/** the view pager adapter */
 	private FragmentStatePagerAdapter mAdapter;
@@ -56,7 +57,7 @@ public class ContactFragment extends BaseFragment implements OnNavigationListene
 	private ContactSurveysFragment mSurveysFragment;
 
 	/** the task used to update the contact */
-	private RoboAsyncTask<Person> mContactTask;
+	private SafeAsyncTask<Person> mContactTask;
 
 	/** the refresh actionbar menu item */
 	private MenuItem mRefreshItem;
@@ -111,12 +112,13 @@ public class ContactFragment extends BaseFragment implements OnNavigationListene
 
 	@Override
 	public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
-		final View view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_contact, null);
-
-		// create the refreshing actionbar view
 		mRefreshingView = (ImageView) inflater.inflate(R.layout.refresh_icon, null);
+		return LayoutInflater.from(getActivity()).inflate(R.layout.fragment_contact, null);
+	}
 
-		mPager = (LockedViewPager) view.findViewById(R.id.pager);
+	@Override
+	public void onViewCreated(final View view, final Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
 
 		if (mAdapter == null) {
 			mAdapter = new FragmentStatePagerAdapter(getChildFragmentManager()) {
@@ -148,8 +150,6 @@ public class ContactFragment extends BaseFragment implements OnNavigationListene
 		mPager.setOffscreenPageLimit(2); // prevent the fragments from being removed
 		mPager.setAdapter(mAdapter);
 		mPager.setCurrentItem(mPage);
-
-		return view;
 	}
 
 	@Override
@@ -236,7 +236,7 @@ public class ContactFragment extends BaseFragment implements OnNavigationListene
 		if (mContactTask != null) {
 			mContactTask.cancel(true);
 		}
-		mContactTask = new RoboAsyncTask<Person>(Application.getContext()) {
+		mContactTask = new SafeAsyncTask<Person>() {
 
 			@Override
 			public Person call() throws Exception {
@@ -264,7 +264,7 @@ public class ContactFragment extends BaseFragment implements OnNavigationListene
 
 			@Override
 			public void onException(final Exception e) {
-				final ExceptionHelper eh = new ExceptionHelper(getContext(), e);
+				final ExceptionHelper eh = new ExceptionHelper(Application.getContext(), e);
 				eh.makeToast("Failed to refresh contact.");
 			}
 
