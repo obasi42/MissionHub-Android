@@ -67,7 +67,7 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 	private Person mPerson;
 
 	/** the list view */
-	@InjectView(R.id.listview) private ListView mListView;
+	private ListView mListView;
 
 	/** the list view adapter */
 	private CommentArrayAdapter mAdapter;
@@ -215,9 +215,16 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 
 	@Override
 	public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
+		View view = inflater.inflate(R.layout.fragment_contact_info, null);
+		mListView = (ListView) view.findViewById(R.id.listview);
+		
 		mHeaderComment = inflater.inflate(R.layout.fragment_contact_info_comment, null);
 		mHeader = inflater.inflate(R.layout.fragment_contact_info_header, null);
-		return inflater.inflate(R.layout.fragment_contact_info, null);
+		
+		mListView.addHeaderView(mHeader);
+		mListView.addHeaderView(mHeaderComment);
+		
+		return view;
 	}
 
 	@Override
@@ -226,13 +233,8 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 
 		mListView.setOnScrollListener(new PauseOnScrollListener(false, true));
 
-		// the header
 		initHeaderView(mHeader);
-		mListView.addHeaderView(mHeader);
-
-		// the add comment box
 		initCommentView(mHeaderComment);
-		mListView.addHeaderView(mHeaderComment);
 
 		// setup the adapter if needed
 		if (mAdapter == null) {
