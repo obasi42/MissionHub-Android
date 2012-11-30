@@ -55,6 +55,7 @@ public class ExceptionHelper {
 	/** Creates a new ExceptionHelper object */
 	public ExceptionHelper(final Context context, final Exception exception) {
 		mContext = context;
+		if (mContext == null) return;
 		mTitle = context.getString(R.string.exception_helper_error);
 		setException(exception);
 	}

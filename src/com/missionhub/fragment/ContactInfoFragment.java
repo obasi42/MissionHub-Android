@@ -858,7 +858,7 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 				final List<CharSequence> actionItems = new ArrayList<CharSequence>();
 
 				// only allow deletion if admin or commenter
-				if (Session.getInstance().isAdmin() || item.getCommenter().getId() == Session.getInstance().getPersonId()) {
+				if (Session.getInstance().isAdmin() || item.getCommenter().getId().compareTo(Session.getInstance().getPersonId()) == 0) {
 					actionItems.add(getString(R.string.action_delete));
 				}
 
