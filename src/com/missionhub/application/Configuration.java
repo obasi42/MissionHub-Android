@@ -68,6 +68,14 @@ public class Configuration {
 	public static String getApiVersion() {
 		return Configuration.getInstance().sProperties.getProperty("API_VERSION", "");
 	}
+	
+	public static String getDeprecatedApiUrl() {
+		return stripTrailingSlash(Configuration.getInstance().sProperties.getProperty("DEPRECATED_API_URL", ""));
+	}
+
+	public static String getDeprecatedApiVersion() {
+		return Configuration.getInstance().sProperties.getProperty("DEPRECATED_API_VERSION", "");
+	}
 
 	public static String getSurveyUrl() {
 		return stripTrailingSlash(Configuration.getInstance().sProperties.getProperty("SURVEY_URL", ""));

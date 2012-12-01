@@ -8,6 +8,10 @@ MARKET=play
 API_URL=https://www.missionhub.com/api
 API_VERSION=2
 
+# the depreciated api
+DEPRECATED_API_URL=https://www.missionhub.com/api
+DEPRECATED_API_VERSION=2
+
 # missionhub surveys
 SURVEY_URL=http://mhub.cc/surveys
 
