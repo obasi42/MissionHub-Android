@@ -1,6 +1,7 @@
 package com.missionhub.api;
 
 import com.missionhub.exception.MissionHubException;
+import com.missionhub.model.gson.GErrorsDepreciated;
 
 /**
  * All API errors extend or directly use this exception type.
@@ -27,8 +28,8 @@ public class ApiException extends MissionHubException {
 	public ApiException(final Throwable cause) {
 		super(cause);
 	}
-
-	public ApiException(final ApiErrorGson error) {
+	
+	public ApiException(final GErrorsDepreciated error) {
 		this(error.error.title, error.error.message, error.error.code);
 	}
 

@@ -30,6 +30,8 @@ public class FacebookImageDownloader extends URLConnectionImageDownloader {
 			} catch (final Exception e) {
 				/* ignore */
 			}
+		} else if (uri.getScheme().equals("fb_square")) {
+			return getStreamFromNetwork(URI.create("http://graph.facebook.com/" + uri.getHost() + "/picture?type=square"));
 		}
 		return null;
 	}
@@ -41,7 +43,7 @@ public class FacebookImageDownloader extends URLConnectionImageDownloader {
 			// remove from memory cache
 			final List<String> toRemove = new ArrayList<String>();
 			for (final String key : ImageLoader.getInstance().getMemoryCache().keys()) {
-				if (key.contains(String.valueOf(person.getFb_id()))) {
+				if (key.contains(String.valueOf(person.getFb_uid()))) {
 					toRemove.add(key);
 				}
 			}
@@ -50,8 +52,8 @@ public class FacebookImageDownloader extends URLConnectionImageDownloader {
 			}
 
 			// remove from disk cache
-			ImageLoader.getInstance().getDiscCache().get("fb://" + person.getFb_id()).delete();
-			ImageLoader.getInstance().getDiscCache().get(person.getPicture()).delete();
+			ImageLoader.getInstance().getDiscCache().get("fb://" + person.getFb_uid()).delete();
+			ImageLoader.getInstance().getDiscCache().get("fb_square://" + person.getFb_uid()).delete();
 		} catch (final Exception e) { /* ignore */}
 	}
 }

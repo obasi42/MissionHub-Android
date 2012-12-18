@@ -15,7 +15,12 @@ public class Organization {
 
     private Long id;
     private String name;
+    private String terminology;
     private String ancestry;
+    private Boolean show_sub_orgs;
+    private String status;
+    private java.util.Date updated_at;
+    private java.util.Date created_at;
 
     /** Used to resolve relations */
     private transient DaoSession daoSession;
@@ -23,11 +28,9 @@ public class Organization {
     /** Used for active entity operations. */
     private transient OrganizationDao myDao;
 
-    private List<Group> groups;
-    private List<GroupLabel> labels;
-    private List<FollowupComment> followupCommentList;
-    private List<Keyword> keywordList;
-    private List<Answer> answerList;
+    private List<Group> groupList;
+    private List<Survey> surveys;
+    private List<SmsKeyword> keywords;
 
     // KEEP FIELDS - put your custom fields here
     // KEEP FIELDS END
@@ -39,10 +42,15 @@ public class Organization {
         this.id = id;
     }
 
-    public Organization(Long id, String name, String ancestry) {
+    public Organization(Long id, String name, String terminology, String ancestry, Boolean show_sub_orgs, String status, java.util.Date updated_at, java.util.Date created_at) {
         this.id = id;
         this.name = name;
+        this.terminology = terminology;
         this.ancestry = ancestry;
+        this.show_sub_orgs = show_sub_orgs;
+        this.status = status;
+        this.updated_at = updated_at;
+        this.created_at = created_at;
     }
 
     /** called by internal mechanisms, do not call yourself. */
@@ -67,6 +75,14 @@ public class Organization {
         this.name = name;
     }
 
+    public String getTerminology() {
+        return terminology;
+    }
+
+    public void setTerminology(String terminology) {
+        this.terminology = terminology;
+    }
+
     public String getAncestry() {
         return ancestry;
     }
@@ -75,89 +91,87 @@ public class Organization {
         this.ancestry = ancestry;
     }
 
+    public Boolean getShow_sub_orgs() {
+        return show_sub_orgs;
+    }
+
+    public void setShow_sub_orgs(Boolean show_sub_orgs) {
+        this.show_sub_orgs = show_sub_orgs;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public java.util.Date getUpdated_at() {
+        return updated_at;
+    }
+
+    public void setUpdated_at(java.util.Date updated_at) {
+        this.updated_at = updated_at;
+    }
+
+    public java.util.Date getCreated_at() {
+        return created_at;
+    }
+
+    public void setCreated_at(java.util.Date created_at) {
+        this.created_at = created_at;
+    }
+
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
-    public synchronized List<Group> getGroups() {
-        if (groups == null) {
+    public synchronized List<Group> getGroupList() {
+        if (groupList == null) {
             if (daoSession == null) {
                 throw new DaoException("Entity is detached from DAO context");
             }
             GroupDao targetDao = daoSession.getGroupDao();
-            groups = targetDao._queryOrganization_Groups(id);
+            groupList = targetDao._queryOrganization_GroupList(id);
         }
-        return groups;
+        return groupList;
     }
 
     /** Resets a to-many relationship, making the next get call to query for a fresh result. */
-    public synchronized void resetGroups() {
-        groups = null;
+    public synchronized void resetGroupList() {
+        groupList = null;
     }
 
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
-    public synchronized List<GroupLabel> getLabels() {
-        if (labels == null) {
+    public synchronized List<Survey> getSurveys() {
+        if (surveys == null) {
             if (daoSession == null) {
                 throw new DaoException("Entity is detached from DAO context");
             }
-            GroupLabelDao targetDao = daoSession.getGroupLabelDao();
-            labels = targetDao._queryOrganization_Labels(id);
+            SurveyDao targetDao = daoSession.getSurveyDao();
+            surveys = targetDao._queryOrganization_Surveys(id);
         }
-        return labels;
+        return surveys;
     }
 
     /** Resets a to-many relationship, making the next get call to query for a fresh result. */
-    public synchronized void resetLabels() {
-        labels = null;
+    public synchronized void resetSurveys() {
+        surveys = null;
     }
 
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
-    public synchronized List<FollowupComment> getFollowupCommentList() {
-        if (followupCommentList == null) {
+    public synchronized List<SmsKeyword> getKeywords() {
+        if (keywords == null) {
             if (daoSession == null) {
                 throw new DaoException("Entity is detached from DAO context");
             }
-            FollowupCommentDao targetDao = daoSession.getFollowupCommentDao();
-            followupCommentList = targetDao._queryOrganization_FollowupCommentList(id);
+            SmsKeywordDao targetDao = daoSession.getSmsKeywordDao();
+            keywords = targetDao._queryOrganization_Keywords(id);
         }
-        return followupCommentList;
+        return keywords;
     }
 
     /** Resets a to-many relationship, making the next get call to query for a fresh result. */
-    public synchronized void resetFollowupCommentList() {
-        followupCommentList = null;
-    }
-
-    /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
-    public synchronized List<Keyword> getKeywordList() {
-        if (keywordList == null) {
-            if (daoSession == null) {
-                throw new DaoException("Entity is detached from DAO context");
-            }
-            KeywordDao targetDao = daoSession.getKeywordDao();
-            keywordList = targetDao._queryOrganization_KeywordList(id);
-        }
-        return keywordList;
-    }
-
-    /** Resets a to-many relationship, making the next get call to query for a fresh result. */
-    public synchronized void resetKeywordList() {
-        keywordList = null;
-    }
-
-    /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
-    public synchronized List<Answer> getAnswerList() {
-        if (answerList == null) {
-            if (daoSession == null) {
-                throw new DaoException("Entity is detached from DAO context");
-            }
-            AnswerDao targetDao = daoSession.getAnswerDao();
-            answerList = targetDao._queryOrganization_AnswerList(id);
-        }
-        return answerList;
-    }
-
-    /** Resets a to-many relationship, making the next get call to query for a fresh result. */
-    public synchronized void resetAnswerList() {
-        answerList = null;
+    public synchronized void resetKeywords() {
+        keywords = null;
     }
 
     /** Convenient call for {@link AbstractDao#delete(Object)}. Entity must attached to an entity context. */

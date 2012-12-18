@@ -80,7 +80,7 @@ public class PreferencesFragment extends BaseFragment {
 
 		try {
 			mName.setText(Session.getInstance().getPerson().getName());
-			ImageLoader.getInstance().displayImage(Session.getInstance().getPerson().getPicture(), mPicture, mImageLoaderOptions);
+			ImageLoader.getInstance().displayImage("fb://" + Session.getInstance().getPerson().getFb_uid(), mPicture, mImageLoaderOptions);
 			// TODO: set picture;
 		} catch (final NoPersonException e) { /* this should be impossible */}
 

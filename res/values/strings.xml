@@ -134,7 +134,18 @@
     <string name="status_contacted">Contacted</string>
     <string name="status_completed">Completed</string>
     <string name="status_do_not_contact">Do Not Contact</string>
-
+    
+    <!-- Roles -->
+    <string name="role_admin">Admin</string>
+    <string name="role_contact">Contact</string>
+    <string name="role_involved">Involved</string>
+    <string name="role_leader">Leader</string>
+    <string name="role_alumni">Alumni</string>
+    
+    <!-- Genders -->
+	<string name="gender_male">Male</string>
+	<string name="gender_female">Female</string>
+	
     <!-- Rejoicibles -->
     <string name="rejoicable_christ">Prayed To Receive Christ </string>
     <string name="rejoicable_gospel">Gospel Presentation</string>

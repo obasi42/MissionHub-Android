@@ -33,18 +33,18 @@ import android.widget.ListView;
 import com.github.rtyley.android.sherlock.roboguice.fragment.RoboSherlockDialogFragment;
 import com.missionhub.R;
 import com.missionhub.api.Api;
-import com.missionhub.api.Api.ContactAssignmentType;
 import com.missionhub.application.Application;
 import com.missionhub.application.DrawableCache;
 import com.missionhub.application.Session;
 import com.missionhub.application.Session.NoPersonException;
 import com.missionhub.exception.ExceptionHelper;
-import com.missionhub.model.Assignment;
-import com.missionhub.model.AssignmentDao;
+import com.missionhub.model.ContactAssignment;
+import com.missionhub.model.ContactAssignmentDao;
 import com.missionhub.model.Group;
 import com.missionhub.model.OrganizationalRole;
 import com.missionhub.model.OrganizationalRoleDao;
 import com.missionhub.model.Person;
+import com.missionhub.model.gson.GContactAssignment;
 import com.missionhub.ui.ObjectArrayAdapter;
 import com.missionhub.ui.widget.LockedViewPager;
 import com.missionhub.util.U;
@@ -80,7 +80,7 @@ public class ContactAssignmentDialog extends RoboSherlockDialogFragment implemen
 	private boolean mCanceled = false;
 
 	/** the task used to process assignments */
-	private SafeAsyncTask<Boolean> mTask;
+	private SafeAsyncTask<Void> mTask;
 
 	/** the progress view */
 	@InjectView(R.id.progress_container) private View mProgress;
@@ -406,11 +406,11 @@ public class ContactAssignmentDialog extends RoboSherlockDialogFragment implemen
 
 			for (final Person person : getDialog().getPeople()) {
 
-				final List<Assignment> assignments = Application.getDb().getAssignmentDao().queryBuilder()
-						.where(AssignmentDao.Properties.Person_id.eq(person.getId()), AssignmentDao.Properties.Organization_id.eq(Session.getInstance().getOrganizationId())).list();
+				final List<ContactAssignment> assignments = Application.getDb().getContactAssignmentDao().queryBuilder()
+						.where(ContactAssignmentDao.Properties.Person_id.eq(person.getId()), ContactAssignmentDao.Properties.Organization_id.eq(Session.getInstance().getOrganizationId())).list();
 
 				if (assignments.size() > 0) {
-					for (final Assignment assignment : assignments) {
+					for (final ContactAssignment assignment : assignments) {
 						if (assignment.getAssigned_to_id().compareTo(Session.getInstance().getPersonId()) == 0) {
 							showNone = true;
 						}
@@ -546,7 +546,7 @@ public class ContactAssignmentDialog extends RoboSherlockDialogFragment implemen
 					.getOrganizationalRoleDao()
 					.queryBuilder()
 					.where(OrganizationalRoleDao.Properties.Organization_id.eq(Session.getInstance().getOrganizationId()),
-							OrganizationalRoleDao.Properties.Role.in(Person.LABEL_ADMIN, Person.LABEL_LEADER)).list();
+							OrganizationalRoleDao.Properties.Role_id.in(U.Role.admin.id(), U.Role.leader.id())).list();
 
 			final Set<Person> leaders = new HashSet<Person>();
 			for (final OrganizationalRole role : roles) {
@@ -691,41 +691,42 @@ public class ContactAssignmentDialog extends RoboSherlockDialogFragment implemen
 		if (mTask != null) {
 			mTask.cancel(true);
 		}
-		mTask = new SafeAsyncTask<Boolean>() {
+		mTask = new SafeAsyncTask<Void>() {
 
 			@Override
-			public Boolean call() throws Exception {
-				final List<Long> personIds = new ArrayList<Long>();
-				for (final Person p : getPeople()) {
-					personIds.add(p.getId());
-				}
-
-				boolean status = false;
-
+			public Void call() throws Exception {
 				if (leader == null) {
-					status = Api.deleteContactAssigment(personIds).get();
+					final List<Long> personIds = new ArrayList<Long>();
+					for (final Person p : getPeople()) {
+						personIds.add(p.getId());
+					}
+					Api.bulkDeleteContactAssignments(personIds).get();
 				} else {
-					final List<Long> toIds = new ArrayList<Long>();
-					toIds.add(leader.getId());
-					status = Api.createContactAssignment(personIds, ContactAssignmentType.leader, toIds).get();
-				}
+					final List<GContactAssignment> assignments = new ArrayList<GContactAssignment>();
+					for (final Person p : getPeople()) {
+						final ContactAssignment oldAssignment = Application.getDb().getContactAssignmentDao().queryBuilder()
+								.where(ContactAssignmentDao.Properties.Person_id.eq(p.getId()), ContactAssignmentDao.Properties.Organization_id.eq(Session.getInstance().getOrganizationId())).unique();
 
-				if (status) {
-					Api.getPeople(personIds).get();
-				}
+						final GContactAssignment assignment = new GContactAssignment();
+						if (assignment != null) {
+							assignment.id = oldAssignment.getId();
+						}
 
-				return status;
+						assignment.assigned_to_id = leader.getId();
+						assignment.person_id = p.getId();
+						assignment.organization_id = Session.getInstance().getOrganizationId();
+
+						assignments.add(assignment);
+					}
+					Api.bulkUpdateContactAssignments(assignments).get();
+				}
+				return null;
 			}
 
 			@Override
-			public void onSuccess(final Boolean sucess) {
-				if (sucess) {
-					Toast.makeText(Application.getContext(), R.string.assignment_complete, Toast.LENGTH_SHORT).show();
-					dismiss();
-				} else {
-					onException(new Exception(Application.getContext().getString(R.string.assignment_server_error)));
-				}
-
+			public void onSuccess(final Void _) {
+				Toast.makeText(Application.getContext(), R.string.assignment_complete, Toast.LENGTH_SHORT).show();
+				dismiss();
 			}
 
 			@Override

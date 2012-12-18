@@ -1,16 +1,14 @@
 package com.missionhub.api;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.FutureTask;
+import java.util.Map;
+import java.util.WeakHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import android.accounts.AuthenticatorException;
-import android.accounts.OperationCanceledException;
 import android.os.Build;
 import ch.boye.httpclientandroidlib.client.utils.URIBuilder;
 
@@ -18,17 +16,24 @@ import com.google.gson.Gson;
 import com.missionhub.application.Application;
 import com.missionhub.application.Configuration;
 import com.missionhub.application.Session;
-import com.missionhub.application.Session.NoAccountException;
+import com.missionhub.model.ContactAssignment;
+import com.missionhub.model.ContactAssignmentDao;
 import com.missionhub.model.FollowupComment;
 import com.missionhub.model.Organization;
 import com.missionhub.model.Person;
-import com.missionhub.model.gson.GAuthTokenDone;
-import com.missionhub.model.gson.GContact;
-import com.missionhub.model.gson.GMetaCommentTop;
-import com.missionhub.model.gson.GMetaContact;
-import com.missionhub.model.gson.GMetaOrganizations;
-import com.missionhub.model.gson.GMetaPeople;
+import com.missionhub.model.Role;
+import com.missionhub.model.gson.GAccessToken;
+import com.missionhub.model.gson.GContactAssignment;
+import com.missionhub.model.gson.GContactAssignments;
+import com.missionhub.model.gson.GErrors;
+import com.missionhub.model.gson.GErrorsDepreciated;
+import com.missionhub.model.gson.GFollowupComment;
+import com.missionhub.model.gson.GOrganization;
+import com.missionhub.model.gson.GOrganizations;
+import com.missionhub.model.gson.GPeople;
 import com.missionhub.model.gson.GPerson;
+import com.missionhub.model.gson.GRole;
+import com.missionhub.model.gson.GRoles;
 import com.missionhub.network.HttpClient;
 import com.missionhub.network.HttpClient.HttpClientFuture;
 import com.missionhub.network.HttpClient.HttpMethod;
@@ -38,20 +43,20 @@ import com.missionhub.network.HttpParams;
 import com.missionhub.network.HttpResponse;
 import com.missionhub.util.U;
 
-/**
- * The Android MissionHub API Client.
- */
 public class Api {
 
 	/** the singleton api object */
 	private static Api sApi;
 
-	/** the logging tag */
-	public static final String TAG = Api.class.getSimpleName();
+	/** the singleton gson parser */
+	protected static final Gson sGson = new Gson();
 
-	/** the gson parser */
-	private final Gson gson = new Gson();
+	/** the current api call id */
+	protected static final AtomicLong sCallId = new AtomicLong();
 
+	/** the active calls */
+	private static final Map<Object, ApiCall<?>> sCalls = Collections.synchronizedMap(new WeakHashMap<Object, ApiCall<?>>());
+	
 	private Api() {}
 
 	/**
@@ -66,58 +71,524 @@ public class Api {
 		return sApi;
 	}
 
-	private HttpResponse doRequest(final HttpMethod method, final String url) throws Exception {
-		return doRequest(method, url, null, null, true, ResponseType.STRING);
+	protected synchronized void registerCall(final ApiCall<?> call) {
+		sCalls.put(call.getId(), call);
 	}
 
-	private HttpResponse doRequest(final HttpMethod method, final String url, final HttpParams params) throws Exception {
-		return doRequest(method, url, null, params, true, ResponseType.STRING);
+	protected synchronized void unregisterCall(final Object callId) {
+		sCalls.remove(callId);
 	}
 
-	private HttpResponse doRequest(final HttpMethod method, final String url, final HttpHeaders headers, final HttpParams params) throws Exception {
-		return doRequest(method, url, headers, params, true, ResponseType.STRING);
+	/**
+	 * Returns the call by the given id. Expect a null value as the call is immediately unregistered on cancellation or
+	 * completion.
+	 * 
+	 * @param callId
+	 * @return
+	 */
+	public synchronized static ApiCall<?> getCallById(final Object callId) {
+		return sCalls.get(callId);
 	}
 
-	private HttpResponse doRequest(final HttpMethod method, final String url, final HttpHeaders headers, final HttpParams params, final boolean authenticated) throws Exception {
-		return doRequest(method, url, headers, params, authenticated, ResponseType.STRING);
+	/**
+	 * Cancels a running call by id
+	 * 
+	 * @param callId
+	 * @param mayInterruptIfRunning
+	 * @return
+	 */
+	public synchronized static boolean cancelCallById(final Object callId, final boolean mayInterruptIfRunning) {
+		final ApiCall<?> call = sCalls.get(callId);
+		if (call != null) {
+			return call.cancel(mayInterruptIfRunning);
+		}
+		return false;
 	}
 
-	private HttpResponse doRequest(final HttpMethod method, final String url, HttpHeaders headers, HttpParams params, final boolean authenticated, final ResponseType responseType) throws Exception {
+	/* People */
+
+	public static ApiCall<Person> getPerson(final long personId) {
+		return getPerson(personId, null);
+	}
+
+	public static ApiCall<Person> getPerson(final long personId, final ApiOptions options) {
+		return new ApiCall<Person>(ApiOptions.builder().method(HttpMethod.GET).url(buildUrl("people", personId)).responseParser(personParser).merge(options).build());
+	}
+
+	public static ApiCall<Person> getPersonMe() {
+		return getPersonMe(null);
+	}
+
+	public static ApiCall<Person> getPersonMe(final ApiOptions options) {
+		return new ApiCall<Person>(ApiOptions.builder().method(HttpMethod.GET).url(buildUrl("people", "me")).responseParser(personParser).merge(options).build());
+	}
+
+	public static ApiCall<Person> createPerson(final GPerson person) {
+		return createPerson(person, null);
+	}
+
+	public static ApiCall<Person> createPerson(final GPerson person, final ApiOptions options) {
+		final HttpParams params = new HttpParams();
+		person.toParams(params);
+		return new ApiCall<Person>(ApiOptions.builder().method(HttpMethod.POST).url(buildUrl("people")).responseParser(personParser).params(params).merge(options).build());
+	}
+
+	public static ApiCall<Person> updatePerson(final GPerson person) {
+		return updatePerson(person, null);
+	}
+
+	public static ApiCall<Person> updatePerson(final GPerson person, final ApiOptions options) {
+		final HttpParams params = new HttpParams();
+		person.toParams(params);
+		return new ApiCall<Person>(ApiOptions.builder().method(HttpMethod.PUT).url(buildUrl("people", person.id)).responseParser(personParser).params(params).merge(options).build());
+	}
+
+	public static ApiCall<Void> deletePerson(final long personId) {
+		return deletePerson(personId, null);
+	}
+
+	public static ApiCall<Void> deletePerson(final long personId, final ApiOptions options) {
+		return new ApiCall<Void>(ApiOptions.builder().method(HttpMethod.DELETE).url(buildUrl("people", personId)).responseParser(new ApiResponseParser<Void>() {
+			@Override
+			public Void parseResponse(final HttpResponse response) throws Exception {
+				final Person person = Application.getDb().getPersonDao().load(personId);
+				if (person != null) {
+					person.deleteWithRelations();
+				}
+				return null;
+			}
+		}).merge(options).build());
+	}
+
+	public static ApiCall<List<Person>> listPeople(final ListOptions listOptions) {
+		return listPeople(listOptions, null);
+	}
+
+	public static ApiCall<List<Person>> listPeople(final ListOptions listOptions, final ApiOptions options) {
+		final HttpParams params = new HttpParams();
+		listOptions.toParams(params);
+		return new ApiCall<List<Person>>(ApiOptions.builder().method(HttpMethod.GET).url(buildUrl("people")).responseParser(peopleParser).params(params).merge(options).build());
+	}
+
+	/* Roles (Labels) */
+	public static ApiCall<Role> getRole(final long roleId) {
+		return getRole(roleId, null);
+	}
+
+	public static ApiCall<Role> getRole(final long roleId, final ApiOptions options) {
+		return new ApiCall<Role>(ApiOptions.builder().method(HttpMethod.GET).url(buildUrl("roles", roleId)).responseParser(roleParser).merge(options).build());
+	}
+
+	public static ApiCall<Role> createRole(final GRole person) {
+		return createRole(person, null);
+	}
+
+	public static ApiCall<Role> createRole(final GRole role, final ApiOptions options) {
+		final HttpParams params = new HttpParams();
+		role.toParams(params);
+		return new ApiCall<Role>(ApiOptions.builder().method(HttpMethod.POST).url(buildUrl("roles")).responseParser(roleParser).params(params).merge(options).build());
+	}
+
+	public static ApiCall<Role> updateRole(final GRole role) {
+		return updateRole(role, null);
+	}
+
+	public static ApiCall<Role> updateRole(final GRole role, final ApiOptions options) {
+		final HttpParams params = new HttpParams();
+		role.toParams(params);
+		return new ApiCall<Role>(ApiOptions.builder().method(HttpMethod.PUT).url(buildUrl("roles", role.id)).responseParser(roleParser).params(params).merge(options).build());
+	}
+
+	public static ApiCall<Void> deleteRole(final long roleId) {
+		return deleteRole(roleId, null);
+	}
+
+	public static ApiCall<Void> deleteRole(final long roleId, final ApiOptions options) {
+		return new ApiCall<Void>(ApiOptions.builder().method(HttpMethod.DELETE).url(buildUrl("roles", roleId)).responseParser(new ApiResponseParser<Void>() {
+			@Override
+			public Void parseResponse(final HttpResponse response) throws Exception {
+				final Role role = Application.getDb().getRoleDao().load(roleId);
+				if (role != null) {
+					role.deleteWithRelations();
+				}
+				return null;
+			}
+		}).merge(options).build());
+	}
+
+	public static ApiCall<List<Role>> listRoles() {
+		return listRoles();
+	}
+
+	public static ApiCall<List<Role>> listRoles(final ApiOptions options, final ListOptions listOptions) {
+		final HttpParams params = new HttpParams();
+		if (listOptions != null) {
+			listOptions.toParams(params);
+		}
+		return new ApiCall<List<Role>>(ApiOptions.builder().method(HttpMethod.GET).url(buildUrl("roles")).responseParser(rolesParser).params(params).merge(options).build());
+	}
+
+	/* Contact Assignments */
+
+	public static ApiCall<List<ContactAssignment>> bulkUpdateContactAssignments(final Collection<GContactAssignment> assignments) {
+		return bulkUpdateContactAssignments(assignments, null);
+	}
+
+	public static ApiCall<List<ContactAssignment>> bulkUpdateContactAssignments(final Collection<GContactAssignment> assignments, final ApiOptions options) {
+		final HttpParams params = new HttpParams();
+		addContactAssignmentParams(params, assignments);
+		return new ApiCall<List<ContactAssignment>>(ApiOptions.builder().method(HttpMethod.POST).url(buildUrl("contact_assignments", "bulk_update")).responseParser(contactAssignmentsParser)
+				.params(params).merge(options).build());
+	}
+
+	public static ApiCall<Void> bulkDeleteContactAssignments(final Collection<Long> assignmentIds) {
+		return bulkDeleteContactAssignments(assignmentIds, null);
+	}
+
+	public static ApiCall<Void> bulkDeleteContactAssignments(final Collection<Long> assignmentIds, final ApiOptions options) {
+		final HttpParams params = new HttpParams();
+		params.add("filters[ids]", U.toCSV(assignmentIds));
+		return new ApiCall<Void>(ApiOptions.builder().method(HttpMethod.DELETE).url(buildUrl("contact_assignments", "bulk_destroy")).responseParser(new ApiResponseParser<Void>() {
+			@Override
+			public Void parseResponse(final HttpResponse response) throws Exception {
+				Application.getDb().getContactAssignmentDao().queryBuilder().where(ContactAssignmentDao.Properties.Id.in(assignmentIds)).buildDelete().executeDeleteWithoutDetachingEntities();
+				return null;
+			}
+		}).params(params).merge(options).build());
+	}
+
+	public static ApiCall<List<ContactAssignment>> listContactAssignments(final ListOptions listOptions) {
+		return listContactAssignments(listOptions, null);
+	}
+
+	public static ApiCall<List<ContactAssignment>> listContactAssignments(final ListOptions listOptions, final ApiOptions options) {
+		final HttpParams params = new HttpParams();
+		if (listOptions != null) {
+			listOptions.toParams(params);
+		}
+		return new ApiCall<List<ContactAssignment>>(ApiOptions.builder().method(HttpMethod.GET).url(buildUrl("contact_assignments")).responseParser(contactAssignmentsParser).params(params)
+				.merge(options).build());
+	}
+
+	private static void addContactAssignmentParams(final HttpParams params, final Collection<GContactAssignment> assignments) {
+		final Iterator<GContactAssignment> itr = assignments.iterator();
+		int i = 0;
+		while (itr.hasNext()) {
+			final GContactAssignment assignment = itr.next();
+			if (assignment == null) continue;
+
+			if (assignment.id > 0) {
+				params.add("contact_assignments[" + i + "][id]", assignment.id);
+			}
+			if (assignment.assigned_to_id > 0) {
+				params.add("contact_assignments[" + i + "][assigned_to_id]", assignment.assigned_to_id);
+			}
+			if (assignment.person_id > 0) {
+				params.add("contact_assignments[" + i + "][person_id]", assignment.person_id);
+			}
+			if (assignment.organization_id > 0) {
+				params.add("contact_assignments[" + i + "][organization_id]", assignment.organization_id);
+			}
+			i++;
+		}
+	}
+
+	/* Followup Comments */
+	public static ApiCall<FollowupComment> getFollowupComment(final long commentId) {
+		return getFollowupComment(commentId, null);
+	}
+
+	public static ApiCall<FollowupComment> getFollowupComment(final long commentId, final ApiOptions options) {
+		return new ApiCall<FollowupComment>(ApiOptions.builder().method(HttpMethod.GET).url(buildUrl("followup_comments", commentId)).responseParser(commentParser).merge(options).build());
+	}
+
+	public static ApiCall<FollowupComment> createFollowupComment(final GFollowupComment comment) {
+		return createFollowupComment(comment, null);
+	}
+
+	public static ApiCall<FollowupComment> createFollowupComment(final GFollowupComment comment, final ApiOptions options) {
+		final HttpParams params = new HttpParams();
+		comment.toParams(params);
+		return new ApiCall<FollowupComment>(ApiOptions.builder().method(HttpMethod.POST).url(buildUrl("followup_comments")).responseParser(commentParser).params(params).merge(options).build());
+	}
+
+	public static ApiCall<FollowupComment> updateFollowupComment(final GFollowupComment comment) {
+		return updateFollowupComment(comment, null);
+	}
+
+	public static ApiCall<FollowupComment> updateFollowupComment(final GFollowupComment comment, final ApiOptions options) {
+		final HttpParams params = new HttpParams();
+		comment.toParams(params);
+		return new ApiCall<FollowupComment>(ApiOptions.builder().method(HttpMethod.PUT).url(buildUrl("followup_comments", comment.id)).responseParser(commentParser).params(params).merge(options)
+				.build());
+	}
+
+	public static ApiCall<Void> deleteFollowupComment(final long commentId) {
+		return deleteFollowupComment(commentId, null);
+	}
+
+	public static ApiCall<Void> deleteFollowupComment(final long commentId, final ApiOptions options) {
+		return new ApiCall<Void>(ApiOptions.builder().method(HttpMethod.DELETE).url(buildUrl("followup_comments", commentId)).responseParser(new ApiResponseParser<Void>() {
+			@Override
+			public Void parseResponse(final HttpResponse response) throws Exception {
+				final FollowupComment comment = Application.getDb().getFollowupCommentDao().load(commentId);
+				if (comment != null) {
+
+					comment.deleteWithRelations();
+				}
+				return null;
+			}
+		}).merge(options).build());
+	}
+
+	/* Organizations */
+	public static ApiCall<Organization> getOrganization(final long organizationId) {
+		return getOrganization(organizationId, null);
+	}
+
+	public static ApiCall<Organization> getOrganization(final long organizationId, final ApiOptions options) {
+		return new ApiCall<Organization>(ApiOptions.builder().method(HttpMethod.GET).url(buildUrl("organizations", organizationId)).responseParser(organizationParser).merge(options).build());
+	}
+
+	public static ApiCall<GOrganization> createOrganization(final GOrganization organization) {
+		return createOrganization(organization, null);
+	}
+
+	public static ApiCall<GOrganization> createOrganization(final GOrganization organization, final ApiOptions options) {
+		// TODO: implement createOrganization
+		throw new RuntimeException("Unimplemented Method");
+	}
+
+	public static ApiCall<GOrganization> updateOrganization(final GOrganization organization) {
+		return updateOrganization(organization, null);
+	}
+
+	public static ApiCall<GOrganization> updateOrganization(final GOrganization organization, final ApiOptions options) {
+		// TODO: implement updateOrganization
+		throw new RuntimeException("Unimplemented Method");
+	}
+
+	public static ApiCall<Void> deleteOrganization(final long organizationId) {
+		return deleteOrganization(organizationId, null);
+	}
+
+	public static ApiCall<Void> deleteOrganization(final long organizationId, final ApiOptions options) {
+		// TODO: implement deleteOrganization
+		throw new RuntimeException("Unimplemented Method");
+	}
+
+	public static ApiCall<List<Organization>> listOrganizations(final ApiOptions options) {
+		return listOrganizations(null, options);
+	}
+
+	public static ApiCall<List<Organization>> listOrganizations(final ListOptions listOptions) {
+		return listOrganizations(listOptions, null);
+	}
+
+	public static ApiCall<List<Organization>> listOrganizations(final ListOptions listOptions, final ApiOptions options) {
+		final HttpParams params = new HttpParams();
+		if (listOptions != null) {
+			listOptions.toParams(params);
+		}
+		return new ApiCall<List<Organization>>(ApiOptions.builder().method(HttpMethod.GET).url(buildUrl("organizations")).responseParser(organizationsParser).params(params).merge(options).build());
+	}
+
+	/* Surveys */
+	public static ApiCall<String> getSurveyUrl() {
+		return new ApiCall<String>(ApiOptions.builder().build()) {
+			@Override
+			public String call() throws Exception {
+				final URIBuilder builder = new URIBuilder(Configuration.getSurveyUrl());
+				builder.addParameter("access_token", Session.getInstance().getAccessToken());
+				builder.addParameter("org_id", String.valueOf(Session.getInstance().getOrganizationId()));
+				builder.addParameter("mobile", "1");
+
+				Api.getInstance().appendLoggingParams(builder);
+
+				return builder.build().toURL().toString();
+			}
+		};
+	}
+
+	/* OAuth */
+	/**
+	 * Returns the access token from a grant code
+	 * 
+	 * @param code
+	 * @return
+	 */
+	public static ApiCall<GAccessToken> getAccessToken(final String code) {
+		final HttpParams params = new HttpParams();
+		params.add("client_id", Configuration.getOauthClientId());
+		params.add("client_secret", Configuration.getOauthClientSecret());
+		params.add("code", code);
+		params.add("grant_type", "authorization_code");
+		params.add("scope", Configuration.getOauthScope());
+		params.add("redirect_uri", Configuration.getOauthUrl() + "/done.json");
+
+		return new ApiCall<GAccessToken>(ApiOptions.builder().method(HttpMethod.POST).url(Configuration.getOauthUrl() + "/access_token").params(params).authenticated(false)
+				.responseParser(new ApiResponseParser<GAccessToken>() {
+					@Override
+					public GAccessToken parseResponse(final HttpResponse response) throws Exception {
+						return sGson.fromJson(response.responseBody, GAccessToken.class);
+					}
+				}).build());
+	}
+
+	/* Generic Response Parsers */
+	private static final ApiResponseParser<Person> personParser = new ApiResponseParser<Person>() {
+		@Override
+		public Person parseResponse(final HttpResponse response) throws Exception {
+			final GPerson person = sGson.fromJson(response.responseBody, GPerson.class);
+			return person.save(false);
+		}
+	};
+
+	private static final ApiResponseParser<List<Person>> peopleParser = new ApiResponseParser<List<Person>>() {
+		@Override
+		public List<Person> parseResponse(final HttpResponse response) throws Exception {
+			final GPeople people = sGson.fromJson(response.responseBody, GPeople.class);
+			return people.save(false);
+		}
+	};
+
+	private static final ApiResponseParser<Role> roleParser = new ApiResponseParser<Role>() {
+		@Override
+		public Role parseResponse(final HttpResponse response) throws Exception {
+			final GRole role = sGson.fromJson(response.responseBody, GRole.class);
+			return role.save(false);
+		}
+	};
+
+	private static final ApiResponseParser<List<Role>> rolesParser = new ApiResponseParser<List<Role>>() {
+		@Override
+		public List<Role> parseResponse(final HttpResponse response) throws Exception {
+			final GRoles roles = sGson.fromJson(response.responseBody, GRoles.class);
+			return roles.save(false);
+		}
+	};
+
+	private static final ApiResponseParser<List<ContactAssignment>> contactAssignmentsParser = new ApiResponseParser<List<ContactAssignment>>() {
+		@Override
+		public List<ContactAssignment> parseResponse(final HttpResponse response) throws Exception {
+			final GContactAssignments assignments = sGson.fromJson(response.responseBody, GContactAssignments.class);
+			return assignments.save(false);
+		}
+	};
+
+	private static final ApiResponseParser<FollowupComment> commentParser = new ApiResponseParser<FollowupComment>() {
+		@Override
+		public FollowupComment parseResponse(final HttpResponse response) throws Exception {
+			final GFollowupComment comment = sGson.fromJson(response.responseBody, GFollowupComment.class);
+			return comment.save(false);
+		}
+	};
+
+	private static final ApiResponseParser<Organization> organizationParser = new ApiResponseParser<Organization>() {
+		@Override
+		public Organization parseResponse(final HttpResponse response) throws Exception {
+			final GOrganization org = sGson.fromJson(response.responseBody, GOrganization.class);
+			return org.save(false);
+		}
+	};
+
+	private static final ApiResponseParser<List<Organization>> organizationsParser = new ApiResponseParser<List<Organization>>() {
+		@Override
+		public List<Organization> parseResponse(final HttpResponse response) throws Exception {
+			final GOrganizations orgs = sGson.fromJson(response.responseBody, GOrganizations.class);
+			return orgs.save(false);
+		}
+	};
+
+	public static interface ApiResponseParser<T> {
+
+		public T parseResponse(HttpResponse response) throws Exception;
+
+	}
+
+	/* Helpers */
+	/**
+	 * Builds an api url from parts
+	 * 
+	 * @param parts
+	 * @return
+	 */
+	private static String buildUrl(final Object... parts) {
+		final StringBuffer sb = new StringBuffer();
+		sb.append(Configuration.getApiUrl() + '/');
+		for (int i = 0; i < parts.length; i++) {
+			final Object part = parts[i];
+			if (part != null) {
+				if (part instanceof List) {
+					sb.append(U.toCSV((List<?>) part));
+				} else {
+					sb.append(part);
+				}
+				if (i + 1 < parts.length) {
+					sb.append('/');
+				}
+			}
+		}
+		return sb.toString();
+	}
+
+	/**
+	 * Makes a request against the api
+	 * 
+	 * @param method
+	 *            the HttpMethod to use
+	 * @param url
+	 *            the url
+	 * @param headers
+	 *            the http headers
+	 * @param params
+	 *            the url params
+	 * @param authenticated
+	 *            true if the access token header should be added
+	 * @param responseType
+	 *            the ResponseType
+	 * @return the http response object
+	 * @throws Exception
+	 */
+	protected HttpResponse doRequest(final HttpMethod method, final String url, HttpHeaders headers, HttpParams params, final boolean authenticated, final ResponseType responseType) throws Exception {
 		HttpResponse response = null;
 		try {
-			// create the headers object if needed and add the api version header
+			// create the headers object if null
 			if (headers == null) {
 				headers = new HttpHeaders();
 			}
-			if (headers.getHeaders("Accept").size() <= 0) {
-				headers.setHeader("Accept", "application/vnd.missionhub-v" + Configuration.getApiVersion() + "+json");
+
+			// add the api version header
+			if (headers.getHeaders("API-VERSION").size() <= 0) {
+				headers.setHeader("API-VERSION", Configuration.getApiVersion());
 			}
 
+			// create the params object if null
 			if (params == null) {
 				params = new HttpParams();
 			}
 
 			// add oauth token to the request if needed
 			if (authenticated) {
-				headers.setHeader("Authorization", "OAuth: " + Session.getInstance().getAccessToken());
+				headers.setHeader("Authorization", "Bearer " + Session.getInstance().getAccessToken());
 
 				if (Session.getInstance().getOrganizationId() >= 0) {
-					params.add("org_id", Session.getInstance().getOrganizationId());
+					params.add("organization_id", Session.getInstance().getOrganizationId());
 				}
 			}
 
 			appendLoggingParams(params);
-
+			
 			// create the client and get the response
 			final HttpClient client = new HttpClient();
 			client.setResponseType(responseType);
 			final HttpClientFuture future = client.doRequest(method, url, headers, params);
 			response = future.get();
-
-			throwApiException(response);
+			maybeThrowException(response);
 
 			return response;
 		} catch (final Exception e) {
+			// we just threw this.. no need to process it again
 			if (e instanceof ApiException) {
 				throw e;
 			}
@@ -131,26 +602,45 @@ public class Api {
 			}
 
 			// check for api errors if the response was a string
-			throwApiException(response);
+			maybeThrowException(response);
 
 			// throw the original exception
 			throw e;
 		}
 	}
 
-	private void throwApiException(final HttpResponse response) throws ApiException {
+	/**
+	 * Parses the response for a json error
+	 * 
+	 * @param response
+	 * @throws ApiException
+	 */
+	private void maybeThrowException(final HttpResponse response) throws ApiException {
 		if (response != null && !U.isNullEmpty(response.responseBody)) {
-			ApiErrorGson error = null;
+			ApiException exception = null;
 			try {
-				error = gson.fromJson(response.responseBody, ApiErrorGson.class);
-			} catch (final Exception e) { /* ignore */}
-			if (error != null && error.error != null) {
-				if (error.error.code.equalsIgnoreCase("56")) {
-					Session.getInstance().reportInvalidAccessToken();
-					throw new AccessTokenException(error);
-				} else {
-					throw new ApiException(error);
+				final GErrors errors = sGson.fromJson(response.responseBody, GErrors.class);
+				if (errors.errors == null) throw new Exception();
+				exception = errors.getException();
+			} catch (final Exception e) {
+				/* ignore */
+			}
+
+			if (exception == null) {
+				try {
+					final GErrorsDepreciated error = sGson.fromJson(response.responseBody, GErrorsDepreciated.class);
+					if (error.error != null && error.error.code.equalsIgnoreCase("56")) {
+						Session.getInstance().reportInvalidAccessToken();
+						exception = new AccessTokenException(error);
+					} else {
+						exception = error.getException();
+					}
+				} catch (final Exception e) {
+					/* ignore */
 				}
+			}
+			if (exception != null) {
+				throw exception;
 			}
 		}
 	}
@@ -183,650 +673,8 @@ public class Api {
 		} catch (final Exception ignore) { /* ignore */}
 	}
 
-	/**
-	 * Builds an api url
-	 * 
-	 * @param parts
-	 * @return
-	 */
-	private String buildUrlPath(final Object... parts) {
-		final StringBuffer sb = new StringBuffer();
-		sb.append(Configuration.getApiUrl() + '/');
-		for (int i = 0; i < parts.length; i++) {
-			final Object part = parts[i];
-			if (part != null) {
-				if (part instanceof List) {
-					sb.append(U.toCSV((List<?>) part));
-				} else {
-					sb.append(part);
-				}
-				if (i + 1 < parts.length) {
-					sb.append('/');
-				}
-			}
-		}
-		return sb.toString();
-	}
-
-	// **********************************//
-	// *********** PEOPLE API ***********//
-	// **********************************//
-
-	/**
-	 * Gets a single person by their id
-	 * 
-	 * @param personId
-	 * @return the person identified by the given personId
-	 */
-	public static FutureTask<Person> getPerson(final long personId) {
-		final Callable<Person> callable = new Callable<Person>() {
-			@Override
-			public Person call() throws Exception {
-				final String url = Api.getInstance().buildUrlPath("people", personId + ".json");
-				final HttpResponse response = Api.getInstance().doRequest(HttpMethod.GET, url);
-				try {
-					final GMetaPeople gmp = Api.getInstance().gson.fromJson(response.responseBody, GMetaPeople.class);
-					final Person p = gmp.people[0].save(false);
-					return p;
-				} catch (final Exception e) {
-					throw new ApiException(e);
-				}
-			}
-		};
-
-		final FutureTask<Person> task = new FutureTask<Person>(callable);
-		Application.getExecutor().execute(task);
-		return task;
-	}
-
-	/**
-	 * Gets the person associated with the access token
-	 * 
-	 * @return the person associated with the access token
-	 */
-	public static FutureTask<Person> getPersonMe() {
-		final Callable<Person> callable = new Callable<Person>() {
-			@Override
-			public Person call() throws Exception {
-				final String url = Api.getInstance().buildUrlPath("people", "me.json");
-				final HttpResponse response = Api.getInstance().doRequest(HttpMethod.GET, url);
-				try {
-					final GMetaPeople gmp = Api.getInstance().gson.fromJson(response.responseBody, GMetaPeople.class);
-					final Person p = gmp.people[0].save(false);
-					return p;
-				} catch (final Exception e) {
-					throw new ApiException(e);
-				}
-			}
-		};
-		final FutureTask<Person> task = new FutureTask<Person>(callable);
-		Application.getExecutor().execute(task);
-		return task;
-	}
-
-	/**
-	 * Gets a list of people by their ids
-	 * 
-	 * @param personIds
-	 * @return list of people
-	 */
-	public static FutureTask<List<Person>> getPeople(final List<Long> personIds) {
-		final Callable<List<Person>> callable = new Callable<List<Person>>() {
-			@Override
-			public List<Person> call() throws Exception {
-				final String url = Api.getInstance().buildUrlPath("people", U.toCSV(personIds) + ".json");
-				final HttpResponse response = Api.getInstance().doRequest(HttpMethod.GET, url);
-				try {
-					final GMetaPeople gmp = Api.getInstance().gson.fromJson(response.responseBody, GMetaPeople.class);
-					final List<Person> persons = new ArrayList<Person>();
-					for (final GPerson gperson : gmp.people) {
-						persons.add(gperson.save(false));
-					}
-					return persons;
-				} catch (final Exception e) {
-					throw new ApiException(e);
-				}
-			}
-		};
-		final FutureTask<List<Person>> task = new FutureTask<List<Person>>(callable);
-		Application.getExecutor().execute(task);
-		return task;
-	}
-
-	// **********************************//
-	// ***** CONTACT ASSIGNMENT API *****//
-	// **********************************//
-
-	public static enum ContactAssignmentType {
-		leader, organization
-	}
-
-	/**
-	 * Creates a contact assignment
-	 * 
-	 * @param personIds
-	 *            from ids
-	 * @param type
-	 * @param toIds
-	 *            to ids
-	 * @return
-	 */
-	public static FutureTask<Boolean> createContactAssignment(final List<Long> personIds, final ContactAssignmentType type, final List<Long> toIds) {
-		final Callable<Boolean> callable = new Callable<Boolean>() {
-			@Override
-			public Boolean call() throws Exception {
-				final String url = Api.getInstance().buildUrlPath("contact_assignments.json");
-
-				final HttpParams params = new HttpParams();
-				params.add("ids", U.toCSV(personIds));
-				// params.add("type", type.name());
-				params.add("assign_to", U.toCSV(toIds));
-
-				final HttpHeaders headers = new HttpHeaders();
-				headers.setHeader("Accept", "application/vnd.missionhub-v1+json");
-
-				Api.getInstance().doRequest(HttpMethod.POST, url, headers, params);
-				return true;
-			}
-		};
-		final FutureTask<Boolean> task = new FutureTask<Boolean>(callable);
-		Application.getExecutor().execute(task);
-		return task;
-	}
-
-	/**
-	 * Deletes a contact assignment
-	 * 
-	 * @param personIds
-	 *            the persons to remove assignments for
-	 * @return
-	 */
-	public static FutureTask<Boolean> deleteContactAssigment(final List<Long> personIds) {
-		final Callable<Boolean> callable = new Callable<Boolean>() {
-			@Override
-			public Boolean call() throws Exception {
-				for (final Long id : personIds) {
-					final String url = Api.getInstance().buildUrlPath("contact_assignments", id + ".json");
-
-					final HttpParams params = new HttpParams();
-					params.add("ids", id);
-					params.add("_method", "delete");
-
-					Api.getInstance().doRequest(HttpMethod.POST, url, params);
-				}
-				return true;
-				//
-				// final String url = Api.getInstance().buildUrlPath("contact_assignments", U.toCSV(personIds) +
-				// ".json");
-				//
-				// final HttpParams params = new HttpParams();
-				// params.add("ids", U.toCSV(personIds));
-				// params.add("_method", "delete");
-				//
-				// Api.getInstance().doRequest(HttpMethod.POST, url, params);
-				// return true;
-			}
-		};
-		final FutureTask<Boolean> task = new FutureTask<Boolean>(callable);
-		Application.getExecutor().execute(task);
-		return task;
-	}
-
-	// **********************************//
-	// ********** CONTACTS API **********//
-	// **********************************//
-
-	/**
-	 * Gets a single contact from the api. This is basically the same as getPerson, however questions answers are also
-	 * returned.
-	 * 
-	 * @param personId
-	 * @return
-	 */
-	public static FutureTask<Person> getContact(final long personId) {
-		final Callable<Person> callable = new Callable<Person>() {
-			@Override
-			public Person call() throws Exception {
-				final String url = Api.getInstance().buildUrlPath("contacts", personId + ".json");
-				final HttpResponse response = Api.getInstance().doRequest(HttpMethod.GET, url);
-				try {
-					final GMetaContact contacts = Api.getInstance().gson.fromJson(response.responseBody, GMetaContact.class);
-					// we should only have one result, so just return the first one
-					return contacts.contacts[0].save(false);
-				} catch (final Exception e) {
-					throw new ApiException(e);
-				}
-			}
-		};
-		final FutureTask<Person> task = new FutureTask<Person>(callable);
-		Application.getExecutor().execute(task);
-		return task;
-	}
-
-	/**
-	 * Gets a list of contacts from the api. This is basically the same as getPerson, however questions answers are also
-	 * returned.
-	 * 
-	 * @param personId
-	 * @return
-	 */
-	public static FutureTask<List<Person>> getContacts(final List<Long> personIds) {
-		final Callable<List<Person>> callable = new Callable<List<Person>>() {
-			@Override
-			public List<Person> call() throws Exception {
-				final String url = Api.getInstance().buildUrlPath("contacts", U.toCSV(personIds) + ".json");
-				final HttpResponse response = Api.getInstance().doRequest(HttpMethod.GET, url);
-				try {
-					final GMetaContact contacts = Api.getInstance().gson.fromJson(response.responseBody, GMetaContact.class);
-					final List<Person> persons = new ArrayList<Person>();
-					for (final GContact contact : contacts.contacts) {
-						persons.add(contact.save(false));
-					}
-					return persons;
-				} catch (final Exception e) {
-					throw new ApiException(e);
-				}
-			}
-		};
-		final FutureTask<List<Person>> task = new FutureTask<List<Person>>(callable);
-		Application.getExecutor().execute(task);
-		return task;
-	}
-
-	/**
-	 * Gets a single contact from the api based on a query
-	 * 
-	 * @param options
-	 *            the options used to create the search query
-	 * @return
-	 */
-	public static FutureTask<List<Person>> getContactList(final ApiContactListOptions options) {
-		final Callable<List<Person>> callable = new Callable<List<Person>>() {
-			@Override
-			public List<Person> call() throws Exception {
-				final String url = Api.getInstance().buildUrlPath("contacts.json");
-
-				final HttpParams params = new HttpParams();
-				options.appendParams(params);
-
-				final HttpResponse response = Api.getInstance().doRequest(HttpMethod.GET, url, params);
-				try {
-					final GMetaContact contacts = Api.getInstance().gson.fromJson(response.responseBody, GMetaContact.class);
-					final List<Person> people = contacts.save(false);
-					return people;
-				} catch (final Exception e) {
-					throw new ApiException(e);
-				}
-			}
-		};
-		final FutureTask<List<Person>> task = new FutureTask<List<Person>>(callable);
-		Application.getExecutor().execute(task);
-		return task;
-	}
-
-	public static FutureTask<Person> createContact(final ApiContact contact) {
-		final Callable<Person> callable = new Callable<Person>() {
-			@Override
-			public Person call() throws Exception {
-				final String url = Api.getInstance().buildUrlPath("contacts.json");
-
-				final HttpParams params = new HttpParams();
-				contact.appendParams(params);
-
-				final HttpResponse response = Api.getInstance().doRequest(HttpMethod.POST, url, params);
-				try {
-					final GPerson person = Api.getInstance().gson.fromJson(response.responseBody, GPerson.class);
-					return person.save(false);
-				} catch (final Exception e) {
-					throw new ApiException(e);
-				}
-			}
-		};
-		final FutureTask<Person> task = new FutureTask<Person>(callable);
-		Application.getExecutor().execute(task);
-		return task;
-	}
-
-	// **********************************//
-	// ********** COMMENTS API **********//
-	// **********************************//
-
-	/**
-	 * Gets the followup comments for a contact
-	 * 
-	 * @param options
-	 *            the options used to create the search query
-	 * @return
-	 */
-	public static FutureTask<List<FollowupComment>> getComments(final long personId) {
-		final Callable<List<FollowupComment>> callable = new Callable<List<FollowupComment>>() {
-			@Override
-			public List<FollowupComment> call() throws Exception {
-				final String url = Api.getInstance().buildUrlPath("followup_comments", personId + ".json");
-				final HttpResponse response = Api.getInstance().doRequest(HttpMethod.GET, url);
-				try {
-					final GMetaCommentTop comments = Api.getInstance().gson.fromJson(response.responseBody, GMetaCommentTop.class);
-
-					return comments.save(false);
-				} catch (final Exception e) {
-					throw new ApiException(e);
-				}
-			}
-		};
-		final FutureTask<List<FollowupComment>> task = new FutureTask<List<FollowupComment>>(callable);
-		Application.getExecutor().execute(task);
-		return task;
-	}
-
-	/**
-	 * Creates a followup comment for a contact
-	 * 
-	 * @param personId
-	 * @param comment
-	 * @param rejoicables
-	 * @return
-	 */
-	public static FutureTask<Boolean> addComment(final JsonComment comment) {
-		final Callable<Boolean> callable = new Callable<Boolean>() {
-			@Override
-			public Boolean call() throws Exception {
-				final String url = Api.getInstance().buildUrlPath("followup_comments");
-
-				final JSONObject jsonComment = new JSONObject();
-
-				if (comment.organizationId < 0) {
-					comment.organizationId = Session.getInstance().getOrganizationId();
-				}
-
-				if (comment.commenterId < 0) {
-					comment.commenterId = Session.getInstance().getPerson().getId();
-				}
-
-				if (U.isNullEmpty(comment.status)) {
-					comment.status = "";
-				}
-
-				if (U.isNullEmpty(comment.comment)) {
-					comment.comment = "";
-				}
-
-				jsonComment.put("organization_id", comment.organizationId);
-				jsonComment.put("contact_id", comment.personId);
-				jsonComment.put("commenter_id", comment.commenterId);
-				jsonComment.put("comment", comment.comment);
-				jsonComment.put("status", comment.status);
-
-				final JSONArray jsonRejoicables = new JSONArray();
-				if (comment.rejoicables != null) {
-					for (final String rejoicable : comment.rejoicables) {
-						if (U.isNullEmpty(rejoicable)) continue;
-						jsonRejoicables.put(rejoicable);
-					}
-				}
-
-				final JSONObject json = new JSONObject();
-				json.put("followup_comment", jsonComment);
-				json.put("rejoicables", jsonRejoicables);
-
-				final HttpParams params = new HttpParams();
-				params.add("json", json.toString());
-
-				Api.getInstance().doRequest(HttpMethod.POST, url, null, params);
-				return true;
-			}
-		};
-		final FutureTask<Boolean> task = new FutureTask<Boolean>(callable);
-		Application.getExecutor().execute(task);
-		return task;
-	}
-
-	public static class JsonComment {
-
-		public long personId = -1;
-		public long commenterId = -1;
-		public long organizationId = -1;
-		public String comment;
-		public String status;
-		public List<String> rejoicables;
-
-		public JsonComment(final long personId, final String comment, final String status, final List<String> rejoicables) {
-			this.personId = personId;
-			this.comment = comment;
-			this.status = status;
-			this.rejoicables = rejoicables;
-		}
-
-	}
-
-	/**
-	 * Deletes a followup comment
-	 * 
-	 * @param commentId
-	 * @return
-	 */
-	public static FutureTask<Boolean> deleteComment(final long commentId) {
-		final List<Long> comments = new ArrayList<Long>();
-		comments.add(commentId);
-		return deleteComments(comments);
-	}
-
-	/**
-	 * Deletes multiple follow up comments
-	 * 
-	 * @param commentIds
-	 *            a list of comment ids
-	 * @return
-	 */
-	public static FutureTask<Boolean> deleteComments(final List<Long> commentIds) {
-		final Callable<Boolean> callable = new Callable<Boolean>() {
-			@Override
-			public Boolean call() throws Exception {
-				final String url = Api.getInstance().buildUrlPath("followup_comments", U.toCSV(commentIds));
-
-				final HttpParams params = new HttpParams();
-				params.add("_method", "delete");
-
-				Api.getInstance().doRequest(HttpMethod.POST, url, params);
-				return true;
-			}
-		};
-		final FutureTask<Boolean> task = new FutureTask<Boolean>(callable);
-		Application.getExecutor().execute(task);
-		return task;
-	}
-
-	// **********************************//
-	// *********** GROUPS API ***********//
-	// **********************************//
-
-	// TODO: implement groups api calls
-
-	// **********************************//
-	// ******** ORGANIZATIONS API *******//
-	// **********************************//
-
-	/**
-	 * Gets the person associated with the access token
-	 * 
-	 * @return the requested organization
-	 */
-	public static FutureTask<Organization> getOrganization(final long organizationId) {
-		final Callable<Organization> callable = new Callable<Organization>() {
-			@Override
-			public Organization call() throws Exception {
-				final String url = Api.getInstance().buildUrlPath("organizations", organizationId);
-				final HttpResponse response = Api.getInstance().doRequest(HttpMethod.GET, url);
-				try {
-					final GMetaOrganizations gmo = Api.getInstance().gson.fromJson(response.responseBody, GMetaOrganizations.class);
-					return gmo.organizations[0].save(false);
-				} catch (final Exception e) {
-					throw new ApiException(e);
-				}
-			}
-		};
-		final FutureTask<Organization> task = new FutureTask<Organization>(callable);
-		Application.getExecutor().execute(task);
-		return task;
-	}
-
-	/**
-	 * Gets a list of people by their ids
-	 * 
-	 * @param organizationIds
-	 *            list of organizations to retrieve. If null, will return all organizations the logged in user has
-	 *            access to.
-	 * @return list of organizations
-	 */
-	public static FutureTask<List<Organization>> getOrganizations(final List<Long> organizationIds) {
-		final Callable<List<Organization>> callable = new Callable<List<Organization>>() {
-			@Override
-			public List<Organization> call() throws Exception {
-				String url = "";
-				if (organizationIds == null) {
-					url = Api.getInstance().buildUrlPath("organizations");
-				} else {
-					url = Api.getInstance().buildUrlPath("organizations", U.toCSV(organizationIds));
-				}
-
-				final HttpResponse response = Api.getInstance().doRequest(HttpMethod.GET, url);
-				try {
-					final GMetaOrganizations gmo = Api.getInstance().gson.fromJson(response.responseBody, GMetaOrganizations.class);
-					return gmo.save(false);
-				} catch (final Exception e) {
-					throw new ApiException(e);
-				}
-			}
-		};
-		final FutureTask<List<Organization>> task = new FutureTask<List<Organization>>(callable);
-		Application.getExecutor().execute(task);
-		return task;
-	}
-
-	// **********************************//
-	// *********** ROLES API ************//
-	// **********************************//
-
-	/**
-	 * Adds a role for a person
-	 * 
-	 * @param personId
-	 * @param role
-	 * @param return
-	 */
-	public static FutureTask<Boolean> addRole(final long personId, final String role) {
-		final Callable<Boolean> callable = new Callable<Boolean>() {
-			@Override
-			public Boolean call() throws Exception {
-				final String url = Api.getInstance().buildUrlPath("roles", personId + ".json");
-
-				final HttpParams params = new HttpParams();
-				params.add("_method", "put");
-				params.add("id", personId);
-				params.add("role", role);
-
-				Api.getInstance().doRequest(HttpMethod.POST, url, params);
-				return true;
-			}
-		};
-		final FutureTask<Boolean> task = new FutureTask<Boolean>(callable);
-		Application.getExecutor().execute(task);
-		return task;
-	}
-
-	/**
-	 * Removes a role from a person
-	 * 
-	 * @param personId
-	 * @param role
-	 * @param return
-	 */
-	public static FutureTask<Boolean> removeRole(final long personId, final String role) {
-		final Callable<Boolean> callable = new Callable<Boolean>() {
-			@Override
-			public Boolean call() throws Exception {
-				final String url = Api.getInstance().buildUrlPath("roles", personId + ".json");
-
-				final HttpParams params = new HttpParams();
-				params.add("_method", "delete");
-				params.add("id", personId);
-				params.add("role", role);
-
-				Api.getInstance().doRequest(HttpMethod.POST, url, params);
-				return true;
-			}
-		};
-		final FutureTask<Boolean> task = new FutureTask<Boolean>(callable);
-		Application.getExecutor().execute(task);
-		return task;
-	}
-
-	// **********************************//
-	// *********** SURVEY API ***********//
-	// **********************************//
-
-	/**
-	 * Gets the url for the survey webview
-	 * 
-	 * @return
-	 * @throws OperationCanceledException
-	 * @throws AuthenticatorException
-	 * @throws NoAccountException
-	 * @throws IOException
-	 */
-	public static FutureTask<String> getSurveyUrl() {
-		final Callable<String> callable = new Callable<String>() {
-			@Override
-			public String call() throws Exception {
-
-				final URIBuilder builder = new URIBuilder(Configuration.getSurveyUrl());
-				builder.addParameter("access_token", Session.getInstance().getAccessToken());
-				builder.addParameter("org_id", String.valueOf(Session.getInstance().getOrganizationId()));
-				builder.addParameter("mobile", "1");
-
-				Api.getInstance().appendLoggingParams(builder);
-
-				return builder.build().toURL().toString();
-			}
-		};
-		final FutureTask<String> task = new FutureTask<String>(callable);
-		Application.getExecutor().execute(task);
-		return task;
-	}
-
-	// **********************************//
-	// *********** OAUTH API ************//
-	// **********************************//
-
-	/**
-	 * Gets a user's access token from an authorization code
-	 * 
-	 * @param code
-	 * @return
-	 */
-	public static FutureTask<GAuthTokenDone> getAccessToken(final String code) {
-		final Callable<GAuthTokenDone> callable = new Callable<GAuthTokenDone>() {
-			@Override
-			public GAuthTokenDone call() throws Exception {
-
-				final HttpParams params = new HttpParams();
-				params.add("client_id", Configuration.getOauthClientId());
-				params.add("client_secret", Configuration.getOauthClientSecret());
-				params.add("code", code);
-				params.add("grant_type", "authorization_code");
-				params.add("scope", Configuration.getOauthScope());
-				params.add("redirect_uri", Configuration.getOauthUrl() + "/done.json");
-
-				final HttpResponse response = Api.getInstance().doRequest(HttpMethod.POST, Configuration.getOauthUrl() + "/access_token", null, params, false);
-				try {
-					final GAuthTokenDone done = Api.getInstance().gson.fromJson(response.responseBody, GAuthTokenDone.class);
-					return done;
-				} catch (final Exception e) {
-					throw new ApiException(e);
-				}
-			}
-		};
-		final FutureTask<GAuthTokenDone> task = new FutureTask<GAuthTokenDone>(callable);
-		Application.getExecutor().execute(task);
-		return task;
+	/** Enum of all available includes */
+	public enum Include {
+		answers, surveys, answer_sheets, all_organizational_roles, organizational_roles, followup_comments, contact_assignments, current_address, user, phone_numbers, person_transfers, email_addresses, questions, keyword, contacts, admins, leaders, people, groups, keywords, assigned_to, person, comments_on_me
 	}
 }

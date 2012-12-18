@@ -1,5 +1,6 @@
 package com.missionhub.fragment;
 
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -23,8 +24,7 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.missionhub.R;
 import com.missionhub.activity.ContactActivity;
-import com.missionhub.api.ApiContactListOptions;
-import com.missionhub.api.ApiContactListOptions.Status;
+import com.missionhub.api.PersonListOptions;
 import com.missionhub.application.Session;
 import com.missionhub.contactlist.ApiContactListProvider;
 import com.missionhub.contactlist.ContactListFragment;
@@ -35,6 +35,7 @@ import com.missionhub.fragment.AddContactDialog.AddContactListener;
 import com.missionhub.fragment.ContactAssignmentDialog.ContactAssignmentListener;
 import com.missionhub.model.Person;
 import com.missionhub.util.U;
+import com.missionhub.util.U.FollowupStatus;
 
 public class MyContactsFragment extends MainFragment implements OnPageChangeListener, ContactListFragmentListener, ActionMode.Callback, ContactAssignmentListener, AddContactListener {
 
@@ -148,8 +149,9 @@ public class MyContactsFragment extends MainFragment implements OnPageChangeList
 	public static class MyAllContactsFragment extends ContactListFragment {
 		@Override
 		public ContactListProvider onCreateContactProvider() {
-			final ApiContactListOptions options = new ApiContactListOptions();
-			options.setFilterAssignedTo(Session.getInstance().getPersonId());
+			final PersonListOptions options = PersonListOptions.builder() //
+					.assignedTo(Session.getInstance().getPersonId()) //
+					.build();
 
 			return new ApiContactListProvider(getActivity(), options, false);
 		}
@@ -158,20 +160,22 @@ public class MyContactsFragment extends MainFragment implements OnPageChangeList
 	public static class MyInProgressContactsFragment extends ContactListFragment {
 		@Override
 		public ContactListProvider onCreateContactProvider() {
-			final ApiContactListOptions options = new ApiContactListOptions();
-			options.setFilterAssignedTo(Session.getInstance().getPersonId());
-			options.setFilterStatus(Status.uncontacted, Status.attempted_contact, Status.contacted);
-
+			final PersonListOptions options = PersonListOptions.builder() //
+					.assignedTo(Session.getInstance().getPersonId()) //
+					.followupStatus(EnumSet.of(FollowupStatus.uncontacted, FollowupStatus.attempted_contact, FollowupStatus.contacted)) //
+					.build();
+			
 			return new ApiContactListProvider(getActivity(), options);
 		}
 	}
 
 	public static class MyCompletedContactsFragment extends ContactListFragment {
 		@Override
-		public ContactListProvider onCreateContactProvider() {
-			final ApiContactListOptions options = new ApiContactListOptions();
-			options.setFilterAssignedTo(Session.getInstance().getPersonId());
-			options.setFilterStatus(Status.completed);
+		public ContactListProvider onCreateContactProvider() {			
+			final PersonListOptions options = PersonListOptions.builder() //
+					.assignedTo(Session.getInstance().getPersonId()) //
+					.followupStatus(FollowupStatus.completed) //
+					.build();
 
 			return new ApiContactListProvider(getActivity(), options, false);
 		}

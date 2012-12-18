@@ -206,4 +206,10 @@ public class HttpParams {
 	public boolean isMultipart() {
 		return !mMultipartParams.isEmpty();
 	}
+
+	public void addAll(final HttpParams params) {
+		mParams.putAll(params.mParams);
+		mUriParams.putAll(params.mUriParams);
+		mMultipartParams.putAll(params.mMultipartParams);
+	}
 }

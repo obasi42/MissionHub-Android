@@ -13,7 +13,6 @@ import java.util.Locale;
 import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 import android.util.TypedValue;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -23,6 +22,7 @@ import com.google.common.collect.TreeMultimap;
 import com.missionhub.R;
 import com.missionhub.application.Application;
 import com.missionhub.model.Person;
+import com.missionhub.model.gson.GRejoicable;
 
 public class U {
 
@@ -56,9 +56,9 @@ public class U {
 		try {
 			return df.parse(s);
 		} catch (final Exception e) {
-			Log.w(TAG, "date parse exception", e);
+			/* ignore */
 		}
-		return new Date();
+		return null;
 	}
 
 	/**
@@ -66,7 +66,7 @@ public class U {
 	 * 
 	 * @param time
 	 *            string
-	 * @return date object
+	 * @return date object or null
 	 */
 	public static Date parseISO8601(final String iso8601String) {
 		try {
@@ -76,11 +76,29 @@ public class U {
 				final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US);
 				return df.parse(iso8601String);
 			} catch (final Exception e2) {
-				Log.w(TAG, "Could not parse date", e);
+				/* ignore */
 			}
 		}
-		return new Date();
+		return null;
 
+	}
+
+	/**
+	 * Parses a date in the format yyyy-mm-dd
+	 * 
+	 * @param ymdString
+	 * @return
+	 */
+	public static Date parseYMD(final String ymdString) {
+		final java.text.DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+		df.setTimeZone(java.util.TimeZone.getTimeZone("Zulu"));
+
+		try {
+			return df.parse(ymdString);
+		} catch (final Exception e) {
+			/* ignore */
+		}
+		return null;
 	}
 
 	/**
@@ -137,13 +155,19 @@ public class U {
 		return false;
 	}
 
-	public static String toCSV(final List<?> list) {
+	/**
+	 * Converts a collection of items into a string of comma seperated values
+	 * 
+	 * @param items
+	 * @return
+	 */
+	public static String toCSV(final Collection<?> items) {
 		final StringBuffer sb = new StringBuffer();
-		final Iterator<?> li = ((List<?>) list).listIterator();
-		while (li.hasNext()) {
-			final Object subpart = li.next();
-			sb.append(subpart);
-			if (li.hasNext()) {
+		final Iterator<?> itr = items.iterator();
+		while (itr.hasNext()) {
+			final String item = String.valueOf(itr.next());
+			sb.append(item);
+			if (itr.hasNext()) {
 				sb.append(',');
 			}
 		}
@@ -185,29 +209,131 @@ public class U {
 		sherlockActivity.getSupportActionBar().setTitle(R.string.app_name);
 	}
 
-	public static List<String> getStatuses() {
-		final List<String> s = new ArrayList<String>();
-		s.add("uncontacted");
-		s.add("attempted_contact");
-		s.add("contacted");
-		s.add("completed");
-		s.add("do_not_contact");
-		return s;
+	public enum Gender {
+		male, female;
+
+		@Override
+		public String toString() {
+			switch (this) {
+			case male:
+				return getString(R.string.gender_male);
+			case female:
+				return getString(R.string.gender_female);
+			default:
+				return "";
+			}
+		}
+
+		public String toFilter() {
+			switch (this) {
+			case male:
+				return "m";
+			case female:
+				return "f";
+			default:
+				return "";
+			}
+		}
 	}
 
-	public static CharSequence translateStatus(final String status) {
-		if (status.equalsIgnoreCase("uncontacted")) {
-			return getString(R.string.status_uncontacted);
-		} else if (status.equalsIgnoreCase("attempted_contact")) {
-			return getString(R.string.status_attempted_contact);
-		} else if (status.equalsIgnoreCase("contacted")) {
-			return getString(R.string.status_contacted);
-		} else if (status.equalsIgnoreCase("completed")) {
-			return getString(R.string.status_completed);
-		} else if (status.equalsIgnoreCase("do_not_contact")) {
-			return getString(R.string.status_do_not_contact);
+	public enum Rejoicable {
+		spiritual_conversation, prayed_to_receive, gospel_presentation;
+
+		@Override
+		public String toString() {
+			switch (this) {
+			case spiritual_conversation:
+				return getString(R.string.rejoice_spiritual_conversation);
+			case prayed_to_receive:
+				return getString(R.string.rejoice_prayed_to_receive);
+			case gospel_presentation:
+				return getString(R.string.rejoice_gospel_presentation);
+			default:
+				return "";
+			}
 		}
-		return "";
+		
+		public GRejoicable rejoicable() {
+			GRejoicable rejoicable = new GRejoicable();
+			rejoicable.what = name();
+			return rejoicable;
+		}
+	}
+
+	public enum FollowupStatus {
+		uncontacted, attempted_contact, contacted, completed, do_not_contact;
+
+		@Override
+		public String toString() {
+			switch (this) {
+			case uncontacted:
+				return getString(R.string.status_uncontacted);
+			case attempted_contact:
+				return getString(R.string.status_attempted_contact);
+			case contacted:
+				return getString(R.string.status_contacted);
+			case completed:
+				return getString(R.string.status_completed);
+			case do_not_contact:
+				return getString(R.string.status_do_not_contact);
+			default:
+				return "";
+			}
+		}
+		
+		public static FollowupStatus fromString(String string) {
+			if (string.equalsIgnoreCase(getString(R.string.status_uncontacted))){
+				return uncontacted;
+			} else if (string.equalsIgnoreCase(getString(R.string.status_attempted_contact))) {
+				return attempted_contact;
+			} else if (string.equalsIgnoreCase(getString(R.string.status_contacted))) {
+				return contacted;
+			} else if (string.equalsIgnoreCase(getString(R.string.status_completed))) {
+				return completed;
+			} else if (string.equalsIgnoreCase(getString(R.string.status_do_not_contact))) {
+				return do_not_contact;
+			}
+			return uncontacted;
+		}
+	}
+	
+	public enum Role {
+		admin, contact, involved, leader, alumni;
+
+		@Override
+		public String toString() {
+			switch (this) {
+			case admin:
+				return getString(R.string.role_admin);
+			case contact:
+				return getString(R.string.role_contact);
+			case involved:
+				return getString(R.string.role_involved);
+			case leader:
+				return getString(R.string.role_leader);
+			case alumni:
+				return getString(R.string.role_alumni);
+			default:
+				return "";
+			}
+		}
+		
+		public long id() {
+			switch (this) {
+			case admin:
+				return 1;
+			case contact:
+				return 2;
+			case involved:
+				return 3;
+			case leader:
+				return 4;
+			case alumni:
+				return 5;
+			default:
+				return -1;
+			}
+		}
 	}
 
 	private static String getString(final int resource) {

@@ -13,16 +13,18 @@ import de.greenrobot.dao.DaoException;
 public class Answer {
 
     private Long id;
-    private Long person_id;
-    private Long organization_id;
+    private Long answer_sheet_id;
     private Long question_id;
-    private String answer;
+    private String value;
 
     /** Used to resolve relations */
     private transient DaoSession daoSession;
 
     /** Used for active entity operations. */
     private transient AnswerDao myDao;
+
+    private AnswerSheet answerSheet;
+    private Long answerSheet__resolvedKey;
 
     private Question question;
     private Long question__resolvedKey;
@@ -38,12 +40,11 @@ public class Answer {
         this.id = id;
     }
 
-    public Answer(Long id, Long person_id, Long organization_id, Long question_id, String answer) {
+    public Answer(Long id, Long answer_sheet_id, Long question_id, String value) {
         this.id = id;
-        this.person_id = person_id;
-        this.organization_id = organization_id;
+        this.answer_sheet_id = answer_sheet_id;
         this.question_id = question_id;
-        this.answer = answer;
+        this.value = value;
     }
 
     /** called by internal mechanisms, do not call yourself. */
@@ -60,20 +61,12 @@ public class Answer {
         this.id = id;
     }
 
-    public Long getPerson_id() {
-        return person_id;
+    public Long getAnswer_sheet_id() {
+        return answer_sheet_id;
     }
 
-    public void setPerson_id(Long person_id) {
-        this.person_id = person_id;
-    }
-
-    public Long getOrganization_id() {
-        return organization_id;
-    }
-
-    public void setOrganization_id(Long organization_id) {
-        this.organization_id = organization_id;
+    public void setAnswer_sheet_id(Long answer_sheet_id) {
+        this.answer_sheet_id = answer_sheet_id;
     }
 
     public Long getQuestion_id() {
@@ -84,12 +77,31 @@ public class Answer {
         this.question_id = question_id;
     }
 
-    public String getAnswer() {
-        return answer;
+    public String getValue() {
+        return value;
     }
 
-    public void setAnswer(String answer) {
-        this.answer = answer;
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    /** To-one relationship, resolved on first access. */
+    public AnswerSheet getAnswerSheet() {
+        if (answerSheet__resolvedKey == null || !answerSheet__resolvedKey.equals(answer_sheet_id)) {
+            if (daoSession == null) {
+                throw new DaoException("Entity is detached from DAO context");
+            }
+            AnswerSheetDao targetDao = daoSession.getAnswerSheetDao();
+            answerSheet = targetDao.load(answer_sheet_id);
+            answerSheet__resolvedKey = answer_sheet_id;
+        }
+        return answerSheet;
+    }
+
+    public void setAnswerSheet(AnswerSheet answerSheet) {
+        this.answerSheet = answerSheet;
+        answer_sheet_id = answerSheet == null ? null : answerSheet.getId();
+        answerSheet__resolvedKey = answer_sheet_id;
     }
 
     /** To-one relationship, resolved on first access. */

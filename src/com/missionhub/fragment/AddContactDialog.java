@@ -26,10 +26,15 @@ import android.widget.RadioGroup;
 import com.github.rtyley.android.sherlock.roboguice.fragment.RoboSherlockDialogFragment;
 import com.missionhub.R;
 import com.missionhub.api.Api;
-import com.missionhub.api.ApiContact;
+import com.missionhub.api.Api.Include;
+import com.missionhub.api.ApiOptions;
 import com.missionhub.application.Application;
 import com.missionhub.exception.ExceptionHelper;
 import com.missionhub.model.Person;
+import com.missionhub.model.gson.GAddress;
+import com.missionhub.model.gson.GEmailAddress;
+import com.missionhub.model.gson.GPerson;
+import com.missionhub.model.gson.GPhoneNumber;
 import com.missionhub.util.U;
 
 public class AddContactDialog extends RoboSherlockDialogFragment {
@@ -52,8 +57,8 @@ public class AddContactDialog extends RoboSherlockDialogFragment {
 	/** the save button */
 	private Button mSave;
 
-	/** the contact data holder */
-	private ApiContact mContact;
+	/** the person data holder */
+	private GPerson mPerson;
 
 	/* the data views */
 	private EditText mName;
@@ -119,10 +124,10 @@ public class AddContactDialog extends RoboSherlockDialogFragment {
 		countryAdapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
 		mAddressCountry.setAdapter(countryAdapter);
 
-		if (mContact == null) {
-			mContact = new ApiContact();
+		if (mPerson == null) {
+			mPerson = new GPerson();
 		} else {
-			restoreFromContact(mContact);
+			restoreFromPerson(mPerson);
 		}
 
 		final View title = getActivity().getLayoutInflater().inflate(R.layout.fragment_add_contact_dialog_title, null);
@@ -165,53 +170,100 @@ public class AddContactDialog extends RoboSherlockDialogFragment {
 	 */
 	@Override
 	public void onDestroyView() {
-		writeToContact(mContact);
+		writeToPerson(mPerson);
 
 		if (getDialog() != null && U.superGetRetainInstance(this)) getDialog().setDismissMessage(null);
 		super.onDestroyView();
 	}
 
-	public void restoreFromContact(final ApiContact contact) {
-		if (mContact != null) {
-			mContact = contact;
-			mName.setText(mContact.getName());
-			if (mContact.gender.equals("male")) {
+	public void restoreFromPerson(final GPerson person) {
+		if (mPerson != null) {
+			mPerson = person;
+			mName.setText(mPerson.getName());
+			if (mPerson.gender.equals("male")) {
 				mGender.check(R.id.male);
-			} else if (mContact.gender.equals("female")) {
+			} else if (mPerson.gender.equals("female")) {
 				mGender.check(R.id.female);
 			}
-			mPhone.setText(mContact.phoneNumber);
-			mPhoneLocation.setSelection(getIndexOfId(mContact.phoneLocation, R.array.phone_location_ids));
-			mEmail.setText(mContact.emailEmail);
-			mAddressLine1.setText(mContact.address1);
-			mAddressLine2.setText(mContact.address2);
-			mAddressCity.setText(mContact.addressCity);
-			mAddressState.setSelection(getIndexOfId(mContact.addressState, R.array.state_ids));
-			mAddressCountry.setSelection(getIndexOfId(mContact.addressCountry, R.array.country_ids));
-			mAddressZip.setText(mContact.addressZip);
+			if (mPerson.phone_numbers != null && mPerson.phone_numbers.length > 0) {
+				GPhoneNumber number = mPerson.phone_numbers[0];
+				mPhone.setText(number.number);
+				mPhoneLocation.setSelection(getIndexOfId(number.location, R.array.phone_location_ids));
+			} else {
+				mPhone.setText("");
+				mPhoneLocation.setSelection(0);
+			}
+			if (mPerson.email_addresses != null && mPerson.email_addresses.length > 0) {
+				GEmailAddress email = mPerson.email_addresses[0];
+				mEmail.setText(email.email);
+			} else {
+				mEmail.setText("");
+			}
+			if (mPerson.current_address != null) {
+				GAddress address = mPerson.current_address;
+				if (!U.isNullEmpty(address.address1)) {
+					mAddressLine1.setText(address.address1);
+				} else {
+					mAddressLine1.setText("");
+				}
+				if (!U.isNullEmpty(address.address2)) {
+					mAddressLine2.setText(address.address2);
+				} else {
+					mAddressLine2.setText("");
+				}
+				if (!U.isNullEmpty(address.city)) {
+					mAddressCity.setText(address.city);
+				} else {
+					mAddressCity.setText("");
+				}
+				if (!U.isNullEmpty(address.state)) {
+					mAddressState.setSelection(getIndexOfId(address.state, R.array.state_ids));
+				} else {
+					mAddressState.setSelection(0);
+				}
+				if (!U.isNull(address.country)) {
+					mAddressCountry.setSelection(getIndexOfId(address.country, R.array.country_ids));
+				} else {
+					mAddressCountry.setSelection(0);
+				}
+				if (!U.isNullEmpty(address.zip)) {
+					mAddressZip.setText(address.zip);
+				} else {
+					mAddressZip.setText("");
+				}
+			}
 		}
 	}
 
-	public void writeToContact(final ApiContact contact) {
-		if (contact != null) {
-			contact.setName(mName.getText().toString());
+	public void writeToPerson(final GPerson person) {
+		if (person != null) {
+			person.setName(mName.getText().toString());
 			final int genderId = mGender.getCheckedRadioButtonId();
 			if (genderId == R.id.male) {
-				contact.gender = "male";
+				person.gender = "male";
 			} else if (genderId == R.id.female) {
-				contact.gender = "female";
+				person.gender = "female";
 			} else {
-				contact.gender = "";
+				person.gender = "";
 			}
-			contact.phoneNumber = mPhone.getText().toString();
-			contact.phoneLocation = getIdFromTitle(mPhoneLocation.getSelectedItem().toString(), R.array.phone_location_titles, R.array.phone_location_ids);
-			contact.emailEmail = mEmail.getText().toString();
-			contact.address1 = mAddressLine1.getText().toString();
-			contact.address2 = mAddressLine2.getText().toString();
-			contact.addressCity = mAddressCity.getText().toString();
-			contact.addressState = getIdFromTitle(mAddressState.getSelectedItem().toString(), R.array.state_titles, R.array.state_ids);
-			contact.addressCountry = getIdFromTitle(mAddressCountry.getSelectedItem().toString(), R.array.country_titles, R.array.country_ids);
-			contact.addressZip = mAddressZip.getText().toString();
+			
+			GPhoneNumber phone = new GPhoneNumber();
+			phone.number = mPhone.getText().toString();
+			phone.location = getIdFromTitle(mPhoneLocation.getSelectedItem().toString(), R.array.phone_location_titles, R.array.phone_location_ids);
+			person.phone_numbers = new GPhoneNumber[] { phone };
+			
+			GEmailAddress email = new GEmailAddress();
+			email.email = mEmail.getText().toString();
+			person.email_addresses = new GEmailAddress[] { email };
+			
+			GAddress address = new GAddress();
+			address.address1 = mAddressLine1.getText().toString();
+			address.address2 = mAddressLine2.getText().toString();
+			address.city = mAddressCity.getText().toString();
+			address.state = getIdFromTitle(mAddressState.getSelectedItem().toString(), R.array.state_titles, R.array.state_ids);
+			address.country = getIdFromTitle(mAddressCountry.getSelectedItem().toString(), R.array.country_titles, R.array.country_ids);
+			address.zip = mAddressZip.getText().toString();
+			person.current_address = address;
 		}
 	}
 
@@ -254,12 +306,12 @@ public class AddContactDialog extends RoboSherlockDialogFragment {
 	}
 
 	private void saveContact() {
-		if (mContact == null) return;
+		if (mPerson == null) return;
 
-		writeToContact(mContact);
-		mContact.assignToMe = mAssignToMe;
+		writeToPerson(mPerson);
+		mPerson._assignToMe = mAssignToMe;
 
-		if (!mContact.isValid()) {
+		if (!mPerson.isValid()) {
 			Toast.makeText(getActivity(), R.string.add_contact_name_required, Toast.LENGTH_SHORT).show();
 			mName.requestFocus();
 			return;
@@ -271,7 +323,13 @@ public class AddContactDialog extends RoboSherlockDialogFragment {
 
 			@Override
 			public Person call() throws Exception {
-				return Api.createContact(mContact).get();
+				return Api.createPerson(mPerson, ApiOptions.builder() //
+						.include(Include.contact_assignments) //
+						.include(Include.current_address) //
+						.include(Include.email_addresses) //
+						.include(Include.phone_numbers) //
+						.include(Include.organizational_roles) //
+						.build()).get();
 			}
 
 			@Override

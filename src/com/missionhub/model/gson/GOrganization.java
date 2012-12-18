@@ -11,13 +11,27 @@ public class GOrganization {
 
 	public long id;
 	public String name;
+	public String terminology;
 	public String ancestry;
+	public Boolean show_sub_orgs;
+	public String status;
+	public String created_at;
+	public String updated_at;
+
+	public GPerson[] contacts;
+	public GPerson[] admins;
 	public GPerson[] leaders;
-	public GKeyword[] keywords;
+	public GPerson[] people;
+	public GSurvey[] surveys;
+	public GGroup[] groups;
+	public GSmsKeyword[] keywords;
+
+	public static final Object lock = new Object();
 
 	/**
-	 * Saves the Organization object to the local database.
+	 * Saves the organization to the SQLite database.
 	 * 
+	 * @param inTx
 	 * @return
 	 * @throws Exception
 	 */
@@ -25,54 +39,81 @@ public class GOrganization {
 		final Callable<Organization> callable = new Callable<Organization>() {
 			@Override
 			public Organization call() throws Exception {
-				final OrganizationDao od = Application.getDb().getOrganizationDao();
+				synchronized (lock) {
+					final OrganizationDao dao = Application.getDb().getOrganizationDao();
 
-				Organization org = od.load(id);
-				if (org == null) {
-					org = new Organization();
+					Organization org = dao.load(id);
+					boolean insert = false;
+					if (org == null) {
+						org = new Organization();
+						insert = true;
+					}
 					org.setId(id);
-				}
+					org.setName(name);
+					org.setTerminology(terminology);
+					org.setAncestry(ancestry);
+					org.setShow_sub_orgs(show_sub_orgs);
+					org.setStatus(status);
+					org.setCreated_at(U.parseISO8601(created_at));
+					org.setUpdated_at(U.parseISO8601(updated_at));
 
-				if (!U.isNullEmpty(name)) org.setName(name);
-				if (!U.isNullEmpty(ancestry)) org.setAncestry(ancestry);
-
-				if (leaders != null) {
-					for (final GPerson person : leaders) {
-						person.save(true);
+					if (contacts != null) {
+						for (final GPerson person : contacts) {
+							person.save(true);
+						}
 					}
-				}
 
-				if (keywords != null) {
-					for (final GKeyword keyword : keywords) {
-						keyword.save(id, true);
+					if (admins != null) {
+						for (final GPerson person : admins) {
+							person.save(true);
+						}
 					}
+
+					if (leaders != null) {
+						for (final GPerson person : leaders) {
+							person.save(true);
+						}
+					}
+
+					if (people != null) {
+						for (final GPerson person : people) {
+							person.save(true);
+						}
+					}
+
+					if (surveys != null) {
+						for (final GSurvey survey : surveys) {
+							survey.save(true);
+						}
+					}
+
+					if (groups != null) {
+						for (final GGroup group : groups) {
+							group.save(true);
+						}
+					}
+
+					if (keywords != null) {
+						for (final GSmsKeyword keyword : keywords) {
+							keyword.save(true);
+						}
+					}
+
+					if (insert) {
+						dao.insert(org);
+					} else {
+						dao.update(org);
+					}
+
+					return org;
 				}
-
-				od.insertOrReplace(org);
-
-				Application.postEvent(new OrganizationUpdatedEvent(org));
-
-				return org;
 			}
 		};
-		if (!inTx) {
-			return Application.getDb().callInTx(callable);
-		} else {
+		if (inTx) {
 			return callable.call();
+		} else {
+			return Application.getDb().callInTx(callable);
 		}
-	}
-
-	/**
-	 * Event posted when a Organization is updated
-	 */
-	public static class OrganizationUpdatedEvent {
-
-		public Organization organization;
-
-		public OrganizationUpdatedEvent(final Organization organization) {
-			this.organization = organization;
-		}
-
 	}
 
 }

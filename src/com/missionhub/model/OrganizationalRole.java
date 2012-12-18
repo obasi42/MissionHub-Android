@@ -13,10 +13,13 @@ import de.greenrobot.dao.DaoException;
 public class OrganizationalRole {
 
     private Long id;
+    private String followup_status;
     private Long person_id;
     private Long organization_id;
-    private String role;
-    private Boolean primary;
+    private Long role_id;
+    private java.util.Date start_date;
+    private java.util.Date updated_at;
+    private java.util.Date created_at;
 
     /** Used to resolve relations */
     private transient DaoSession daoSession;
@@ -24,8 +27,14 @@ public class OrganizationalRole {
     /** Used for active entity operations. */
     private transient OrganizationalRoleDao myDao;
 
+    private PhoneNumber phoneNumber;
+    private Long phoneNumber__resolvedKey;
+
     private Organization organization;
     private Long organization__resolvedKey;
+
+    private Role role;
+    private Long role__resolvedKey;
 
 
     // KEEP FIELDS - put your custom fields here
@@ -38,12 +47,15 @@ public class OrganizationalRole {
         this.id = id;
     }
 
-    public OrganizationalRole(Long id, Long person_id, Long organization_id, String role, Boolean primary) {
+    public OrganizationalRole(Long id, String followup_status, Long person_id, Long organization_id, Long role_id, java.util.Date start_date, java.util.Date updated_at, java.util.Date created_at) {
         this.id = id;
+        this.followup_status = followup_status;
         this.person_id = person_id;
         this.organization_id = organization_id;
-        this.role = role;
-        this.primary = primary;
+        this.role_id = role_id;
+        this.start_date = start_date;
+        this.updated_at = updated_at;
+        this.created_at = created_at;
     }
 
     /** called by internal mechanisms, do not call yourself. */
@@ -58,6 +70,14 @@ public class OrganizationalRole {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getFollowup_status() {
+        return followup_status;
+    }
+
+    public void setFollowup_status(String followup_status) {
+        this.followup_status = followup_status;
     }
 
     public Long getPerson_id() {
@@ -76,20 +96,55 @@ public class OrganizationalRole {
         this.organization_id = organization_id;
     }
 
-    public String getRole() {
-        return role;
+    public Long getRole_id() {
+        return role_id;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void setRole_id(Long role_id) {
+        this.role_id = role_id;
     }
 
-    public Boolean getPrimary() {
-        return primary;
+    public java.util.Date getStart_date() {
+        return start_date;
     }
 
-    public void setPrimary(Boolean primary) {
-        this.primary = primary;
+    public void setStart_date(java.util.Date start_date) {
+        this.start_date = start_date;
+    }
+
+    public java.util.Date getUpdated_at() {
+        return updated_at;
+    }
+
+    public void setUpdated_at(java.util.Date updated_at) {
+        this.updated_at = updated_at;
+    }
+
+    public java.util.Date getCreated_at() {
+        return created_at;
+    }
+
+    public void setCreated_at(java.util.Date created_at) {
+        this.created_at = created_at;
+    }
+
+    /** To-one relationship, resolved on first access. */
+    public PhoneNumber getPhoneNumber() {
+        if (phoneNumber__resolvedKey == null || !phoneNumber__resolvedKey.equals(person_id)) {
+            if (daoSession == null) {
+                throw new DaoException("Entity is detached from DAO context");
+            }
+            PhoneNumberDao targetDao = daoSession.getPhoneNumberDao();
+            phoneNumber = targetDao.load(person_id);
+            phoneNumber__resolvedKey = person_id;
+        }
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(PhoneNumber phoneNumber) {
+        this.phoneNumber = phoneNumber;
+        person_id = phoneNumber == null ? null : phoneNumber.getId();
+        phoneNumber__resolvedKey = person_id;
     }
 
     /** To-one relationship, resolved on first access. */
@@ -109,6 +164,25 @@ public class OrganizationalRole {
         this.organization = organization;
         organization_id = organization == null ? null : organization.getId();
         organization__resolvedKey = organization_id;
+    }
+
+    /** To-one relationship, resolved on first access. */
+    public Role getRole() {
+        if (role__resolvedKey == null || !role__resolvedKey.equals(role_id)) {
+            if (daoSession == null) {
+                throw new DaoException("Entity is detached from DAO context");
+            }
+            RoleDao targetDao = daoSession.getRoleDao();
+            role = targetDao.load(role_id);
+            role__resolvedKey = role_id;
+        }
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+        role_id = role == null ? null : role.getId();
+        role__resolvedKey = role_id;
     }
 
     /** Convenient call for {@link AbstractDao#delete(Object)}. Entity must attached to an entity context. */

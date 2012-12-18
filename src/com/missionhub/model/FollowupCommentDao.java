@@ -1,6 +1,7 @@
 package com.missionhub.model;
 
 import java.util.List;
+import java.util.ArrayList;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
@@ -8,6 +9,7 @@ import android.database.sqlite.SQLiteStatement;
 import de.greenrobot.dao.AbstractDao;
 import de.greenrobot.dao.DaoConfig;
 import de.greenrobot.dao.Property;
+import de.greenrobot.dao.SqlUtils;
 import de.greenrobot.dao.Query;
 import de.greenrobot.dao.QueryBuilder;
 
@@ -32,16 +34,14 @@ public class FollowupCommentDao extends AbstractDao<FollowupComment, Long> {
         public final static Property Organization_id = new Property(3, Long.class, "organization_id", false, "ORGANIZATION_ID");
         public final static Property Comment = new Property(4, String.class, "comment", false, "COMMENT");
         public final static Property Status = new Property(5, String.class, "status", false, "STATUS");
-        public final static Property Created_at = new Property(6, java.util.Date.class, "created_at", false, "CREATED_AT");
-        public final static Property Updated_at = new Property(7, java.util.Date.class, "updated_at", false, "UPDATED_AT");
-        public final static Property Deleted_at = new Property(8, java.util.Date.class, "deleted_at", false, "DELETED_AT");
+        public final static Property Updated_at = new Property(6, java.util.Date.class, "updated_at", false, "UPDATED_AT");
+        public final static Property Created_at = new Property(7, java.util.Date.class, "created_at", false, "CREATED_AT");
     };
 
     private DaoSession daoSession;
 
+    private Query<FollowupComment> person_Comments_on_meQuery;
     private Query<FollowupComment> person_Followup_commentsQuery;
-    private Query<FollowupComment> person_Posted_commentsQuery;
-    private Query<FollowupComment> organization_FollowupCommentListQuery;
 
     public FollowupCommentDao(DaoConfig config) {
         super(config);
@@ -56,15 +56,14 @@ public class FollowupCommentDao extends AbstractDao<FollowupComment, Long> {
     public static void createTable(SQLiteDatabase db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "'FOLLOWUP_COMMENT' (" + //
-                "'_id' INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
+                "'_id' INTEGER PRIMARY KEY ," + // 0: id
                 "'CONTACT_ID' INTEGER," + // 1: contact_id
                 "'COMMENTER_ID' INTEGER," + // 2: commenter_id
                 "'ORGANIZATION_ID' INTEGER," + // 3: organization_id
                 "'COMMENT' TEXT," + // 4: comment
                 "'STATUS' TEXT," + // 5: status
-                "'CREATED_AT' INTEGER," + // 6: created_at
-                "'UPDATED_AT' INTEGER," + // 7: updated_at
-                "'DELETED_AT' INTEGER);"); // 8: deleted_at
+                "'UPDATED_AT' INTEGER," + // 6: updated_at
+                "'CREATED_AT' INTEGER);"); // 7: created_at
     }
 
     /** Drops the underlying database table. */
@@ -108,19 +107,14 @@ public class FollowupCommentDao extends AbstractDao<FollowupComment, Long> {
             stmt.bindString(6, status);
         }
  
-        java.util.Date created_at = entity.getCreated_at();
-        if (created_at != null) {
-            stmt.bindLong(7, created_at.getTime());
-        }
- 
         java.util.Date updated_at = entity.getUpdated_at();
         if (updated_at != null) {
-            stmt.bindLong(8, updated_at.getTime());
+            stmt.bindLong(7, updated_at.getTime());
         }
  
-        java.util.Date deleted_at = entity.getDeleted_at();
-        if (deleted_at != null) {
-            stmt.bindLong(9, deleted_at.getTime());
+        java.util.Date created_at = entity.getCreated_at();
+        if (created_at != null) {
+            stmt.bindLong(8, created_at.getTime());
         }
     }
 
@@ -146,9 +140,8 @@ public class FollowupCommentDao extends AbstractDao<FollowupComment, Long> {
             cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3), // organization_id
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // comment
             cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // status
-            cursor.isNull(offset + 6) ? null : new java.util.Date(cursor.getLong(offset + 6)), // created_at
-            cursor.isNull(offset + 7) ? null : new java.util.Date(cursor.getLong(offset + 7)), // updated_at
-            cursor.isNull(offset + 8) ? null : new java.util.Date(cursor.getLong(offset + 8)) // deleted_at
+            cursor.isNull(offset + 6) ? null : new java.util.Date(cursor.getLong(offset + 6)), // updated_at
+            cursor.isNull(offset + 7) ? null : new java.util.Date(cursor.getLong(offset + 7)) // created_at
         );
         return entity;
     }
@@ -162,9 +155,8 @@ public class FollowupCommentDao extends AbstractDao<FollowupComment, Long> {
         entity.setOrganization_id(cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3));
         entity.setComment(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
         entity.setStatus(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
-        entity.setCreated_at(cursor.isNull(offset + 6) ? null : new java.util.Date(cursor.getLong(offset + 6)));
-        entity.setUpdated_at(cursor.isNull(offset + 7) ? null : new java.util.Date(cursor.getLong(offset + 7)));
-        entity.setDeleted_at(cursor.isNull(offset + 8) ? null : new java.util.Date(cursor.getLong(offset + 8)));
+        entity.setUpdated_at(cursor.isNull(offset + 6) ? null : new java.util.Date(cursor.getLong(offset + 6)));
+        entity.setCreated_at(cursor.isNull(offset + 7) ? null : new java.util.Date(cursor.getLong(offset + 7)));
      }
     
     /** @inheritdoc */
@@ -190,40 +182,133 @@ public class FollowupCommentDao extends AbstractDao<FollowupComment, Long> {
         return true;
     }
     
-    /** Internal query to resolve the "followup_comments" to-many relationship of Person. */
-    public synchronized List<FollowupComment> _queryPerson_Followup_comments(Long contact_id) {
-        if (person_Followup_commentsQuery == null) {
+    /** Internal query to resolve the "comments_on_me" to-many relationship of Person. */
+    public synchronized List<FollowupComment> _queryPerson_Comments_on_me(Long contact_id) {
+        if (person_Comments_on_meQuery == null) {
             QueryBuilder<FollowupComment> queryBuilder = queryBuilder();
             queryBuilder.where(Properties.Contact_id.eq(contact_id));
+            person_Comments_on_meQuery = queryBuilder.build();
+        } else {
+            person_Comments_on_meQuery.setParameter(0, contact_id);
+        }
+        return person_Comments_on_meQuery.list();
+    }
+
+    /** Internal query to resolve the "followup_comments" to-many relationship of Person. */
+    public synchronized List<FollowupComment> _queryPerson_Followup_comments(Long commenter_id) {
+        if (person_Followup_commentsQuery == null) {
+            QueryBuilder<FollowupComment> queryBuilder = queryBuilder();
+            queryBuilder.where(Properties.Commenter_id.eq(commenter_id));
             person_Followup_commentsQuery = queryBuilder.build();
         } else {
-            person_Followup_commentsQuery.setParameter(0, contact_id);
+            person_Followup_commentsQuery.setParameter(0, commenter_id);
         }
         return person_Followup_commentsQuery.list();
     }
 
-    /** Internal query to resolve the "posted_comments" to-many relationship of Person. */
-    public synchronized List<FollowupComment> _queryPerson_Posted_comments(Long commenter_id) {
-        if (person_Posted_commentsQuery == null) {
-            QueryBuilder<FollowupComment> queryBuilder = queryBuilder();
-            queryBuilder.where(Properties.Commenter_id.eq(commenter_id));
-            person_Posted_commentsQuery = queryBuilder.build();
-        } else {
-            person_Posted_commentsQuery.setParameter(0, commenter_id);
+    private String selectDeep;
+
+    protected String getSelectDeep() {
+        if (selectDeep == null) {
+            StringBuilder builder = new StringBuilder("SELECT ");
+            SqlUtils.appendColumns(builder, "T", getAllColumns());
+            builder.append(',');
+            SqlUtils.appendColumns(builder, "T0", daoSession.getPersonDao().getAllColumns());
+            builder.append(',');
+            SqlUtils.appendColumns(builder, "T1", daoSession.getPersonDao().getAllColumns());
+            builder.append(',');
+            SqlUtils.appendColumns(builder, "T2", daoSession.getOrganizationDao().getAllColumns());
+            builder.append(" FROM FOLLOWUP_COMMENT T");
+            builder.append(" LEFT JOIN PERSON T0 ON T.'CONTACT_ID'=T0.'_id'");
+            builder.append(" LEFT JOIN PERSON T1 ON T.'COMMENTER_ID'=T1.'_id'");
+            builder.append(" LEFT JOIN ORGANIZATION T2 ON T.'ORGANIZATION_ID'=T2.'_id'");
+            builder.append(' ');
+            selectDeep = builder.toString();
         }
-        return person_Posted_commentsQuery.list();
+        return selectDeep;
+    }
+    
+    protected FollowupComment loadCurrentDeep(Cursor cursor, boolean lock) {
+        FollowupComment entity = loadCurrent(cursor, 0, lock);
+        int offset = getAllColumns().length;
+
+        Person contact = loadCurrentOther(daoSession.getPersonDao(), cursor, offset);
+        entity.setContact(contact);
+        offset += daoSession.getPersonDao().getAllColumns().length;
+
+        Person commenter = loadCurrentOther(daoSession.getPersonDao(), cursor, offset);
+        entity.setCommenter(commenter);
+        offset += daoSession.getPersonDao().getAllColumns().length;
+
+        Organization organization = loadCurrentOther(daoSession.getOrganizationDao(), cursor, offset);
+        entity.setOrganization(organization);
+
+        return entity;    
     }
 
-    /** Internal query to resolve the "followupCommentList" to-many relationship of Organization. */
-    public synchronized List<FollowupComment> _queryOrganization_FollowupCommentList(Long organization_id) {
-        if (organization_FollowupCommentListQuery == null) {
-            QueryBuilder<FollowupComment> queryBuilder = queryBuilder();
-            queryBuilder.where(Properties.Organization_id.eq(organization_id));
-            organization_FollowupCommentListQuery = queryBuilder.build();
-        } else {
-            organization_FollowupCommentListQuery.setParameter(0, organization_id);
+    public FollowupComment loadDeep(Long key) {
+        assertSinglePk();
+        if (key == null) {
+            return null;
         }
-        return organization_FollowupCommentListQuery.list();
-    }
 
+        StringBuilder builder = new StringBuilder(getSelectDeep());
+        builder.append("WHERE ");
+        SqlUtils.appendColumnsEqValue(builder, "T", getPkColumns());
+        String sql = builder.toString();
+        
+        String[] keyArray = new String[] { key.toString() };
+        Cursor cursor = db.rawQuery(sql, keyArray);
+        
+        try {
+            boolean available = cursor.moveToFirst();
+            if (!available) {
+                return null;
+            } else if (!cursor.isLast()) {
+                throw new IllegalStateException("Expected unique result, but count was " + cursor.getCount());
+            }
+            return loadCurrentDeep(cursor, true);
+        } finally {
+            cursor.close();
+        }
+    }
+    
+    /** Reads all available rows from the given cursor and returns a list of new ImageTO objects. */
+    public List<FollowupComment> loadAllDeepFromCursor(Cursor cursor) {
+        int count = cursor.getCount();
+        List<FollowupComment> list = new ArrayList<FollowupComment>(count);
+        
+        if (cursor.moveToFirst()) {
+            if (identityScope != null) {
+                identityScope.lock();
+                identityScope.reserveRoom(count);
+            }
+            try {
+                do {
+                    list.add(loadCurrentDeep(cursor, false));
+                } while (cursor.moveToNext());
+            } finally {
+                if (identityScope != null) {
+                    identityScope.unlock();
+                }
+            }
+        }
+        return list;
+    }
+    
+    protected List<FollowupComment> loadDeepAllAndCloseCursor(Cursor cursor) {
+        try {
+            return loadAllDeepFromCursor(cursor);
+        } finally {
+            cursor.close();
+        }
+    }
+    
+
+    /** A raw-style query where you can pass any WHERE clause and arguments. */
+    public List<FollowupComment> queryDeep(String where, String... selectionArg) {
+        Cursor cursor = db.rawQuery(getSelectDeep() + where, selectionArg);
+        return loadDeepAllAndCloseCursor(cursor);
+    }
+ 
 }

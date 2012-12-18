@@ -1,6 +1,6 @@
 package com.missionhub.fragment;
 
-import java.util.HashMap;
+import java.util.List;
 
 import org.holoeverywhere.widget.Toast;
 
@@ -17,16 +17,18 @@ import android.widget.TextView;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.google.common.collect.HashMultimap;
 import com.missionhub.R;
 import com.missionhub.api.Api;
+import com.missionhub.api.ApiOptions;
+import com.missionhub.api.Api.Include;
 import com.missionhub.application.Application;
 import com.missionhub.application.Session;
 import com.missionhub.model.Answer;
-import com.missionhub.model.Keyword;
+import com.missionhub.model.AnswerSheet;
 import com.missionhub.model.Organization;
 import com.missionhub.model.Person;
 import com.missionhub.model.Question;
+import com.missionhub.model.Survey;
 import com.missionhub.ui.ObjectArrayAdapter;
 import com.missionhub.ui.ObjectArrayAdapter.DisabledItem;
 import com.missionhub.util.U;
@@ -114,8 +116,8 @@ public class ContactSurveysFragment extends BaseFragment {
 			if (convertView == null) {
 				holder = new ViewHolder();
 
-				if (object instanceof KeyItem) {
-					view = getLayoutInflater().inflate(R.layout.item_contact_surveys_keyword, null);
+				if (object instanceof SurveyItem) {
+					view = getLayoutInflater().inflate(R.layout.item_contact_surveys_survey, null);
 					holder.keyword = (TextView) view.findViewById(android.R.id.text1);
 				} else if (object instanceof QAItem) {
 					view = getLayoutInflater().inflate(R.layout.item_contact_surveys_qa, null);
@@ -129,10 +131,10 @@ public class ContactSurveysFragment extends BaseFragment {
 				holder = (ViewHolder) view.getTag();
 			}
 
-			if (object instanceof KeyItem) {
-				final KeyItem item = (KeyItem) object;
-				if (!U.isNullEmpty(item.keyword.getKeyword())) {
-					holder.keyword.setText(item.keyword.getKeyword());
+			if (object instanceof SurveyItem) {
+				final SurveyItem item = (SurveyItem) object;
+				if (!U.isNullEmpty(item.survey.getTitle())) {
+					holder.keyword.setText(item.survey.getTitle());
 				} else {
 					holder.keyword.setText(R.string.contact_surveys_no_key);
 				}
@@ -143,9 +145,9 @@ public class ContactSurveysFragment extends BaseFragment {
 				} else {
 					holder.question.setText(R.string.contact_surveys_no_q);
 				}
-
-				if (!U.isNullEmpty(item.answer.getAnswer())) {
-					holder.answer.setText(item.answer.getAnswer());
+				
+				if (!U.isNullEmpty(item.answer.getValue())) {
+					holder.answer.setText(item.answer.getValue());
 					holder.answer.setTextColor(answeredColor);
 				} else {
 					holder.answer.setText(R.string.contact_surveys_no_a);
@@ -190,31 +192,31 @@ public class ContactSurveysFragment extends BaseFragment {
 		mAdapter.setNotifyOnChange(false);
 		mAdapter.clear();
 
-		mPerson.resetAnswerList();
+		mPerson.resetAnswerSheetList();
 
-		boolean updateOrg = false;
-
-		final HashMultimap<Keyword, Question> multi = HashMultimap.create();
-		final HashMap<Question, Answer> qa = new HashMap<Question, Answer>();
-
-		for (final Answer a : mPerson.getAnswerList()) {
-			// only grab from current org
-			if (a.getOrganization_id() != Session.getInstance().getOrganizationId()) continue;
-
-			final Question q = a.getQuestion();
-			if (q == null || q.getKeyword() == null) {
-				updateOrg = true;
+		boolean fetchQuestionData = false;
+		
+		final List<AnswerSheet> sheets = mPerson.getAnswerSheetList();
+		for(final AnswerSheet sheet : sheets) {
+			if (sheet.getSurvey() == null)  {
+				fetchQuestionData = true;
 				continue;
 			}
-
-			multi.put(q.getKeyword(), q);
-			qa.put(q, a);
-		}
-
-		for (final Keyword key : multi.keySet()) {
-			mAdapter.add(new KeyItem(key));
-			for (final Question question : multi.get(key)) {
-				mAdapter.add(new QAItem(question, qa.get(question)));
+			
+			// only look at answers from current organization
+			if (sheet.getSurvey().getOrganization_id() != Session.getInstance().getOrganizationId()) {
+				continue;
+			}
+			
+			mAdapter.add(new SurveyItem(sheet.getSurvey()));
+			
+			final List<Answer> answers = sheet.getAnswerList();
+			for(final Answer answer : answers) {
+				if (answer.getQuestion() == null) {
+					fetchQuestionData = true;
+					continue;
+				}
+				mAdapter.add(new QAItem(answer.getQuestion(), answer));
 			}
 		}
 
@@ -224,7 +226,7 @@ public class ContactSurveysFragment extends BaseFragment {
 
 		mAdapter.notifyDataSetChanged();
 
-		if (updateOrg && !mUpdatedOrganization) {
+		if (fetchQuestionData && !mUpdatedOrganization) {
 			updateOrganization();
 		}
 	}
@@ -233,11 +235,11 @@ public class ContactSurveysFragment extends BaseFragment {
 		return mOrganizationTask != null;
 	}
 
-	public static class KeyItem extends DisabledItem {
-		public Keyword keyword;
+	public static class SurveyItem extends DisabledItem {
+		public Survey survey;
 
-		public KeyItem(final Keyword keyword) {
-			this.keyword = keyword;
+		public SurveyItem(final Survey survey) {
+			this.survey = survey;
 		}
 	}
 
@@ -262,7 +264,11 @@ public class ContactSurveysFragment extends BaseFragment {
 
 			@Override
 			public Organization call() throws Exception {
-				return Api.getOrganization(Session.getInstance().getOrganizationId()).get();
+				return Api.getOrganization(Session.getInstance().getOrganizationId(), ApiOptions.builder() //
+					.include(Include.keywords) //
+					.include(Include.questions) //
+					.include(Include.surveys) //
+					.build()).get();
 			}
 
 			@Override

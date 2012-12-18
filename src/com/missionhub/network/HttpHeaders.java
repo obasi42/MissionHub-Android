@@ -151,4 +151,8 @@ public class HttpHeaders {
 
 		return sb.toString();
 	}
+
+	public void addAll(final HttpHeaders headers) {
+		this.headers.putAll(headers.headers);
+	}
 }

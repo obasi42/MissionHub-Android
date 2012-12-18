@@ -18,7 +18,7 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.missionhub.R;
 import com.missionhub.activity.ContactActivity;
-import com.missionhub.api.ApiContactListOptions;
+import com.missionhub.api.PersonListOptions;
 import com.missionhub.contactlist.ApiContactListProvider;
 import com.missionhub.contactlist.ContactListFragment;
 import com.missionhub.contactlist.ContactListFragment.ContactListFragmentListener;
@@ -124,7 +124,7 @@ public class AllContactsFragment extends MainFragment implements ContactListFrag
 	public static class AllContactsFragmentFragment extends ContactListFragment {
 		@Override
 		public ContactListProvider onCreateContactProvider() {
-			final ApiContactListOptions options = new ApiContactListOptions();
+			final PersonListOptions options = PersonListOptions.builder().build();
 
 			return new ApiContactListProvider(getActivity(), options);
 		}

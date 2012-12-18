@@ -8,23 +8,23 @@ import android.util.Log;
 import de.greenrobot.dao.AbstractDaoMaster;
 import de.greenrobot.dao.IdentityScopeType;
 
+import com.missionhub.model.UserDao;
 import com.missionhub.model.PersonDao;
-import com.missionhub.model.AssignmentDao;
-import com.missionhub.model.InterestDao;
-import com.missionhub.model.EducationDao;
-import com.missionhub.model.LocationDao;
+import com.missionhub.model.AddressDao;
+import com.missionhub.model.EmailAddressDao;
+import com.missionhub.model.PhoneNumberDao;
 import com.missionhub.model.OrganizationDao;
+import com.missionhub.model.RoleDao;
 import com.missionhub.model.OrganizationalRoleDao;
+import com.missionhub.model.ContactAssignmentDao;
 import com.missionhub.model.GroupDao;
-import com.missionhub.model.GroupLabelDao;
-import com.missionhub.model.GroupLabelsDao;
-import com.missionhub.model.GroupMembershipDao;
 import com.missionhub.model.FollowupCommentDao;
 import com.missionhub.model.RejoicableDao;
-import com.missionhub.model.KeywordDao;
 import com.missionhub.model.QuestionDao;
+import com.missionhub.model.SurveyDao;
+import com.missionhub.model.SmsKeywordDao;
+import com.missionhub.model.AnswerSheetDao;
 import com.missionhub.model.AnswerDao;
-import com.missionhub.model.QuestionChoiceDao;
 import com.missionhub.model.SettingDao;
 import com.missionhub.model.UserSettingDao;
 
@@ -37,46 +37,46 @@ public class DaoMaster extends AbstractDaoMaster {
 
     /** Creates underlying database table using DAOs. */
     public static void createAllTables(SQLiteDatabase db, boolean ifNotExists) {
+        UserDao.createTable(db, ifNotExists);
         PersonDao.createTable(db, ifNotExists);
-        AssignmentDao.createTable(db, ifNotExists);
-        InterestDao.createTable(db, ifNotExists);
-        EducationDao.createTable(db, ifNotExists);
-        LocationDao.createTable(db, ifNotExists);
+        AddressDao.createTable(db, ifNotExists);
+        EmailAddressDao.createTable(db, ifNotExists);
+        PhoneNumberDao.createTable(db, ifNotExists);
         OrganizationDao.createTable(db, ifNotExists);
+        RoleDao.createTable(db, ifNotExists);
         OrganizationalRoleDao.createTable(db, ifNotExists);
+        ContactAssignmentDao.createTable(db, ifNotExists);
         GroupDao.createTable(db, ifNotExists);
-        GroupLabelDao.createTable(db, ifNotExists);
-        GroupLabelsDao.createTable(db, ifNotExists);
-        GroupMembershipDao.createTable(db, ifNotExists);
         FollowupCommentDao.createTable(db, ifNotExists);
         RejoicableDao.createTable(db, ifNotExists);
-        KeywordDao.createTable(db, ifNotExists);
         QuestionDao.createTable(db, ifNotExists);
+        SurveyDao.createTable(db, ifNotExists);
+        SmsKeywordDao.createTable(db, ifNotExists);
+        AnswerSheetDao.createTable(db, ifNotExists);
         AnswerDao.createTable(db, ifNotExists);
-        QuestionChoiceDao.createTable(db, ifNotExists);
         SettingDao.createTable(db, ifNotExists);
         UserSettingDao.createTable(db, ifNotExists);
     }
     
     /** Drops underlying database table using DAOs. */
     public static void dropAllTables(SQLiteDatabase db, boolean ifExists) {
+        UserDao.dropTable(db, ifExists);
         PersonDao.dropTable(db, ifExists);
-        AssignmentDao.dropTable(db, ifExists);
-        InterestDao.dropTable(db, ifExists);
-        EducationDao.dropTable(db, ifExists);
-        LocationDao.dropTable(db, ifExists);
+        AddressDao.dropTable(db, ifExists);
+        EmailAddressDao.dropTable(db, ifExists);
+        PhoneNumberDao.dropTable(db, ifExists);
         OrganizationDao.dropTable(db, ifExists);
+        RoleDao.dropTable(db, ifExists);
         OrganizationalRoleDao.dropTable(db, ifExists);
+        ContactAssignmentDao.dropTable(db, ifExists);
         GroupDao.dropTable(db, ifExists);
-        GroupLabelDao.dropTable(db, ifExists);
-        GroupLabelsDao.dropTable(db, ifExists);
-        GroupMembershipDao.dropTable(db, ifExists);
         FollowupCommentDao.dropTable(db, ifExists);
         RejoicableDao.dropTable(db, ifExists);
-        KeywordDao.dropTable(db, ifExists);
         QuestionDao.dropTable(db, ifExists);
+        SurveyDao.dropTable(db, ifExists);
+        SmsKeywordDao.dropTable(db, ifExists);
+        AnswerSheetDao.dropTable(db, ifExists);
         AnswerDao.dropTable(db, ifExists);
-        QuestionChoiceDao.dropTable(db, ifExists);
         SettingDao.dropTable(db, ifExists);
         UserSettingDao.dropTable(db, ifExists);
     }
@@ -110,23 +110,23 @@ public class DaoMaster extends AbstractDaoMaster {
 
     public DaoMaster(SQLiteDatabase db) {
         super(db, SCHEMA_VERSION);
+        registerDaoClass(UserDao.class);
         registerDaoClass(PersonDao.class);
-        registerDaoClass(AssignmentDao.class);
-        registerDaoClass(InterestDao.class);
-        registerDaoClass(EducationDao.class);
-        registerDaoClass(LocationDao.class);
+        registerDaoClass(AddressDao.class);
+        registerDaoClass(EmailAddressDao.class);
+        registerDaoClass(PhoneNumberDao.class);
         registerDaoClass(OrganizationDao.class);
+        registerDaoClass(RoleDao.class);
         registerDaoClass(OrganizationalRoleDao.class);
+        registerDaoClass(ContactAssignmentDao.class);
         registerDaoClass(GroupDao.class);
-        registerDaoClass(GroupLabelDao.class);
-        registerDaoClass(GroupLabelsDao.class);
-        registerDaoClass(GroupMembershipDao.class);
         registerDaoClass(FollowupCommentDao.class);
         registerDaoClass(RejoicableDao.class);
-        registerDaoClass(KeywordDao.class);
         registerDaoClass(QuestionDao.class);
+        registerDaoClass(SurveyDao.class);
+        registerDaoClass(SmsKeywordDao.class);
+        registerDaoClass(AnswerSheetDao.class);
         registerDaoClass(AnswerDao.class);
-        registerDaoClass(QuestionChoiceDao.class);
         registerDaoClass(SettingDao.class);
         registerDaoClass(UserSettingDao.class);
     }

@@ -8,7 +8,7 @@ import roboguice.util.SafeAsyncTask;
 import android.content.Context;
 
 import com.missionhub.api.Api;
-import com.missionhub.api.ApiContactListOptions;
+import com.missionhub.api.PersonListOptions;
 import com.missionhub.model.Person;
 
 /**
@@ -26,7 +26,7 @@ public class ApiContactListProvider extends ContactListProvider {
 	private boolean mPaused = false;
 
 	/** the contact list options */
-	private ApiContactListOptions mOptions;
+	private PersonListOptions mOptions;
 
 	/** Single thread executor to ensure sequential results */
 	private final Executor mExecutor = Executors.newSingleThreadExecutor();
@@ -43,11 +43,11 @@ public class ApiContactListProvider extends ContactListProvider {
 		mStarted = start;
 	}
 
-	public ApiContactListProvider(final Context context, final ApiContactListOptions options) {
+	public ApiContactListProvider(final Context context, final PersonListOptions options) {
 		this(context, options, true);
 	}
 
-	public ApiContactListProvider(final Context context, final ApiContactListOptions options, final boolean start) {
+	public ApiContactListProvider(final Context context, final PersonListOptions options, final boolean start) {
 		super(context);
 		mStarted = start;
 		mOptions = options;
@@ -58,14 +58,14 @@ public class ApiContactListProvider extends ContactListProvider {
 		reload();
 	}
 
-	public void setOptions(final ApiContactListOptions options) {
+	public void setOptions(final PersonListOptions options) {
 		mOptions = options;
 		reload();
 	}
 
-	public ApiContactListOptions getOptions() {
+	public PersonListOptions getOptions() {
 		if (mOptions != null) {
-			return (ApiContactListOptions) mOptions.clone();
+			return (PersonListOptions) mOptions.clone();
 		}
 		return null;
 	}
@@ -97,12 +97,12 @@ public class ApiContactListProvider extends ContactListProvider {
 		mTask = new SafeAsyncTask<List<Person>>() {
 			@Override
 			public List<Person> call() throws Exception {
-				return Api.getContactList(mOptions).get();
+				return Api.listPeople(mOptions).get();
 			}
 
 			@Override
 			public void onSuccess(final List<Person> people) {
-				mOptions.advanceStart();
+				mOptions.advanceOffset();
 				if (people.size() < mOptions.getLimit()) {
 					mDone = true;
 				}
@@ -173,7 +173,7 @@ public class ApiContactListProvider extends ContactListProvider {
 				mTask = null;
 			}
 			if (mOptions != null) {
-				mOptions.resetPosition();
+				mOptions.setOffset(0);
 			}
 			mDone = false;
 			mPaused = false;

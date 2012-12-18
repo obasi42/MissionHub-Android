@@ -1,6 +1,5 @@
 package com.missionhub.model;
 
-import java.util.List;
 import com.missionhub.model.DaoSession;
 import de.greenrobot.dao.DaoException;
 
@@ -9,7 +8,7 @@ import de.greenrobot.dao.DaoException;
 // KEEP INCLUDES - put your custom includes here
 // KEEP INCLUDES END
 /**
- * Entity mapped to table GROUPS.
+ * Entity mapped to table Groups.
  */
 public class Group {
 
@@ -17,13 +16,14 @@ public class Group {
     private String name;
     private String location;
     private String meets;
+    private String meeting_day;
     private Integer start_time;
     private Integer end_time;
     private Long organization_id;
-    private java.util.Date created_at;
-    private java.util.Date updated_at;
     private Boolean list_publicly;
     private Boolean approve_join_requests;
+    private java.util.Date updated_at;
+    private java.util.Date created_at;
 
     /** Used to resolve relations */
     private transient DaoSession daoSession;
@@ -34,7 +34,6 @@ public class Group {
     private Organization organization;
     private Long organization__resolvedKey;
 
-    private List<GroupMembership> members;
 
     // KEEP FIELDS - put your custom fields here
     // KEEP FIELDS END
@@ -46,18 +45,19 @@ public class Group {
         this.id = id;
     }
 
-    public Group(Long id, String name, String location, String meets, Integer start_time, Integer end_time, Long organization_id, java.util.Date created_at, java.util.Date updated_at, Boolean list_publicly, Boolean approve_join_requests) {
+    public Group(Long id, String name, String location, String meets, String meeting_day, Integer start_time, Integer end_time, Long organization_id, Boolean list_publicly, Boolean approve_join_requests, java.util.Date updated_at, java.util.Date created_at) {
         this.id = id;
         this.name = name;
         this.location = location;
         this.meets = meets;
+        this.meeting_day = meeting_day;
         this.start_time = start_time;
         this.end_time = end_time;
         this.organization_id = organization_id;
-        this.created_at = created_at;
-        this.updated_at = updated_at;
         this.list_publicly = list_publicly;
         this.approve_join_requests = approve_join_requests;
+        this.updated_at = updated_at;
+        this.created_at = created_at;
     }
 
     /** called by internal mechanisms, do not call yourself. */
@@ -98,6 +98,14 @@ public class Group {
         this.meets = meets;
     }
 
+    public String getMeeting_day() {
+        return meeting_day;
+    }
+
+    public void setMeeting_day(String meeting_day) {
+        this.meeting_day = meeting_day;
+    }
+
     public Integer getStart_time() {
         return start_time;
     }
@@ -122,22 +130,6 @@ public class Group {
         this.organization_id = organization_id;
     }
 
-    public java.util.Date getCreated_at() {
-        return created_at;
-    }
-
-    public void setCreated_at(java.util.Date created_at) {
-        this.created_at = created_at;
-    }
-
-    public java.util.Date getUpdated_at() {
-        return updated_at;
-    }
-
-    public void setUpdated_at(java.util.Date updated_at) {
-        this.updated_at = updated_at;
-    }
-
     public Boolean getList_publicly() {
         return list_publicly;
     }
@@ -152,6 +144,22 @@ public class Group {
 
     public void setApprove_join_requests(Boolean approve_join_requests) {
         this.approve_join_requests = approve_join_requests;
+    }
+
+    public java.util.Date getUpdated_at() {
+        return updated_at;
+    }
+
+    public void setUpdated_at(java.util.Date updated_at) {
+        this.updated_at = updated_at;
+    }
+
+    public java.util.Date getCreated_at() {
+        return created_at;
+    }
+
+    public void setCreated_at(java.util.Date created_at) {
+        this.created_at = created_at;
     }
 
     /** To-one relationship, resolved on first access. */
@@ -171,23 +179,6 @@ public class Group {
         this.organization = organization;
         organization_id = organization == null ? null : organization.getId();
         organization__resolvedKey = organization_id;
-    }
-
-    /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
-    public synchronized List<GroupMembership> getMembers() {
-        if (members == null) {
-            if (daoSession == null) {
-                throw new DaoException("Entity is detached from DAO context");
-            }
-            GroupMembershipDao targetDao = daoSession.getGroupMembershipDao();
-            members = targetDao._queryGroup_Members(id);
-        }
-        return members;
-    }
-
-    /** Resets a to-many relationship, making the next get call to query for a fresh result. */
-    public synchronized void resetMembers() {
-        members = null;
     }
 
     /** Convenient call for {@link AbstractDao#delete(Object)}. Entity must attached to an entity context. */
