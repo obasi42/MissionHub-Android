@@ -1,6 +1,11 @@
+/.checkstyle
 /.classpath
-/bin/
-/local.properties
-/GreenDroid_src
-/proguard
+/.settings
+/bin
 /gen
+/proguard
+/reports
+/target
+/build.number
+/local.properties
+/assets/missionhub.properties

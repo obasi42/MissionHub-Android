@@ -1,18 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<color name="white">#fff</color>
-	<color name="black">#000</color>
-	<color name="transparent">#00000000</color>
-	<color name="opaque_background">#99000000</color>
-	<color name="webview_background">#f0f0f0</color>
-	<color name="light_gray">#CCC</color>
-	<color name="light_gray2">#BBB</color>
-	<color name="comment_status">#666</color>
-	<color name="comment_time">#666</color>
-	<color name="mh_blue">#0379AE</color>
-	<color name="medium_gray">#999</color>
-	<color name="dark_gray">#333</color>
-	
-	<color name="dashboard_label">#fff</color>
-	<color name="dashboard_bottom_bar">#fff</color>
+
+    <color name="background">#FFEEEEEE</color>
+    <color name="well">#FFF5F5F5</color>
+    <color name="well_border">#FFCCCCCC</color>
+    <color name="main_menu_background">#ffEAF1F6</color>
+    <color name="main_menu_divider">#ff0379AE</color>
+    <color name="main_menu_title">#000</color>
+    <color name="main_menu_divider_title">#ff0379AE</color>
+    <color name="red_error">#ff0000</color>
+    <color name="white">#FFF</color>
+    <color name="black">#000</color>
+    <color name="transparent">#00000000</color>
+    <color name="opaque_background">#99000000</color>
+    <color name="blue">#0078AE</color>
+    <color name="light_blue">#1AB4FA</color>
+    <color name="dark_blue">#004361</color>
+    <color name="light_gray">#E6EAED</color>
+    <color name="gray">#838383</color>
+    <color name="dark_gray">#535455</color>
+    <color name="green">#C6DA74</color>
+    <color name="orange">#E3A45A</color>
+
 </resources>

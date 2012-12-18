@@ -1,11 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- The Main Menu Items -->
+    <item name="menu_item_dashboard" type="id"/>
+    <item name="menu_item_my_contacts" type="id"/>
+    <item name="menu_item_all_contacts" type="id"/>
+    <item name="menu_item_surveys" type="id"/>
+    <item name="menu_item_groups" type="id"/>
+    <item name="menu_item_preferences" type="id"/>
+    <item name="menu_item_logout" type="id"/>
+    <item name="menu_item_about" type="id" />
+    <item name="menu_item_help" type="id"/>
+    
+    <!-- Navigation Bar Items -->
+    <item name="menu_item_restart" type="id" />
+    <item name="menu_item_refresh" type="id" />
+    <item name="menu_item_comment" type="id" />
+    <item name="menu_item_assign" type="id" />
+    <item name="menu_item_permissions" type="id" />
+    <item name="menu_item_add_contact" type="id" />
 
-    <resources>
-        <item type="id" name="action_bar_refresh"></item>
-        <item type="id" name="action_bar_search"></item>
-        <item type="id" name="action_bar_logout"></item>
-        <item type="id" name="action_bar_profile"></item>
-        <item type="id" name="action_bar_take_photo"></item>
-        <item type="id" name="action_bar_export"></item>
-        <item type="id" name="action_bar_edit"></item>
-        <item type="id" name="action_bar_save"></item>
-    </resources>
+</resources>

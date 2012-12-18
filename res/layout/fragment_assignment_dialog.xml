@@ -1,0 +1,38 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/fragment_assignment_dialog"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content" >
+
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/progress_container"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:padding="16.0dip"
+        android:visibility="gone" >
+
+        <org.holoeverywhere.widget.ProgressBar
+            android:id="@android:id/progress"
+            style="@style/Holo.ProgressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true" />
+
+        <org.holoeverywhere.widget.TextView
+            android:id="@android:id/text1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="8.0dip"
+            android:layout_toRightOf="@android:id/progress"
+            android:gravity="center_vertical"
+            android:text="@string/assignment_progress" />
+    </RelativeLayout>
+
+    <com.missionhub.ui.widget.LockedViewPager
+        android:id="@+id/pager"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" />
+
+</FrameLayout>
