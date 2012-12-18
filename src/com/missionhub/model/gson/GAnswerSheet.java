@@ -48,6 +48,12 @@ public class GAnswerSheet {
 					sheet.setUpdated_at(U.parseISO8601(updated_at));
 					sheet.setCompleted_at(U.parseISO8601(completed_at));
 
+					if (insert) {
+						dao.insert(sheet);
+					} else {
+						dao.update(sheet);
+					}
+
 					if (answers != null) {
 						for (final GAnswer answer : answers) {
 							answer.save(id, true);
@@ -59,13 +65,6 @@ public class GAnswerSheet {
 						}
 					}
 
-					if (insert) {
-						dao.insert(sheet);
-					} else {
-						dao.update(sheet);
-					}
-
-					dao.insert(sheet);
 					return sheet;
 				}
 			}

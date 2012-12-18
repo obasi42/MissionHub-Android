@@ -63,16 +63,16 @@ public class GFollowupComment {
 					c.setCreated_at(U.parseISO8601(created_at));
 					c.setUpdated_at(U.parseISO8601(updated_at));
 
-					if (rejoicables != null) {
-						for (final GRejoicable rejoicable : rejoicables) {
-							rejoicable.save(contact_id, commenter_id, organization_id, true);
-						}
-					}
-
 					if (insert) {
 						dao.insert(c);
 					} else {
 						dao.update(c);
+					}
+
+					if (rejoicables != null) {
+						for (final GRejoicable rejoicable : rejoicables) {
+							rejoicable.save(contact_id, commenter_id, organization_id, true);
+						}
 					}
 
 					return c;

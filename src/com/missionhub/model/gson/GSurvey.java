@@ -55,6 +55,12 @@ public class GSurvey {
 					survey.setCreated_at(U.parseISO8601(created_at));
 					survey.setUpdated_at(U.parseISO8601(updated_at));
 
+					if (insert) {
+						dao.insert(survey);
+					} else {
+						dao.update(survey);
+					}
+
 					if (questions != null) {
 						for (final GQuestion question : questions) {
 							question.save(true);
@@ -63,12 +69,6 @@ public class GSurvey {
 
 					if (keyword != null) {
 						keyword.save(true);
-					}
-
-					if (insert) {
-						dao.insert(survey);
-					} else {
-						dao.update(survey);
 					}
 
 					return survey;

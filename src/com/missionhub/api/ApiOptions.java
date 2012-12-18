@@ -118,7 +118,7 @@ public class ApiOptions {
 				includes = new HashSet<String>();
 			}
 			if (include instanceof Enum) {
-				((Enum<?>) include).name();
+				includes.add(((Enum<?>) include).name());
 			} else {
 				includes.add(include.toString());
 			}

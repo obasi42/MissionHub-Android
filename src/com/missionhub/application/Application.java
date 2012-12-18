@@ -3,6 +3,8 @@ package com.missionhub.application;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.holoeverywhere.widget.Toast;
+
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -71,6 +73,8 @@ public class Application extends android.app.Application {
 				.imageDownloader(new FacebookImageDownloader()).build();
 
 		ImageLoader.getInstance().init(config);
+
+		registerEventSubscriber(this, ToastEvent.class);
 	}
 
 	/**
@@ -211,5 +215,31 @@ public class Application extends android.app.Application {
 	 */
 	public static ObjectStore getObjectStore() {
 		return mObjectStore;
+	}
+
+	public static void showToast(final int message, final int duration) {
+		showToast(Application.getContext().getString(message), duration);
+	}
+
+	public static void showToast(final String message, final int duration) {
+		Application.postEvent(new ToastEvent(message, duration));
+	}
+
+	public void onEventMainThread(final ToastEvent event) {
+		Toast.makeText(getContext(), event.message, event.duration).show();
+	}
+
+	public static class ToastEvent {
+		public String message;
+		public int duration = Toast.LENGTH_SHORT;
+
+		public ToastEvent(final String message) {
+			this.message = message;
+		}
+
+		public ToastEvent(final String message, final int duration) {
+			this.message = message;
+			this.duration = duration;
+		}
 	}
 }

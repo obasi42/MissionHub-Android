@@ -57,6 +57,12 @@ public class GOrganization {
 					org.setCreated_at(U.parseISO8601(created_at));
 					org.setUpdated_at(U.parseISO8601(updated_at));
 
+					if (insert) {
+						dao.insert(org);
+					} else {
+						dao.update(org);
+					}
+
 					if (contacts != null) {
 						for (final GPerson person : contacts) {
 							person.save(true);
@@ -97,12 +103,6 @@ public class GOrganization {
 						for (final GSmsKeyword keyword : keywords) {
 							keyword.save(true);
 						}
-					}
-
-					if (insert) {
-						dao.insert(org);
-					} else {
-						dao.update(org);
 					}
 
 					return org;

@@ -10,6 +10,7 @@ import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 import android.os.Build;
+import android.util.Log;
 import ch.boye.httpclientandroidlib.client.utils.URIBuilder;
 
 import com.google.gson.Gson;
@@ -439,8 +440,8 @@ public class Api {
 	private static final ApiResponseParser<Person> personParser = new ApiResponseParser<Person>() {
 		@Override
 		public Person parseResponse(final HttpResponse response) throws Exception {
-			final GPerson person = sGson.fromJson(response.responseBody, GPerson.class);
-			return person.save(false);
+			final GPeople people= sGson.fromJson(response.responseBody, GPeople.class);
+			return people.person.save(false);
 		}
 	};
 
@@ -579,6 +580,8 @@ public class Api {
 
 			appendLoggingParams(params);
 			
+			Log.e("API", method.name() + ": " + url);
+			
 			// create the client and get the response
 			final HttpClient client = new HttpClient();
 			client.setResponseType(responseType);
@@ -586,6 +589,8 @@ public class Api {
 			response = future.get();
 			maybeThrowException(response);
 
+			Log.e("API", response.responseBody);
+			
 			return response;
 		} catch (final Exception e) {
 			// we just threw this.. no need to process it again

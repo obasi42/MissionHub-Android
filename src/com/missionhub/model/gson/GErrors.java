@@ -7,9 +7,9 @@ public class GErrors {
 	public String[] errors;
 
 	public ApiException getException() {
-		StringBuffer sb = new StringBuffer();
+		final StringBuffer sb = new StringBuffer();
 		if (errors != null) {
-			for(String error : errors) {
+			for (final String error : errors) {
 				sb.append(error + "\n");
 			}
 		}

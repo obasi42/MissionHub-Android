@@ -5,6 +5,8 @@ import java.util.concurrent.Callable;
 
 import com.google.common.collect.HashMultimap;
 import com.missionhub.application.Application;
+import com.missionhub.application.Session;
+import com.missionhub.model.OrganizationalRoleDao;
 import com.missionhub.model.Person;
 import com.missionhub.model.PersonDao;
 import com.missionhub.network.HttpParams;
@@ -36,6 +38,7 @@ public class GPerson {
 	public GFollowupComment[] followup_comments;
 	public GFollowupComment[] comments_on_me;
 	public GOrganizationalRole[] organizational_roles;
+	public GOrganizationalRole[] all_organizational_roles;
 	public GAddress current_address;
 
 	public Boolean _assignToMe = false; // used by AddContactDialog
@@ -81,6 +84,12 @@ public class GPerson {
 					person.setCreated_at(U.parseISO8601(created_at));
 					person.setUpdated_at(U.parseISO8601(updated_at));
 
+					if (insert) {
+						dao.insert(person);
+					} else {
+						dao.update(person);
+					}
+
 					if (user != null) {
 						user.save(id, true);
 					}
@@ -116,19 +125,23 @@ public class GPerson {
 					}
 
 					if (organizational_roles != null) {
+						Application.getDb().getOrganizationalRoleDao().queryBuilder()
+								.where(OrganizationalRoleDao.Properties.Person_id.eq(id), OrganizationalRoleDao.Properties.Organization_id.eq(Session.getInstance().getOrganizationId())).buildDelete()
+								.executeDeleteWithoutDetachingEntities();
 						for (final GOrganizationalRole role : organizational_roles) {
+							role.save(true);
+						}
+					}
+
+					if (all_organizational_roles != null) {
+						Application.getDb().getOrganizationalRoleDao().queryBuilder().where(OrganizationalRoleDao.Properties.Person_id.eq(id)).buildDelete().executeDeleteWithoutDetachingEntities();
+						for (final GOrganizationalRole role : all_organizational_roles) {
 							role.save(true);
 						}
 					}
 
 					if (current_address != null) {
 						current_address.save(id, true);
-					}
-
-					if (insert) {
-						dao.insert(person);
-					} else {
-						dao.update(person);
 					}
 
 					return person;

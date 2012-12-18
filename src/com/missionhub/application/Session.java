@@ -222,20 +222,14 @@ public class Session implements OnAccountsUpdateListener {
 			public void run() {
 				try {
 					// update the person
-					Application.postEvent(new SessionResumeStatusEvent(Application.getContext().getString(R.string.init_updating_person)));
-
 					if (!Configuration.isSkipSessionUpdate()) {
-						
-						Person p = updatePerson().get();
-						
-						// update the account information
-						mAccountManager.setUserData(mAccount, Authenticator.KEY_PERSON_ID, String.valueOf(p.getId()));
-						mAccountManager.setUserData(mAccount, AccountManager.KEY_ACCOUNT_NAME, p.getName());
-
 						// update the organizations
 						Application.postEvent(new SessionResumeStatusEvent(Application.getContext().getString(R.string.init_updating_orgs)));
 						updateUserOrganizations().get();
-					
+						
+						// update the person
+						Application.postEvent(new SessionResumeStatusEvent(Application.getContext().getString(R.string.init_updating_person)));
+						updatePerson().get();
 					}
 					Application.postEvent(new SessionResumeSuccessEvent());
 				} catch (final Exception e) {
@@ -351,7 +345,7 @@ public class Session implements OnAccountsUpdateListener {
 
 		if (!getPerson().isAdminOrLeader(getOrganizationId())) {
 			setOrganizationId(getPerson().getPrimaryOrganizationId());
-			Toast.makeText(Application.getContext(), Application.getContext().getString(R.string.session_no_longer_admin), Toast.LENGTH_LONG).show();
+			Application.showToast(R.string.session_no_longer_admin, Toast.LENGTH_LONG);
 		}
 	}
 
@@ -367,7 +361,7 @@ public class Session implements OnAccountsUpdateListener {
 			SettingsManager.setSessionOrganizationId(getPersonId(), mOrganizationId);
 			Application.postEvent(new SessionOrganizationIdChanged(organizationId));
 		} else {
-			Toast.makeText(Application.getContext(), Application.getContext().getString(R.string.session_not_admin), Toast.LENGTH_LONG).show();
+			Application.showToast(R.string.session_not_admin, Toast.LENGTH_LONG);
 		}
 	}
 

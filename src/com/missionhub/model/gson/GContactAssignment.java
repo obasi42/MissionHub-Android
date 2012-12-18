@@ -38,7 +38,7 @@ public class GContactAssignment {
 					final ContactAssignmentDao dao = Application.getDb().getContactAssignmentDao();
 
 					ContactAssignment assignment = dao.load(id);
-					
+
 					if (deleted_at != null) {
 						if (assignment != null) {
 							assignment.delete();
@@ -58,17 +58,17 @@ public class GContactAssignment {
 					assignment.setCreated_at(U.parseISO8601(created_at));
 					assignment.setUpdated_at(U.parseISO8601(updated_at));
 
+					if (insert) {
+						dao.insert(assignment);
+					} else {
+						dao.update(assignment);
+					}
+
 					if (assigned_to != null) {
 						assigned_to.save(true);
 					}
 					if (person != null) {
 						person.save(true);
-					}
-
-					if (insert) {
-						dao.insert(assignment);
-					} else {
-						dao.update(assignment);
 					}
 
 					return assignment;
