@@ -1,5 +1,7 @@
 package com.missionhub.model;
 
+import java.util.List;
+import java.util.ArrayList;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
@@ -7,6 +9,7 @@ import android.database.sqlite.SQLiteStatement;
 import de.greenrobot.dao.AbstractDao;
 import de.greenrobot.dao.DaoConfig;
 import de.greenrobot.dao.Property;
+import de.greenrobot.dao.SqlUtils;
 
 import com.missionhub.model.Person;
 
@@ -24,18 +27,21 @@ public class PersonDao extends AbstractDao<Person, Long> {
     */
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
-        public final static Property Name = new Property(1, String.class, "name", false, "NAME");
-        public final static Property Gender = new Property(2, String.class, "gender", false, "GENDER");
-        public final static Property Fb_id = new Property(3, String.class, "fb_id", false, "FB_ID");
-        public final static Property Picture = new Property(4, String.class, "picture", false, "PICTURE");
-        public final static Property Status = new Property(5, String.class, "status", false, "STATUS");
-        public final static Property First_name = new Property(6, String.class, "first_name", false, "FIRST_NAME");
-        public final static Property Last_name = new Property(7, String.class, "last_name", false, "LAST_NAME");
-        public final static Property Phone_number = new Property(8, String.class, "phone_number", false, "PHONE_NUMBER");
-        public final static Property Email_address = new Property(9, String.class, "email_address", false, "EMAIL_ADDRESS");
-        public final static Property Birthday = new Property(10, String.class, "birthday", false, "BIRTHDAY");
-        public final static Property Locale = new Property(11, String.class, "locale", false, "LOCALE");
-        public final static Property Num_contacts = new Property(12, String.class, "num_contacts", false, "NUM_CONTACTS");
+        public final static Property First_name = new Property(1, String.class, "first_name", false, "FIRST_NAME");
+        public final static Property Last_name = new Property(2, String.class, "last_name", false, "LAST_NAME");
+        public final static Property Gender = new Property(3, String.class, "gender", false, "GENDER");
+        public final static Property Campus = new Property(4, String.class, "campus", false, "CAMPUS");
+        public final static Property Year_in_school = new Property(5, String.class, "year_in_school", false, "YEAR_IN_SCHOOL");
+        public final static Property Major = new Property(6, String.class, "major", false, "MAJOR");
+        public final static Property Minor = new Property(7, String.class, "minor", false, "MINOR");
+        public final static Property Birth_date = new Property(8, java.util.Date.class, "birth_date", false, "BIRTH_DATE");
+        public final static Property Date_became_christian = new Property(9, java.util.Date.class, "date_became_christian", false, "DATE_BECAME_CHRISTIAN");
+        public final static Property Graduation_date = new Property(10, java.util.Date.class, "graduation_date", false, "GRADUATION_DATE");
+        public final static Property Picture = new Property(11, String.class, "picture", false, "PICTURE");
+        public final static Property User_id = new Property(12, Long.class, "user_id", false, "USER_ID");
+        public final static Property Fb_uid = new Property(13, Long.class, "fb_uid", false, "FB_UID");
+        public final static Property Updated_at = new Property(14, java.util.Date.class, "updated_at", false, "UPDATED_AT");
+        public final static Property Created_at = new Property(15, java.util.Date.class, "created_at", false, "CREATED_AT");
     };
 
     private DaoSession daoSession;
@@ -55,18 +61,21 @@ public class PersonDao extends AbstractDao<Person, Long> {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "'PERSON' (" + //
                 "'_id' INTEGER PRIMARY KEY ," + // 0: id
-                "'NAME' TEXT," + // 1: name
-                "'GENDER' TEXT," + // 2: gender
-                "'FB_ID' TEXT," + // 3: fb_id
-                "'PICTURE' TEXT," + // 4: picture
-                "'STATUS' TEXT," + // 5: status
-                "'FIRST_NAME' TEXT," + // 6: first_name
-                "'LAST_NAME' TEXT," + // 7: last_name
-                "'PHONE_NUMBER' TEXT," + // 8: phone_number
-                "'EMAIL_ADDRESS' TEXT," + // 9: email_address
-                "'BIRTHDAY' TEXT," + // 10: birthday
-                "'LOCALE' TEXT," + // 11: locale
-                "'NUM_CONTACTS' TEXT);"); // 12: num_contacts
+                "'FIRST_NAME' TEXT," + // 1: first_name
+                "'LAST_NAME' TEXT," + // 2: last_name
+                "'GENDER' TEXT," + // 3: gender
+                "'CAMPUS' TEXT," + // 4: campus
+                "'YEAR_IN_SCHOOL' TEXT," + // 5: year_in_school
+                "'MAJOR' TEXT," + // 6: major
+                "'MINOR' TEXT," + // 7: minor
+                "'BIRTH_DATE' INTEGER," + // 8: birth_date
+                "'DATE_BECAME_CHRISTIAN' INTEGER," + // 9: date_became_christian
+                "'GRADUATION_DATE' INTEGER," + // 10: graduation_date
+                "'PICTURE' TEXT," + // 11: picture
+                "'USER_ID' INTEGER," + // 12: user_id
+                "'FB_UID' INTEGER," + // 13: fb_uid
+                "'UPDATED_AT' INTEGER," + // 14: updated_at
+                "'CREATED_AT' INTEGER);"); // 15: created_at
     }
 
     /** Drops the underlying database table. */
@@ -85,64 +94,79 @@ public class PersonDao extends AbstractDao<Person, Long> {
             stmt.bindLong(1, id);
         }
  
-        String name = entity.getName();
-        if (name != null) {
-            stmt.bindString(2, name);
-        }
- 
-        String gender = entity.getGender();
-        if (gender != null) {
-            stmt.bindString(3, gender);
-        }
- 
-        String fb_id = entity.getFb_id();
-        if (fb_id != null) {
-            stmt.bindString(4, fb_id);
-        }
- 
-        String picture = entity.getPicture();
-        if (picture != null) {
-            stmt.bindString(5, picture);
-        }
- 
-        String status = entity.getStatus();
-        if (status != null) {
-            stmt.bindString(6, status);
-        }
- 
         String first_name = entity.getFirst_name();
         if (first_name != null) {
-            stmt.bindString(7, first_name);
+            stmt.bindString(2, first_name);
         }
  
         String last_name = entity.getLast_name();
         if (last_name != null) {
-            stmt.bindString(8, last_name);
+            stmt.bindString(3, last_name);
         }
  
-        String phone_number = entity.getPhone_number();
-        if (phone_number != null) {
-            stmt.bindString(9, phone_number);
+        String gender = entity.getGender();
+        if (gender != null) {
+            stmt.bindString(4, gender);
         }
  
-        String email_address = entity.getEmail_address();
-        if (email_address != null) {
-            stmt.bindString(10, email_address);
+        String campus = entity.getCampus();
+        if (campus != null) {
+            stmt.bindString(5, campus);
         }
  
-        String birthday = entity.getBirthday();
-        if (birthday != null) {
-            stmt.bindString(11, birthday);
+        String year_in_school = entity.getYear_in_school();
+        if (year_in_school != null) {
+            stmt.bindString(6, year_in_school);
         }
  
-        String locale = entity.getLocale();
-        if (locale != null) {
-            stmt.bindString(12, locale);
+        String major = entity.getMajor();
+        if (major != null) {
+            stmt.bindString(7, major);
         }
  
-        String num_contacts = entity.getNum_contacts();
-        if (num_contacts != null) {
-            stmt.bindString(13, num_contacts);
+        String minor = entity.getMinor();
+        if (minor != null) {
+            stmt.bindString(8, minor);
+        }
+ 
+        java.util.Date birth_date = entity.getBirth_date();
+        if (birth_date != null) {
+            stmt.bindLong(9, birth_date.getTime());
+        }
+ 
+        java.util.Date date_became_christian = entity.getDate_became_christian();
+        if (date_became_christian != null) {
+            stmt.bindLong(10, date_became_christian.getTime());
+        }
+ 
+        java.util.Date graduation_date = entity.getGraduation_date();
+        if (graduation_date != null) {
+            stmt.bindLong(11, graduation_date.getTime());
+        }
+ 
+        String picture = entity.getPicture();
+        if (picture != null) {
+            stmt.bindString(12, picture);
+        }
+ 
+        Long user_id = entity.getUser_id();
+        if (user_id != null) {
+            stmt.bindLong(13, user_id);
+        }
+ 
+        Long fb_uid = entity.getFb_uid();
+        if (fb_uid != null) {
+            stmt.bindLong(14, fb_uid);
+        }
+ 
+        java.util.Date updated_at = entity.getUpdated_at();
+        if (updated_at != null) {
+            stmt.bindLong(15, updated_at.getTime());
+        }
+ 
+        java.util.Date created_at = entity.getCreated_at();
+        if (created_at != null) {
+            stmt.bindLong(16, created_at.getTime());
         }
     }
 
@@ -163,18 +187,21 @@ public class PersonDao extends AbstractDao<Person, Long> {
     public Person readEntity(Cursor cursor, int offset) {
         Person entity = new Person( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
-            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // name
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // gender
-            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // fb_id
-            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // picture
-            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // status
-            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // first_name
-            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // last_name
-            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // phone_number
-            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // email_address
-            cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // birthday
-            cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11), // locale
-            cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12) // num_contacts
+            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // first_name
+            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // last_name
+            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // gender
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // campus
+            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // year_in_school
+            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // major
+            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // minor
+            cursor.isNull(offset + 8) ? null : new java.util.Date(cursor.getLong(offset + 8)), // birth_date
+            cursor.isNull(offset + 9) ? null : new java.util.Date(cursor.getLong(offset + 9)), // date_became_christian
+            cursor.isNull(offset + 10) ? null : new java.util.Date(cursor.getLong(offset + 10)), // graduation_date
+            cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11), // picture
+            cursor.isNull(offset + 12) ? null : cursor.getLong(offset + 12), // user_id
+            cursor.isNull(offset + 13) ? null : cursor.getLong(offset + 13), // fb_uid
+            cursor.isNull(offset + 14) ? null : new java.util.Date(cursor.getLong(offset + 14)), // updated_at
+            cursor.isNull(offset + 15) ? null : new java.util.Date(cursor.getLong(offset + 15)) // created_at
         );
         return entity;
     }
@@ -183,18 +210,21 @@ public class PersonDao extends AbstractDao<Person, Long> {
     @Override
     public void readEntity(Cursor cursor, Person entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
-        entity.setName(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
-        entity.setGender(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
-        entity.setFb_id(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
-        entity.setPicture(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
-        entity.setStatus(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
-        entity.setFirst_name(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
-        entity.setLast_name(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
-        entity.setPhone_number(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
-        entity.setEmail_address(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
-        entity.setBirthday(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
-        entity.setLocale(cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11));
-        entity.setNum_contacts(cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12));
+        entity.setFirst_name(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
+        entity.setLast_name(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
+        entity.setGender(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
+        entity.setCampus(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
+        entity.setYear_in_school(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
+        entity.setMajor(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
+        entity.setMinor(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
+        entity.setBirth_date(cursor.isNull(offset + 8) ? null : new java.util.Date(cursor.getLong(offset + 8)));
+        entity.setDate_became_christian(cursor.isNull(offset + 9) ? null : new java.util.Date(cursor.getLong(offset + 9)));
+        entity.setGraduation_date(cursor.isNull(offset + 10) ? null : new java.util.Date(cursor.getLong(offset + 10)));
+        entity.setPicture(cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11));
+        entity.setUser_id(cursor.isNull(offset + 12) ? null : cursor.getLong(offset + 12));
+        entity.setFb_uid(cursor.isNull(offset + 13) ? null : cursor.getLong(offset + 13));
+        entity.setUpdated_at(cursor.isNull(offset + 14) ? null : new java.util.Date(cursor.getLong(offset + 14)));
+        entity.setCreated_at(cursor.isNull(offset + 15) ? null : new java.util.Date(cursor.getLong(offset + 15)));
      }
     
     /** @inheritdoc */
@@ -220,4 +250,95 @@ public class PersonDao extends AbstractDao<Person, Long> {
         return true;
     }
     
+    private String selectDeep;
+
+    protected String getSelectDeep() {
+        if (selectDeep == null) {
+            StringBuilder builder = new StringBuilder("SELECT ");
+            SqlUtils.appendColumns(builder, "T", getAllColumns());
+            builder.append(',');
+            SqlUtils.appendColumns(builder, "T0", daoSession.getUserDao().getAllColumns());
+            builder.append(" FROM PERSON T");
+            builder.append(" LEFT JOIN USER T0 ON T.'USER_ID'=T0.'_id'");
+            builder.append(' ');
+            selectDeep = builder.toString();
+        }
+        return selectDeep;
+    }
+    
+    protected Person loadCurrentDeep(Cursor cursor, boolean lock) {
+        Person entity = loadCurrent(cursor, 0, lock);
+        int offset = getAllColumns().length;
+
+        User user = loadCurrentOther(daoSession.getUserDao(), cursor, offset);
+        entity.setUser(user);
+
+        return entity;    
+    }
+
+    public Person loadDeep(Long key) {
+        assertSinglePk();
+        if (key == null) {
+            return null;
+        }
+
+        StringBuilder builder = new StringBuilder(getSelectDeep());
+        builder.append("WHERE ");
+        SqlUtils.appendColumnsEqValue(builder, "T", getPkColumns());
+        String sql = builder.toString();
+        
+        String[] keyArray = new String[] { key.toString() };
+        Cursor cursor = db.rawQuery(sql, keyArray);
+        
+        try {
+            boolean available = cursor.moveToFirst();
+            if (!available) {
+                return null;
+            } else if (!cursor.isLast()) {
+                throw new IllegalStateException("Expected unique result, but count was " + cursor.getCount());
+            }
+            return loadCurrentDeep(cursor, true);
+        } finally {
+            cursor.close();
+        }
+    }
+    
+    /** Reads all available rows from the given cursor and returns a list of new ImageTO objects. */
+    public List<Person> loadAllDeepFromCursor(Cursor cursor) {
+        int count = cursor.getCount();
+        List<Person> list = new ArrayList<Person>(count);
+        
+        if (cursor.moveToFirst()) {
+            if (identityScope != null) {
+                identityScope.lock();
+                identityScope.reserveRoom(count);
+            }
+            try {
+                do {
+                    list.add(loadCurrentDeep(cursor, false));
+                } while (cursor.moveToNext());
+            } finally {
+                if (identityScope != null) {
+                    identityScope.unlock();
+                }
+            }
+        }
+        return list;
+    }
+    
+    protected List<Person> loadDeepAllAndCloseCursor(Cursor cursor) {
+        try {
+            return loadAllDeepFromCursor(cursor);
+        } finally {
+            cursor.close();
+        }
+    }
+    
+
+    /** A raw-style query where you can pass any WHERE clause and arguments. */
+    public List<Person> queryDeep(String where, String... selectionArg) {
+        Cursor cursor = db.rawQuery(getSelectDeep() + where, selectionArg);
+        return loadDeepAllAndCloseCursor(cursor);
+    }
+ 
 }

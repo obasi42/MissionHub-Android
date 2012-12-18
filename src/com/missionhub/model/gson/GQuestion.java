@@ -1,11 +1,80 @@
 package com.missionhub.model.gson;
 
+import java.util.concurrent.Callable;
+
+import com.missionhub.application.Application;
+import com.missionhub.model.Question;
+import com.missionhub.model.QuestionDao;
+import com.missionhub.util.U;
+
 public class GQuestion {
+
 	public long id;
-	public String label;
-	public String style;
 	public String kind;
-	public String required;
-	public String[] choices;
-	public String active;
+	public String style;
+	public String label;
+	public String content;
+	public String object_name;
+	public String attribute_name;
+	public Boolean web_only;
+	public String trigger_words;
+	public String notify_via;
+	public Boolean hidden;
+	public String created_at;
+	public String updated_at;
+
+	public static final Object lock = new Object();
+
+	/**
+	 * Saves the question to the SQLite database.
+	 * 
+	 * @param inTx
+	 * @return
+	 * @throws Exception
+	 */
+	public Question save(final boolean inTx) throws Exception {
+		final Callable<Question> callable = new Callable<Question>() {
+			@Override
+			public Question call() throws Exception {
+				synchronized (lock) {
+					final QuestionDao dao = Application.getDb().getQuestionDao();
+
+					Question question = dao.load(id);
+
+					boolean insert = false;
+					if (question == null) {
+						question = new Question();
+						insert = true;
+					}
+					question.setId(id);
+					question.setKind(kind);
+					question.setStyle(style);
+					question.setLabel(label);
+					question.setContent(content);
+					question.setObject_name(object_name);
+					question.setAttribute_name(attribute_name);
+					question.setWeb_only(web_only);
+					question.setTrigger_words(trigger_words);
+					question.setNotify_via(notify_via);
+					question.setHidden(hidden);
+					question.setCreated_at(U.parseISO8601(created_at));
+					question.setUpdated_at(U.parseISO8601(updated_at));
+
+					if (insert) {
+						dao.insert(question);
+					} else {
+						dao.update(question);
+					}
+
+					return question;
+				}
+			}
+		};
+		if (inTx) {
+			return callable.call();
+		} else {
+			return Application.getDb().callInTx(callable);
+		}
+	}
+
 }

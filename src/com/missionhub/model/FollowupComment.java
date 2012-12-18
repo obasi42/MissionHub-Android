@@ -19,15 +19,23 @@ public class FollowupComment {
     private Long organization_id;
     private String comment;
     private String status;
-    private java.util.Date created_at;
     private java.util.Date updated_at;
-    private java.util.Date deleted_at;
+    private java.util.Date created_at;
 
     /** Used to resolve relations */
     private transient DaoSession daoSession;
 
     /** Used for active entity operations. */
     private transient FollowupCommentDao myDao;
+
+    private Person contact;
+    private Long contact__resolvedKey;
+
+    private Person commenter;
+    private Long commenter__resolvedKey;
+
+    private Organization organization;
+    private Long organization__resolvedKey;
 
     private List<Rejoicable> rejoicables;
 
@@ -41,16 +49,15 @@ public class FollowupComment {
         this.id = id;
     }
 
-    public FollowupComment(Long id, Long contact_id, Long commenter_id, Long organization_id, String comment, String status, java.util.Date created_at, java.util.Date updated_at, java.util.Date deleted_at) {
+    public FollowupComment(Long id, Long contact_id, Long commenter_id, Long organization_id, String comment, String status, java.util.Date updated_at, java.util.Date created_at) {
         this.id = id;
         this.contact_id = contact_id;
         this.commenter_id = commenter_id;
         this.organization_id = organization_id;
         this.comment = comment;
         this.status = status;
-        this.created_at = created_at;
         this.updated_at = updated_at;
-        this.deleted_at = deleted_at;
+        this.created_at = created_at;
     }
 
     /** called by internal mechanisms, do not call yourself. */
@@ -107,14 +114,6 @@ public class FollowupComment {
         this.status = status;
     }
 
-    public java.util.Date getCreated_at() {
-        return created_at;
-    }
-
-    public void setCreated_at(java.util.Date created_at) {
-        this.created_at = created_at;
-    }
-
     public java.util.Date getUpdated_at() {
         return updated_at;
     }
@@ -123,12 +122,69 @@ public class FollowupComment {
         this.updated_at = updated_at;
     }
 
-    public java.util.Date getDeleted_at() {
-        return deleted_at;
+    public java.util.Date getCreated_at() {
+        return created_at;
     }
 
-    public void setDeleted_at(java.util.Date deleted_at) {
-        this.deleted_at = deleted_at;
+    public void setCreated_at(java.util.Date created_at) {
+        this.created_at = created_at;
+    }
+
+    /** To-one relationship, resolved on first access. */
+    public Person getContact() {
+        if (contact__resolvedKey == null || !contact__resolvedKey.equals(contact_id)) {
+            if (daoSession == null) {
+                throw new DaoException("Entity is detached from DAO context");
+            }
+            PersonDao targetDao = daoSession.getPersonDao();
+            contact = targetDao.load(contact_id);
+            contact__resolvedKey = contact_id;
+        }
+        return contact;
+    }
+
+    public void setContact(Person contact) {
+        this.contact = contact;
+        contact_id = contact == null ? null : contact.getId();
+        contact__resolvedKey = contact_id;
+    }
+
+    /** To-one relationship, resolved on first access. */
+    public Person getCommenter() {
+        if (commenter__resolvedKey == null || !commenter__resolvedKey.equals(commenter_id)) {
+            if (daoSession == null) {
+                throw new DaoException("Entity is detached from DAO context");
+            }
+            PersonDao targetDao = daoSession.getPersonDao();
+            commenter = targetDao.load(commenter_id);
+            commenter__resolvedKey = commenter_id;
+        }
+        return commenter;
+    }
+
+    public void setCommenter(Person commenter) {
+        this.commenter = commenter;
+        commenter_id = commenter == null ? null : commenter.getId();
+        commenter__resolvedKey = commenter_id;
+    }
+
+    /** To-one relationship, resolved on first access. */
+    public Organization getOrganization() {
+        if (organization__resolvedKey == null || !organization__resolvedKey.equals(organization_id)) {
+            if (daoSession == null) {
+                throw new DaoException("Entity is detached from DAO context");
+            }
+            OrganizationDao targetDao = daoSession.getOrganizationDao();
+            organization = targetDao.load(organization_id);
+            organization__resolvedKey = organization_id;
+        }
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
+        organization_id = organization == null ? null : organization.getId();
+        organization__resolvedKey = organization_id;
     }
 
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
@@ -173,6 +229,14 @@ public class FollowupComment {
     }
 
     // KEEP METHODS - put your custom methods here
+
+	public void deleteWithRelations() {
+		if (daoSession == null) {
+            throw new DaoException("Entity is detached from DAO context");
+        }
+		daoSession.getRejoicableDao().queryBuilder().where(RejoicableDao.Properties.Followup_comment_id.eq(getId())).buildDelete().executeDeleteWithoutDetachingEntities();
+		delete();
+	}
     // KEEP METHODS END
 
 }

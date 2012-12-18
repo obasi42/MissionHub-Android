@@ -113,35 +113,41 @@ public class ContactListAdapter extends ObjectArrayAdapter {
 				}
 
 				if (holder.status != null) {
-					if (!U.isNullEmpty(item.person.getStatus())) {
-						holder.status.setText(U.translateStatus(item.person.getStatus()));
-					} else {
-						holder.status.setText("");
-					}
+					//TODO: show status
+//					if (!U.isNullEmpty(item.person.getStatus())) {
+//						holder.status.setText(U.translateStatus(item.person.getStatus()));
+//					} else {
+//						holder.status.setText("");
+//					}
 				}
 
 				if (holder.gender != null) {
-					if (!U.isNullEmpty(item.person.getGender())) {
-						holder.gender.setText(U.translateStatus(item.person.getGender()));
-					} else {
-						holder.gender.setText("");
-					}
+					//TODO: show gender
+//					if (!U.isNullEmpty(item.person.getGender())) {
+//						holder.gender.setText(U.translateStatus(item.person.getGender()));
+//					} else {
+//						holder.gender.setText("");
+//					}
 				}
 
 				if (holder.email != null) {
-					if (!U.isNullEmpty(item.person.getEmail_address())) {
-						holder.email.setText(U.translateStatus(item.person.getEmail_address()));
-					} else {
-						holder.email.setText("");
-					}
+					item.person.getEmailAddressList();
+					// TODO: show email address
+//					
+//					if (!U.isNullEmpty(item.person.getEmail_address())) {
+//						holder.email.setText(U.translateStatus(item.person.getEmail_address()));
+//					} else {
+//						holder.email.setText("");
+//					}
 				}
 
 				if (holder.phone != null) {
-					if (!U.isNullEmpty(item.person.getPhone_number())) {
-						holder.phone.setText(U.translateStatus(item.person.getPhone_number()));
-					} else {
-						holder.phone.setText("");
-					}
+					//TODO: show phone number
+//					if (!U.isNullEmpty(item.person.getPhone_number())) {
+//						holder.phone.setText(U.translateStatus(item.person.getPhone_number()));
+//					} else {
+//						holder.phone.setText("");
+//					}
 				}
 			}
 		} else if (object instanceof ProgressItem) {

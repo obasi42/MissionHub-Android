@@ -1,6 +1,8 @@
 package com.missionhub.application;
 
 import java.io.IOException;
+import java.util.concurrent.Callable;
+import java.util.concurrent.FutureTask;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.holoeverywhere.widget.Toast;
@@ -13,6 +15,7 @@ import android.accounts.OperationCanceledException;
 
 import com.missionhub.R;
 import com.missionhub.api.Api;
+import com.missionhub.api.ApiOptions;
 import com.missionhub.authenticator.Authenticator;
 import com.missionhub.exception.MissionHubException;
 import com.missionhub.model.Person;
@@ -40,14 +43,14 @@ public class Session implements OnAccountsUpdateListener {
 	/** the account being used */
 	private Account mAccount;
 
-	/** true if updating the user's organizations */
-	private final AtomicBoolean mUpdatingPerson = new AtomicBoolean(false);
+	/** true while resuming the user's session */
+	private final AtomicBoolean mResuming = new AtomicBoolean();
 
-	/** true if updating the user's organizations */
-	private final AtomicBoolean mUpdatingOrganizations = new AtomicBoolean(false);
+	/** task used to update the current person data */
+	private FutureTask<Person> mUpdatePersonTask;
 
-	/** true if the session is being refreshed */
-	private final AtomicBoolean mResuming = new AtomicBoolean(false);
+	/** task used to update organizations */
+	private FutureTask<Void> mUpdateOrganizationsTask;
 
 	/**
 	 * Creates a new session object and sets up the account manager
@@ -119,61 +122,69 @@ public class Session implements OnAccountsUpdateListener {
 	}
 
 	/**
-	 * Updates the person from the MissionHub Server Posts SessionUpdatePersonEvent SSEF events
+	 * Updates the person from the MissionHub Server Posts SessionUpdatePersonEvent
 	 */
-	public void updatePerson() {
-		if (mUpdatingPerson.get()) return;
-		mUpdatingPerson.set(true);
+	public FutureTask<Person> updatePerson() {
+		if (mUpdatePersonTask != null) return mUpdatePersonTask;
 
-		Application.postEvent(new SessionUpdatePersonStartedEvent());
-
-		final Runnable runnable = new Runnable() {
+		final Callable<Person> callable = new Callable<Person>() {
 			@Override
-			public void run() {
-				try {
-					final Person p = Api.getPersonMe().get();
+			public Person call() throws Exception {
+				Person person = Api.getPersonMe(ApiOptions.builder() //
+						.include(Api.Include.all_organizational_roles) //
+						.include(Api.Include.answer_sheets) //
+						.include(Api.Include.answers) //
+						.include(Api.Include.contact_assignments) //
+						.include(Api.Include.email_addresses) //
+						.include(Api.Include.phone_numbers) //
+						.include(Api.Include.current_address) //
+						.include(Api.Include.comments_on_me) //
+						.include(Api.Include.user) //
+						.build()).get(); //
 
-					updateLabels();
+				mPerson.refresh();
 
-					// update the account with new data to keep it fresh
-					mAccountManager.setUserData(mAccount, Authenticator.KEY_PERSON_ID, String.valueOf(p.getId()));
-					mAccountManager.setUserData(mAccount, AccountManager.KEY_ACCOUNT_NAME, p.getName());
+				updateLabels();
 
-					Application.postEvent(new SessionUpdatePersonSuccessEvent());
-				} catch (final Exception e) {
-					Application.postEvent(new SessionUpdatePersonErrorEvent(e));
-				}
-				mUpdatingPerson.set(false);
-				Application.postEvent(new SessionUpdatePersonFinishedEvent());
+				// update the account with new data to keep it fresh
+				mAccountManager.setUserData(mAccount, Authenticator.KEY_PERSON_ID, String.valueOf(mPerson.getId()));
+				mAccountManager.setUserData(mAccount, AccountManager.KEY_ACCOUNT_NAME, mPerson.getName());
+
+				mUpdatePersonTask = null;
+				
+				return person;
 			}
 		};
-		Application.getExecutor().submit(runnable);
+
+		mUpdatePersonTask = new FutureTask<Person>(callable);
+		Application.getExecutor().submit(mUpdatePersonTask);
+		return mUpdatePersonTask;
 	}
 
 	/**
-	 * Updates the user's organization data from the MissionHub Server Posts SessionUpdatePersonEvent SSEF events
+	 * Updates the basic organization data the user has access to
 	 */
-	public void updateOrganizations() {
-		if (mUpdatingOrganizations.get()) return;
-		mUpdatingOrganizations.set(true);
-
-		Application.postEvent(new SessionUpdateOrganizationsStartedEvent());
-
-		final Runnable runnable = new Runnable() {
+	public FutureTask<Void> updateUserOrganizations() {
+		if (mUpdateOrganizationsTask != null) return mUpdateOrganizationsTask;
+		final Callable<Void> callable = new Callable<Void>() {
 			@Override
-			public void run() {
-				try {
-					Api.getOrganizations(null).get();
-					getPerson().resetOrganizationHierarchy();
-					Application.postEvent(new SessionUpdateOrganizationsSuccessEvent());
-				} catch (final Exception e) {
-					Application.postEvent(new SessionUpdateOrganizationsErrorEvent(e));
-				}
-				mUpdatingOrganizations.set(false);
-				Application.postEvent(new SessionUpdateOrganizationsFinishedEvent());
+			public Void call() throws Exception {
+
+				final long lastUpdated = Long.parseLong(SettingsManager.getInstance().getUserSetting(mPersonId, "organizations_last_updated", "0"));
+				SettingsManager.getInstance().setUserSetting(mPersonId, "organizations_last_updated", System.currentTimeMillis() - 1000);
+
+				Api.listOrganizations(ApiOptions.builder().since(lastUpdated).build()).get();
+
+				getPerson().resetOrganizationHierarchy();
+
+				mUpdateOrganizationsTask = null;
+				return null;
 			}
 		};
-		Application.getExecutor().submit(runnable);
+
+		mUpdateOrganizationsTask = new FutureTask<Void>(callable);
+		Application.getExecutor().submit(mUpdateOrganizationsTask);
+		return mUpdateOrganizationsTask;
 	}
 
 	/**
@@ -214,20 +225,18 @@ public class Session implements OnAccountsUpdateListener {
 					Application.postEvent(new SessionResumeStatusEvent(Application.getContext().getString(R.string.init_updating_person)));
 
 					if (!Configuration.isSkipSessionUpdate()) {
-						final Person p = Api.getPersonMe().get();
-
+						
+						Person p = updatePerson().get();
+						
 						// update the account information
 						mAccountManager.setUserData(mAccount, Authenticator.KEY_PERSON_ID, String.valueOf(p.getId()));
 						mAccountManager.setUserData(mAccount, AccountManager.KEY_ACCOUNT_NAME, p.getName());
 
 						// update the organizations
 						Application.postEvent(new SessionResumeStatusEvent(Application.getContext().getString(R.string.init_updating_orgs)));
-						Api.getOrganizations(null).get();
+						updateUserOrganizations().get();
+					
 					}
-
-					updateLabels();
-					getPerson().resetOrganizationHierarchy();
-
 					Application.postEvent(new SessionResumeSuccessEvent());
 				} catch (final Exception e) {
 					Application.postEvent(new SessionResumeErrorEvent(e));
@@ -368,40 +377,6 @@ public class Session implements OnAccountsUpdateListener {
 
 	/** base type for all events relating to the user session */
 	public static class SessionEvent {}
-
-	/* events posted from updatePerson() */
-	public static class SessionUpdatePersonEvent extends SessionEvent {}
-
-	public static class SessionUpdatePersonStartedEvent extends SessionUpdatePersonEvent {}
-
-	public static class SessionUpdatePersonFinishedEvent extends SessionUpdatePersonEvent {}
-
-	public static class SessionUpdatePersonSuccessEvent extends SessionUpdatePersonEvent {}
-
-	public static class SessionUpdatePersonErrorEvent extends SessionUpdatePersonEvent {
-		public Exception exception;
-
-		public SessionUpdatePersonErrorEvent(final Exception e) {
-			exception = e;
-		}
-	}
-
-	/* events posted from updateOrganizations() */
-	public static class SessionUpdateOrganizationsEvent extends SessionEvent {}
-
-	public static class SessionUpdateOrganizationsStartedEvent extends SessionUpdateOrganizationsEvent {}
-
-	public static class SessionUpdateOrganizationsFinishedEvent extends SessionUpdateOrganizationsEvent {}
-
-	public static class SessionUpdateOrganizationsSuccessEvent extends SessionUpdateOrganizationsEvent {}
-
-	public static class SessionUpdateOrganizationsErrorEvent extends SessionUpdateOrganizationsEvent {
-		public Exception exception;
-
-		public SessionUpdateOrganizationsErrorEvent(final Exception e) {
-			exception = e;
-		}
-	}
 
 	/* events posted from resumeSession() */
 	public static class SessionResumeEvent extends SessionEvent {}

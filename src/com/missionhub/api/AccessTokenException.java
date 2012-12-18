@@ -1,5 +1,7 @@
 package com.missionhub.api;
 
+import com.missionhub.model.gson.GErrorsDepreciated;
+
 public class AccessTokenException extends ApiException {
 
 	private static final long serialVersionUID = 1L;
@@ -8,7 +10,7 @@ public class AccessTokenException extends ApiException {
 		super(cause);
 	}
 
-	public AccessTokenException(final ApiErrorGson error) {
+	public AccessTokenException(final GErrorsDepreciated error) {
 		super(error);
 	}
 

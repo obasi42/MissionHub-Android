@@ -34,14 +34,15 @@ import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.missionhub.R;
 import com.missionhub.api.Api;
-import com.missionhub.api.ApiErrorGson;
 import com.missionhub.application.Application;
 import com.missionhub.application.Configuration;
 import com.missionhub.application.SettingsManager;
 import com.missionhub.exception.ExceptionHelper;
 import com.missionhub.exception.ExceptionHelper.DialogButton;
 import com.missionhub.exception.WebViewException;
-import com.missionhub.model.gson.GAuthTokenDone;
+import com.missionhub.model.Person;
+import com.missionhub.model.gson.GAccessToken;
+import com.missionhub.model.gson.GErrorsDepreciated;
 import com.missionhub.util.U;
 
 /**
@@ -70,7 +71,7 @@ public class AuthenticatorActivity extends RoboSherlockAccountAuthenticatorActiv
 	@InjectView(R.id.progress_text) private TextView mProgressText;
 
 	/** holds the task that fetches the access token and adds the system account */
-	private FutureTask<GAuthTokenDone> mAuthTask;
+	private FutureTask<GAccessToken> mAuthTask;
 
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
@@ -152,7 +153,7 @@ public class AuthenticatorActivity extends RoboSherlockAccountAuthenticatorActiv
 				if (!U.isNullEmpty(uri.getQueryParameter("error"))) {
 					try {
 						final Gson gson = new Gson();
-						final ApiErrorGson error = gson.fromJson(URLDecoder.decode(uri.getQueryParameter("error_description"), "UTF-8"), ApiErrorGson.class);
+						final GErrorsDepreciated error = gson.fromJson(URLDecoder.decode(uri.getQueryParameter("error_description"), "UTF-8"), GErrorsDepreciated.class);
 						onError(error.getException());
 					} catch (final Exception e) {
 						onError(new Exception(uri.getQueryParameter("error")));
@@ -258,32 +259,34 @@ public class AuthenticatorActivity extends RoboSherlockAccountAuthenticatorActiv
 
 		showProgress(getString(R.string.auth_fetching_account_info));
 
-		final SafeAsyncTask<GAuthTokenDone> task = new SafeAsyncTask<GAuthTokenDone>() {
+		final SafeAsyncTask<GAccessToken> task = new SafeAsyncTask<GAccessToken>() {
 			@Override
-			public GAuthTokenDone call() throws Exception {
+			public GAccessToken call() throws Exception {
 				// request the access token from the code
-				final GAuthTokenDone done = Api.getAccessToken(code).get();
+				final GAccessToken done = Api.getAccessToken(code).get();
 
-				// save the person to the local database for access later.
-				done.person.save(false);
+				// save the person stub to the local database for access later.
+				done.person.save();
 
 				// return the done object
 				return done;
 			}
 
 			@Override
-			protected void onSuccess(final GAuthTokenDone done) {
+			protected void onSuccess(final GAccessToken done) {
 
-				final String accountId = String.valueOf(done.person.name);
+				final Person person = Application.getDb().getPersonDao().load(done.person.id);
+
+				final String accountId = String.valueOf(person.getName());
 				final String token = done.access_token;
-
+				
 				// check for duplicate account
 				final Account[] accounts = mAccountManager.getAccountsByType(Authenticator.ACCOUNT_TYPE);
 				for (final Account account : accounts) {
 					final long personId = Long.parseLong(mAccountManager.getUserData(account, Authenticator.KEY_PERSON_ID));
 					if (personId == done.person.id) {
 						// we have a duplicate, show a toast and cancel the authenticator
-						Toast.makeText(Application.getContext(), String.format(getString(R.string.auth_duplicate_account), done.person.name), Toast.LENGTH_LONG).show();
+						Toast.makeText(Application.getContext(), String.format(getString(R.string.auth_duplicate_account), person.getName()), Toast.LENGTH_LONG).show();
 						finishActivity(RESULT_DUPLICATE, account, personId);
 						return;
 					}

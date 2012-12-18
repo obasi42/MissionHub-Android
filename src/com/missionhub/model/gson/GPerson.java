@@ -1,46 +1,52 @@
 package com.missionhub.model.gson;
 
+import java.util.Set;
 import java.util.concurrent.Callable;
 
+import com.google.common.collect.HashMultimap;
 import com.missionhub.application.Application;
-import com.missionhub.model.Interest;
-import com.missionhub.model.Location;
-import com.missionhub.model.OrganizationalRole;
 import com.missionhub.model.Person;
 import com.missionhub.model.PersonDao;
+import com.missionhub.network.HttpParams;
 import com.missionhub.util.U;
 
-/**
- * The PJO of a JSON Person
- */
 public class GPerson {
 
+	public long id;
 	public String first_name;
 	public String last_name;
-	public String name;
-	public long id;
-	public String birthday;
-	public String locale;
 	public String gender;
-	public String fb_id;
+	public String campus;
+	public String year_in_school;
+	public String major;
+	public String minor;
+	public String birth_date;
+	public String date_became_christian;
+	public String graduation_date;
 	public String picture;
-	public String status;
-	public String request_org_id;
-	public String phone_number;
-	public String email_address;
-	public GIdNameProvider location;
-	public GIdNameProvider[] interests;
-	public GAssignment assignment;
-	public GOrgGeneric[] organizational_roles;
-	public GGroupMembership[] group_memberships;
-	public GEducation[] education;
-	public String num_contacts;
+	public Long user_id;
+	public Long fb_uid;
+	public String created_at;
+	public String updated_at;
+
+	public GUser user;
+	public GPhoneNumber[] phone_numbers;
+	public GEmailAddress[] email_addresses;
+	public GContactAssignment[] contact_assignments;
+	public GFollowupComment[] followup_comments;
+	public GFollowupComment[] comments_on_me;
+	public GOrganizationalRole[] organizational_roles;
+	public GAddress current_address;
+
+	public Boolean _assignToMe = false; // used by AddContactDialog
+	public HashMultimap<Long, String> _answers; // used by AddContactDialog
+
+	public static final Object lock = new Object();
 
 	/**
-	 * Saves the person object to the local database.
+	 * Saves the person to the SQLite database.
 	 * 
-	 * @param execute
-	 *            true if the task should be automatically executed, false otherwise
+	 * @param inTx
 	 * @return
 	 * @throws Exception
 	 */
@@ -48,69 +54,213 @@ public class GPerson {
 		final Callable<Person> callable = new Callable<Person>() {
 			@Override
 			public Person call() throws Exception {
-				final PersonDao pdao = Application.getDb().getPersonDao();
-				Person p = pdao.load(id);
-				if (p == null) {
-					p = new Person();
+				synchronized (lock) {
+					final PersonDao dao = Application.getDb().getPersonDao();
+
+					boolean insert = false;
+					Person person = dao.load(id);
+
+					if (person == null) {
+						person = new Person();
+						insert = true;
+					}
+					person.setId(id);
+					person.setFirst_name(first_name);
+					person.setLast_name(last_name);
+					person.setGender(gender);
+					person.setCampus(campus);
+					person.setYear_in_school(year_in_school);
+					person.setMajor(major);
+					person.setMinor(minor);
+					person.setBirth_date(U.parseYMD(birth_date));
+					person.setDate_became_christian(U.parseYMD(date_became_christian));
+					person.setGraduation_date(U.parseYMD(graduation_date));
+					person.setPicture(picture);
+					person.setUser_id(user_id);
+					person.setFb_uid(fb_uid);
+					person.setCreated_at(U.parseISO8601(created_at));
+					person.setUpdated_at(U.parseISO8601(updated_at));
+
+					if (user != null) {
+						user.save(id, true);
+					}
+
+					if (phone_numbers != null) {
+						for (final GPhoneNumber number : phone_numbers) {
+							number.save(true);
+						}
+					}
+
+					if (email_addresses != null) {
+						for (final GEmailAddress address : email_addresses) {
+							address.save(true);
+						}
+					}
+
+					if (contact_assignments != null) {
+						for (final GContactAssignment assignment : contact_assignments) {
+							assignment.save(true);
+						}
+					}
+
+					if (followup_comments != null) {
+						for (final GFollowupComment comment : followup_comments) {
+							comment.save(true);
+						}
+					}
+
+					if (comments_on_me != null) {
+						for (final GFollowupComment comment : comments_on_me) {
+							comment.save(true);
+						}
+					}
+
+					if (organizational_roles != null) {
+						for (final GOrganizationalRole role : organizational_roles) {
+							role.save(true);
+						}
+					}
+
+					if (current_address != null) {
+						current_address.save(id, true);
+					}
+
+					if (insert) {
+						dao.insert(person);
+					} else {
+						dao.update(person);
+					}
+
+					return person;
 				}
-
-				if (!U.isNullEmptyNegative(id)) p.setId(id);
-				if (!U.isNullEmpty(first_name)) p.setFirst_name(first_name);
-				if (!U.isNullEmpty(last_name)) p.setLast_name(last_name);
-				if (!U.isNullEmpty(name)) p.setName(name);
-				if (!U.isNullEmpty(birthday)) p.setBirthday(birthday);
-				if (!U.isNullEmpty(locale)) p.setLocale(locale);
-				if (!U.isNullEmpty(gender)) p.setGender(gender);
-				if (!U.isNullEmpty(fb_id)) p.setFb_id(fb_id);
-				if (!U.isNullEmpty(picture)) p.setPicture(picture);
-				if (!U.isNullEmpty(status)) p.setStatus(status);
-				if (!U.isNullEmpty(phone_number)) p.setPhone_number(phone_number);
-				if (!U.isNullEmpty(email_address)) p.setEmail_address(email_address);
-
-				GIdNameProvider.save(Location.class, location, p, true);
-				GIdNameProvider.save(Interest.class, interests, p, true);
-
-				if (!U.isNullEmpty(assignment)) assignment.save(p, request_org_id, true);
-
-				if (organizational_roles != null && organizational_roles.length > 0) {
-					GOrgGeneric.save(OrganizationalRole.class, organizational_roles, p, true);
-				}
-
-				if (group_memberships != null && group_memberships.length > 0) {
-					GGroupMembership.save(group_memberships, p, true);
-				}
-
-				if (education != null && education.length > 0) {
-					GEducation.save(education, p, true);
-				}
-
-				if (!U.isNullEmpty(num_contacts)) p.setNum_contacts(num_contacts);
-
-				pdao.insertOrReplace(p);
-
-				Application.postEvent(new PersonUpdatedEvent(p));
-
-				return p;
 			}
 		};
-		if (!inTx) {
-			return Application.getDb().callInTx(callable);
-		} else {
+		if (inTx) {
 			return callable.call();
+		} else {
+			return Application.getDb().callInTx(callable);
 		}
 	}
 
 	/**
-	 * Event posted when a person is updated
+	 * Adds the http params for this person
+	 * 
+	 * @param params
 	 */
-	public static class PersonUpdatedEvent {
-
-		public Person person;
-
-		public PersonUpdatedEvent(final Person p) {
-			this.person = p;
+	public void toParams(final HttpParams params) {
+		if (!U.isNullEmpty(first_name)) {
+			params.add("person[first_name]", first_name);
+		}
+		if (!U.isNullEmpty(last_name)) {
+			params.add("person[last_name]", first_name);
+		}
+		if (!U.isNullEmpty(gender)) {
+			params.add("person[gender]", first_name);
 		}
 
+		if (phone_numbers != null) {
+			for (int i = 0; i < phone_numbers.length; i++) {
+				final GPhoneNumber number = phone_numbers[i];
+				if (number.id > 0) {
+					params.add("person[phone_numbers_attributes][" + i + "][id]", number.id);
+				}
+				if (!U.isNullEmpty(number.number)) {
+					params.add("person[phone_numbers_attributes][" + i + "][number]", number.number);
+				}
+				if (!U.isNullEmpty(number.location)) {
+					params.add("person[phone_numbers_attributes][" + i + "][location]", number.location);
+				}
+				if (!U.isNullEmpty(number.primary)) {
+					params.add("person[phone_numbers_attributes][" + i + "][primary]", number.primary);
+				}
+			}
+		}
+
+		if (email_addresses != null) {
+			for (int i = 0; i < email_addresses.length; i++) {
+				final GEmailAddress address = email_addresses[i];
+				if (address.id > 0) {
+					params.add("person[email_addresses_attributes][" + i + "][id]", address.id);
+				}
+				if (address.id > 0 && U.isNullEmpty(address.email)) {
+					params.add("person[email_addresses_attributes][" + i + "][_destroy]", true);
+				} else {
+					if (!U.isNullEmpty(address.email)) {
+						params.add("person[email_addresses_attributes][" + i + "][number]", address.email);
+					}
+					if (!U.isNullEmpty(address.primary)) {
+						params.add("person[email_addresses_attributes][" + i + "][primary]", address.primary);
+					}
+				}
+			}
+		}
+
+		if (current_address != null) {
+			if (!U.isNullEmpty(current_address.address1)) {
+				params.add("person[current_address_attributes][address1]", current_address.address1);
+			}
+			if (!U.isNullEmpty(current_address.address2)) {
+				params.add("person[current_address_attributes][address2]", current_address.address2);
+			}
+			if (!U.isNullEmpty(current_address.city)) {
+				params.add("person[current_address_attributes][city]", current_address.city);
+			}
+			if (!U.isNullEmpty(current_address.country)) {
+				params.add("person[current_address_attributes][country]", current_address.country);
+			}
+			if (!U.isNullEmpty(current_address.state)) {
+				params.add("person[current_address_attributes][state]", current_address.state);
+			}
+			if (!U.isNullEmpty(current_address.zip)) {
+				params.add("person[current_address_attributes][zip]", current_address.zip);
+			}
+		}
+
+		if (_assignToMe != null) {
+			params.add("assign_to_me", _assignToMe);
+		}
+
+		for (final Long key : _answers.keySet()) {
+			final Set<String> values = _answers.get(key);
+			if (values.size() <= 1) {
+				for (final String value : values) {
+					params.add("answers[" + key + "]", value);
+				}
+			} else {
+				int count = 0;
+				for (final String value : values) {
+					params.add("answers[" + key + "][" + count + "]", value);
+					count++;
+				}
+			}
+		}
+	}
+
+	public CharSequence getName() {
+		if (first_name == null) first_name = "";
+		if (last_name == null) last_name = "";
+		return (first_name + " " + last_name).trim();
+	}
+
+	public void setName(final String string) {
+		final String[] parts = string.split(" ");
+
+		if (parts.length == 1) {
+			first_name = parts[0];
+		} else if (parts.length == 2) {
+			first_name = parts[0];
+			last_name = parts[1];
+		} else if (parts.length > 2) {
+			for (int i = 0; i < parts.length - 1; i++) {
+				first_name += parts[i] + " ";
+			}
+			first_name = first_name.trim();
+			last_name = parts[parts.length - 1];
+		}
+	}
+
+	public boolean isValid() {
+		return !U.isNullEmpty(first_name);
 	}
 
 }

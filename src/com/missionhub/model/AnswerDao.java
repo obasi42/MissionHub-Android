@@ -29,16 +29,14 @@ public class AnswerDao extends AbstractDao<Answer, Long> {
     */
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
-        public final static Property Person_id = new Property(1, Long.class, "person_id", false, "PERSON_ID");
-        public final static Property Organization_id = new Property(2, Long.class, "organization_id", false, "ORGANIZATION_ID");
-        public final static Property Question_id = new Property(3, Long.class, "question_id", false, "QUESTION_ID");
-        public final static Property Answer = new Property(4, String.class, "answer", false, "ANSWER");
+        public final static Property Answer_sheet_id = new Property(1, Long.class, "answer_sheet_id", false, "ANSWER_SHEET_ID");
+        public final static Property Question_id = new Property(2, Long.class, "question_id", false, "QUESTION_ID");
+        public final static Property Value = new Property(3, String.class, "value", false, "VALUE");
     };
 
     private DaoSession daoSession;
 
-    private Query<Answer> person_AnswerListQuery;
-    private Query<Answer> organization_AnswerListQuery;
+    private Query<Answer> answerSheet_AnswerListQuery;
 
     public AnswerDao(DaoConfig config) {
         super(config);
@@ -53,11 +51,10 @@ public class AnswerDao extends AbstractDao<Answer, Long> {
     public static void createTable(SQLiteDatabase db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "'ANSWER' (" + //
-                "'_id' INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
-                "'PERSON_ID' INTEGER," + // 1: person_id
-                "'ORGANIZATION_ID' INTEGER," + // 2: organization_id
-                "'QUESTION_ID' INTEGER," + // 3: question_id
-                "'ANSWER' TEXT);"); // 4: answer
+                "'_id' INTEGER PRIMARY KEY ," + // 0: id
+                "'ANSWER_SHEET_ID' INTEGER," + // 1: answer_sheet_id
+                "'QUESTION_ID' INTEGER," + // 2: question_id
+                "'VALUE' TEXT);"); // 3: value
     }
 
     /** Drops the underlying database table. */
@@ -76,24 +73,19 @@ public class AnswerDao extends AbstractDao<Answer, Long> {
             stmt.bindLong(1, id);
         }
  
-        Long person_id = entity.getPerson_id();
-        if (person_id != null) {
-            stmt.bindLong(2, person_id);
-        }
- 
-        Long organization_id = entity.getOrganization_id();
-        if (organization_id != null) {
-            stmt.bindLong(3, organization_id);
+        Long answer_sheet_id = entity.getAnswer_sheet_id();
+        if (answer_sheet_id != null) {
+            stmt.bindLong(2, answer_sheet_id);
         }
  
         Long question_id = entity.getQuestion_id();
         if (question_id != null) {
-            stmt.bindLong(4, question_id);
+            stmt.bindLong(3, question_id);
         }
  
-        String answer = entity.getAnswer();
-        if (answer != null) {
-            stmt.bindString(5, answer);
+        String value = entity.getValue();
+        if (value != null) {
+            stmt.bindString(4, value);
         }
     }
 
@@ -114,10 +106,9 @@ public class AnswerDao extends AbstractDao<Answer, Long> {
     public Answer readEntity(Cursor cursor, int offset) {
         Answer entity = new Answer( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
-            cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1), // person_id
-            cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2), // organization_id
-            cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3), // question_id
-            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4) // answer
+            cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1), // answer_sheet_id
+            cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2), // question_id
+            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3) // value
         );
         return entity;
     }
@@ -126,10 +117,9 @@ public class AnswerDao extends AbstractDao<Answer, Long> {
     @Override
     public void readEntity(Cursor cursor, Answer entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
-        entity.setPerson_id(cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1));
-        entity.setOrganization_id(cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2));
-        entity.setQuestion_id(cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3));
-        entity.setAnswer(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
+        entity.setAnswer_sheet_id(cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1));
+        entity.setQuestion_id(cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2));
+        entity.setValue(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
      }
     
     /** @inheritdoc */
@@ -155,28 +145,16 @@ public class AnswerDao extends AbstractDao<Answer, Long> {
         return true;
     }
     
-    /** Internal query to resolve the "answerList" to-many relationship of Person. */
-    public synchronized List<Answer> _queryPerson_AnswerList(Long person_id) {
-        if (person_AnswerListQuery == null) {
+    /** Internal query to resolve the "answerList" to-many relationship of AnswerSheet. */
+    public synchronized List<Answer> _queryAnswerSheet_AnswerList(Long answer_sheet_id) {
+        if (answerSheet_AnswerListQuery == null) {
             QueryBuilder<Answer> queryBuilder = queryBuilder();
-            queryBuilder.where(Properties.Person_id.eq(person_id));
-            person_AnswerListQuery = queryBuilder.build();
+            queryBuilder.where(Properties.Answer_sheet_id.eq(answer_sheet_id));
+            answerSheet_AnswerListQuery = queryBuilder.build();
         } else {
-            person_AnswerListQuery.setParameter(0, person_id);
+            answerSheet_AnswerListQuery.setParameter(0, answer_sheet_id);
         }
-        return person_AnswerListQuery.list();
-    }
-
-    /** Internal query to resolve the "answerList" to-many relationship of Organization. */
-    public synchronized List<Answer> _queryOrganization_AnswerList(Long organization_id) {
-        if (organization_AnswerListQuery == null) {
-            QueryBuilder<Answer> queryBuilder = queryBuilder();
-            queryBuilder.where(Properties.Organization_id.eq(organization_id));
-            organization_AnswerListQuery = queryBuilder.build();
-        } else {
-            organization_AnswerListQuery.setParameter(0, organization_id);
-        }
-        return organization_AnswerListQuery.list();
+        return answerSheet_AnswerListQuery.list();
     }
 
     private String selectDeep;
@@ -186,9 +164,12 @@ public class AnswerDao extends AbstractDao<Answer, Long> {
             StringBuilder builder = new StringBuilder("SELECT ");
             SqlUtils.appendColumns(builder, "T", getAllColumns());
             builder.append(',');
-            SqlUtils.appendColumns(builder, "T0", daoSession.getQuestionDao().getAllColumns());
+            SqlUtils.appendColumns(builder, "T0", daoSession.getAnswerSheetDao().getAllColumns());
+            builder.append(',');
+            SqlUtils.appendColumns(builder, "T1", daoSession.getQuestionDao().getAllColumns());
             builder.append(" FROM ANSWER T");
-            builder.append(" LEFT JOIN QUESTION T0 ON T.'QUESTION_ID'=T0.'_id'");
+            builder.append(" LEFT JOIN ANSWER_SHEET T0 ON T.'ANSWER_SHEET_ID'=T0.'_id'");
+            builder.append(" LEFT JOIN QUESTION T1 ON T.'QUESTION_ID'=T1.'_id'");
             builder.append(' ');
             selectDeep = builder.toString();
         }
@@ -198,6 +179,10 @@ public class AnswerDao extends AbstractDao<Answer, Long> {
     protected Answer loadCurrentDeep(Cursor cursor, boolean lock) {
         Answer entity = loadCurrent(cursor, 0, lock);
         int offset = getAllColumns().length;
+
+        AnswerSheet answerSheet = loadCurrentOther(daoSession.getAnswerSheetDao(), cursor, offset);
+        entity.setAnswerSheet(answerSheet);
+        offset += daoSession.getAnswerSheetDao().getAllColumns().length;
 
         Question question = loadCurrentOther(daoSession.getQuestionDao(), cursor, offset);
         entity.setQuestion(question);

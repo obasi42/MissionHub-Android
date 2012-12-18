@@ -25,7 +25,12 @@ public class OrganizationDao extends AbstractDao<Organization, Long> {
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property Name = new Property(1, String.class, "name", false, "NAME");
-        public final static Property Ancestry = new Property(2, String.class, "ancestry", false, "ANCESTRY");
+        public final static Property Terminology = new Property(2, String.class, "terminology", false, "TERMINOLOGY");
+        public final static Property Ancestry = new Property(3, String.class, "ancestry", false, "ANCESTRY");
+        public final static Property Show_sub_orgs = new Property(4, Boolean.class, "show_sub_orgs", false, "SHOW_SUB_ORGS");
+        public final static Property Status = new Property(5, String.class, "status", false, "STATUS");
+        public final static Property Updated_at = new Property(6, java.util.Date.class, "updated_at", false, "UPDATED_AT");
+        public final static Property Created_at = new Property(7, java.util.Date.class, "created_at", false, "CREATED_AT");
     };
 
     private DaoSession daoSession;
@@ -46,7 +51,12 @@ public class OrganizationDao extends AbstractDao<Organization, Long> {
         db.execSQL("CREATE TABLE " + constraint + "'ORGANIZATION' (" + //
                 "'_id' INTEGER PRIMARY KEY ," + // 0: id
                 "'NAME' TEXT," + // 1: name
-                "'ANCESTRY' TEXT);"); // 2: ancestry
+                "'TERMINOLOGY' TEXT," + // 2: terminology
+                "'ANCESTRY' TEXT," + // 3: ancestry
+                "'SHOW_SUB_ORGS' INTEGER," + // 4: show_sub_orgs
+                "'STATUS' TEXT," + // 5: status
+                "'UPDATED_AT' INTEGER," + // 6: updated_at
+                "'CREATED_AT' INTEGER);"); // 7: created_at
     }
 
     /** Drops the underlying database table. */
@@ -70,9 +80,34 @@ public class OrganizationDao extends AbstractDao<Organization, Long> {
             stmt.bindString(2, name);
         }
  
+        String terminology = entity.getTerminology();
+        if (terminology != null) {
+            stmt.bindString(3, terminology);
+        }
+ 
         String ancestry = entity.getAncestry();
         if (ancestry != null) {
-            stmt.bindString(3, ancestry);
+            stmt.bindString(4, ancestry);
+        }
+ 
+        Boolean show_sub_orgs = entity.getShow_sub_orgs();
+        if (show_sub_orgs != null) {
+            stmt.bindLong(5, show_sub_orgs ? 1l: 0l);
+        }
+ 
+        String status = entity.getStatus();
+        if (status != null) {
+            stmt.bindString(6, status);
+        }
+ 
+        java.util.Date updated_at = entity.getUpdated_at();
+        if (updated_at != null) {
+            stmt.bindLong(7, updated_at.getTime());
+        }
+ 
+        java.util.Date created_at = entity.getCreated_at();
+        if (created_at != null) {
+            stmt.bindLong(8, created_at.getTime());
         }
     }
 
@@ -94,7 +129,12 @@ public class OrganizationDao extends AbstractDao<Organization, Long> {
         Organization entity = new Organization( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // name
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2) // ancestry
+            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // terminology
+            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // ancestry
+            cursor.isNull(offset + 4) ? null : cursor.getShort(offset + 4) != 0, // show_sub_orgs
+            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // status
+            cursor.isNull(offset + 6) ? null : new java.util.Date(cursor.getLong(offset + 6)), // updated_at
+            cursor.isNull(offset + 7) ? null : new java.util.Date(cursor.getLong(offset + 7)) // created_at
         );
         return entity;
     }
@@ -104,7 +144,12 @@ public class OrganizationDao extends AbstractDao<Organization, Long> {
     public void readEntity(Cursor cursor, Organization entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setName(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
-        entity.setAncestry(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
+        entity.setTerminology(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
+        entity.setAncestry(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
+        entity.setShow_sub_orgs(cursor.isNull(offset + 4) ? null : cursor.getShort(offset + 4) != 0);
+        entity.setStatus(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
+        entity.setUpdated_at(cursor.isNull(offset + 6) ? null : new java.util.Date(cursor.getLong(offset + 6)));
+        entity.setCreated_at(cursor.isNull(offset + 7) ? null : new java.util.Date(cursor.getLong(offset + 7)));
      }
     
     /** @inheritdoc */
