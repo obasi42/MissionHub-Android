@@ -10,6 +10,7 @@ import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 import android.os.Build;
+import android.util.Log;
 import ch.boye.httpclientandroidlib.client.utils.URIBuilder;
 
 import com.google.gson.Gson;
@@ -579,12 +580,18 @@ public class Api {
 
 			appendLoggingParams(params);
 
+			Log.e("API", method.name() + ": " + url);
+			Log.e("API", headers.toString());
+			Log.e("API", params.toString());
+			
 			// create the client and get the response
 			final HttpClient client = new HttpClient();
 			client.setResponseType(responseType);
 			final HttpClientFuture future = client.doRequest(method, url, headers, params);
 			response = future.get();
 			maybeThrowException(response);
+			
+			Log.d("API", response.responseBody);
 
 			return response;
 		} catch (final Exception e) {

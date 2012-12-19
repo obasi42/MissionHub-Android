@@ -708,7 +708,7 @@ public class ContactAssignmentDialog extends RoboSherlockDialogFragment implemen
 								.where(ContactAssignmentDao.Properties.Person_id.eq(p.getId()), ContactAssignmentDao.Properties.Organization_id.eq(Session.getInstance().getOrganizationId())).unique();
 
 						final GContactAssignment assignment = new GContactAssignment();
-						if (assignment != null) {
+						if (oldAssignment != null) {
 							assignment.id = oldAssignment.getId();
 						}
 

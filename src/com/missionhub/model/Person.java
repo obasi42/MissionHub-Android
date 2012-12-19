@@ -2,8 +2,6 @@ package com.missionhub.model;
 
 import java.util.List;
 
-import android.util.Log;
-
 import com.missionhub.model.DaoSession;
 import de.greenrobot.dao.DaoException;
 
@@ -467,8 +465,6 @@ public class Person {
 					labelsTemp.put(role.getOrganization_id(), role.getRole_id());
 				}
 			} catch (final DaoException e) {
-				Log.e("TEST", e.getMessage(), e);
-				
 				getLabels();
 			}
 			mLabels = labelsTemp;
@@ -596,13 +592,7 @@ public class Person {
 	 * @return
 	 */
 	public synchronized TreeDataStructure<Long> getOrganizationHierarchy() {
-		
-		Log.e("PERSON", "getOrganizationHierarchy");
-		
 		if (mOrganizationHierarchy == null) {
-			
-			Log.e("PERSON", "build organization hierarchy");
-			
 			if (daoSession == null) {
 				throw new DaoException("Entity is detached from DAO context");
 			}
@@ -620,7 +610,6 @@ public class Person {
 					.list();
 			
 			for (final Organization organization : organizations) {
-				Log.e("ROOT ORG", organization.getName());
 				recursiveBuildOrganizationHierarchy(tree, organization, hasLabel(organization.getId(), U.Role.admin.id()));
 			}
 			
