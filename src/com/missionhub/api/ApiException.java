@@ -28,7 +28,7 @@ public class ApiException extends MissionHubException {
 	public ApiException(final Throwable cause) {
 		super(cause);
 	}
-	
+
 	public ApiException(final GErrorsDepreciated error) {
 		this(error.error.title, error.error.message, error.error.code);
 	}

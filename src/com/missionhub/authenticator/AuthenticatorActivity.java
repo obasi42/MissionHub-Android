@@ -279,7 +279,7 @@ public class AuthenticatorActivity extends RoboSherlockAccountAuthenticatorActiv
 
 				final String accountId = String.valueOf(person.getName());
 				final String token = done.access_token;
-				
+
 				// check for duplicate account
 				final Account[] accounts = mAccountManager.getAccountsByType(Authenticator.ACCOUNT_TYPE);
 				for (final Account account : accounts) {

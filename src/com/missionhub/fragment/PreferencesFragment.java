@@ -185,7 +185,7 @@ public class PreferencesFragment extends BaseFragment {
 		for (final TreeDataStructure<Long> subTree : tree.getSubTrees()) {
 			final long organizationId = subTree.getHead();
 			final Organization org = Application.getDb().getOrganizationDao().load(organizationId);
-			if (org != null && Session.getInstance().getPerson().isAdminOrLeader(org.getId())) {
+			if (org != null) {
 				mOrganizationsAdapter.add(new OrganizationItem(org, depth));
 				if (org.getId() == Session.getInstance().getOrganizationId()) {
 					mDefaultSpinnerIndex = mOrganizationsAdapter.getCount() - 1;

@@ -186,7 +186,7 @@ public class AddContactDialog extends RoboSherlockDialogFragment {
 				mGender.check(R.id.female);
 			}
 			if (mPerson.phone_numbers != null && mPerson.phone_numbers.length > 0) {
-				GPhoneNumber number = mPerson.phone_numbers[0];
+				final GPhoneNumber number = mPerson.phone_numbers[0];
 				mPhone.setText(number.number);
 				mPhoneLocation.setSelection(getIndexOfId(number.location, R.array.phone_location_ids));
 			} else {
@@ -194,13 +194,13 @@ public class AddContactDialog extends RoboSherlockDialogFragment {
 				mPhoneLocation.setSelection(0);
 			}
 			if (mPerson.email_addresses != null && mPerson.email_addresses.length > 0) {
-				GEmailAddress email = mPerson.email_addresses[0];
+				final GEmailAddress email = mPerson.email_addresses[0];
 				mEmail.setText(email.email);
 			} else {
 				mEmail.setText("");
 			}
 			if (mPerson.current_address != null) {
-				GAddress address = mPerson.current_address;
+				final GAddress address = mPerson.current_address;
 				if (!U.isNullEmpty(address.address1)) {
 					mAddressLine1.setText(address.address1);
 				} else {
@@ -246,17 +246,17 @@ public class AddContactDialog extends RoboSherlockDialogFragment {
 			} else {
 				person.gender = "";
 			}
-			
-			GPhoneNumber phone = new GPhoneNumber();
+
+			final GPhoneNumber phone = new GPhoneNumber();
 			phone.number = mPhone.getText().toString();
 			phone.location = getIdFromTitle(mPhoneLocation.getSelectedItem().toString(), R.array.phone_location_titles, R.array.phone_location_ids);
 			person.phone_numbers = new GPhoneNumber[] { phone };
-			
-			GEmailAddress email = new GEmailAddress();
+
+			final GEmailAddress email = new GEmailAddress();
 			email.email = mEmail.getText().toString();
 			person.email_addresses = new GEmailAddress[] { email };
-			
-			GAddress address = new GAddress();
+
+			final GAddress address = new GAddress();
 			address.address1 = mAddressLine1.getText().toString();
 			address.address2 = mAddressLine2.getText().toString();
 			address.city = mAddressCity.getText().toString();

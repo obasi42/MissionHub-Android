@@ -167,8 +167,8 @@ public class Address {
     }
 
     // KEEP METHODS - put your custom methods here
-    public GAddress getGModel() {
-    	GAddress a = new GAddress();
+	public GAddress getGModel() {
+		final GAddress a = new GAddress();
 		a.id = getId();
 		a.address1 = getAddress1();
 		a.address2 = getAddress2();
@@ -177,7 +177,7 @@ public class Address {
 		a.state = getState();
 		a.zip = getZip();
 		return a;
-    }
+	}
     // KEEP METHODS END
 
 }

@@ -164,14 +164,14 @@ public class MyContactsFragment extends MainFragment implements OnPageChangeList
 					.assignedTo(Session.getInstance().getPersonId()) //
 					.followupStatus(EnumSet.of(FollowupStatus.uncontacted, FollowupStatus.attempted_contact, FollowupStatus.contacted)) //
 					.build();
-			
+
 			return new ApiContactListProvider(getActivity(), options);
 		}
 	}
 
 	public static class MyCompletedContactsFragment extends ContactListFragment {
 		@Override
-		public ContactListProvider onCreateContactProvider() {			
+		public ContactListProvider onCreateContactProvider() {
 			final PersonListOptions options = PersonListOptions.builder() //
 					.assignedTo(Session.getInstance().getPersonId()) //
 					.followupStatus(FollowupStatus.completed) //

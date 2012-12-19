@@ -108,7 +108,9 @@ public class GPerson {
 					}
 
 					if (contact_assignments != null) {
-						Application.getDb().getContactAssignmentDao().queryBuilder().where(ContactAssignmentDao.Properties.Person_id.eq(id), ContactAssignmentDao.Properties.Organization_id.eq(Session.getInstance().getOrganizationId())).buildDelete().executeDeleteWithoutDetachingEntities();
+						Application.getDb().getContactAssignmentDao().queryBuilder()
+								.where(ContactAssignmentDao.Properties.Person_id.eq(id), ContactAssignmentDao.Properties.Organization_id.eq(Session.getInstance().getOrganizationId())).buildDelete()
+								.executeDeleteWithoutDetachingEntities();
 						for (final GContactAssignment assignment : contact_assignments) {
 							assignment.save(true);
 						}

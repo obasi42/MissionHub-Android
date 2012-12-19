@@ -165,14 +165,14 @@ public class Role {
     }
 
     // KEEP METHODS - put your custom methods here
-    public void deleteWithRelations() {
-    	if (daoSession == null) {
-            throw new DaoException("Entity is detached from DAO context");
-        }
-    	OrganizationalRoleDao targetDao = daoSession.getOrganizationalRoleDao();
-    	targetDao.queryBuilder().where(OrganizationalRoleDao.Properties.Role_id.eq(getId())).buildDelete().executeDeleteWithoutDetachingEntities();
-    	delete();
-    }
+	public void deleteWithRelations() {
+		if (daoSession == null) {
+			throw new DaoException("Entity is detached from DAO context");
+		}
+		final OrganizationalRoleDao targetDao = daoSession.getOrganizationalRoleDao();
+		targetDao.queryBuilder().where(OrganizationalRoleDao.Properties.Role_id.eq(getId())).buildDelete().executeDeleteWithoutDetachingEntities();
+		delete();
+	}
     // KEEP METHODS END
 
 }

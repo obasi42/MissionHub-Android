@@ -130,7 +130,7 @@ public class Session implements OnAccountsUpdateListener {
 		final Callable<Person> callable = new Callable<Person>() {
 			@Override
 			public Person call() throws Exception {
-				Person person = Api.getPersonMe(ApiOptions.builder() //
+				Api.getPersonMe(ApiOptions.builder() //
 						.include(Api.Include.all_organizational_roles) //
 						.include(Api.Include.answer_sheets) //
 						.include(Api.Include.answers) //
@@ -142,17 +142,17 @@ public class Session implements OnAccountsUpdateListener {
 						.include(Api.Include.user) //
 						.build()).get(); //
 
-				mPerson.refreshAll();
-
+				getPerson().refreshAll();
 				updateLabels();
+				getPerson().resetOrganizationHierarchy();
 
 				// update the account with new data to keep it fresh
-				mAccountManager.setUserData(mAccount, Authenticator.KEY_PERSON_ID, String.valueOf(mPerson.getId()));
-				mAccountManager.setUserData(mAccount, AccountManager.KEY_ACCOUNT_NAME, mPerson.getName());
+				mAccountManager.setUserData(mAccount, Authenticator.KEY_PERSON_ID, String.valueOf(getPerson().getId()));
+				mAccountManager.setUserData(mAccount, AccountManager.KEY_ACCOUNT_NAME, getPerson().getName());
 
 				mUpdatePersonTask = null;
-				
-				return person;
+
+				return getPerson();
 			}
 		};
 
@@ -170,12 +170,10 @@ public class Session implements OnAccountsUpdateListener {
 			@Override
 			public Void call() throws Exception {
 
-				final long lastUpdated = Long.parseLong(SettingsManager.getInstance().getUserSetting(mPersonId, "organizations_last_updated", "0"));
-				SettingsManager.getInstance().setUserSetting(mPersonId, "organizations_last_updated", System.currentTimeMillis() - 1000);
+				final long lastUpdated = Long.parseLong(SettingsManager.getInstance().getUserSetting(getPersonId(), "organizations_last_updated", "0"));
+				SettingsManager.getInstance().setUserSetting(getPersonId(), "organizations_last_updated", System.currentTimeMillis() - 1000);
 
 				Api.listOrganizations(ApiOptions.builder().since(lastUpdated).build()).get();
-
-				getPerson().resetOrganizationHierarchy();
 
 				mUpdateOrganizationsTask = null;
 				return null;
@@ -226,7 +224,7 @@ public class Session implements OnAccountsUpdateListener {
 						// update the organizations
 						Application.postEvent(new SessionResumeStatusEvent(Application.getContext().getString(R.string.init_updating_orgs)));
 						updateUserOrganizations().get();
-						
+
 						// update the person
 						Application.postEvent(new SessionResumeStatusEvent(Application.getContext().getString(R.string.init_updating_person)));
 						updatePerson().get();
@@ -268,7 +266,7 @@ public class Session implements OnAccountsUpdateListener {
 
 	@Override
 	public void onAccountsUpdated(final Account[] accounts) {
-		if (mPersonId > 0 && findAccount(mPersonId) == null) {
+		if (getPersonId() > 0 && findAccount(getPersonId()) == null) {
 			resetSession();
 		}
 	}

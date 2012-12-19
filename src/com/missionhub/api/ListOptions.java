@@ -244,7 +244,7 @@ public class ListOptions {
 	public void setOffset(final Integer offset) {
 		mOffset = offset;
 	}
-	
+
 	public void advanceOffset() {
 		mOffset += mLimit;
 	}

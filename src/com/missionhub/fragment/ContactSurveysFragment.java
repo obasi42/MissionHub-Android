@@ -19,8 +19,8 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.missionhub.R;
 import com.missionhub.api.Api;
-import com.missionhub.api.ApiOptions;
 import com.missionhub.api.Api.Include;
+import com.missionhub.api.ApiOptions;
 import com.missionhub.application.Application;
 import com.missionhub.application.Session;
 import com.missionhub.model.Answer;
@@ -145,7 +145,7 @@ public class ContactSurveysFragment extends BaseFragment {
 				} else {
 					holder.question.setText(R.string.contact_surveys_no_q);
 				}
-				
+
 				if (!U.isNullEmpty(item.answer.getValue())) {
 					holder.answer.setText(item.answer.getValue());
 					holder.answer.setTextColor(answeredColor);
@@ -195,23 +195,23 @@ public class ContactSurveysFragment extends BaseFragment {
 		mPerson.resetAnswerSheetList();
 
 		boolean fetchQuestionData = false;
-		
+
 		final List<AnswerSheet> sheets = mPerson.getAnswerSheetList();
-		for(final AnswerSheet sheet : sheets) {
-			if (sheet.getSurvey() == null)  {
+		for (final AnswerSheet sheet : sheets) {
+			if (sheet.getSurvey() == null) {
 				fetchQuestionData = true;
 				continue;
 			}
-			
+
 			// only look at answers from current organization
 			if (sheet.getSurvey().getOrganization_id() != Session.getInstance().getOrganizationId()) {
 				continue;
 			}
-			
+
 			mAdapter.add(new SurveyItem(sheet.getSurvey()));
-			
+
 			final List<Answer> answers = sheet.getAnswerList();
-			for(final Answer answer : answers) {
+			for (final Answer answer : answers) {
 				if (answer.getQuestion() == null) {
 					fetchQuestionData = true;
 					continue;
@@ -265,10 +265,10 @@ public class ContactSurveysFragment extends BaseFragment {
 			@Override
 			public Organization call() throws Exception {
 				return Api.getOrganization(Session.getInstance().getOrganizationId(), ApiOptions.builder() //
-					.include(Include.keywords) //
-					.include(Include.questions) //
-					.include(Include.surveys) //
-					.build()).get();
+						.include(Include.keywords) //
+						.include(Include.questions) //
+						.include(Include.surveys) //
+						.build()).get();
 			}
 
 			@Override

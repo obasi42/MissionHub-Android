@@ -96,7 +96,7 @@ public class ContactListAdapter extends ObjectArrayAdapter {
 			}
 
 			if (item.person != null) {
-				
+
 				if (holder.avatar != null) {
 					if (!U.isNullEmpty(item.person.getPicture())) {
 						ImageLoader.getInstance().displayImage(item.person.getPicture(), holder.avatar, mImageLoaderOptions);
@@ -138,7 +138,7 @@ public class ContactListAdapter extends ObjectArrayAdapter {
 				}
 
 				if (holder.phone != null) {
-					if (item.person.getPrimaryPhoneNumber() != null) {	
+					if (item.person.getPrimaryPhoneNumber() != null) {
 						holder.phone.setText(item.person.getPrimaryPhoneNumber().getNumber());
 					} else {
 						holder.phone.setText("");

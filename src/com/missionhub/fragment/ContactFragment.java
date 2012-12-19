@@ -25,8 +25,8 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.missionhub.R;
 import com.missionhub.api.Api;
-import com.missionhub.api.ApiOptions;
 import com.missionhub.api.Api.Include;
+import com.missionhub.api.ApiOptions;
 import com.missionhub.application.Application;
 import com.missionhub.exception.ExceptionHelper;
 import com.missionhub.model.Person;
@@ -239,16 +239,12 @@ public class ContactFragment extends BaseFragment implements OnNavigationListene
 
 			@Override
 			public Person call() throws Exception {
-				return Api.getPerson(mPersonId, ApiOptions.builder() //
-					.include(Include.answer_sheets)
-					.include(Include.answers)
-					.include(Include.comments_on_me)
-					.include(Include.contact_assignments)
-					.include(Include.current_address)
-					.include(Include.email_addresses)
-					.include(Include.organizational_roles)
-					.include(Include.phone_numbers)
-					.build()).get();
+				return Api.getPerson(
+						mPersonId,
+						ApiOptions.builder()
+								//
+								.include(Include.answer_sheets).include(Include.answers).include(Include.comments_on_me).include(Include.contact_assignments).include(Include.current_address)
+								.include(Include.email_addresses).include(Include.organizational_roles).include(Include.phone_numbers).build()).get();
 			}
 
 			@Override

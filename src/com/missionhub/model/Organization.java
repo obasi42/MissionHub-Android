@@ -199,6 +199,16 @@ public class Organization {
     }
 
     // KEEP METHODS - put your custom methods here
+	public List<Organization> getSubOrganizations() {
+		if (myDao == null) {
+			throw new DaoException("Entity is detached from DAO context");
+		}
+
+		return myDao.queryBuilder() //
+				.where(OrganizationDao.Properties.Status.eq("active")) //
+				.whereOr(OrganizationDao.Properties.Ancestry.eq(getId()), OrganizationDao.Properties.Ancestry.eq(getAncestry() + "/" + getId())) //
+				.orderAsc(OrganizationDao.Properties.Name).list();
+	}
     // KEEP METHODS END
 
 }
