@@ -38,13 +38,7 @@ public class GSurvey {
 				synchronized (lock) {
 					final SurveyDao dao = Application.getDb().getSurveyDao();
 
-					Survey survey = dao.load(id);
-
-					boolean insert = false;
-					if (survey == null) {
-						survey = new Survey();
-						insert = true;
-					}
+					Survey survey = new Survey();
 					survey.setId(id);
 					survey.setTitle(title);
 					survey.setOrganization_id(organization_id);
@@ -54,12 +48,7 @@ public class GSurvey {
 					survey.setIs_frozen(is_frozen);
 					survey.setCreated_at(U.parseISO8601(created_at));
 					survey.setUpdated_at(U.parseISO8601(updated_at));
-
-					if (insert) {
-						dao.insert(survey);
-					} else {
-						dao.update(survey);
-					}
+					dao.insertOrReplace(survey);
 
 					if (questions != null) {
 						for (final GQuestion question : questions) {

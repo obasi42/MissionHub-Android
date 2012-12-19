@@ -4,10 +4,12 @@ import org.holoeverywhere.widget.Toast;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.Window;
 import com.missionhub.R;
+import com.missionhub.application.Session;
 import com.missionhub.application.Session.SessionInvalidTokenEvent;
 import com.missionhub.application.Session.SessionInvalidatedEvent;
 import com.missionhub.fragment.MainFragment;

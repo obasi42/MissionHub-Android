@@ -32,26 +32,16 @@ public class GRole {
 			public Role call() throws Exception {
 				synchronized (lock) {
 					final RoleDao dao = Application.getDb().getRoleDao();
-					Role role = dao.load(id);
-
-					boolean insert = false;
-					if (role == null) {
-						role = new Role();
-						insert = true;
-					}
+					
+					Role role = new Role();
 					role.setId(id);
 					role.setOrganization_id(organization_id);
 					role.setName(name);
 					role.setI18n(i18n);
 					role.setCreated_at(U.parseISO8601(created_at));
 					role.setUpdated_at(U.parseISO8601(updated_at));
-
-					if (insert) {
-						dao.insert(role);
-					} else {
-						dao.update(role);
-					}
-
+					dao.insertOrReplace(role);
+					
 					return role;
 				}
 			}

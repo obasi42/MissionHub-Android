@@ -34,25 +34,14 @@ public class GAnswerSheet {
 				synchronized (lock) {
 					final AnswerSheetDao dao = Application.getDb().getAnswerSheetDao();
 
-					AnswerSheet sheet = dao.load(id);
-					boolean insert = false;
-					if (sheet == null) {
-						sheet = new AnswerSheet();
-						insert = true;
-					}
-
+					AnswerSheet sheet = new AnswerSheet();
 					sheet.setId(id);
 					sheet.setPerson_id(personId);
 					sheet.setSurvey_id(survey_id);
 					sheet.setCreated_at(U.parseISO8601(created_at));
 					sheet.setUpdated_at(U.parseISO8601(updated_at));
 					sheet.setCompleted_at(U.parseISO8601(completed_at));
-
-					if (insert) {
-						dao.insert(sheet);
-					} else {
-						dao.update(sheet);
-					}
+					dao.insertOrReplace(sheet);
 
 					if (answers != null) {
 						for (final GAnswer answer : answers) {

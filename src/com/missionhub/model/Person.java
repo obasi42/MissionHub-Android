@@ -1,6 +1,9 @@
 package com.missionhub.model;
 
 import java.util.List;
+
+import android.util.Log;
+
 import com.missionhub.model.DaoSession;
 import de.greenrobot.dao.DaoException;
 
@@ -9,9 +12,7 @@ import de.greenrobot.dao.DaoException;
 // KEEP INCLUDES - put your custom includes here
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimaps;
@@ -73,6 +74,7 @@ public class Person {
 
     // KEEP FIELDS - put your custom fields here
 	private SetMultimap<Long, Long> mLabels; // organizationId, label
+	private SetMultimap<Long, U.Role> mRoleCache;
 	private TreeDataStructure<Long> mOrganizationHierarchy;
 	private Map<Long, FollowupStatus> mStatuses;
 	private EmailAddress mPrimaryEmailAddress;
@@ -454,14 +456,7 @@ public class Person {
     }
 
     // KEEP METHODS - put your custom methods here
-	public SetMultimap<Long, Long> getLabelsCopy() {
-		if (mLabels == null) {
-			resetLabels();
-		}
-		return HashMultimap.create(getLabels());
-	}
-
-	private SetMultimap<Long, Long> getLabels() {
+    private synchronized SetMultimap<Long, Long> getLabels() {
 		if (mLabels == null) {
 			final SetMultimap<Long, Long> labelsTemp = Multimaps.synchronizedSetMultimap(HashMultimap.<Long, Long> create());
 			resetOrganizationalRoleList();
@@ -472,6 +467,8 @@ public class Person {
 					labelsTemp.put(role.getOrganization_id(), role.getRole_id());
 				}
 			} catch (final DaoException e) {
+				Log.e("TEST", e.getMessage(), e);
+				
 				getLabels();
 			}
 			mLabels = labelsTemp;
@@ -479,12 +476,12 @@ public class Person {
 		return mLabels;
 	}
 
-	public void resetLabels() {
+	public synchronized void resetLabels() {
 		mLabels = null;
 	}
 
 	/**
-	 * Checks if a user has one of the given labels (role)
+	 * Checks if a user has one of the given labels
 	 * 
 	 * @param label
 	 * @param organizationId
@@ -499,52 +496,74 @@ public class Person {
 		}
 		return has;
 	}
-
-	/**
-	 * Checks if a user has all of the given labels (role)
-	 * 
-	 * @param label
-	 * @param organizationId
-	 * @return true if they have the label
-	 */
-	public synchronized boolean hasLabels(final long organizationId, final long... label) {
-		boolean has = true;
-		for (final long l : label) {
-			if (!getLabels().containsEntry(organizationId, l)) {
-				has = false;
+	
+	public synchronized boolean hasRole(U.Role role) {
+		return hasRole(role, Session.getInstance().getOrganizationId());
+	}
+	
+	public synchronized boolean hasRole(U.Role role, final long organizationId) {
+		if (mRoleCache == null) {
+			mRoleCache = Multimaps.synchronizedSetMultimap(HashMultimap.<Long, U.Role> create());
+		}
+		
+		if (mRoleCache.containsEntry(organizationId, role)) {
+			return true;
+		}
+		
+		if (hasLabel(organizationId, role.id())) {
+			mRoleCache.put(organizationId, role);
+			return true;
+		}
+		
+		if (daoSession == null) {
+			throw new DaoException("Entity is detached from DAO context");
+		}
+		
+		// check sub orgs for admins
+		if (role == U.Role.admin) {
+			Organization organization = daoSession.getOrganizationDao().load(organizationId);
+			
+			if (!U.isNullEmpty(organization.getAncestry())) {
+				String[] ancestors = organization.getAncestry().trim().split("/");
+				
+				for(String ancestor : ancestors) {
+					if (hasLabel(Long.parseLong(ancestor), role.id())) {
+						mRoleCache.put(organizationId, role);
+						return true;
+					}
+				}
 			}
 		}
-		return has;
+		
+		return false;
 	}
-
-	/**
-	 * Returns true if the user is an admin or leader in the given organizationId
-	 * 
-	 * @param organizationId
-	 * @return
-	 */
+	
+	public synchronized void resetRoleCache() {
+		mRoleCache = null;
+	}
+	
+	public synchronized boolean isAdminOrLeader() {
+		return isAdminOrLeader(Session.getInstance().getOrganizationId());
+	}
+	
 	public synchronized boolean isAdminOrLeader(final long organizationId) {
 		return isAdmin(organizationId) || isLeader(organizationId);
 	}
 
-	/**
-	 * Returns true if the user is an admin in the given organizationId
-	 * 
-	 * @param organizationId
-	 * @return
-	 */
+	public synchronized boolean isAdmin() {
+		return isAdmin(Session.getInstance().getOrganizationId());
+	}
+	
+	public synchronized boolean isLeader() {
+		return isLeader(Session.getInstance().getOrganizationId());
+	}
+	
 	public synchronized boolean isAdmin(final long organizationId) {
-		return hasLabel(organizationId, U.Role.admin.id());
+		return hasRole(U.Role.admin, organizationId);
 	}
 
-	/**
-	 * Returns true if the user is a leader in the given organization
-	 * 
-	 * @param organizationId
-	 * @return
-	 */
 	public synchronized boolean isLeader(final long organizationId) {
-		return hasLabel(organizationId, U.Role.leader.id());
+		return hasRole(U.Role.leader, organizationId);
 	}
 
 	/**
@@ -552,14 +571,14 @@ public class Person {
 	 * 
 	 * @return
 	 */
-	public Long getPrimaryOrganizationId() {
+	public synchronized Long getPrimaryOrganizationId() {
 		if (getUser() != null) {
 			return getUser().getPrimary_organization_id();
 		}
 		return -1l;
 	}
 
-	public Organization getPrimaryOrganization() {
+	public synchronized Organization getPrimaryOrganization() {
 		if (daoSession == null) {
 			throw new DaoException("Entity is detached from DAO context");
 		}
@@ -569,71 +588,56 @@ public class Person {
 
 	public synchronized void resetOrganizationHierarchy() {
 		mOrganizationHierarchy = null;
-		getOrganizationHierarchy();
 	}
 
 	/**
-	 * Returns a tree of the user's organizations
+	 * Returns a tree of the user's privileged organizations
 	 * 
 	 * @return
 	 */
 	public synchronized TreeDataStructure<Long> getOrganizationHierarchy() {
-		if (mOrganizationHierarchy != null) {
-			return mOrganizationHierarchy;
+		
+		Log.e("PERSON", "getOrganizationHierarchy");
+		
+		if (mOrganizationHierarchy == null) {
+			
+			Log.e("PERSON", "build organization hierarchy");
+			
+			if (daoSession == null) {
+				throw new DaoException("Entity is detached from DAO context");
+			}
+			
+			// build a tree from organization ancestry
+			final TreeDataStructure<Long> tree = new TreeDataStructure<Long>(0l);
+			
+			final List<Organization> organizations = Application.getDb()
+					.getOrganizationDao()
+					.queryBuilder()
+					.where(new WhereCondition.StringCondition(OrganizationDao.Properties.Id.columnName + " IN " + "(SELECT " + OrganizationalRoleDao.TABLENAME + "."
+							+ OrganizationalRoleDao.Properties.Organization_id.columnName + " FROM " + OrganizationalRoleDao.TABLENAME + " WHERE " + OrganizationalRoleDao.TABLENAME + "."
+							+ OrganizationalRoleDao.Properties.Person_id.columnName + " = " + getId() + " AND " + OrganizationalRoleDao.TABLENAME + "."
+							+ OrganizationalRoleDao.Properties.Role_id.columnName + " IN (" + U.Role.admin.id() + "," + U.Role.leader.id() + ")" + ")")).orderAsc(OrganizationDao.Properties.Name).build()
+					.list();
+			
+			for (final Organization organization : organizations) {
+				Log.e("ROOT ORG", organization.getName());
+				recursiveBuildOrganizationHierarchy(tree, organization, hasLabel(organization.getId(), U.Role.admin.id()));
+			}
+			
+			mOrganizationHierarchy = tree;
 		}
-
-		if (daoSession == null) {
-			throw new DaoException("Entity is detached from DAO context");
-		}
-
-		// final List<Long> adminRoles = new ArrayList<Long>();
-		// adminRoles.add(U.Role.admin.id());
-		// adminRoles.add(U.Role.leader.id());
-		// final List<OrganizationalRole> roles = daoSession.getOrganizationalRoleDao().queryBuilder().where(
-		// OrganizationalRoleDao.Properties.Person_id.eq(getId())
-		//
-		// , OrganizationalRoleDao.Properties.Role_id.in(adminRoles))
-		//
-		//
-		//
-		// .orderAsc(OrganizationalRoleDao.Properties.Organization_id).list();
-		//
-		final List<Organization> organizations = daoSession
-				.getOrganizationDao()
-				.queryBuilder()
-				.where(new WhereCondition.StringCondition(OrganizationDao.Properties.Id.columnName + " IN " + "(SELECT " + OrganizationalRoleDao.TABLENAME + "."
-						+ OrganizationalRoleDao.Properties.Organization_id.columnName + " FROM " + OrganizationalRoleDao.TABLENAME + " WHERE " + OrganizationalRoleDao.TABLENAME + "."
-						+ OrganizationalRoleDao.Properties.Person_id.columnName + " = " + getId() + " AND " + OrganizationalRoleDao.TABLENAME + "."
-						+ OrganizationalRoleDao.Properties.Role_id.columnName + " IN (" + U.Role.admin.id() + "," + U.Role.leader.id() + ")" + ")")).orderAsc(OrganizationDao.Properties.Name).build()
-				.list();
-
-		// build a tree from organization ancestry
-		final TreeDataStructure<Long> tree = new TreeDataStructure<Long>(0l);
-
-		// stores already added orgs to avoid duplicates
-		final Set<Long> addedOrgs = new HashSet<Long>();
-
-		for (final Organization organization : organizations) {
-			recursiveBuildOrganizationHierarchy(tree, organization, addedOrgs);
-		}
-
-		mOrganizationHierarchy = tree;
 		return mOrganizationHierarchy;
 	}
 
-	private void recursiveBuildOrganizationHierarchy(final TreeDataStructure<Long> tree, final Organization organization, final Set<Long> addedOrgs) {
-		if (organization == null || addedOrgs.contains(organization.getId())) return;
-		addedOrgs.add(organization.getId());
-
+	private synchronized void recursiveBuildOrganizationHierarchy(final TreeDataStructure<Long> tree, final Organization organization, final boolean isAdmin) {
 		if (organization.getAncestry() != null) {
 			TreeDataStructure<Long> parent = tree;
 			boolean hasPermissions = false;
 			for (final String ancestor : organization.getAncestry().trim().split("/")) {
 				final Long a = Long.parseLong(ancestor);
-				if (isAdminOrLeader(a)) {
+				if (hasLabel(a, U.Role.admin.id()) || hasLabel(a, U.Role.leader.id())) {
 					hasPermissions = true;
 				}
-
 				if (hasPermissions) {
 					if (parent.getTree(a) == null) {
 						parent = parent.addLeaf(a);
@@ -647,16 +651,17 @@ public class Person {
 			}
 		} else {
 			if (tree.getTree(organization.getId()) == null) {
-				if (isAdminOrLeader(organization.getId())) {
+				if (hasLabel(organization.getId(), U.Role.admin.id()) || hasLabel(organization.getId(), U.Role.leader.id())) {
 					tree.addLeaf(organization.getId());
 				}
 			}
 		}
-
-		if (organization.getShow_sub_orgs()) {
+		
+		// parse sub orgs for admins
+		if (organization.getShow_sub_orgs() && isAdmin) {
 			final List<Organization> subOrgs = organization.getSubOrganizations();
 			for (final Organization subOrg : subOrgs) {
-				recursiveBuildOrganizationHierarchy(tree, subOrg, addedOrgs);
+				recursiveBuildOrganizationHierarchy(tree, subOrg, isAdmin);
 			}
 		}
 	}
@@ -664,7 +669,7 @@ public class Person {
 	/**
 	 * @return the person's full first and last name
 	 */
-	public String getName() {
+	public synchronized String getName() {
 		String name = "";
 		if (!U.isNullEmpty(getFirst_name())) {
 			name += getFirst_name();
@@ -675,32 +680,32 @@ public class Person {
 		return name.trim();
 	}
 
-	public Address getCurrentAddress() {
+	public synchronized Address getCurrentAddress() {
 		for (final Address address : getAddressList()) {
 			return address;
 		}
 		return null;
 	}
 
-	public void deleteWithRelations() {
+	public synchronized void deleteWithRelations() {
 		if (daoSession == null) {
 			throw new DaoException("Entity is detached from DAO context");
 		}
 		daoSession.getContactAssignmentDao().queryBuilder().whereOr(ContactAssignmentDao.Properties.Assigned_to_id.eq(id), ContactAssignmentDao.Properties.Person_id.eq(id)).buildDelete()
-				.executeDeleteWithoutDetachingEntities();
-		daoSession.getAddressDao().queryBuilder().where(AddressDao.Properties.Person_id.eq(id)).buildDelete().executeDeleteWithoutDetachingEntities();
-		daoSession.getEmailAddressDao().queryBuilder().where(EmailAddressDao.Properties.Person_id.eq(id)).buildDelete().executeDeleteWithoutDetachingEntities();
+				.executeDelete();
+		daoSession.getAddressDao().queryBuilder().where(AddressDao.Properties.Person_id.eq(id)).buildDelete().executeDelete();
+		daoSession.getEmailAddressDao().queryBuilder().where(EmailAddressDao.Properties.Person_id.eq(id)).buildDelete().executeDelete();
 		daoSession.getFollowupCommentDao().queryBuilder().whereOr(FollowupCommentDao.Properties.Contact_id.eq(id), FollowupCommentDao.Properties.Commenter_id.eq(id)).buildDelete()
-				.executeDeleteWithoutDetachingEntities();
-		daoSession.getOrganizationalRoleDao().queryBuilder().where(OrganizationalRoleDao.Properties.Person_id.eq(id)).buildDelete().executeDeleteWithoutDetachingEntities();
-		daoSession.getPhoneNumberDao().queryBuilder().where(PhoneNumberDao.Properties.Person_id.eq(id)).buildDelete().executeDeleteWithoutDetachingEntities();
+				.executeDelete();
+		daoSession.getOrganizationalRoleDao().queryBuilder().where(OrganizationalRoleDao.Properties.Person_id.eq(id)).buildDelete().executeDelete();
+		daoSession.getPhoneNumberDao().queryBuilder().where(PhoneNumberDao.Properties.Person_id.eq(id)).buildDelete().executeDelete();
 		daoSession.getRejoicableDao().queryBuilder().whereOr(RejoicableDao.Properties.Person_id.eq(id), RejoicableDao.Properties.Created_by_id.eq(id)).buildDelete()
-				.executeDeleteWithoutDetachingEntities();
-		daoSession.getUserDao().queryBuilder().where(UserDao.Properties.Person_id.eq(id)).buildDelete().executeDeleteWithoutDetachingEntities();
+				.executeDelete();
+		daoSession.getUserDao().queryBuilder().where(UserDao.Properties.Person_id.eq(id)).buildDelete().executeDelete();
 		delete();
 	}
 
-	public GPerson getGModel() {
+	public synchronized GPerson getGModel() {
 		final GPerson p = new GPerson();
 
 		p.id = getId();
@@ -730,15 +735,15 @@ public class Person {
 		return p;
 	}
 
-	public void resetStatus() {
+	public synchronized void resetStatus() {
 		mStatuses = null;
 	}
 
-	public FollowupStatus getStatus() {
+	public synchronized FollowupStatus getStatus() {
 		return getStatus(Session.getInstance().getOrganizationId());
 	}
 
-	public FollowupStatus getStatus(final long organizationId) {
+	public synchronized FollowupStatus getStatus(final long organizationId) {
 		if (mStatuses == null) {
 			mStatuses = new HashMap<Long, FollowupStatus>();
 		}
@@ -768,7 +773,7 @@ public class Person {
 		return mStatuses.get(organizationId);
 	}
 
-	public PhoneNumber getPrimaryPhoneNumber() {
+	public synchronized PhoneNumber getPrimaryPhoneNumber() {
 		if (mPrimaryPhoneNumber != null) return mPrimaryPhoneNumber;
 
 		if (daoSession == null) {
@@ -779,11 +784,11 @@ public class Person {
 		return mPrimaryPhoneNumber;
 	}
 
-	public void resetPrimaryPhoneNumber() {
+	public synchronized void resetPrimaryPhoneNumber() {
 		mPrimaryPhoneNumber = null;
 	}
 
-	public EmailAddress getPrimaryEmailAddress() {
+	public synchronized EmailAddress getPrimaryEmailAddress() {
 		if (mPrimaryEmailAddress != null) return mPrimaryEmailAddress;
 
 		if (daoSession == null) {
@@ -794,15 +799,15 @@ public class Person {
 		return mPrimaryEmailAddress;
 	}
 
-	public void resetPrimaryEmailAddress() {
+	public synchronized void resetPrimaryEmailAddress() {
 		mPrimaryEmailAddress = null;
 	}
 
-	public ContactAssignment getContactAssignment() {
+	public synchronized ContactAssignment getContactAssignment() {
 		return getContactAssignment(Session.getInstance().getOrganizationId());
 	}
 
-	public ContactAssignment getContactAssignment(final long organizationId) {
+	public synchronized ContactAssignment getContactAssignment(final long organizationId) {
 		if (mContactAssignments == null) {
 			mContactAssignments = new HashMap<Long, ContactAssignment>();
 		}
@@ -820,11 +825,11 @@ public class Person {
 		return mContactAssignments.get(organizationId);
 	}
 
-	public void resetContactAssignments() {
+	public synchronized void resetContactAssignments() {
 		mContactAssignments = null;
 	}
 
-	public Gender getGenderEnum() {
+	public synchronized Gender getGenderEnum() {
 		if (U.isNullEmpty(getGender())) {
 			return null;
 		}
@@ -835,10 +840,9 @@ public class Person {
 		}
 	}
 
-	public void refreshAll() {
+	public synchronized void refreshAll() {
 		refresh();
 		resetStatus();
-		resetLabels();
 		resetPrimaryEmailAddress();
 		resetPrimaryPhoneNumber();
 		resetContactAssignments();

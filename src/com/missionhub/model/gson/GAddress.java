@@ -31,8 +31,9 @@ public class GAddress {
 			public Address call() throws Exception {
 				synchronized (lock) {
 					final AddressDao dao = Application.getDb().getAddressDao();
+					
 					// delete old addresses
-					dao.queryBuilder().where(AddressDao.Properties.Person_id.eq(personId)).buildDelete().executeDeleteWithoutDetachingEntities();
+					dao.queryBuilder().where(AddressDao.Properties.Person_id.eq(personId)).buildDelete().executeDelete();
 
 					// add new address
 					final Address address = new Address();

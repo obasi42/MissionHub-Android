@@ -60,8 +60,7 @@ public class GContactAssignments {
 					final ContactAssignmentDao dao = Application.getDb().getContactAssignmentDao();
 
 					// delete current assignments
-					dao.queryBuilder().where(ContactAssignmentDao.Properties.Person_id.eq(personId), ContactAssignmentDao.Properties.Organization_id.eq(organizationId)).buildDelete()
-							.executeDeleteWithoutDetachingEntities();
+					dao.queryBuilder().where(ContactAssignmentDao.Properties.Person_id.eq(personId), ContactAssignmentDao.Properties.Organization_id.eq(organizationId)).buildDelete().executeDelete();
 
 					// save the new assignments
 					final List<ContactAssignment> assign = new ArrayList<ContactAssignment>();

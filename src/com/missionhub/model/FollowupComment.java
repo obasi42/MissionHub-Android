@@ -234,7 +234,7 @@ public class FollowupComment {
 		if (daoSession == null) {
 			throw new DaoException("Entity is detached from DAO context");
 		}
-		daoSession.getRejoicableDao().queryBuilder().where(RejoicableDao.Properties.Followup_comment_id.eq(getId())).buildDelete().executeDeleteWithoutDetachingEntities();
+		daoSession.getRejoicableDao().queryBuilder().where(RejoicableDao.Properties.Followup_comment_id.eq(getId())).buildDelete().executeDelete();
 		delete();
 	}
     // KEEP METHODS END

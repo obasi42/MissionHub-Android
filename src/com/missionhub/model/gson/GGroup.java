@@ -38,12 +38,7 @@ public class GGroup {
 				synchronized (lock) {
 					final GroupDao dao = Application.getDb().getGroupDao();
 
-					Group group = dao.load(id);
-					boolean insert = false;
-					if (group == null) {
-						group = new Group();
-						insert = true;
-					}
+					Group group = new Group();
 					group.setId(id);
 					group.setName(name);
 					group.setLocation(location);
@@ -56,13 +51,8 @@ public class GGroup {
 					group.setApprove_join_requests(approve_join_requests);
 					group.setCreated_at(U.parseISO8601(created_at));
 					group.setUpdated_at(U.parseISO8601(updated_at));
-
-					if (insert) {
-						dao.insert(group);
-					} else {
-						dao.update(group);
-					}
-
+					dao.insertOrReplace(group);
+					
 					return group;
 				}
 			}

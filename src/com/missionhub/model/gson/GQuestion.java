@@ -39,13 +39,7 @@ public class GQuestion {
 				synchronized (lock) {
 					final QuestionDao dao = Application.getDb().getQuestionDao();
 
-					Question question = dao.load(id);
-
-					boolean insert = false;
-					if (question == null) {
-						question = new Question();
-						insert = true;
-					}
+					Question question = new Question();
 					question.setId(id);
 					question.setKind(kind);
 					question.setStyle(style);
@@ -59,12 +53,7 @@ public class GQuestion {
 					question.setHidden(hidden);
 					question.setCreated_at(U.parseISO8601(created_at));
 					question.setUpdated_at(U.parseISO8601(updated_at));
-
-					if (insert) {
-						dao.insert(question);
-					} else {
-						dao.update(question);
-					}
+					dao.insertOrReplace(question);
 
 					return question;
 				}

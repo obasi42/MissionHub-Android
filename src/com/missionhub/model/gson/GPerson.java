@@ -7,9 +7,12 @@ import com.google.common.collect.HashMultimap;
 import com.missionhub.application.Application;
 import com.missionhub.application.Session;
 import com.missionhub.model.ContactAssignmentDao;
+import com.missionhub.model.EmailAddressDao;
+import com.missionhub.model.FollowupCommentDao;
 import com.missionhub.model.OrganizationalRoleDao;
 import com.missionhub.model.Person;
 import com.missionhub.model.PersonDao;
+import com.missionhub.model.PhoneNumberDao;
 import com.missionhub.network.HttpParams;
 import com.missionhub.util.U;
 
@@ -69,21 +72,49 @@ public class GPerson {
 						insert = true;
 					}
 					person.setId(id);
-					person.setFirst_name(first_name);
-					person.setLast_name(last_name);
-					person.setGender(gender);
-					person.setCampus(campus);
-					person.setYear_in_school(year_in_school);
-					person.setMajor(major);
-					person.setMinor(minor);
-					person.setBirth_date(U.parseYMD(birth_date));
-					person.setDate_became_christian(U.parseYMD(date_became_christian));
-					person.setGraduation_date(U.parseYMD(graduation_date));
-					person.setPicture(picture);
-					person.setUser_id(user_id);
-					person.setFb_uid(fb_uid);
-					person.setCreated_at(U.parseISO8601(created_at));
-					person.setUpdated_at(U.parseISO8601(updated_at));
+
+					if (!U.isNullEmpty(first_name)) {
+						person.setFirst_name(first_name);
+					}
+					if (!U.isNullEmpty(last_name)) {
+						person.setLast_name(last_name);
+					}
+					if (!U.isNullEmpty(gender)) {
+						person.setGender(gender);
+					}
+					if (!U.isNullEmpty(campus)) {
+						person.setCampus(campus);
+					}
+					if (!U.isNullEmpty(major)) {
+						person.setMajor(major);
+					}
+					if (!U.isNullEmpty(minor)) {
+						person.setMinor(minor);
+					}
+					if (!U.isNullEmpty(birth_date)) {
+						person.setBirth_date(U.parseYMD(birth_date));
+					}
+					if (!U.isNullEmpty(date_became_christian)) {
+						person.setDate_became_christian(U.parseYMD(date_became_christian));
+					}
+					if (!U.isNullEmpty(graduation_date)) {
+						person.setGraduation_date(U.parseYMD(graduation_date));
+					}
+					if (!U.isNullEmpty(picture)) {
+						person.setPicture(picture);
+					}
+					if (!U.isNullEmpty(user_id)) {
+						person.setUser_id(user_id);
+					}
+					if (!U.isNullEmpty(fb_uid)) {
+						person.setFb_uid(fb_uid);
+					}
+					if (!U.isNullEmpty(created_at)) {
+						person.setCreated_at(U.parseISO8601(created_at));
+					}
+					if (!U.isNullEmpty(updated_at)) {
+						person.setUpdated_at(U.parseISO8601(updated_at));
+					}
 
 					if (insert) {
 						dao.insert(person);
@@ -96,12 +127,14 @@ public class GPerson {
 					}
 
 					if (phone_numbers != null) {
+						Application.getDb().getPhoneNumberDao().queryBuilder().where(PhoneNumberDao.Properties.Person_id.eq(id)).buildDelete().executeDelete();
 						for (final GPhoneNumber number : phone_numbers) {
 							number.save(true);
 						}
 					}
 
 					if (email_addresses != null) {
+						Application.getDb().getEmailAddressDao().queryBuilder().where(EmailAddressDao.Properties.Person_id.eq(id)).buildDelete().executeDelete();
 						for (final GEmailAddress address : email_addresses) {
 							address.save(true);
 						}
@@ -110,19 +143,25 @@ public class GPerson {
 					if (contact_assignments != null) {
 						Application.getDb().getContactAssignmentDao().queryBuilder()
 								.where(ContactAssignmentDao.Properties.Person_id.eq(id), ContactAssignmentDao.Properties.Organization_id.eq(Session.getInstance().getOrganizationId())).buildDelete()
-								.executeDeleteWithoutDetachingEntities();
+								.executeDelete();
 						for (final GContactAssignment assignment : contact_assignments) {
 							assignment.save(true);
 						}
 					}
 
 					if (followup_comments != null) {
+						Application.getDb().getFollowupCommentDao().queryBuilder()
+								.where(FollowupCommentDao.Properties.Commenter_id.eq(id), FollowupCommentDao.Properties.Organization_id.eq(Session.getInstance().getOrganizationId())).buildDelete()
+								.executeDelete();
 						for (final GFollowupComment comment : followup_comments) {
 							comment.save(true);
 						}
 					}
 
 					if (comments_on_me != null) {
+						Application.getDb().getFollowupCommentDao().queryBuilder()
+								.where(FollowupCommentDao.Properties.Contact_id.eq(id), FollowupCommentDao.Properties.Organization_id.eq(Session.getInstance().getOrganizationId())).buildDelete()
+								.executeDelete();
 						for (final GFollowupComment comment : comments_on_me) {
 							comment.save(true);
 						}
@@ -131,14 +170,14 @@ public class GPerson {
 					if (organizational_roles != null) {
 						Application.getDb().getOrganizationalRoleDao().queryBuilder()
 								.where(OrganizationalRoleDao.Properties.Person_id.eq(id), OrganizationalRoleDao.Properties.Organization_id.eq(Session.getInstance().getOrganizationId())).buildDelete()
-								.executeDeleteWithoutDetachingEntities();
+								.executeDelete();
 						for (final GOrganizationalRole role : organizational_roles) {
 							role.save(true);
 						}
 					}
 
 					if (all_organizational_roles != null) {
-						Application.getDb().getOrganizationalRoleDao().queryBuilder().where(OrganizationalRoleDao.Properties.Person_id.eq(id)).buildDelete().executeDeleteWithoutDetachingEntities();
+						Application.getDb().getOrganizationalRoleDao().queryBuilder().where(OrganizationalRoleDao.Properties.Person_id.eq(id)).buildDelete().executeDelete();
 						for (final GOrganizationalRole role : all_organizational_roles) {
 							role.save(true);
 						}

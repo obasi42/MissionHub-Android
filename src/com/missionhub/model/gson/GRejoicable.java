@@ -30,18 +30,13 @@ public class GRejoicable {
 			public Rejoicable call() throws Exception {
 				synchronized (lock) {
 					final RejoicableDao dao = Application.getDb().getRejoicableDao();
-
+					
 					if (deleted_at != null) {
 						dao.deleteByKey(id);
 						return null;
 					}
 
-					Rejoicable rejoicable = dao.load(id);
-					boolean insert = false;
-					if (rejoicable == null) {
-						rejoicable = new Rejoicable();
-						insert = true;
-					}
+					Rejoicable rejoicable = new Rejoicable();
 					rejoicable.setId(id);
 					rejoicable.setPerson_id(personId);
 					rejoicable.setCreated_by_id(createdById);
@@ -49,13 +44,8 @@ public class GRejoicable {
 					rejoicable.setWhat(what);
 					rejoicable.setCreated_at(U.parseISO8601(created_at));
 					rejoicable.setUpdated_at(U.parseISO8601(updated_at));
-
-					if (insert) {
-						dao.insert(rejoicable);
-					} else {
-						dao.update(rejoicable);
-					}
-
+					dao.insertOrReplace(rejoicable);
+					
 					return rejoicable;
 				}
 			}

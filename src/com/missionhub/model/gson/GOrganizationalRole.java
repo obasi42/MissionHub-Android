@@ -40,13 +40,7 @@ public class GOrganizationalRole {
 						return null;
 					}
 
-					boolean insert = false;
-					OrganizationalRole role = dao.load(id);
-					if (role == null) {
-						role = new OrganizationalRole();
-						insert = true;
-					}
-
+					final OrganizationalRole role = new OrganizationalRole();
 					role.setId(id);
 					role.setPerson_id(person_id);
 					role.setOrganization_id(organization_id);
@@ -55,12 +49,7 @@ public class GOrganizationalRole {
 					role.setStart_date(U.parseYMD(start_date));
 					role.setCreated_at(U.parseISO8601(created_at));
 					role.setUpdated_at(U.parseISO8601(updated_at));
-
-					if (insert) {
-						dao.insert(role);
-					} else {
-						dao.update(role);
-					}
+					dao.insertOrReplace(role);
 
 					return role;
 				}

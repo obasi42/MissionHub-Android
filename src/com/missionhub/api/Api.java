@@ -251,7 +251,7 @@ public class Api {
 		return new ApiCall<Void>(ApiOptions.builder().method(HttpMethod.DELETE).url(buildUrl("contact_assignments", "bulk_destroy")).responseParser(new ApiResponseParser<Void>() {
 			@Override
 			public Void parseResponse(final HttpResponse response) throws Exception {
-				Application.getDb().getContactAssignmentDao().queryBuilder().where(ContactAssignmentDao.Properties.Id.in(assignmentIds)).buildDelete().executeDeleteWithoutDetachingEntities();
+				Application.getDb().getContactAssignmentDao().queryBuilder().where(ContactAssignmentDao.Properties.Id.in(assignmentIds)).buildDelete().executeDelete();
 				return null;
 			}
 		}).params(params).merge(options).build());

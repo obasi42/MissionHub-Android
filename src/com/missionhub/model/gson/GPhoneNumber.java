@@ -41,12 +41,7 @@ public class GPhoneNumber {
 				synchronized (lock) {
 					final PhoneNumberDao dao = Application.getDb().getPhoneNumberDao();
 
-					PhoneNumber num = dao.load(id);
-					boolean insert = false;
-					if (num == null) {
-						num = new PhoneNumber();
-						insert = true;
-					}
+					PhoneNumber num = new PhoneNumber();
 					num.setId(id);
 					num.setPerson_id(person_id);
 					num.setNumber(number);
@@ -56,13 +51,8 @@ public class GPhoneNumber {
 					num.setEmail_updated_at(U.parseISO8601(email_updated_at));
 					num.setCreated_at(U.parseISO8601(created_at));
 					num.setUpdated_at(U.parseISO8601(updated_at));
-
-					if (insert) {
-						dao.insert(num);
-					} else {
-						dao.update(num);
-					}
-
+					dao.insertOrReplace(num);
+					
 					return num;
 				}
 			}

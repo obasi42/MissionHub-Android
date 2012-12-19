@@ -170,7 +170,7 @@ public class Role {
 			throw new DaoException("Entity is detached from DAO context");
 		}
 		final OrganizationalRoleDao targetDao = daoSession.getOrganizationalRoleDao();
-		targetDao.queryBuilder().where(OrganizationalRoleDao.Properties.Role_id.eq(getId())).buildDelete().executeDeleteWithoutDetachingEntities();
+		targetDao.queryBuilder().where(OrganizationalRoleDao.Properties.Role_id.eq(getId())).buildDelete().executeDelete();
 		delete();
 	}
     // KEEP METHODS END

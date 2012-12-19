@@ -34,7 +34,7 @@ public class Session implements OnAccountsUpdateListener {
 	/** the person id */
 	private long mPersonId = -1;
 
-	/** the oragnization id */
+	/** the organization id */
 	private long mOrganizationId = -1;
 
 	/** the android account manager */
@@ -85,10 +85,8 @@ public class Session implements OnAccountsUpdateListener {
 	 * @return
 	 */
 	public synchronized long getOrganizationId() {
-		if (mOrganizationId < 0) try {
-			return getPerson().getPrimaryOrganizationId();
-		} catch (final NoPersonException e) {
-			return -1;
+		if (mOrganizationId <= 0) {
+			return getPrimaryOrganizationId();
 		}
 		return mOrganizationId;
 	}
@@ -99,8 +97,13 @@ public class Session implements OnAccountsUpdateListener {
 	 * @return
 	 * @throws NoPersonException
 	 */
-	public synchronized long getPrimaryOrganizationId() throws NoPersonException {
-		return getPerson().getPrimaryOrganizationId();
+	public synchronized long getPrimaryOrganizationId() {
+		try {
+			return getPerson().getPrimaryOrganizationId();
+		} catch (NoPersonException e) {
+			/* ignore */
+		}
+		return -1l;
 	}
 
 	/**
@@ -142,13 +145,17 @@ public class Session implements OnAccountsUpdateListener {
 						.include(Api.Include.user) //
 						.build()).get(); //
 
-				getPerson().refreshAll();
-				updateLabels();
-				getPerson().resetOrganizationHierarchy();
-
 				// update the account with new data to keep it fresh
 				mAccountManager.setUserData(mAccount, Authenticator.KEY_PERSON_ID, String.valueOf(getPerson().getId()));
 				mAccountManager.setUserData(mAccount, AccountManager.KEY_ACCOUNT_NAME, getPerson().getName());
+
+				getPerson().refreshAll();
+
+				updateLabels();
+
+				// update the person's organization hierarchy, as it is too expensive to do from the ui thread.
+				getPerson().resetOrganizationHierarchy();
+				getPerson().getOrganizationHierarchy();
 
 				mUpdatePersonTask = null;
 
@@ -169,7 +176,6 @@ public class Session implements OnAccountsUpdateListener {
 		final Callable<Void> callable = new Callable<Void>() {
 			@Override
 			public Void call() throws Exception {
-
 				final long lastUpdated = Long.parseLong(SettingsManager.getInstance().getUserSetting(getPersonId(), "organizations_last_updated", "0"));
 				SettingsManager.getInstance().setUserSetting(getPersonId(), "organizations_last_updated", System.currentTimeMillis() - 1000);
 
@@ -244,10 +250,26 @@ public class Session implements OnAccountsUpdateListener {
 	 * Resets the session data
 	 */
 	private synchronized void resetSession() {
-		mPersonId = -1;
 		mPerson = null;
+		mPersonId = -1;
 		mOrganizationId = -1;
 		mAccount = null;
+		mResuming.set(false);
+		try {
+			mUpdatePersonTask.cancel(true);
+			mUpdatePersonTask = null;
+		} catch (final Exception e) {
+			/* ignore */
+		}
+		try {
+			mUpdateOrganizationsTask.cancel(true);
+			mUpdateOrganizationsTask = null;
+		} catch (final Exception e) {
+			/* ignore */
+		}
+
+		// clear database cache
+		Application.getDb().clear();
 
 		Application.postEvent(new SessionInvalidatedEvent());
 	}

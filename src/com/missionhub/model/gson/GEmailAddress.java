@@ -36,26 +36,16 @@ public class GEmailAddress {
 			@Override
 			public EmailAddress call() throws Exception {
 				synchronized (lock) {
+					
 					final EmailAddressDao dao = Application.getDb().getEmailAddressDao();
-
-					EmailAddress address = dao.load(id);
-					boolean insert = false;
-					if (address == null) {
-						address = new EmailAddress();
-						insert = true;
-					}
+					EmailAddress address = new EmailAddress();
 					address.setId(id);
 					address.setEmail(email);
 					address.setPerson_id(person_id);
 					address.setPrimary(primary);
 					address.setCreated_at(U.parseISO8601(created_at));
 					address.setUpdated_at(U.parseISO8601(updated_at));
-
-					if (insert) {
-						dao.insert(address);
-					} else {
-						dao.update(address);
-					}
+					dao.insertOrReplace(address);
 
 					return address;
 				}

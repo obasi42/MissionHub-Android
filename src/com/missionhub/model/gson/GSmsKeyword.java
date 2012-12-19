@@ -36,13 +36,7 @@ public class GSmsKeyword {
 				synchronized (lock) {
 					final SmsKeywordDao dao = Application.getDb().getSmsKeywordDao();
 
-					SmsKeyword key = dao.load(id);
-					boolean insert = false;
-					if (key == null) {
-						key = new SmsKeyword();
-						insert = true;
-					}
-
+					SmsKeyword key = new SmsKeyword();
 					key.setId(id);
 					key.setKeyword(keyword);
 					key.setOrganization_id(organization_id);
@@ -53,12 +47,7 @@ public class GSmsKeyword {
 					key.setSurvey_id(survey_id);
 					key.setCreated_at(U.parseISO8601(created_at));
 					key.setUpdated_at(U.parseISO8601(updated_at));
-
-					if (insert) {
-						dao.insert(key);
-					} else {
-						dao.update(key);
-					}
+					dao.insertOrReplace(key);
 
 					return key;
 				}
