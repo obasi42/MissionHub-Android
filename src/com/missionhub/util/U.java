@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Locale;
 
 import android.content.Context;
@@ -210,11 +209,29 @@ public class U {
 	}
 
 	public enum Gender {
-		male, female;
+		m, M, male, Male, f, F, female, Female;
+
+		public Gender normalize() {
+			switch (this) {
+			case m:
+			case M:
+			case male:
+			case Male:
+				return male;
+			case f:
+			case F:
+			case female:
+			case Female:
+				return female;
+			default:
+				return null;
+			}
+
+		}
 
 		@Override
 		public String toString() {
-			switch (this) {
+			switch (normalize()) {
 			case male:
 				return getString(R.string.gender_male);
 			case female:
@@ -225,7 +242,7 @@ public class U {
 		}
 
 		public String toFilter() {
-			switch (this) {
+			switch (normalize()) {
 			case male:
 				return "m";
 			case female:
@@ -252,9 +269,9 @@ public class U {
 				return "";
 			}
 		}
-		
+
 		public GRejoicable rejoicable() {
-			GRejoicable rejoicable = new GRejoicable();
+			final GRejoicable rejoicable = new GRejoicable();
 			rejoicable.what = name();
 			return rejoicable;
 		}
@@ -280,9 +297,9 @@ public class U {
 				return "";
 			}
 		}
-		
-		public static FollowupStatus fromString(String string) {
-			if (string.equalsIgnoreCase(getString(R.string.status_uncontacted))){
+
+		public static FollowupStatus fromString(final String string) {
+			if (string.equalsIgnoreCase(getString(R.string.status_uncontacted))) {
 				return uncontacted;
 			} else if (string.equalsIgnoreCase(getString(R.string.status_attempted_contact))) {
 				return attempted_contact;
@@ -296,7 +313,7 @@ public class U {
 			return uncontacted;
 		}
 	}
-	
+
 	public enum Role {
 		admin, contact, involved, leader, alumni;
 
@@ -317,7 +334,7 @@ public class U {
 				return "";
 			}
 		}
-		
+
 		public long id() {
 			switch (this) {
 			case admin:

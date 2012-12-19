@@ -6,6 +6,7 @@ import java.util.concurrent.Callable;
 import com.google.common.collect.HashMultimap;
 import com.missionhub.application.Application;
 import com.missionhub.application.Session;
+import com.missionhub.model.ContactAssignmentDao;
 import com.missionhub.model.OrganizationalRoleDao;
 import com.missionhub.model.Person;
 import com.missionhub.model.PersonDao;
@@ -107,6 +108,7 @@ public class GPerson {
 					}
 
 					if (contact_assignments != null) {
+						Application.getDb().getContactAssignmentDao().queryBuilder().where(ContactAssignmentDao.Properties.Person_id.eq(id), ContactAssignmentDao.Properties.Organization_id.eq(Session.getInstance().getOrganizationId())).buildDelete().executeDeleteWithoutDetachingEntities();
 						for (final GContactAssignment assignment : contact_assignments) {
 							assignment.save(true);
 						}
@@ -165,10 +167,10 @@ public class GPerson {
 			params.add("person[first_name]", first_name);
 		}
 		if (!U.isNullEmpty(last_name)) {
-			params.add("person[last_name]", first_name);
+			params.add("person[last_name]", last_name);
 		}
 		if (!U.isNullEmpty(gender)) {
-			params.add("person[gender]", first_name);
+			params.add("person[gender]", gender);
 		}
 
 		if (phone_numbers != null) {
@@ -233,17 +235,19 @@ public class GPerson {
 			params.add("assign_to_me", _assignToMe);
 		}
 
-		for (final Long key : _answers.keySet()) {
-			final Set<String> values = _answers.get(key);
-			if (values.size() <= 1) {
-				for (final String value : values) {
-					params.add("answers[" + key + "]", value);
-				}
-			} else {
-				int count = 0;
-				for (final String value : values) {
-					params.add("answers[" + key + "][" + count + "]", value);
-					count++;
+		if (_answers != null) {
+			for (final Long key : _answers.keySet()) {
+				final Set<String> values = _answers.get(key);
+				if (values.size() <= 1) {
+					for (final String value : values) {
+						params.add("answers[" + key + "]", value);
+					}
+				} else {
+					int count = 0;
+					for (final String value : values) {
+						params.add("answers[" + key + "][" + count + "]", value);
+						count++;
+					}
 				}
 			}
 		}

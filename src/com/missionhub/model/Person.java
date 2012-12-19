@@ -1,6 +1,9 @@
 package com.missionhub.model;
 
 import java.util.List;
+
+import com.missionhub.application.Application;
+import com.missionhub.application.Session;
 import com.missionhub.model.DaoSession;
 import de.greenrobot.dao.DaoException;
 
@@ -16,12 +19,15 @@ import com.missionhub.model.gson.GPhoneNumber;
 import com.missionhub.util.TreeDataStructure;
 import com.missionhub.util.U;
 import com.missionhub.util.U.FollowupStatus;
+import com.missionhub.util.U.Gender;
 
 import de.greenrobot.dao.QueryBuilder;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 // KEEP INCLUDES END
 /**
@@ -67,10 +73,13 @@ public class Person {
     private List<AnswerSheet> answerSheetList;
 
     // KEEP FIELDS - put your custom fields here
- 	/** system labels. */
  	private SetMultimap<Long, Long> mLabels; // organizationId, label
  	private TreeDataStructure<Long> mOrganizationHierarchy;
-    // KEEP FIELDS END
+ 	private Map<Long, FollowupStatus> mStatuses;
+	private EmailAddress mPrimaryEmailAddress;
+	private PhoneNumber mPrimaryPhoneNumber;
+	private Map<Long, ContactAssignment> mContactAssignments;
+ 	// KEEP FIELDS END
 
     public Person() {
     }
@@ -455,24 +464,24 @@ public class Person {
 
  	private SetMultimap<Long, Long> getLabels() {
  		if (mLabels == null) {
- 			resetLabels();
+ 			final SetMultimap<Long, Long> labelsTemp = Multimaps.synchronizedSetMultimap(HashMultimap.<Long, Long> create());
+ 	 		resetOrganizationalRoleList();
+ 	 		try {
+ 	 			final List<OrganizationalRole> roles = getOrganizationalRoleList();
+ 	 			for (final OrganizationalRole role : roles) {
+ 	 				role.refresh();
+ 	 				labelsTemp.put(role.getOrganization_id(), role.getRole_id());
+ 	 			}
+ 	 		} catch (DaoException e) {
+ 	 			getLabels();
+ 	 		}
+ 	 		mLabels = labelsTemp;
  		}
  		return mLabels;
  	}
-
+ 	
  	public void resetLabels() {
- 		final SetMultimap<Long, Long> labelsTemp = Multimaps.synchronizedSetMultimap(HashMultimap.<Long, Long> create());
- 		resetOrganizationalRoleList();
- 		try {
- 			final List<OrganizationalRole> roles = getOrganizationalRoleList();
- 			for (final OrganizationalRole role : roles) {
- 				role.refresh();
- 				labelsTemp.put(role.getOrganization_id(), role.getRole_id());
- 			}
- 		} catch (DaoException e) {
- 			resetLabels();
- 		}
- 		mLabels = labelsTemp;
+ 		mLabels = null;
  	}
 
  	/**
@@ -683,16 +692,107 @@ public class Person {
 		return p;
  	}
  	
+ 	public void resetStatus() {
+ 		mStatuses = null;
+ 	}
+ 	
+	public FollowupStatus getStatus() {
+		return getStatus(Session.getInstance().getOrganizationId());
+	}
+ 	
  	public FollowupStatus getStatus(long organizationId) {
+ 		if (mStatuses == null) {
+ 			mStatuses = new HashMap<Long, FollowupStatus>();
+ 		}
+ 		
+ 		if (mStatuses.get(organizationId) == null) {
+ 			if (daoSession == null) {
+ 	 			throw new DaoException("Entity is detached from DAO context");
+ 	 		}
+ 			
+	 		OrganizationalRole role = daoSession.getOrganizationalRoleDao().queryBuilder().where(OrganizationalRoleDao.Properties.Person_id.eq(getId()), OrganizationalRoleDao.Properties.Role_id.eq(U.Role.contact.id()), OrganizationalRoleDao.Properties.Organization_id.eq(organizationId)).limit(1).unique();
+	 		if (role == null || role.getFollowup_status() == null) {
+	 		 	role = daoSession.getOrganizationalRoleDao().queryBuilder().where(OrganizationalRoleDao.Properties.Person_id.eq(getId()), OrganizationalRoleDao.Properties.Followup_status.isNotNull(), OrganizationalRoleDao.Properties.Organization_id.eq(organizationId)).limit(1).unique();
+	 		}
+	 		
+	 		if (role != null) {
+	 			mStatuses.put(organizationId, U.FollowupStatus.valueOf(role.getFollowup_status()));
+	 		}
+ 		}
+ 		return mStatuses.get(organizationId);
+ 	}
+ 	
+ 	public PhoneNumber getPrimaryPhoneNumber() {
+ 		if (mPrimaryPhoneNumber != null) return mPrimaryPhoneNumber;
+ 		
  		if (daoSession == null) {
  			throw new DaoException("Entity is detached from DAO context");
  		}
- 		OrganizationalRole role = daoSession.getOrganizationalRoleDao().queryBuilder().where(OrganizationalRoleDao.Properties.Person_id.eq(getId()), OrganizationalRoleDao.Properties.Role_id.eq(U.Role.contact.id()), OrganizationalRoleDao.Properties.Organization_id.eq(organizationId)).unique();
- 		if (role != null) {
- 			return U.FollowupStatus.valueOf(role.getFollowup_status());
- 		}
- 		return null;
+ 		
+ 		mPrimaryPhoneNumber = daoSession.getPhoneNumberDao().queryBuilder().where(PhoneNumberDao.Properties.Person_id.eq(getId()), PhoneNumberDao.Properties.Primary.eq(true)).limit(1).unique();
+ 		return mPrimaryPhoneNumber;
  	}
+ 	
+ 	public void resetPrimaryPhoneNumber() {
+ 		mPrimaryPhoneNumber = null;
+ 	}
+ 	
+ 	public EmailAddress getPrimaryEmailAddress() {
+ 		if (mPrimaryEmailAddress != null) return mPrimaryEmailAddress;
+ 		
+ 		if (daoSession == null) {
+ 			throw new DaoException("Entity is detached from DAO context");
+ 		}
+ 		
+ 		mPrimaryEmailAddress = daoSession.getEmailAddressDao().queryBuilder().where(EmailAddressDao.Properties.Person_id.eq(getId()), EmailAddressDao.Properties.Primary.eq(true)).limit(1).unique();
+ 		return mPrimaryEmailAddress;
+ 	}
+ 	
+ 	public void resetPrimaryEmailAddress() {
+ 		mPrimaryEmailAddress = null;
+ 	}
+ 	
+ 	public ContactAssignment getContactAssignment() {
+ 		return getContactAssignment(Session.getInstance().getOrganizationId());
+ 	}
+ 	
+ 	public ContactAssignment getContactAssignment(long organizationId) {
+ 		if (mContactAssignments == null) {
+ 			mContactAssignments = new HashMap<Long, ContactAssignment>();
+ 		}
+ 		
+ 		if (mContactAssignments.get(organizationId) == null) {
+ 	 		if (daoSession == null) {
+ 	 			throw new DaoException("Entity is detached from DAO context");
+ 	 		}
+ 			mContactAssignments.put(organizationId, Application.getDb().getContactAssignmentDao().queryBuilder().where(ContactAssignmentDao.Properties.Person_id.eq(getId()), ContactAssignmentDao.Properties.Organization_id.eq(Session.getInstance().getOrganizationId())).orderDesc(ContactAssignmentDao.Properties.Updated_at).limit(1).unique());
+ 		}
+ 		return mContactAssignments.get(organizationId);
+ 	}
+ 	
+ 	public void resetContactAssignments() {
+ 		mContactAssignments = null;
+ 	}
+ 	
+ 	public Gender getGenderEnum() {
+ 		if (U.isNullEmpty(getGender())) {
+ 			return null;
+ 		}
+ 		try {
+ 			return Gender.valueOf(getGender());
+ 		} catch (Exception e) {
+ 			return null;
+ 		}
+ 	}
+ 	
+	public void refreshAll() {
+		refresh();
+		resetStatus();
+ 		resetLabels();
+ 		resetOrganizationHierarchy();
+ 		resetPrimaryEmailAddress();
+ 		resetPrimaryPhoneNumber();
+ 		resetContactAssignments();
+	}
     // KEEP METHODS END
-
 }

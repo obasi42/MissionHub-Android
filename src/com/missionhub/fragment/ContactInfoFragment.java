@@ -39,14 +39,11 @@ import com.missionhub.application.Session;
 import com.missionhub.exception.ExceptionHelper;
 import com.missionhub.fragment.ContactAssignmentDialog.ContactAssignmentListener;
 import com.missionhub.model.ContactAssignment;
-import com.missionhub.model.ContactAssignmentDao;
 import com.missionhub.model.EmailAddress;
-import com.missionhub.model.EmailAddressDao;
 import com.missionhub.model.FollowupComment;
 import com.missionhub.model.FollowupCommentDao;
 import com.missionhub.model.Person;
 import com.missionhub.model.PhoneNumber;
-import com.missionhub.model.PhoneNumberDao;
 import com.missionhub.model.Rejoicable;
 import com.missionhub.model.gson.GFollowupComment;
 import com.missionhub.model.gson.GRejoicable;
@@ -381,7 +378,7 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 		if (mPerson == null) return;
 		if (!mLayoutComplete) return;
 
-		mPerson.refresh();
+		mPerson.refreshAll();
 
 		// all this for a name...
 		String givenName = mPerson.getFirst_name();
@@ -426,7 +423,7 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 		}
 
 		// calling/messaging
-		PhoneNumber phoneNumber = Application.getDb().getPhoneNumberDao().queryBuilder().where(PhoneNumberDao.Properties.Person_id.eq(mPersonId), PhoneNumberDao.Properties.Primary.eq(true)).unique();
+		final PhoneNumber phoneNumber = mPerson.getPrimaryPhoneNumber();
 		if (phoneNumber != null) {
 			final String prettyNumber = U.formatPhoneNumber(phoneNumber.getNumber());
 			mHeaderPhone.setText(prettyNumber);
@@ -463,7 +460,7 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 		}
 
 		// emailing
-		final EmailAddress emailAddress = Application.getDb().getEmailAddressDao().queryBuilder().where(EmailAddressDao.Properties.Person_id.eq(mPersonId), EmailAddressDao.Properties.Primary.eq(true)).unique();
+		final EmailAddress emailAddress = mPerson.getPrimaryEmailAddress();
 		if (emailAddress != null) {
 			mHeaderEmail.setText(emailAddress.getEmail());
 			mHeaderContainerEmail.setVisibility(View.VISIBLE);
@@ -482,14 +479,11 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 		}
 
 		// assignment
-		final ContactAssignment assignment = Application.getDb().getContactAssignmentDao().queryBuilder()
-				.where(ContactAssignmentDao.Properties.Person_id.eq(mPerson.getId()), ContactAssignmentDao.Properties.Organization_id.eq(Session.getInstance().getOrganizationId())).limit(1).unique();
-
+		final ContactAssignment assignment = mPerson.getContactAssignment();
 		if (assignment == null) {
-			mHeaderAssignment.setText("Unassigned");
+			mHeaderAssignment.setText("");
 		} else {
 			final Person assignedTo = Application.getDb().getPersonDao().load(assignment.getAssigned_to_id());
-
 			if (!U.isNullEmpty(assignedTo.getName())) {
 				mHeaderAssignment.setText(assignedTo.getName());
 			} else {
@@ -498,8 +492,8 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 		}
 
 		// set the "more info" view
-		if (!U.isNullEmpty(mPerson.getGender())) {
-			((TextView) mInfoGender.findViewById(android.R.id.text1)).setText(mPerson.getGender());
+		if (mPerson.getGenderEnum() != null) {
+			((TextView) mInfoGender.findViewById(android.R.id.text1)).setText(mPerson.getGenderEnum().toString());
 			mInfoGender.setVisibility(View.VISIBLE);
 		} else {
 			mInfoGender.setVisibility(View.GONE);
@@ -534,12 +528,11 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 		if (mPerson == null) return;
 		if (!mLayoutComplete) return;
 
-		mPerson.resetFollowup_comments();
-
 		mAdapter.setNotifyOnChange(false);
 		mAdapter.clear();
 
-		final List<FollowupComment> comments = Application.getDb().getFollowupCommentDao().queryBuilder().where(FollowupCommentDao.Properties.Contact_id.eq(mPersonId)).orderDesc(FollowupCommentDao.Properties.Updated_at).list();
+		final List<FollowupComment> comments = Application.getDb().getFollowupCommentDao().queryBuilder().where(FollowupCommentDao.Properties.Contact_id.eq(mPersonId))
+				.orderDesc(FollowupCommentDao.Properties.Updated_at).list();
 		for (final FollowupComment comment : comments) {
 			mAdapter.add(new CommentItem(comment));
 		}
@@ -891,7 +884,7 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 
 		updateCommentStateData();
 
-		if (U.isNullEmpty(mComment.comment) && mComment.rejoicables.length == 0 && mComment.status.equalsIgnoreCase(mPerson.getStatus(Session.getInstance().getOrganizationId()).toString())) {
+		if (U.isNullEmpty(mComment.comment) && (mComment.rejoicables == null || mComment.rejoicables.length == 0) && mComment.status.equalsIgnoreCase(mPerson.getStatus().toString())) {
 			Toast.makeText(getActivity(), R.string.contact_cannot_comment, Toast.LENGTH_LONG).show();
 			return;
 		}
@@ -907,11 +900,11 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 			@Override
 			public void onSuccess(final Void _) {
 				Toast.makeText(Application.getContext(), R.string.contact_comment_saved, Toast.LENGTH_SHORT).show();
-				
+
 				if (mComment.status != null && isVisible()) {
 					mCommentStatus.setSelection(U.FollowupStatus.valueOf(mComment.status).ordinal(), false);
 				}
-				
+
 				clearCommentBox();
 				refreshContact();
 			}
@@ -976,8 +969,8 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 	private void updateCommentStateData() {
 		mComment.comment = mCommentComment.getText().toString();
 		mComment.status = ((FollowupStatus) mCommentStatus.getSelectedItem()).name();
-		
-		List<GRejoicable> rejoicables = new ArrayList<GRejoicable>();
+
+		final List<GRejoicable> rejoicables = new ArrayList<GRejoicable>();
 		if ((Boolean) mCommentRejoiceChrist.getTag()) {
 			rejoicables.add(U.Rejoicable.prayed_to_receive.rejoicable());
 		}
@@ -997,7 +990,7 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 		mComment = new GFollowupComment();
 		mCommentComment.setText("");
 		mCommentComment.clearFocus();
-		mCommentStatus.setSelection(mPerson.getStatus(Session.getInstance().getOrganizationId()).ordinal(), false);
+		mCommentStatus.setSelection(mPerson.getStatus().ordinal(), false);
 		mCommentRejoiceGospel.setTag(false);
 		mCommentRejoiceChrist.setTag(false);
 		mCommentRejoiceConvo.setTag(false);
@@ -1008,11 +1001,11 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 	 * Updates the comment box with the contacts status and data in mComment
 	 */
 	private void updateCommentBox() {
-		FollowupStatus status = mPerson.getStatus(Session.getInstance().getOrganizationId());
+		final FollowupStatus status = mPerson.getStatus(Session.getInstance().getOrganizationId());
 		if (status != null) {
 			mCommentStatus.setSelection(status.ordinal(), false);
 		}
-		
+
 		// restore comment from mComment
 		if (mComment != null) {
 			if (mComment.comment != null) {

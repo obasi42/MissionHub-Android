@@ -12,6 +12,7 @@ import com.missionhub.application.DrawableCache;
 import com.missionhub.model.Person;
 import com.missionhub.ui.ObjectArrayAdapter;
 import com.missionhub.util.U;
+import com.missionhub.util.U.Gender;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
@@ -95,7 +96,7 @@ public class ContactListAdapter extends ObjectArrayAdapter {
 			}
 
 			if (item.person != null) {
-
+				
 				if (holder.avatar != null) {
 					if (!U.isNullEmpty(item.person.getPicture())) {
 						ImageLoader.getInstance().displayImage(item.person.getPicture(), holder.avatar, mImageLoaderOptions);
@@ -113,41 +114,35 @@ public class ContactListAdapter extends ObjectArrayAdapter {
 				}
 
 				if (holder.status != null) {
-					//TODO: show status
-//					if (!U.isNullEmpty(item.person.getStatus())) {
-//						holder.status.setText(U.translateStatus(item.person.getStatus()));
-//					} else {
-//						holder.status.setText("");
-//					}
+					if (!U.isNullEmpty(item.person.getStatus())) {
+						holder.status.setText(item.person.getStatus().toString());
+					} else {
+						holder.status.setText("");
+					}
 				}
 
 				if (holder.gender != null) {
-					//TODO: show gender
-//					if (!U.isNullEmpty(item.person.getGender())) {
-//						holder.gender.setText(U.translateStatus(item.person.getGender()));
-//					} else {
-//						holder.gender.setText("");
-//					}
+					if (!U.isNullEmpty(item.person.getGender())) {
+						holder.gender.setText(Gender.valueOf(item.person.getGender()).toString());
+					} else {
+						holder.gender.setText("");
+					}
 				}
 
 				if (holder.email != null) {
-					item.person.getEmailAddressList();
-					// TODO: show email address
-//					
-//					if (!U.isNullEmpty(item.person.getEmail_address())) {
-//						holder.email.setText(U.translateStatus(item.person.getEmail_address()));
-//					} else {
-//						holder.email.setText("");
-//					}
+					if (item.person.getPrimaryEmailAddress() != null) {
+						holder.email.setText(item.person.getPrimaryEmailAddress().getEmail());
+					} else {
+						holder.email.setText("");
+					}
 				}
 
 				if (holder.phone != null) {
-					//TODO: show phone number
-//					if (!U.isNullEmpty(item.person.getPhone_number())) {
-//						holder.phone.setText(U.translateStatus(item.person.getPhone_number()));
-//					} else {
-//						holder.phone.setText("");
-//					}
+					if (item.person.getPrimaryPhoneNumber() != null) {	
+						holder.phone.setText(item.person.getPrimaryPhoneNumber().getNumber());
+					} else {
+						holder.phone.setText("");
+					}
 				}
 			}
 		} else if (object instanceof ProgressItem) {

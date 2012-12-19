@@ -142,7 +142,7 @@ public class Session implements OnAccountsUpdateListener {
 						.include(Api.Include.user) //
 						.build()).get(); //
 
-				mPerson.refresh();
+				mPerson.refreshAll();
 
 				updateLabels();
 
