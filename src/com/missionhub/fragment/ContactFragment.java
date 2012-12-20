@@ -1,5 +1,6 @@
 package com.missionhub.fragment;
 
+import org.holoeverywhere.widget.ProgressBar;
 import org.holoeverywhere.widget.Toast;
 
 import roboguice.inject.InjectView;
@@ -8,15 +9,10 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.ImageView;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
@@ -31,9 +27,9 @@ import com.missionhub.application.Application;
 import com.missionhub.exception.ExceptionHelper;
 import com.missionhub.model.Person;
 import com.missionhub.ui.NavigationSpinnerAdapter;
+import com.missionhub.ui.ProgressItemHelper;
 import com.missionhub.ui.widget.LockedViewPager;
 import com.missionhub.util.U;
-import com.missionhub.util.facebook.FacebookImageDownloader;
 
 public class ContactFragment extends BaseFragment implements OnNavigationListener, OnPageChangeListener {
 
@@ -49,6 +45,9 @@ public class ContactFragment extends BaseFragment implements OnNavigationListene
 	/** the view pager */
 	@InjectView(R.id.pager) private LockedViewPager mPager;
 
+	/** the progress view */
+	@InjectView(R.id.progress) private ProgressBar mProgress;
+
 	/** the view pager adapter */
 	private FragmentStatePagerAdapter mAdapter;
 
@@ -58,19 +57,18 @@ public class ContactFragment extends BaseFragment implements OnNavigationListene
 	/** the survey results fragment */
 	private ContactSurveysFragment mSurveysFragment;
 
-	/** the task used to update the contact */
-	private SafeAsyncTask<Person> mContactTask;
+	/** the task used to refresh the person */
+	private SafeAsyncTask<Person> mRefreshTask;
 
-	/** the refresh actionbar menu item */
-	private MenuItem mRefreshItem;
+	/** the progress item helper */
+	private final ProgressItemHelper mProgressHelper = new ProgressItemHelper();
 
-	/** the image view for the actionbar refreshing icon */
-	private ImageView mRefreshingView;
-
+	/** instantiate a new fragment for the given person */
 	public static ContactFragment instantiate(final Person person) {
 		return instantiate(person.getId());
 	}
 
+	/** instantiate a new fragment for the given person id */
 	public static ContactFragment instantiate(final long personId) {
 		final Bundle bundle = new Bundle();
 		bundle.putLong("personId", personId);
@@ -84,7 +82,9 @@ public class ContactFragment extends BaseFragment implements OnNavigationListene
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setRetainInstance(true);
+		if (!U.superGetRetainInstance(this)) {
+			setRetainInstance(true);
+		}
 		setHasOptionsMenu(true);
 	}
 
@@ -92,48 +92,70 @@ public class ContactFragment extends BaseFragment implements OnNavigationListene
 	public void onAttach(final Activity activity) {
 		super.onAttach(activity);
 
-		final Person oldPerson = mPerson;
-
 		if (getArguments() != null) {
 			mPersonId = getArguments().getLong("personId", -1);
-			mPerson = Application.getDb().getPersonDao().load(mPersonId);
 		}
 
-		if (mPersonId < 0 || mPerson == null) {
-			if (mContactTask != null) {
-				mContactTask.cancel(true);
-			}
-			Toast.makeText(getActivity(), "No person provided for this fragment.", Toast.LENGTH_SHORT).show();
+		if (mPersonId < 0) {
+			Toast.makeText(getActivity(), "No target person id.", Toast.LENGTH_SHORT).show();
 			activity.finish();
+			return;
 		}
 
-		if (oldPerson == null) {
-			refreshContact();
+		if (mPerson == null) {
+			mPerson = Application.getDb().getPersonDao().load(mPersonId);
+			notifyPersonUpdated();
+			refreshPerson();
 		}
 	}
 
 	@Override
 	public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
-		mRefreshingView = (ImageView) inflater.inflate(R.layout.refresh_icon, null);
+		mProgressHelper.onCreateView(inflater);
 		return LayoutInflater.from(getActivity()).inflate(R.layout.fragment_contact, null);
+	}
+
+	@Override
+	public void onDestroyView() {
+		mProgressHelper.onDestroyView();
+		super.onDestroyView();
+	}
+
+	@Override
+	public void onDestroy() {
+		try {
+			mRefreshTask.cancel(true);
+		} catch (final Exception e) {
+			/* ignore */
+		}
+		super.onDestroy();
 	}
 
 	@Override
 	public void onViewCreated(final View view, final Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 
+		if (mPerson != null) {
+			mProgress.setVisibility(View.INVISIBLE);
+			mPager.setVisibility(View.VISIBLE);
+		} else {
+			mPager.setVisibility(View.INVISIBLE);
+			mProgress.setVisibility(View.VISIBLE);
+		}
+
 		if (mAdapter == null) {
 			mAdapter = new FragmentStatePagerAdapter(getChildFragmentManager()) {
 
 				@Override
 				public Fragment getItem(final int index) {
-					Log.e("CREATE FRAGMENT", "CREATE FRAGMENT " + index);
 					switch (index) {
 					case 0:
-						mInfoFragment = ContactInfoFragment.instantiate(mPersonId);
+						mInfoFragment = new ContactInfoFragment();
+						notifyPersonUpdated();
 						return mInfoFragment;
 					case 1:
-						mSurveysFragment = ContactSurveysFragment.instantiate(mPersonId);
+						mSurveysFragment = new ContactSurveysFragment();
+						notifyPersonUpdated();
 						return mSurveysFragment;
 					default:
 						throw new RuntimeException("Index out of bounds");
@@ -146,10 +168,9 @@ public class ContactFragment extends BaseFragment implements OnNavigationListene
 				}
 			};
 		}
-
 		mPager.setPagingLocked(false);
 		mPager.setOnPageChangeListener(this);
-		mPager.setOffscreenPageLimit(2); // prevent the fragments from being removed
+		mPager.setOffscreenPageLimit(2);
 		mPager.setAdapter(mAdapter);
 		mPager.setCurrentItem(mPage);
 	}
@@ -159,20 +180,17 @@ public class ContactFragment extends BaseFragment implements OnNavigationListene
 		super.onActivityCreated(savedInstanceState);
 
 		U.resetActionBar(getSherlockActivity());
-
 		getSherlockActivity().getSupportActionBar().setDisplayShowTitleEnabled(false);
 		getSherlockActivity().getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 		getSherlockActivity().getSupportActionBar().setListNavigationCallbacks(new NavigationSpinnerAdapter(getActivity(), R.string.contact_nav_info, R.string.contact_nav_surveys), this);
 		getSherlockActivity().getSupportActionBar().setSelectedNavigationItem(mPager.getCurrentItem());
 	}
 
+	/**
+	 * Called on action bar menu item selected
+	 */
 	@Override
 	public boolean onNavigationItemSelected(final int index, final long id) {
-		if (mRefreshingView != null && mRefreshItem != null) {
-			mRefreshingView.clearAnimation();
-			mRefreshItem.setActionView(null);
-		}
-		getSherlockActivity().invalidateOptionsMenu();
 		switch (index) {
 		case 0:
 			mPager.setCurrentItem(0, true);
@@ -185,131 +203,154 @@ public class ContactFragment extends BaseFragment implements OnNavigationListene
 	}
 
 	@Override
-	public void onPageScrollStateChanged(final int state) {
-		if (state == ViewPager.SCROLL_STATE_IDLE) {
-			getSherlockActivity().getSupportActionBar().setSelectedNavigationItem(mPager.getCurrentItem());
-		}
-		mPage = mPager.getCurrentItem();
-	}
+	public void onPageScrollStateChanged(final int state) {}
 
 	@Override
 	public void onPageScrolled(final int index, final float positionOffset, final int positionOffsetPixels) {}
 
 	@Override
-	public void onPageSelected(final int index) {}
+	public void onPageSelected(final int index) {
+		if (mPage != index) {
+			getSherlockActivity().getSupportActionBar().setSelectedNavigationItem(mPager.getCurrentItem());
+			mPage = index;
+		}
+	}
 
 	@Override
 	public void onCreateOptionsMenu(final Menu menu, final MenuInflater inflater) {
-		// TODO remove this logic when nested fragment menus work
-		if (mInfoFragment != null && mPage == 0) {
-			mInfoFragment.onCreateOptionsMenu(menu, inflater);
-		}
-		if (mSurveysFragment != null && mPage == 1) {
-			mSurveysFragment.onCreateOptionsMenu(menu, inflater);
-		}
-
-		mRefreshItem = menu.add(Menu.NONE, R.id.menu_item_refresh, Menu.NONE, R.string.action_refresh).setIcon(R.drawable.ic_action_refresh)
-				.setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
-
-		updateRefreshIcon();
-
 		super.onCreateOptionsMenu(menu, inflater);
+
+		mProgressHelper.onCreateOptionsMenu(menu);
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(final MenuItem item) {
-		// TODO remove this logic when nested fragment menus work
-		if (item.getItemId() == R.id.menu_item_refresh) {
-			refreshContact();
+		if (item.getItemId() == R.id.action_refresh) {
+			refreshPerson();
 			return true;
-		}
-		if (mPage == 0) {
-			return mInfoFragment.onOptionsItemSelected(item);
-		} else if (mPage == 1) {
-			return mSurveysFragment.onOptionsItemSelected(item);
 		}
 		return super.onOptionsItemSelected(item);
 	}
 
-	public synchronized void refreshContact() {
-		if (mContactTask != null) {
-			mContactTask.cancel(true);
+	/**
+	 * Refreshes the person data from the MissionHub API
+	 */
+	private synchronized void refreshPerson() {
+		try {
+			mRefreshTask.cancel(true);
+		} catch (final Exception e) {
+			/* ignore */
 		}
-		mContactTask = new SafeAsyncTask<Person>() {
+
+		addProgress("refreshPerson");
+
+		mRefreshTask = new SafeAsyncTask<Person>() {
 
 			@Override
 			public Person call() throws Exception {
-				return Api.getPerson(
-						mPersonId,
-						ApiOptions.builder()
-								//
-								.include(Include.answer_sheets).include(Include.answers).include(Include.comments_on_me).include(Include.contact_assignments).include(Include.current_address)
-								.include(Include.email_addresses).include(Include.organizational_roles).include(Include.phone_numbers).build()).get();
+				final Person person = Api.getPerson(mPersonId, ApiOptions.builder() //
+						.include(Include.answer_sheets) //
+						.include(Include.answers) //
+						.include(Include.comments_on_me) //
+						.include(Include.rejoicables) //
+						.include(Include.contact_assignments) //
+						.include(Include.current_address) //
+						.include(Include.email_addresses) //
+						.include(Include.organizational_roles) //
+						.include(Include.phone_numbers) //
+						.build()).get();
+
+				person.refreshAll();
+				return person;
 			}
 
 			@Override
 			public void onSuccess(final Person person) {
-				mPersonId = person.getId();
 				mPerson = person;
-				FacebookImageDownloader.removeFromCache(mPerson);
-				if (mInfoFragment != null) {
-					mInfoFragment.notifyContactUpdated();
+
+				if (isVisible() && mPager != null) {
+					mProgress.setVisibility(View.INVISIBLE);
+					mPager.setVisibility(View.VISIBLE);
 				}
-				if (mSurveysFragment != null) {
-					mSurveysFragment.notifyContactUpdated();
-				}
+
+				notifyPersonUpdated();
 			}
 
 			@Override
 			public void onFinally() {
-				mContactTask = null;
-				updateRefreshIcon();
+				mRefreshTask = null;
+
+				removeProgress("refreshPerson");
+
+				if (mPerson == null) {
+					finishWithNoPerson();
+					return;
+				}
 			}
 
 			@Override
 			public void onException(final Exception e) {
-				final ExceptionHelper eh = new ExceptionHelper(Application.getContext(), e);
-				eh.makeToast("Failed to refresh contact.");
+				if (mPerson != null) {
+					final ExceptionHelper eh = new ExceptionHelper(Application.getContext(), e);
+					eh.makeToast("Failed to refresh contact.");
+				}
 			}
 
 			@Override
-			public void onInterrupted(final Exception e) {
-
-			}
+			public void onInterrupted(final Exception e) {}
 		};
-		updateRefreshIcon();
-		Application.getExecutor().execute(mContactTask.future());
-	}
-
-	public boolean isInfoWorking() {
-		if (mInfoFragment != null) {
-			return mInfoFragment.isWorking();
-		}
-		return false;
-	}
-
-	public boolean isSurveysWorking() {
-		if (mSurveysFragment != null) {
-			return mSurveysFragment.isWorking();
-		}
-		return false;
+		Application.getExecutor().execute(mRefreshTask.future());
 	}
 
 	/**
-	 * Updates the refresh icon based on the tasks
+	 * Adds a task to the progress item helper
+	 * 
+	 * @param task
 	 */
-	public void updateRefreshIcon() {
-		if (mRefreshItem == null || mRefreshingView == null) return;
+	public void addProgress(final Object task) {
+		mProgressHelper.addProgress(task);
+	}
 
-		if (mContactTask != null || isInfoWorking() || isSurveysWorking()) {
-			final Animation rotation = AnimationUtils.loadAnimation(getActivity(), R.anim.clockwise_refresh);
-			rotation.setRepeatCount(Animation.INFINITE);
-			mRefreshingView.startAnimation(rotation);
-			mRefreshItem.setActionView(mRefreshingView);
-		} else {
-			mRefreshingView.clearAnimation();
-			mRefreshItem.setActionView(null);
+	/**
+	 * Removes a task from the progress item helper
+	 * 
+	 * @param task
+	 */
+	public void removeProgress(final Object task) {
+		mProgressHelper.removeProgress(task);
+	}
+
+	/**
+	 * Returns true when the progress helper has the given task
+	 * 
+	 * @param task
+	 * @return
+	 */
+	public boolean hasProgress(final Object task) {
+		return mProgressHelper.hasProgress(task);
+	}
+
+	/**
+	 * Displays an error toast and finishes the activity.
+	 */
+	private void finishWithNoPerson() {
+		Application.showToast("Could not load person.", Toast.LENGTH_SHORT);
+		if (getActivity() != null) {
+			getActivity().finish();
 		}
 	}
 
+	/**
+	 * Notifies the attached fragments that the person has been updated
+	 */
+	private void notifyPersonUpdated() {
+		if (mPerson != null) {
+			if (mInfoFragment != null) {
+				mInfoFragment.notifyPersonUpdated(mPerson);
+			}
+			if (mSurveysFragment != null) {
+				mSurveysFragment.notifyPersonUpdated(mPerson);
+			}
+		}
+	}
 }

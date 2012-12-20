@@ -100,7 +100,7 @@ public class Session implements OnAccountsUpdateListener {
 	public synchronized long getPrimaryOrganizationId() {
 		try {
 			return getPerson().getPrimaryOrganizationId();
-		} catch (NoPersonException e) {
+		} catch (final NoPersonException e) {
 			/* ignore */
 		}
 		return -1l;
@@ -225,16 +225,14 @@ public class Session implements OnAccountsUpdateListener {
 			@Override
 			public void run() {
 				try {
-					// update the person
-					if (!Configuration.isSkipSessionUpdate()) {
-						// update the organizations
-						Application.postEvent(new SessionResumeStatusEvent(Application.getContext().getString(R.string.init_updating_orgs)));
-						updateUserOrganizations().get();
+					// update the organizations
+					Application.postEvent(new SessionResumeStatusEvent(Application.getContext().getString(R.string.init_updating_orgs)));
+					updateUserOrganizations().get();
 
-						// update the person
-						Application.postEvent(new SessionResumeStatusEvent(Application.getContext().getString(R.string.init_updating_person)));
-						updatePerson().get();
-					}
+					// update the person
+					Application.postEvent(new SessionResumeStatusEvent(Application.getContext().getString(R.string.init_updating_person)));
+					updatePerson().get();
+
 					Application.postEvent(new SessionResumeSuccessEvent());
 				} catch (final Exception e) {
 					Application.postEvent(new SessionResumeErrorEvent(e));

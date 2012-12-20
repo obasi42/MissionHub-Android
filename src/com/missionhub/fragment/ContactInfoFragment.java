@@ -28,16 +28,16 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 import com.missionhub.R;
 import com.missionhub.api.Api;
+import com.missionhub.api.Api.Include;
+import com.missionhub.api.ApiOptions;
 import com.missionhub.application.Application;
 import com.missionhub.application.DrawableCache;
 import com.missionhub.application.Session;
 import com.missionhub.exception.ExceptionHelper;
-import com.missionhub.fragment.ContactAssignmentDialog.ContactAssignmentListener;
+import com.missionhub.fragment.dialog.ContactAssignmentDialogFragment;
+import com.missionhub.fragment.dialog.ContactAssignmentDialogFragment.ContactAssignmentListener;
 import com.missionhub.model.ContactAssignment;
 import com.missionhub.model.EmailAddress;
 import com.missionhub.model.FollowupComment;
@@ -63,10 +63,7 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 	/** the logging tag */
 	public static final String TAG = ContactInfoFragment.class.getName();
 
-	/** the person id of the displayed contact */
-	private long mPersonId = -1;
-
-	/** the person object of the displayed contact */
+	/** the person to display info about */
 	private Person mPerson;
 
 	/** the list view */
@@ -75,14 +72,20 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 	/** the list view adapter */
 	private CommentArrayAdapter mAdapter;
 
-	/** task used to update the comments */
-	private SafeAsyncTask<List<FollowupComment>> mCommentTask;
+	/** the task used for refresh comments */
+	private SafeAsyncTask<Person> mRefreshCommentsTask;
 
-	/** task used to save comment/status change */
-	private SafeAsyncTask<Void> mSaveTask;
+	/** the comment data holder */
+	private GFollowupComment mComment = new GFollowupComment();
 
-	/** task used to change roles (promote/demote) */
-	private SafeAsyncTask<Void> mRoleTask;
+	/** the dialog used for comment actions */
+	private AlertDialog mCommentActionDialog;
+
+	/** true when layout is completed */
+	private boolean mLayoutComplete = false;
+
+	/** image loader options for the avatar */
+	private DisplayImageOptions mImageLoaderOptions;
 
 	/** the progress item */
 	private final ProgressItem mProgressItem = new ProgressItem();
@@ -150,9 +153,6 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 	/** the more info facebook link */
 	@InjectView(R.id.facebook) private View mInfoFacebook;
 
-	/** the comment data holder */
-	private GFollowupComment mComment = new GFollowupComment();
-
 	/** the comment comment */
 	@InjectView(R.id.comment) private EditText mCommentComment;
 
@@ -174,39 +174,9 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 	/** the comment status adapter */
 	private CommentStatusAdapter mCommentStatusAdapter;
 
-	/** the dialog usesed for comment actions */
-	private AlertDialog mCommentActionDialog;
-
-	/** true when layout is completed */
-	private boolean mLayoutComplete = false;
-
-	/** image loader options for the avatar */
-	private DisplayImageOptions mImageLoaderOptions;
-
-	/**
-	 * Creates a new ContactInfoFragment with a person id
-	 * 
-	 * @param personId
-	 * @return
-	 */
-	public static ContactInfoFragment instantiate(final long personId) {
-		final Bundle bundle = new Bundle();
-		bundle.putLong("personId", personId);
-
-		final ContactInfoFragment fragment = new ContactInfoFragment();
-		fragment.setArguments(bundle);
-
-		return fragment;
-	}
-
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setHasOptionsMenu(true);
-
-		final Bundle arguments = getArguments();
-		mPersonId = arguments.getLong("personId", -1);
-		mPerson = Application.getDb().getPersonDao().load(mPersonId);
 
 		mImageLoaderOptions = new DisplayImageOptions.Builder().displayer(new FadeInBitmapDisplayer(200)).showImageForEmptyUri(R.drawable.default_contact).cacheInMemory().cacheOnDisc().build();
 	}
@@ -250,12 +220,17 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 		mLayoutComplete = true;
 
 		// sets the data in the header and add comment box
-		notifyContactUpdated();
+		notifyPersonUpdated();
+	}
 
-		// build the comment list from sql if the adapter is empty
-		if (mAdapter.isEmpty()) {
-			notifyCommentsUpdated();
+	@Override
+	public void onDestroy() {
+		try {
+			mRefreshCommentsTask.cancel(true);
+		} catch (final Exception e) {
+			/* ignore */
 		}
+		super.onDestroy();
 	}
 
 	/**
@@ -267,7 +242,7 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 		mHeaderAssignment.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(final View v) {
-				final ContactAssignmentDialog dialog = ContactAssignmentDialog.show(getFragmentManager(), mPerson);
+				final ContactAssignmentDialogFragment dialog = ContactAssignmentDialogFragment.show(getFragmentManager(), mPerson);
 				dialog.setAssignmentListener(ContactInfoFragment.this);
 			}
 		});
@@ -353,12 +328,6 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 	}
 
 	@Override
-	public void onResume() {
-		super.onResume();
-		updateRefreshIcon();
-	}
-
-	@Override
 	public void onDestroyView() {
 		mLayoutComplete = false;
 
@@ -371,14 +340,16 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 		super.onDestroyView();
 	}
 
+	public void notifyPersonUpdated(final Person person) {
+		mPerson = person;
+		notifyPersonUpdated();
+	}
+
 	/**
 	 * Updates the data in the header and add comment box
 	 */
-	public void notifyContactUpdated() {
-		if (mPerson == null) return;
-		if (!mLayoutComplete) return;
-
-		mPerson.refreshAll();
+	private void notifyPersonUpdated() {
+		if (!mLayoutComplete || mPerson == null) return;
 
 		// all this for a name...
 		String givenName = mPerson.getFirst_name();
@@ -519,21 +490,16 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 
 		// the comment view
 		updateCommentBox();
-	}
 
-	/**
-	 * Rebuilds the data in the comment list
-	 */
-	public void notifyCommentsUpdated() {
-		if (mPerson == null) return;
-		if (!mLayoutComplete) return;
-
+		// comments
 		mAdapter.setNotifyOnChange(false);
 		mAdapter.clear();
 
-		final List<FollowupComment> comments = Application.getDb().getFollowupCommentDao().queryBuilder().where(FollowupCommentDao.Properties.Contact_id.eq(mPersonId))
+		final List<FollowupComment> comments = Application.getDb().getFollowupCommentDao().queryBuilder()
+				.where(FollowupCommentDao.Properties.Contact_id.eq(mPerson.getId()), FollowupCommentDao.Properties.Organization_id.eq(Session.getInstance().getOrganizationId()))
 				.orderDesc(FollowupCommentDao.Properties.Updated_at).list();
 		for (final FollowupComment comment : comments) {
+			comment.refresh();
 			mAdapter.add(new CommentItem(comment));
 		}
 
@@ -557,14 +523,6 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 			mHeaderMoreText.setText(R.string.contact_info_expand);
 			mHeaderMoreText.setCompoundDrawablesWithIntrinsicBounds(null, null, DrawableCache.getDrawable(R.drawable.ic_action_expand), null);
 		}
-	}
-
-	/**
-	 * Refreshes the person from through the api
-	 */
-	public synchronized void refreshContact() {
-		getParent().refreshContact();
-		updateRefreshIcon();
 	}
 
 	/**
@@ -621,8 +579,6 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 				final CommentItem i = (CommentItem) item;
 
 				if (i.comment != null) {
-					i.comment.refresh();
-
 					if (i.getCommenter() != null) {
 						if (!U.isNullEmpty(i.getCommenter().getName())) {
 							holder.name.setText(i.getCommenter().getName());
@@ -663,7 +619,6 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 					holder.rejoiceChrist.setVisibility(View.GONE);
 					holder.rejoiceGospel.setVisibility(View.GONE);
 
-					i.comment.resetRejoicables();
 					final List<Rejoicable> rejoicables = i.comment.getRejoicables();
 					for (final Rejoicable r : rejoicables) {
 						if (r.getWhat().contains("spiritual_conversation")) {
@@ -700,22 +655,6 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 			return getView(position, convertView, parent);
 		}
 
-	}
-
-	@Override
-	public void onCreateOptionsMenu(final Menu menu, final MenuInflater inflater) {
-		super.onCreateOptionsMenu(menu, inflater);
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(final MenuItem item) {
-		switch (item.getItemId()) {
-		case R.id.menu_item_refresh:
-			refreshContact();
-			return true;
-		}
-
-		return super.onOptionsItemSelected(item);
 	}
 
 	/**
@@ -755,31 +694,6 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 		public boolean isEnabled() {
 			return false;
 		}
-	}
-
-	/**
-	 * Updates the refresh icon based on the tasks
-	 */
-	public void updateRefreshIcon() {
-		if (mAdapter == null) return;
-
-		if (mCommentTask != null) {
-			mAdapter.setNotifyOnChange(false);
-			mAdapter.remove(mProgressItem);
-			mAdapter.insert(mProgressItem, 0);
-			mAdapter.notifyDataSetChanged();
-		} else {
-			mAdapter.remove(mProgressItem);
-		}
-
-		getParent().updateRefreshIcon();
-	}
-
-	/**
-	 * Called by the parent fragment to see if this frament is busy
-	 */
-	public boolean isWorking() {
-		return mCommentTask != null || mSaveTask != null || mRoleTask != null;
 	}
 
 	/**
@@ -840,6 +754,10 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 	 * @param item
 	 */
 	public void deleteComment(final CommentItem item) {
+		if (getParent().hasProgress(item.comment.getId())) return;
+
+		getParent().addProgress("delete_comment_" + item.comment.getId());
+
 		final SafeAsyncTask<Void> task = new SafeAsyncTask<Void>() {
 
 			@Override
@@ -850,12 +768,20 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 
 			@Override
 			public void onSuccess(final Void _) {
-				if (isAdded()) {
-					if (mAdapter != null) {
-						mAdapter.remove(item);
+				if (mAdapter != null) {
+					mAdapter.remove(item);
+					if (mAdapter.isEmpty()) {
+						mAdapter.add(mEmptyItem);
 					}
-					Toast.makeText(Application.getContext(), R.string.contact_comment_deleted, Toast.LENGTH_SHORT).show();
 				}
+				if (isAdded()) {
+					Application.showToast(R.string.contact_comment_deleted, Toast.LENGTH_SHORT);
+				}
+			}
+
+			@Override
+			public void onFinally() {
+				getParent().removeProgress("delete_comment_" + item.comment.getId());
 			}
 
 			@Override
@@ -876,7 +802,7 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 	 * Posts a comment from the data in the view
 	 */
 	public void postComment() {
-		if (mSaveTask != null) return;
+		if (getParent().hasProgress("postComment")) return;
 
 		final InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
 		imm.hideSoftInputFromWindow(mCommentComment.getWindowToken(), 0);
@@ -889,7 +815,17 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 			return;
 		}
 
-		mSaveTask = new SafeAsyncTask<Void>() {
+		getParent().addProgress("postComment");
+
+		if (mAdapter != null) {
+			mAdapter.insert(mProgressItem, 0);
+		}
+
+		mComment.commenter_id = Session.getInstance().getPersonId();
+		mComment.contact_id = mPerson.getId();
+		mComment.organization_id = Session.getInstance().getOrganizationId();
+
+		final SafeAsyncTask<Void> task = new SafeAsyncTask<Void>() {
 
 			@Override
 			public Void call() throws Exception {
@@ -901,18 +837,27 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 			public void onSuccess(final Void _) {
 				Toast.makeText(Application.getContext(), R.string.contact_comment_saved, Toast.LENGTH_SHORT).show();
 
+				clearCommentBox();
+
 				if (mComment.status != null && isVisible()) {
 					mCommentStatus.setSelection(U.FollowupStatus.valueOf(mComment.status).ordinal(), false);
 				}
 
-				clearCommentBox();
-				refreshContact();
+				if (mPerson != null) {
+					mPerson.resetOrganizationalRoleList();
+					mPerson.resetStatus();
+				}
+
+				refreshComments();
 			}
 
 			@Override
 			public void onFinally() {
-				mSaveTask = null;
-				updateRefreshIcon();
+				getParent().removeProgress("postComment");
+
+				if (mAdapter != null) {
+					mAdapter.remove(mProgressItem);
+				}
 			}
 
 			@Override
@@ -926,8 +871,55 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 
 			}
 		};
-		updateRefreshIcon();
-		Application.getExecutor().execute(mSaveTask.future());
+		Application.getExecutor().execute(task.future());
+	}
+
+	private synchronized void refreshComments() {
+		try {
+			mRefreshCommentsTask.cancel(true);
+		} catch (final Exception e) {
+			/* ignore */
+		}
+
+		getParent().addProgress("refreshComments");
+
+		mRefreshCommentsTask = new SafeAsyncTask<Person>() {
+
+			@Override
+			public Person call() throws Exception {
+				final Person person = Api.getPerson(mPerson.getId(), ApiOptions.builder() //
+						.include(Include.comments_on_me) //
+						.include(Include.rejoicables) //
+						.include(Include.organizational_roles) //
+						.build()).get();
+
+				person.refreshAll();
+				return person;
+			}
+
+			@Override
+			public void onSuccess(final Person person) {
+				notifyPersonUpdated();
+			}
+
+			@Override
+			public void onFinally() {
+				mRefreshCommentsTask = null;
+				if (getParent() != null) {
+					getParent().removeProgress("refreshComments");
+				}
+			}
+
+			@Override
+			public void onException(final Exception e) {
+				final ExceptionHelper eh = new ExceptionHelper(Application.getContext(), e);
+				eh.makeToast("Failed to refresh followup comments.");
+			}
+
+			@Override
+			public void onInterrupted(final Exception e) {}
+		};
+		Application.getExecutor().execute(mRefreshCommentsTask.future());
 	}
 
 	/**
@@ -1021,12 +1013,15 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 				for (final GRejoicable r : mComment.rejoicables) {
 					if (r.what.contains(U.Rejoicable.spiritual_conversation.name())) {
 						mCommentRejoiceConvo.setImageDrawable(DrawableCache.getDrawable(R.drawable.ic_rejoice_convo));
+						mCommentRejoiceConvo.setTag(true);
 					}
 					if (r.what.contains(U.Rejoicable.prayed_to_receive.name())) {
 						mCommentRejoiceChrist.setImageDrawable(DrawableCache.getDrawable(R.drawable.ic_rejoice_christ));
+						mCommentRejoiceChrist.setTag(true);
 					}
 					if (r.what.contains(U.Rejoicable.gospel_presentation.name())) {
 						mCommentRejoiceGospel.setImageDrawable(DrawableCache.getDrawable(R.drawable.ic_rejoice_gospel));
+						mCommentRejoiceGospel.setTag(true);
 					}
 				}
 			}
@@ -1038,15 +1033,14 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 	}
 
 	public void openAddress() {
-
+		// TODO:
 	}
 
 	@Override
 	public void onAssignmentCompleted() {
-		notifyContactUpdated();
+		notifyPersonUpdated();
 	}
 
 	@Override
 	public void onAssignmentCanceled() {}
-
 }

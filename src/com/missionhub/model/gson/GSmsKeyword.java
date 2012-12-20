@@ -36,7 +36,7 @@ public class GSmsKeyword {
 				synchronized (lock) {
 					final SmsKeywordDao dao = Application.getDb().getSmsKeywordDao();
 
-					SmsKeyword key = new SmsKeyword();
+					final SmsKeyword key = new SmsKeyword();
 					key.setId(id);
 					key.setKeyword(keyword);
 					key.setOrganization_id(organization_id);

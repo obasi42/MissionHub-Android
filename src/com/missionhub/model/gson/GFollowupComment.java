@@ -71,7 +71,7 @@ public class GFollowupComment {
 
 					if (rejoicables != null) {
 						for (final GRejoicable rejoicable : rejoicables) {
-							rejoicable.save(contact_id, commenter_id, organization_id, true);
+							rejoicable.save(true);
 						}
 					}
 
@@ -124,15 +124,26 @@ public class GFollowupComment {
 		if (contact_id > 0) {
 			params.add("followup_comment[contact_id]", contact_id);
 		}
-		if (U.isNullEmpty(comment)) {
+		if (commenter_id > 0) {
+			params.add("followup_comment[commenter_id]", commenter_id);
+		}
+		if (!U.isNullEmpty(comment)) {
 			params.add("followup_comment[comment]", comment);
 		}
-		if (U.isNullEmpty(status)) {
+		if (!U.isNullEmpty(status)) {
 			params.add("followup_comment[status]", status);
 		}
 		if (rejoicables != null) {
-			for (final GRejoicable rejoice : rejoicables) {
-				params.add("rejoicables[]", rejoice.what);
+			for (int i = 0; i < rejoicables.length; i++) {
+				final GRejoicable rejoicable = rejoicables[i];
+				if (rejoicable.id > 0) {
+					params.add("followup_comment[rejoicables_attributes][" + i + "][id]", rejoicable.id);
+				}
+				if (U.isNullEmpty(rejoicable.what) && rejoicable.id > 0) {
+					params.add("followup_comment[rejoicables_attributes][" + i + "][_destroy]", true);
+				} else if (!U.isNullEmpty(rejoicable.what)) {
+					params.add("followup_comment[rejoicables_attributes][" + i + "][what]", rejoicable.what);
+				}
 			}
 		}
 	}

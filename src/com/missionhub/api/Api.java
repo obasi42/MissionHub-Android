@@ -583,14 +583,14 @@ public class Api {
 			Log.e("API", method.name() + ": " + url);
 			Log.e("API", headers.toString());
 			Log.e("API", params.toString());
-			
+
 			// create the client and get the response
 			final HttpClient client = new HttpClient();
 			client.setResponseType(responseType);
 			final HttpClientFuture future = client.doRequest(method, url, headers, params);
 			response = future.get();
 			maybeThrowException(response);
-			
+
 			Log.d("API", response.responseBody);
 
 			return response;
@@ -682,6 +682,6 @@ public class Api {
 
 	/** Enum of all available includes */
 	public enum Include {
-		answers, surveys, answer_sheets, all_organizational_roles, organizational_roles, followup_comments, contact_assignments, current_address, user, phone_numbers, person_transfers, email_addresses, questions, keyword, contacts, admins, leaders, people, groups, keywords, assigned_to, person, comments_on_me
+		answers, surveys, answer_sheets, all_organizational_roles, organizational_roles, followup_comments, contact_assignments, current_address, user, phone_numbers, person_transfers, email_addresses, questions, keyword, contacts, admins, leaders, people, groups, keywords, assigned_to, person, comments_on_me, rejoicables
 	}
 }

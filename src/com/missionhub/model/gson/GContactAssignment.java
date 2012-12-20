@@ -41,8 +41,8 @@ public class GContactAssignment {
 						dao.deleteByKey(id);
 						return null;
 					}
-					
-					ContactAssignment assignment = new ContactAssignment();
+
+					final ContactAssignment assignment = new ContactAssignment();
 					assignment.setId(id);
 					assignment.setPerson_id(person_id);
 					assignment.setAssigned_to_id(assigned_to_id);

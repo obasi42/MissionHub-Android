@@ -35,9 +35,6 @@ import com.missionhub.util.U;
 
 public class ContactSurveysFragment extends BaseFragment {
 
-	/** the person id of the displayed contact */
-	private long mPersonId = -1;
-
 	/** the person object of the displayed contact */
 	private Person mPerson;
 
@@ -53,24 +50,9 @@ public class ContactSurveysFragment extends BaseFragment {
 	/** updated organization */
 	private boolean mUpdatedOrganization = false;
 
-	public static ContactSurveysFragment instantiate(final long personId) {
-		final Bundle bundle = new Bundle();
-		bundle.putLong("personId", personId);
-
-		final ContactSurveysFragment fragment = new ContactSurveysFragment();
-		fragment.setArguments(bundle);
-
-		return fragment;
-	}
-
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		// setHasOptionsMenu(false);
-
-		final Bundle arguments = getArguments();
-		mPersonId = arguments.getLong("personId", -1);
-		mPerson = Application.getDb().getPersonDao().load(mPersonId);
 	}
 
 	@Override
@@ -91,7 +73,7 @@ public class ContactSurveysFragment extends BaseFragment {
 		mListView.setAdapter(mAdapter);
 
 		if (mAdapter.isEmpty()) {
-			notifyContactUpdated();
+			notifyPersonUpdated();
 		}
 	}
 
@@ -179,7 +161,7 @@ public class ContactSurveysFragment extends BaseFragment {
 	@Override
 	public boolean onOptionsItemSelected(final MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.menu_item_refresh:
+		case R.id.action_refresh:
 
 			return true;
 		}
@@ -187,7 +169,12 @@ public class ContactSurveysFragment extends BaseFragment {
 		return super.onOptionsItemSelected(item);
 	}
 
-	public void notifyContactUpdated() {
+	public void notifyPersonUpdated(final Person person) {
+		mPerson = person;
+		notifyPersonUpdated();
+	}
+
+	public void notifyPersonUpdated() {
 		if (mAdapter == null || mPerson == null) return;
 		mAdapter.setNotifyOnChange(false);
 		mAdapter.clear();
@@ -256,9 +243,13 @@ public class ContactSurveysFragment extends BaseFragment {
 	public static class EmptyItem extends DisabledItem {}
 
 	private void updateOrganization() {
-		if (mOrganizationTask != null) {
+		try {
 			mOrganizationTask.cancel(true);
+		} catch (final Exception e) {
+			/* ignore */
 		}
+
+		getParent().addProgress("updateOrganization");
 
 		mOrganizationTask = new SafeAsyncTask<Organization>() {
 
@@ -273,14 +264,17 @@ public class ContactSurveysFragment extends BaseFragment {
 
 			@Override
 			public void onSuccess(final Organization organization) {
-				notifyContactUpdated();
+				notifyPersonUpdated();
 			}
 
 			@Override
 			public void onFinally() {
 				mUpdatedOrganization = true;
 				mOrganizationTask = null;
-				getParent().updateRefreshIcon();
+
+				if (getParent() != null) {
+					getParent().removeProgress("updateOrganization");
+				}
 			}
 
 			@Override
@@ -295,7 +289,6 @@ public class ContactSurveysFragment extends BaseFragment {
 
 		};
 		Toast.makeText(getActivity(), R.string.contact_surveys_updating_org, Toast.LENGTH_LONG).show();
-		getParent().updateRefreshIcon();
 		Application.getExecutor().execute(mOrganizationTask.future());
 	}
 

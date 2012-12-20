@@ -5,12 +5,8 @@ ENVIRONMENT=development
 MARKET=play
 
 # missionhub api
-API_URL=https://www.missionhub.com/api
-API_VERSION=2
-
-# the depreciated api
-DEPRECATED_API_URL=https://www.missionhub.com/api
-DEPRECATED_API_VERSION=2
+API_URL=https://www.missionhub.com/apis
+API_VERSION=v3
 
 # missionhub surveys
 SURVEY_URL=http://mhub.cc/surveys
@@ -27,12 +23,12 @@ CACHE_FILE_SIZE=10m
 
 # google analytics
 ANALYTICS_ENABLED=false
-ANALYTICS_KEY=UA-XXXXXX-XX
-ANALYTICS_DEBUG=false
-ANALYTICS_DRY_RUN=false
+ANALYTICS_KEY=UA-325725-21
+ANALYTICS_DEBUG=true
+ANALYTICS_DRY_RUN=true
 ANAYLTICS_ANONYMIZE_IP=false
 
 # errbit notifier
 ERRBIT_ENABLED=false
-ERRBIT_API_URL=http://example.com/notifier_api/v2/notices
+ERRBIT_API_URL=
 ERRBIT_API_KEY=

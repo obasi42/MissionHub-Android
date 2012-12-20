@@ -212,26 +212,26 @@ public class HttpParams {
 		mUriParams.putAll(params.mUriParams);
 		mMultipartParams.putAll(params.mMultipartParams);
 	}
-	
+
 	@Override
 	public String toString() {
-		StringBuffer sb = new StringBuffer();
-		
+		final StringBuffer sb = new StringBuffer();
+
 		if (!mParams.isEmpty()) {
 			sb.append("PARAMS:\n");
-			for(Entry<String, String> entry : mParams.entrySet()) {
+			for (final Entry<String, String> entry : mParams.entrySet()) {
 				sb.append(entry.getKey() + " => " + entry.getValue() + "\n");
 			}
 		}
-		if(!mUriParams.isEmpty()) {
+		if (!mUriParams.isEmpty()) {
 			sb.append("URI PARAMS:\n");
-			for(Entry<String, String> entry : mUriParams.entrySet()) {
+			for (final Entry<String, String> entry : mUriParams.entrySet()) {
 				sb.append(entry.getKey() + " => " + entry.getValue() + "\n");
 			}
 		}
-		if(!mMultipartParams.isEmpty()) {
+		if (!mMultipartParams.isEmpty()) {
 			sb.append("MULTIPART PARAMS:\n");
-			for(Entry<String, ContentBody> entry : mMultipartParams.entrySet()) {
+			for (final Entry<String, ContentBody> entry : mMultipartParams.entrySet()) {
 				sb.append(entry.getKey() + " => " + entry.getValue() + "\n");
 			}
 		}

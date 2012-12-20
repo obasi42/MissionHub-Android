@@ -41,6 +41,7 @@ public class GPerson {
 	public GContactAssignment[] contact_assignments;
 	public GFollowupComment[] followup_comments;
 	public GFollowupComment[] comments_on_me;
+	public GRejoicable[] rejoicables;
 	public GOrganizationalRole[] organizational_roles;
 	public GOrganizationalRole[] all_organizational_roles;
 	public GAddress current_address;
@@ -164,6 +165,12 @@ public class GPerson {
 								.executeDelete();
 						for (final GFollowupComment comment : comments_on_me) {
 							comment.save(true);
+						}
+					}
+
+					if (rejoicables != null) {
+						for (final GRejoicable rejoicable : rejoicables) {
+							rejoicable.save(true);
 						}
 					}
 

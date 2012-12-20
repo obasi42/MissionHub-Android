@@ -38,7 +38,7 @@ public class GGroup {
 				synchronized (lock) {
 					final GroupDao dao = Application.getDb().getGroupDao();
 
-					Group group = new Group();
+					final Group group = new Group();
 					group.setId(id);
 					group.setName(name);
 					group.setLocation(location);
@@ -52,7 +52,7 @@ public class GGroup {
 					group.setCreated_at(U.parseISO8601(created_at));
 					group.setUpdated_at(U.parseISO8601(updated_at));
 					dao.insertOrReplace(group);
-					
+
 					return group;
 				}
 			}

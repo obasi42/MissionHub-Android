@@ -24,8 +24,10 @@ import com.missionhub.contactlist.ContactListFragment;
 import com.missionhub.contactlist.ContactListFragment.ContactListFragmentListener;
 import com.missionhub.contactlist.ContactListProvider;
 import com.missionhub.exception.ExceptionHelper;
-import com.missionhub.fragment.AddContactDialog.AddContactListener;
-import com.missionhub.fragment.ContactAssignmentDialog.ContactAssignmentListener;
+import com.missionhub.fragment.dialog.ContactAssignmentDialogFragment;
+import com.missionhub.fragment.dialog.ContactAssignmentDialogFragment.ContactAssignmentListener;
+import com.missionhub.fragment.dialog.EditContactDialogFragment;
+import com.missionhub.fragment.dialog.EditContactDialogFragment.AddContactListener;
 import com.missionhub.model.Person;
 import com.missionhub.util.U;
 
@@ -72,24 +74,24 @@ public class AllContactsFragment extends MainFragment implements ContactListFrag
 	public void onCreateOptionsMenu(final Menu menu, final MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
 
-		menu.add(Menu.NONE, R.id.menu_item_add_contact, Menu.NONE, R.string.action_add_contact).setIcon(R.drawable.ic_action_add_contact)
+		menu.add(Menu.NONE, R.id.action_add_contact, Menu.NONE, R.string.action_add_contact).setIcon(R.drawable.ic_action_add_contact)
 				.setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 
-		mRefreshItem = menu.add(Menu.NONE, R.id.menu_item_refresh, Menu.NONE, R.string.action_refresh).setIcon(R.drawable.ic_action_refresh)
+		mRefreshItem = menu.add(Menu.NONE, R.id.action_refresh, Menu.NONE, R.string.action_refresh).setIcon(R.drawable.ic_action_refresh)
 				.setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(final MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.menu_item_refresh:
+		case R.id.action_refresh:
 			if (mFragment != null) {
 				mFragment.reload();
 				return true;
 			}
 			break;
-		case R.id.menu_item_add_contact:
-			final AddContactDialog dialog = AddContactDialog.show(getChildFragmentManager(), false);
+		case R.id.action_add_contact:
+			final EditContactDialogFragment dialog = EditContactDialogFragment.show(getChildFragmentManager(), false);
 			dialog.setAddContactListener(this);
 			break;
 		}
@@ -169,7 +171,7 @@ public class AllContactsFragment extends MainFragment implements ContactListFrag
 
 	@Override
 	public boolean onCreateActionMode(final ActionMode mode, final Menu menu) {
-		menu.add(Menu.NONE, R.id.menu_item_assign, Menu.NONE, R.string.action_assign).setIcon(R.drawable.ic_action_assign)
+		menu.add(Menu.NONE, R.id.action_assign, Menu.NONE, R.string.action_assign).setIcon(R.drawable.ic_action_assign)
 				.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 		return true;
 
@@ -182,9 +184,9 @@ public class AllContactsFragment extends MainFragment implements ContactListFrag
 
 	@Override
 	public boolean onActionItemClicked(final ActionMode mode, final MenuItem item) {
-		if (item.getItemId() == R.id.menu_item_assign) {
+		if (item.getItemId() == R.id.action_assign) {
 			final Set<Person> people = new HashSet<Person>(mFragment.getCheckedPeople());
-			ContactAssignmentDialog.show(getChildFragmentManager(), people).setAssignmentListener(this);
+			ContactAssignmentDialogFragment.show(getChildFragmentManager(), people).setAssignmentListener(this);
 		}
 		mode.finish();
 		return true;

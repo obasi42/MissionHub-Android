@@ -34,7 +34,7 @@ public class GAnswerSheet {
 				synchronized (lock) {
 					final AnswerSheetDao dao = Application.getDb().getAnswerSheetDao();
 
-					AnswerSheet sheet = new AnswerSheet();
+					final AnswerSheet sheet = new AnswerSheet();
 					sheet.setId(id);
 					sheet.setPerson_id(personId);
 					sheet.setSurvey_id(survey_id);

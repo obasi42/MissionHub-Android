@@ -32,8 +32,8 @@ public class GRole {
 			public Role call() throws Exception {
 				synchronized (lock) {
 					final RoleDao dao = Application.getDb().getRoleDao();
-					
-					Role role = new Role();
+
+					final Role role = new Role();
 					role.setId(id);
 					role.setOrganization_id(organization_id);
 					role.setName(name);
@@ -41,7 +41,7 @@ public class GRole {
 					role.setCreated_at(U.parseISO8601(created_at));
 					role.setUpdated_at(U.parseISO8601(updated_at));
 					dao.insertOrReplace(role);
-					
+
 					return role;
 				}
 			}

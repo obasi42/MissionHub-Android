@@ -42,7 +42,7 @@ public class GOrganization {
 				synchronized (lock) {
 					final OrganizationDao dao = Application.getDb().getOrganizationDao();
 
-					Organization org = new Organization();
+					final Organization org = new Organization();
 					org.setId(id);
 					org.setName(name);
 					org.setTerminology(terminology);
@@ -52,7 +52,7 @@ public class GOrganization {
 					org.setCreated_at(U.parseISO8601(created_at));
 					org.setUpdated_at(U.parseISO8601(updated_at));
 					dao.insertOrReplace(org);
-					
+
 					if (contacts != null) {
 						for (final GPerson person : contacts) {
 							person.save(true);

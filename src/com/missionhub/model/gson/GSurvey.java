@@ -38,7 +38,7 @@ public class GSurvey {
 				synchronized (lock) {
 					final SurveyDao dao = Application.getDb().getSurveyDao();
 
-					Survey survey = new Survey();
+					final Survey survey = new Survey();
 					survey.setId(id);
 					survey.setTitle(title);
 					survey.setOrganization_id(organization_id);

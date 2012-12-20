@@ -28,13 +28,13 @@ public class GAnswer {
 				synchronized (lock) {
 					final AnswerDao dao = Application.getDb().getAnswerDao();
 
-					Answer answer = new Answer();
+					final Answer answer = new Answer();
 					answer.setId(id);
 					answer.setAnswer_sheet_id(answerSheetId);
 					answer.setQuestion_id(question_id);
 					answer.setValue(value);
 					dao.insertOrReplace(answer);
-					
+
 					return answer;
 				}
 			}

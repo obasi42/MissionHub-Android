@@ -1,4 +1,4 @@
-package com.missionhub.fragment;
+package com.missionhub.fragment.dialog;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -16,7 +16,6 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnKeyListener;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -30,7 +29,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageView;
 import android.widget.ListView;
 
-import com.github.rtyley.android.sherlock.roboguice.fragment.RoboSherlockDialogFragment;
 import com.missionhub.R;
 import com.missionhub.api.Api;
 import com.missionhub.application.Application;
@@ -38,6 +36,7 @@ import com.missionhub.application.DrawableCache;
 import com.missionhub.application.Session;
 import com.missionhub.application.Session.NoPersonException;
 import com.missionhub.exception.ExceptionHelper;
+import com.missionhub.fragment.BaseFragment;
 import com.missionhub.model.ContactAssignment;
 import com.missionhub.model.ContactAssignmentDao;
 import com.missionhub.model.Group;
@@ -53,7 +52,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.PauseOnScrollListener;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 
-public class ContactAssignmentDialog extends RoboSherlockDialogFragment implements OnKeyListener, OnItemClickListener {
+public class ContactAssignmentDialogFragment extends BaseDialogFragment implements OnKeyListener, OnItemClickListener {
 
 	/** the view pager */
 	@InjectView(R.id.pager) private LockedViewPager mPager;
@@ -85,7 +84,7 @@ public class ContactAssignmentDialog extends RoboSherlockDialogFragment implemen
 	/** the progress view */
 	@InjectView(R.id.progress_container) private View mProgress;
 
-	public ContactAssignmentDialog() {}
+	public ContactAssignmentDialogFragment() {}
 
 	/**
 	 * Creates a new assignment dialog for the given person
@@ -93,7 +92,7 @@ public class ContactAssignmentDialog extends RoboSherlockDialogFragment implemen
 	 * @param person
 	 * @return
 	 */
-	public static ContactAssignmentDialog getInstance(final Person person) {
+	public static ContactAssignmentDialogFragment getInstance(final Person person) {
 		final HashSet<Person> people = new HashSet<Person>();
 		people.add(person);
 		return getInstance(people);
@@ -105,8 +104,8 @@ public class ContactAssignmentDialog extends RoboSherlockDialogFragment implemen
 	 * @param people
 	 * @return
 	 */
-	public static ContactAssignmentDialog getInstance(final Set<Person> people) {
-		final ContactAssignmentDialog dialog = new ContactAssignmentDialog();
+	public static ContactAssignmentDialogFragment getInstance(final Set<Person> people) {
+		final ContactAssignmentDialogFragment dialog = new ContactAssignmentDialogFragment();
 		final Bundle args = new Bundle();
 		final HashSet<Person> copyList = new HashSet<Person>(people);
 		args.putSerializable("people", copyList);
@@ -117,9 +116,6 @@ public class ContactAssignmentDialog extends RoboSherlockDialogFragment implemen
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		if (getParentFragment() == null) {
-			setRetainInstance(true);
-		}
 
 		if (getArguments() != null) {
 			@SuppressWarnings("unchecked") final HashSet<Person> people = (HashSet<Person>) getArguments().getSerializable("people");
@@ -127,8 +123,6 @@ public class ContactAssignmentDialog extends RoboSherlockDialogFragment implemen
 				mPeople = new HashSet<Person>(people);
 			}
 		}
-
-		setStyle(DialogFragment.STYLE_NORMAL, R.style.Theme_Sherlock_Light_Dialog);
 	}
 
 	@Override
@@ -357,8 +351,8 @@ public class ContactAssignmentDialog extends RoboSherlockDialogFragment implemen
 	}
 
 	public static abstract class AssignmentFragment extends BaseFragment {
-		public ContactAssignmentDialog getDialog() {
-			return (ContactAssignmentDialog) getParentFragment();
+		public ContactAssignmentDialogFragment getDialog() {
+			return (ContactAssignmentDialogFragment) getParentFragment();
 		}
 	}
 
@@ -589,15 +583,6 @@ public class ContactAssignmentDialog extends RoboSherlockDialogFragment implemen
 	}
 
 	/**
-	 * Override to keep dialog from being dismissed on rotation
-	 */
-	@Override
-	public void onDestroyView() {
-		if (getDialog() != null && U.superGetRetainInstance(this)) getDialog().setDismissMessage(null);
-		super.onDestroyView();
-	}
-
-	/**
 	 * Notifies the listener and dismisses the dialog
 	 */
 	public void cancel() {
@@ -657,7 +642,7 @@ public class ContactAssignmentDialog extends RoboSherlockDialogFragment implemen
 	 * @param person
 	 * @return
 	 */
-	public static ContactAssignmentDialog show(final FragmentManager fm, final Person person) {
+	public static ContactAssignmentDialogFragment show(final FragmentManager fm, final Person person) {
 		final HashSet<Person> people = new HashSet<Person>();
 		people.add(person);
 		return show(fm, people);
@@ -670,7 +655,7 @@ public class ContactAssignmentDialog extends RoboSherlockDialogFragment implemen
 	 * @param people
 	 * @return
 	 */
-	public static ContactAssignmentDialog show(final FragmentManager fm, final Set<Person> people) {
+	public static ContactAssignmentDialogFragment show(final FragmentManager fm, final Set<Person> people) {
 		final FragmentTransaction ft = fm.beginTransaction();
 		final Fragment prev = fm.findFragmentByTag("assignment_dialog");
 		if (prev != null) {
@@ -678,7 +663,7 @@ public class ContactAssignmentDialog extends RoboSherlockDialogFragment implemen
 		}
 		ft.addToBackStack(null);
 
-		final ContactAssignmentDialog fragment = ContactAssignmentDialog.getInstance(people);
+		final ContactAssignmentDialogFragment fragment = ContactAssignmentDialogFragment.getInstance(people);
 		fragment.show(ft, "assignment_dialog");
 		return fragment;
 	}
@@ -739,7 +724,7 @@ public class ContactAssignmentDialog extends RoboSherlockDialogFragment implemen
 				final ExceptionHelper eh = new ExceptionHelper(Application.getContext(), e);
 				eh.makeToast(R.string.assignment_failed);
 
-				ContactAssignmentDialog.this.cancel();
+				ContactAssignmentDialogFragment.this.cancel();
 			}
 
 			@Override

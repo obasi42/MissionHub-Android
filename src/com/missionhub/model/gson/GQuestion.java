@@ -39,7 +39,7 @@ public class GQuestion {
 				synchronized (lock) {
 					final QuestionDao dao = Application.getDb().getQuestionDao();
 
-					Question question = new Question();
+					final Question question = new Question();
 					question.setId(id);
 					question.setKind(kind);
 					question.setStyle(style);

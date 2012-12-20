@@ -36,9 +36,9 @@ public class GEmailAddress {
 			@Override
 			public EmailAddress call() throws Exception {
 				synchronized (lock) {
-					
+
 					final EmailAddressDao dao = Application.getDb().getEmailAddressDao();
-					EmailAddress address = new EmailAddress();
+					final EmailAddress address = new EmailAddress();
 					address.setId(id);
 					address.setEmail(email);
 					address.setPerson_id(person_id);

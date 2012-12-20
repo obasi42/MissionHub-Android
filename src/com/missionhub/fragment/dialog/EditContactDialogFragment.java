@@ -1,4 +1,4 @@
-package com.missionhub.fragment;
+package com.missionhub.fragment.dialog;
 
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
@@ -15,7 +15,6 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -37,7 +36,7 @@ import com.missionhub.model.gson.GPerson;
 import com.missionhub.model.gson.GPhoneNumber;
 import com.missionhub.util.U;
 
-public class AddContactDialog extends RoboSherlockDialogFragment {
+public class EditContactDialogFragment extends RoboSherlockDialogFragment {
 
 	/** the task used to add a contact */
 	private SafeAsyncTask<Person> mTask;
@@ -73,23 +72,17 @@ public class AddContactDialog extends RoboSherlockDialogFragment {
 	private Spinner mAddressCountry;
 	private EditText mAddressZip;
 
-	public AddContactDialog() {}
+	public EditContactDialogFragment() {}
 
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		if (!U.superGetRetainInstance(this)) {
-			setRetainInstance(true);
-		}
-
 		if (getArguments() != null) {
 			mAssignToMe = getArguments().getBoolean("assignToMe", false);
 		}
-		setStyle(DialogFragment.STYLE_NORMAL, R.style.Theme_Sherlock_Light_Dialog);
 	}
 
-	public static AddContactDialog getInstance(final boolean assignToMe) {
-		final AddContactDialog dialog = new AddContactDialog();
+	public static EditContactDialogFragment getInstance(final boolean assignToMe) {
+		final EditContactDialogFragment dialog = new EditContactDialogFragment();
 		final Bundle args = new Bundle();
 		args.putBoolean("assignToMe", assignToMe);
 		dialog.setArguments(args);
@@ -171,8 +164,6 @@ public class AddContactDialog extends RoboSherlockDialogFragment {
 	@Override
 	public void onDestroyView() {
 		writeToPerson(mPerson);
-
-		if (getDialog() != null && U.superGetRetainInstance(this)) getDialog().setDismissMessage(null);
 		super.onDestroyView();
 	}
 
@@ -301,7 +292,7 @@ public class AddContactDialog extends RoboSherlockDialogFragment {
 		public void onAddContactCanceled();
 	}
 
-	public static AddContactDialog show(final FragmentManager fm) {
+	public static EditContactDialogFragment show(final FragmentManager fm) {
 		return show(fm, false);
 	}
 
@@ -376,7 +367,7 @@ public class AddContactDialog extends RoboSherlockDialogFragment {
 	 * @param assignToMe
 	 * @return
 	 */
-	public static AddContactDialog show(final FragmentManager fm, final boolean assignToMe) {
+	public static EditContactDialogFragment show(final FragmentManager fm, final boolean assignToMe) {
 		final FragmentTransaction ft = fm.beginTransaction();
 		final Fragment prev = fm.findFragmentByTag("add_contact_dialog");
 		if (prev != null) {
@@ -384,7 +375,7 @@ public class AddContactDialog extends RoboSherlockDialogFragment {
 		}
 		ft.addToBackStack(null);
 
-		final AddContactDialog fragment = AddContactDialog.getInstance(assignToMe);
+		final EditContactDialogFragment fragment = EditContactDialogFragment.getInstance(assignToMe);
 		fragment.show(ft, "add_contact_dialog");
 		return fragment;
 	}
