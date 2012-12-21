@@ -1,5 +1,6 @@
 package com.missionhub.fragment;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.holoeverywhere.widget.Toast;
@@ -202,8 +203,7 @@ public class ContactSurveysFragment extends BaseFragment {
 				continue;
 			}
 
-			mAdapter.add(new SurveyItem(sheet.getSurvey()));
-
+			ArrayList<QAItem> items = new ArrayList<QAItem>();
 			final List<Answer> answers = sheet.getAnswerList();
 			for (final Answer answer : answers) {
 				if (answer.getQuestion() == null) {
@@ -211,7 +211,14 @@ public class ContactSurveysFragment extends BaseFragment {
 					fetchQuestionData = true;
 					continue;
 				}
-				mAdapter.add(new QAItem(answer.getQuestion(), answer));
+				items.add(new QAItem(answer.getQuestion(), answer));
+			}
+			
+			if (!items.isEmpty()) {
+				mAdapter.add(new SurveyItem(sheet.getSurvey()));
+				for(QAItem item : items) {
+					mAdapter.add(item);
+				}
 			}
 		}
 
