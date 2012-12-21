@@ -9,7 +9,6 @@ import roboguice.inject.InjectView;
 import roboguice.util.SafeAsyncTask;
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +26,7 @@ import com.missionhub.application.Application;
 import com.missionhub.application.Session;
 import com.missionhub.model.Answer;
 import com.missionhub.model.AnswerSheet;
+import com.missionhub.model.AnswerSheetDao;
 import com.missionhub.model.Organization;
 import com.missionhub.model.Person;
 import com.missionhub.model.Question;
@@ -191,12 +191,10 @@ public class ContactSurveysFragment extends BaseFragment {
 
 		boolean fetchQuestionData = false;
 
-		mPerson.resetAddressList();
-		final List<AnswerSheet> sheets = mPerson.getAnswerSheetList();
+		List<AnswerSheet> sheets = Application.getDb().getAnswerSheetDao().queryBuilder().where(AnswerSheetDao.Properties.Person_id.eq(mPerson.getId())).list();
 		for (final AnswerSheet sheet : sheets) {
-
+			
 			if (sheet.getSurvey() == null) {
-				Log.e("NO SURVEY", sheet.getSurvey_id() + "");
 				continue;
 			}
 
@@ -209,7 +207,6 @@ public class ContactSurveysFragment extends BaseFragment {
 			final List<Answer> answers = sheet.getAnswerList();
 			for (final Answer answer : answers) {
 				if (answer.getQuestion() == null) {
-					Log.e("No Question", answer.getQuestion_id() + " ");
 					fetchQuestionData = true;
 					continue;
 				}
@@ -288,7 +285,6 @@ public class ContactSurveysFragment extends BaseFragment {
 
 			@Override
 			public void onSuccess(final Organization organization) {
-				mPerson.refresh();
 				notifyPersonUpdated();
 			}
 
