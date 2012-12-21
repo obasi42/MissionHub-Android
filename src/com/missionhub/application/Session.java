@@ -7,6 +7,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.holoeverywhere.widget.Toast;
 
+import roboguice.util.SafeAsyncTask;
+
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AuthenticatorException;
@@ -15,9 +17,12 @@ import android.accounts.OperationCanceledException;
 
 import com.missionhub.R;
 import com.missionhub.api.Api;
+import com.missionhub.api.Api.Include;
 import com.missionhub.api.ApiOptions;
 import com.missionhub.authenticator.Authenticator;
+import com.missionhub.exception.ExceptionHelper;
 import com.missionhub.exception.MissionHubException;
+import com.missionhub.model.Organization;
 import com.missionhub.model.Person;
 
 public class Session implements OnAccountsUpdateListener {
@@ -51,6 +56,9 @@ public class Session implements OnAccountsUpdateListener {
 
 	/** task used to update organizations */
 	private FutureTask<Void> mUpdateOrganizationsTask;
+	
+	/** task used to update current organization */
+	private SafeAsyncTask<Void> mUpdateOrganizationTask;
 
 	/**
 	 * Creates a new session object and sets up the account manager
@@ -190,6 +198,61 @@ public class Session implements OnAccountsUpdateListener {
 		Application.getExecutor().submit(mUpdateOrganizationsTask);
 		return mUpdateOrganizationsTask;
 	}
+	
+	private FutureTask<Void> updateCurrentOrganization(final boolean force) {
+		try {
+			mUpdateOrganizationTask.cancel(true);
+		} catch (Exception e) {
+			/* ignore */
+		}
+		
+		mUpdateOrganizationTask = new SafeAsyncTask<Void> () {
+
+			private long mOneWeekMillis = 60 * 60 * 24 * 7 * 1000;
+			
+			@Override
+			public Void call() throws Exception {
+				final long organizationId = getOrganizationId();
+				long lastUpdated = Long.parseLong(SettingsManager.getInstance().getUserSetting(getPersonId(), "organization_" + organizationId + "_updated", "0"));
+				final long currentTime = System.currentTimeMillis() - 1000;
+				
+				if (lastUpdated < System.currentTimeMillis() - mOneWeekMillis || force) {
+				
+					Api.getOrganization(organizationId, ApiOptions.builder() //
+						.include(Include.all_questions) //
+						.include(Include.groups) //
+						.include(Include.keywords) //
+						.include(Include.leaders) //
+						.include(Include.organizational_roles) //
+						.include(Include.surveys) //
+						.build()).get();
+					
+					SettingsManager.getInstance().setUserSetting(getPersonId(), "organization_" + getOrganizationId() + "_updated", currentTime);
+					
+				}
+				
+				return null;
+			}
+			
+			@Override
+			public void onSuccess(final Void _) {}
+
+			@Override
+			public void onFinally() {
+				mUpdateOrganizationTask = null;
+			}
+
+			@Override
+			public void onException(final Exception e) {}
+
+			@Override
+			public void onInterrupted(final Exception e) {}
+		};
+		
+		FutureTask<Void> future = mUpdateOrganizationTask.future();
+		Application.getExecutor().submit(future);
+		return future;
+	}
 
 	/**
 	 * Attempts to resume the previous user's session
@@ -232,6 +295,10 @@ public class Session implements OnAccountsUpdateListener {
 					// update the person
 					Application.postEvent(new SessionResumeStatusEvent(Application.getContext().getString(R.string.init_updating_person)));
 					updatePerson().get();
+					
+					// update the current organization
+					Application.postEvent(new SessionResumeStatusEvent(Application.getContext().getString(R.string.init_updating_current_organization)));
+					updateCurrentOrganization(false);
 
 					Application.postEvent(new SessionResumeSuccessEvent());
 				} catch (final Exception e) {
@@ -378,6 +445,8 @@ public class Session implements OnAccountsUpdateListener {
 			mOrganizationId = organizationId;
 			SettingsManager.setSessionOrganizationId(getPersonId(), mOrganizationId);
 			Application.postEvent(new SessionOrganizationIdChanged(organizationId));
+			
+			updateCurrentOrganization(true);
 		} else {
 			Application.showToast(R.string.session_not_admin, Toast.LENGTH_LONG);
 		}

@@ -87,10 +87,11 @@
 
     <!-- Init Activity -->
     <string name="init_resuming">Resuming session…</string>
-    <string name="init_updating_person">Updating person…</string>
-    <string name="init_updating_orgs">Updating organizations…</string>
+    <string name="init_updating_person">Loading your account…</string>
+    <string name="init_updating_orgs">Loading your organizations…</string>
     <string name="init_add_account">Add Account</string>
     <string name="init_choose_account">Choose account…</string>
+    <string name="init_updating_current_organization">Loading your current organization…</string>
 
     <!-- Session -->
     <string name="session_no_longer_admin">You are no longer an admin or leader in your preferred organization. Selecting your primary.</string>

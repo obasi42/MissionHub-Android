@@ -455,7 +455,7 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 			mHeaderAssignment.setText("Unassigned");
 		} else {
 			final Person assignedTo = Application.getDb().getPersonDao().load(assignment.getAssigned_to_id());
-			if (!U.isNullEmpty(assignedTo.getName())) {
+			if (assignedTo != null && !U.isNullEmpty(assignedTo.getName())) {
 				mHeaderAssignment.setText(assignedTo.getName());
 			} else {
 				mHeaderAssignment.setText("Assignment Loading...");
