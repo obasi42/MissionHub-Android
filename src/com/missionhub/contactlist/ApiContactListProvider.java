@@ -99,15 +99,13 @@ public class ApiContactListProvider extends ContactListProvider {
 		mTask = new SafeAsyncTask<List<Person>>() {
 			@Override
 			public List<Person> call() throws Exception {
-				return Api.listPeople(
-						mOptions,
-						ApiOptions.builder() //
-								.include(Include.assigned_tos) //
-								.include(Include.current_address) //
-								.include(Include.email_addresses) //
-								.include(Include.organizational_roles) //
-								.include(Include.phone_numbers) //
-								.build()).get();
+				return Api.listPeople(mOptions, ApiOptions.builder() //
+						.include(Include.assigned_tos) //
+						.include(Include.current_address) //
+						.include(Include.email_addresses) //
+						.include(Include.organizational_roles) //
+						.include(Include.phone_numbers) //
+						.build()).get();
 			}
 
 			@Override

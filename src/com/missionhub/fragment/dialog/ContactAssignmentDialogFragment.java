@@ -25,9 +25,9 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageView;
@@ -62,19 +62,19 @@ public class ContactAssignmentDialogFragment extends BaseDialogFragment implemen
 
 	/** the title icon */
 	@InjectView(R.id.icon) private ImageView mIcon;
-	
+
 	/** the alert title view */
 	@InjectView(R.id.alertTitle) private TextView mAlertTitle;
-	
+
 	/** the refresh button */
 	@InjectView(R.id.action_refresh) private ImageView mRefresh;
-	
+
 	/** the view pager */
 	@InjectView(R.id.pager) private LockedViewPager mPager;
-	
+
 	/** the progress view */
 	@InjectView(R.id.progress_container) private View mProgress;
-	
+
 	/** the view pager adapter */
 	private FragmentStatePagerAdapter mPagerAdapter;
 
@@ -98,10 +98,10 @@ public class ContactAssignmentDialogFragment extends BaseDialogFragment implemen
 
 	/** the task used to process assignments */
 	private SafeAsyncTask<Void> mTask;
-	
+
 	/** the task used to refresh leaders */
 	private SafeAsyncTask<Void> mRefreshLeadersTask;
-	
+
 	/** the refresh icon animation */
 	private Animation mRefreshAnimation;
 
@@ -138,7 +138,7 @@ public class ContactAssignmentDialogFragment extends BaseDialogFragment implemen
 	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setStyle(DialogFragment.STYLE_NO_TITLE, R.style.Theme_Sherlock_Light_Dialog);
-		
+
 		if (getArguments() != null) {
 			@SuppressWarnings("unchecked") final HashSet<Person> people = (HashSet<Person>) getArguments().getSerializable("people");
 			if (people != null) {
@@ -205,10 +205,10 @@ public class ContactAssignmentDialogFragment extends BaseDialogFragment implemen
 		if (mTask != null) {
 			showProgress();
 		}
-		
+
 		mRefresh.setOnClickListener(new OnClickListener() {
 			@Override
-			public void onClick(View v) {
+			public void onClick(final View v) {
 				refresh();
 			}
 		});
@@ -572,9 +572,6 @@ public class ContactAssignmentDialogFragment extends BaseDialogFragment implemen
 			}
 
 			for (final Person leader : U.sortPeople(leaders, true)) {
-				
-				
-				
 				mLeaderAdapter.add(new LeaderItem(leader));
 			}
 
@@ -800,25 +797,24 @@ public class ContactAssignmentDialogFragment extends BaseDialogFragment implemen
 			doLeaderAssignment(((LeaderItem) item).leader);
 		}
 	}
-	
+
 	public void refresh() {
 		if (mSelectionFragment.mSelection == IndexFragment.GROUPS) {
-			
+
 		} else if (mSelectionFragment.mSelection == IndexFragment.LEADERS) {
 			if (mRefreshLeadersTask != null) return;
-			
+
 			mRefreshLeadersTask = new SafeAsyncTask<Void>() {
 
 				@Override
 				public Void call() throws Exception {
 					Api.getOrganization(Session.getInstance().getOrganizationId(), ApiOptions.builder()//
-							.include(Include.admins)
-							.include(Include.leaders)
-							.include(Include.organizational_roles)
+							.include(Include.leaders) //
+							.include(Include.organizational_roles) //
 							.build()).get();
 					return null;
 				}
-				
+
 				@Override
 				public void onSuccess(final Void _) {
 					mSelectionFragment.buildLeaderAdapter();
@@ -840,24 +836,24 @@ public class ContactAssignmentDialogFragment extends BaseDialogFragment implemen
 				public void onInterrupted(final Exception e) {
 
 				}
-				
+
 			};
 			updateRefreshIcon();
 			Application.getExecutor().submit(mRefreshLeadersTask.future());
 		}
 	}
-	
+
 	@Override
 	public void onDestroy() {
 		try {
 			mRefreshLeadersTask.cancel(true);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			/* ignore */
 		}
 		super.onDestroy();
 	}
-	
-	private void updateRefreshIcon() {	
+
+	private void updateRefreshIcon() {
 		if (mRefreshLeadersTask != null) {
 			mRefresh.setEnabled(false);
 			mRefresh.startAnimation(mRefreshAnimation);

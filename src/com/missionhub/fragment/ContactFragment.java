@@ -260,7 +260,7 @@ public class ContactFragment extends BaseFragment implements OnNavigationListene
 						.include(Include.organizational_roles) //
 						.include(Include.phone_numbers) //
 						.build()).get();
-				
+
 				person.refreshAll();
 				return person;
 			}

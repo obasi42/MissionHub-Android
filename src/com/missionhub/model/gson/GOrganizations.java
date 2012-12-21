@@ -24,17 +24,17 @@ public class GOrganizations {
 			@Override
 			public List<Organization> call() throws Exception {
 				final List<Organization> orgs = new ArrayList<Organization>();
-				
+
 				if (organization != null) {
 					orgs.add(organization.save(true));
 				}
-				
+
 				if (organizations != null) {
 					for (final GOrganization organization : organizations) {
 						orgs.add(organization.save(true));
 					}
 				}
-				
+
 				return orgs;
 			}
 		};

@@ -461,7 +461,7 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 				mHeaderAssignment.setText("Assignment Loading...");
 			}
 		}
-		
+
 		// set the "more info" view
 		if (mPerson.getGenderEnum() != null) {
 			((TextView) mInfoGender.findViewById(android.R.id.text1)).setText(mPerson.getGenderEnum().toString());

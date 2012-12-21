@@ -50,12 +50,12 @@ public class ContactSurveysFragment extends BaseFragment {
 
 	/** updated organization */
 	private boolean mUpdatedOrganization = false;
-	
+
 	/** the progress item */
-	private ProgressItem mProgressItem = new ProgressItem();
-	
+	private final ProgressItem mProgressItem = new ProgressItem();
+
 	/** the empty item */
-	private EmptyItem mEmptyItem = new EmptyItem();
+	private final EmptyItem mEmptyItem = new EmptyItem();
 
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
@@ -187,12 +187,12 @@ public class ContactSurveysFragment extends BaseFragment {
 		if (mAdapter == null || mPerson == null) return;
 		mAdapter.setNotifyOnChange(false);
 		mAdapter.clear();
-		
+
 		boolean fetchQuestionData = false;
 
 		final List<AnswerSheet> sheets = mPerson.getAnswerSheetList();
 		for (final AnswerSheet sheet : sheets) {
-			
+
 			if (sheet.getSurvey() == null) {
 				continue;
 			}
@@ -249,7 +249,7 @@ public class ContactSurveysFragment extends BaseFragment {
 	}
 
 	public static class EmptyItem extends DisabledItem {}
-	
+
 	public static class ProgressItem extends DisabledItem {}
 
 	private void updateOrganization() {
@@ -260,7 +260,7 @@ public class ContactSurveysFragment extends BaseFragment {
 		}
 
 		getParent().addProgress("updateOrganization");
-		
+
 		mAdapter.setNotifyOnChange(false);
 		mAdapter.remove(mEmptyItem);
 		mAdapter.insert(mProgressItem, 0);
@@ -287,7 +287,7 @@ public class ContactSurveysFragment extends BaseFragment {
 			public void onFinally() {
 				mUpdatedOrganization = true;
 				mOrganizationTask = null;
-				
+
 				if (getParent() != null) {
 					getParent().removeProgress("updateOrganization");
 				}

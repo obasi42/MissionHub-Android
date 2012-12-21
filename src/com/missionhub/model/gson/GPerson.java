@@ -148,13 +148,13 @@ public class GPerson {
 
 					if (contact_assignments != null) {
 						Application.getDb().getContactAssignmentDao().queryBuilder()
-								.where(ContactAssignmentDao.Properties.Assigned_to_id.eq(id), ContactAssignmentDao.Properties.Organization_id.eq(Session.getInstance().getOrganizationId())).buildDelete()
-								.executeDelete();
+								.where(ContactAssignmentDao.Properties.Assigned_to_id.eq(id), ContactAssignmentDao.Properties.Organization_id.eq(Session.getInstance().getOrganizationId()))
+								.buildDelete().executeDelete();
 						for (final GContactAssignment assignment : contact_assignments) {
 							assignment.save(true);
 						}
 					}
-					
+
 					if (assigned_tos != null) {
 						Application.getDb().getContactAssignmentDao().queryBuilder()
 								.where(ContactAssignmentDao.Properties.Person_id.eq(id), ContactAssignmentDao.Properties.Organization_id.eq(Session.getInstance().getOrganizationId())).buildDelete()
@@ -203,13 +203,13 @@ public class GPerson {
 							role.save(true);
 						}
 					}
-					
+
 					if (answer_sheets != null) {
-						List<AnswerSheet> oldSheets = Application.getDb().getAnswerSheetDao().queryBuilder().where(AnswerSheetDao.Properties.Person_id.eq(id)).list();
-						for(AnswerSheet oldSheet : oldSheets) {
+						final List<AnswerSheet> oldSheets = Application.getDb().getAnswerSheetDao().queryBuilder().where(AnswerSheetDao.Properties.Person_id.eq(id)).list();
+						for (final AnswerSheet oldSheet : oldSheets) {
 							oldSheet.deleteWithRelations();
 						}
-						for(GAnswerSheet sheet : answer_sheets) {
+						for (final GAnswerSheet sheet : answer_sheets) {
 							sheet.save(id, true);
 						}
 					}
