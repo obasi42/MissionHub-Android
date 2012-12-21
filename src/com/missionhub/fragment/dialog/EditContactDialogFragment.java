@@ -76,6 +76,8 @@ public class EditContactDialogFragment extends RoboSherlockDialogFragment {
 
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		
 		if (getArguments() != null) {
 			mAssignToMe = getArguments().getBoolean("assignToMe", false);
 		}

@@ -16,6 +16,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnKeyListener;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -23,6 +24,9 @@ import android.support.v4.app.FragmentTransaction;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -31,6 +35,8 @@ import android.widget.ListView;
 
 import com.missionhub.R;
 import com.missionhub.api.Api;
+import com.missionhub.api.Api.Include;
+import com.missionhub.api.ApiOptions;
 import com.missionhub.application.Application;
 import com.missionhub.application.DrawableCache;
 import com.missionhub.application.Session;
@@ -54,9 +60,21 @@ import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 
 public class ContactAssignmentDialogFragment extends BaseDialogFragment implements OnKeyListener, OnItemClickListener {
 
+	/** the title icon */
+	@InjectView(R.id.icon) private ImageView mIcon;
+	
+	/** the alert title view */
+	@InjectView(R.id.alertTitle) private TextView mAlertTitle;
+	
+	/** the refresh button */
+	@InjectView(R.id.action_refresh) private ImageView mRefresh;
+	
 	/** the view pager */
 	@InjectView(R.id.pager) private LockedViewPager mPager;
-
+	
+	/** the progress view */
+	@InjectView(R.id.progress_container) private View mProgress;
+	
 	/** the view pager adapter */
 	private FragmentStatePagerAdapter mPagerAdapter;
 
@@ -80,9 +98,12 @@ public class ContactAssignmentDialogFragment extends BaseDialogFragment implemen
 
 	/** the task used to process assignments */
 	private SafeAsyncTask<Void> mTask;
-
-	/** the progress view */
-	@InjectView(R.id.progress_container) private View mProgress;
+	
+	/** the task used to refresh leaders */
+	private SafeAsyncTask<Void> mRefreshLeadersTask;
+	
+	/** the refresh icon animation */
+	private Animation mRefreshAnimation;
 
 	public ContactAssignmentDialogFragment() {}
 
@@ -116,7 +137,8 @@ public class ContactAssignmentDialogFragment extends BaseDialogFragment implemen
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		setStyle(DialogFragment.STYLE_NO_TITLE, R.style.Theme_Sherlock_Light_Dialog);
+		
 		if (getArguments() != null) {
 			@SuppressWarnings("unchecked") final HashSet<Person> people = (HashSet<Person>) getArguments().getSerializable("people");
 			if (people != null) {
@@ -127,6 +149,8 @@ public class ContactAssignmentDialogFragment extends BaseDialogFragment implemen
 
 	@Override
 	public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
+		mRefreshAnimation = AnimationUtils.loadAnimation(inflater.getContext(), R.anim.clockwise_refresh);
+		mRefreshAnimation.setRepeatCount(Animation.INFINITE);
 		return inflater.inflate(R.layout.fragment_assignment_dialog, null);
 	}
 
@@ -181,7 +205,13 @@ public class ContactAssignmentDialogFragment extends BaseDialogFragment implemen
 		if (mTask != null) {
 			showProgress();
 		}
-
+		
+		mRefresh.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				refresh();
+			}
+		});
 	}
 
 	@Override
@@ -197,13 +227,12 @@ public class ContactAssignmentDialogFragment extends BaseDialogFragment implemen
 	public void showIndex(final boolean animate) {
 		mPage = 0;
 		mPager.setCurrentItem(0, animate);
-		if (getDialog() != null) {
-			if (mPeople.size() > 1) {
-				getDialog().setTitle(R.string.assignment_title_mass);
-			} else {
-				getDialog().setTitle(R.string.assignment_title);
-			}
+		if (mPeople.size() > 1) {
+			mAlertTitle.setText(R.string.assignment_title_mass);
+		} else {
+			mAlertTitle.setText(R.string.assignment_title);
 		}
+		mRefresh.setVisibility(View.GONE);
 	}
 
 	/**
@@ -213,9 +242,7 @@ public class ContactAssignmentDialogFragment extends BaseDialogFragment implemen
 		mSelectionFragment.showGroups();
 		mPage = 1;
 		mPager.setCurrentItem(1, animate);
-		if (getDialog() != null) {
-			getDialog().setTitle(R.string.assignment_title_group);
-		}
+		mAlertTitle.setText(R.string.assignment_title_group);
 	}
 
 	/**
@@ -225,9 +252,8 @@ public class ContactAssignmentDialogFragment extends BaseDialogFragment implemen
 		mSelectionFragment.showLeaders();
 		mPage = 1;
 		mPager.setCurrentItem(1, animate);
-		if (getDialog() != null) {
-			getDialog().setTitle(R.string.assignment_title_leader);
-		}
+		mAlertTitle.setText(R.string.assignment_title_leader);
+		mRefresh.setVisibility(View.VISIBLE);
 	}
 
 	public static class AssignNoneItem {}
@@ -328,8 +354,6 @@ public class ContactAssignmentDialogFragment extends BaseDialogFragment implemen
 				if (!U.isNullEmpty(item.me.getPicture())) {
 					ImageLoader.getInstance().displayImage(item.me.getPicture(), holder.icon, mImageLoaderOptions);
 				}
-			} else if (object instanceof AssignNoneItem) {
-				// nothing to do here
 			}
 
 			return view;
@@ -393,8 +417,8 @@ public class ContactAssignmentDialogFragment extends BaseDialogFragment implemen
 			mAdapter.setNotifyOnChange(false);
 			mAdapter.clear();
 
-			boolean showNone = false;
 			boolean showMe = false;
+			boolean showNone = false;
 			final boolean showLeaders = true;
 			final boolean showGroups = false;
 
@@ -548,6 +572,9 @@ public class ContactAssignmentDialogFragment extends BaseDialogFragment implemen
 			}
 
 			for (final Person leader : U.sortPeople(leaders, true)) {
+				
+				
+				
 				mLeaderAdapter.add(new LeaderItem(leader));
 			}
 
@@ -771,6 +798,72 @@ public class ContactAssignmentDialogFragment extends BaseDialogFragment implemen
 			doGroupAssignment(((GroupItem) item).group);
 		} else if (item instanceof LeaderItem) {
 			doLeaderAssignment(((LeaderItem) item).leader);
+		}
+	}
+	
+	public void refresh() {
+		if (mSelectionFragment.mSelection == IndexFragment.GROUPS) {
+			
+		} else if (mSelectionFragment.mSelection == IndexFragment.LEADERS) {
+			if (mRefreshLeadersTask != null) return;
+			
+			mRefreshLeadersTask = new SafeAsyncTask<Void>() {
+
+				@Override
+				public Void call() throws Exception {
+					Api.getOrganization(Session.getInstance().getOrganizationId(), ApiOptions.builder()//
+							.include(Include.admins)
+							.include(Include.leaders)
+							.include(Include.organizational_roles)
+							.build()).get();
+					return null;
+				}
+				
+				@Override
+				public void onSuccess(final Void _) {
+					mSelectionFragment.buildLeaderAdapter();
+				}
+
+				@Override
+				public void onFinally() {
+					mRefreshLeadersTask = null;
+					updateRefreshIcon();
+				}
+
+				@Override
+				public void onException(final Exception e) {
+					final ExceptionHelper eh = new ExceptionHelper(Application.getContext(), e);
+					eh.makeToast("Update Failed");
+				}
+
+				@Override
+				public void onInterrupted(final Exception e) {
+
+				}
+				
+			};
+			updateRefreshIcon();
+			Application.getExecutor().submit(mRefreshLeadersTask.future());
+		}
+	}
+	
+	@Override
+	public void onDestroy() {
+		try {
+			mRefreshLeadersTask.cancel(true);
+		} catch (Exception e) {
+			/* ignore */
+		}
+		super.onDestroy();
+	}
+	
+	private void updateRefreshIcon() {	
+		if (mRefreshLeadersTask != null) {
+			mRefresh.setEnabled(false);
+			mRefresh.startAnimation(mRefreshAnimation);
+		} else {
+			mRefresh.setEnabled(true);
+			mRefresh.clearAnimation();
 		}
 	}
 }

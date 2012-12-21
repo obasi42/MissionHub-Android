@@ -238,21 +238,21 @@ public class Api {
 	public static ApiCall<List<ContactAssignment>> bulkUpdateContactAssignments(final Collection<GContactAssignment> assignments, final ApiOptions options) {
 		final HttpParams params = new HttpParams();
 		addContactAssignmentParams(params, assignments);
-		return new ApiCall<List<ContactAssignment>>(ApiOptions.builder().method(HttpMethod.POST).url(buildUrl("contact_assignments", "bulk_update")).responseParser(contactAssignmentsParser)
+		return new ApiCall<List<ContactAssignment>>(ApiOptions.builder().method(HttpMethod.PUT).url(buildUrl("contact_assignments", "bulk_update")).responseParser(contactAssignmentsParser)
 				.params(params).merge(options).build());
 	}
 
-	public static ApiCall<Void> bulkDeleteContactAssignments(final Collection<Long> assignmentIds) {
-		return bulkDeleteContactAssignments(assignmentIds, null);
+	public static ApiCall<Void> bulkDeleteContactAssignments(final Collection<Long> personIds) {
+		return bulkDeleteContactAssignments(personIds, null);
 	}
 
-	public static ApiCall<Void> bulkDeleteContactAssignments(final Collection<Long> assignmentIds, final ApiOptions options) {
+	public static ApiCall<Void> bulkDeleteContactAssignments(final Collection<Long> personIds, final ApiOptions options) {
 		final HttpParams params = new HttpParams();
-		params.add("filters[ids]", U.toCSV(assignmentIds));
+		params.add("filters[person_id]", U.toCSV(personIds));
 		return new ApiCall<Void>(ApiOptions.builder().method(HttpMethod.DELETE).url(buildUrl("contact_assignments", "bulk_destroy")).responseParser(new ApiResponseParser<Void>() {
 			@Override
 			public Void parseResponse(final HttpResponse response) throws Exception {
-				Application.getDb().getContactAssignmentDao().queryBuilder().where(ContactAssignmentDao.Properties.Id.in(assignmentIds)).buildDelete().executeDelete();
+				Application.getDb().getContactAssignmentDao().queryBuilder().where(ContactAssignmentDao.Properties.Person_id.in(personIds)).buildDelete().executeDelete();
 				return null;
 			}
 		}).params(params).merge(options).build());
@@ -488,8 +488,8 @@ public class Api {
 	private static final ApiResponseParser<Organization> organizationParser = new ApiResponseParser<Organization>() {
 		@Override
 		public Organization parseResponse(final HttpResponse response) throws Exception {
-			final GOrganization org = sGson.fromJson(response.responseBody, GOrganization.class);
-			return org.save(false);
+			final GOrganizations orgs = sGson.fromJson(response.responseBody, GOrganizations.class);
+			return orgs.save(false).get(0);
 		}
 	};
 
@@ -682,6 +682,6 @@ public class Api {
 
 	/** Enum of all available includes */
 	public enum Include {
-		answers, surveys, answer_sheets, all_organizational_roles, organizational_roles, followup_comments, contact_assignments, current_address, user, phone_numbers, person_transfers, email_addresses, questions, keyword, contacts, admins, leaders, people, groups, keywords, assigned_to, person, comments_on_me, rejoicables
+		answers, surveys, answer_sheets, all_organizational_roles, organizational_roles, followup_comments, contact_assignments, assigned_tos, current_address, user, phone_numbers, person_transfers, email_addresses, all_questions, elements, keyword, contacts, admins, leaders, people, groups, keywords, assigned_to, person, comments_on_me, rejoicables
 	}
 }

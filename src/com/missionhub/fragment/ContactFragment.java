@@ -253,13 +253,14 @@ public class ContactFragment extends BaseFragment implements OnNavigationListene
 						.include(Include.answers) //
 						.include(Include.comments_on_me) //
 						.include(Include.rejoicables) //
-						.include(Include.contact_assignments) //
+						.include(Include.assigned_tos) //
+						.include(Include.assigned_to) //
 						.include(Include.current_address) //
 						.include(Include.email_addresses) //
 						.include(Include.organizational_roles) //
 						.include(Include.phone_numbers) //
 						.build()).get();
-
+				
 				person.refreshAll();
 				return person;
 			}

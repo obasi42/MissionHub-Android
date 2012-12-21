@@ -1,11 +1,14 @@
 package com.missionhub.model.gson;
 
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
 import com.google.common.collect.HashMultimap;
 import com.missionhub.application.Application;
 import com.missionhub.application.Session;
+import com.missionhub.model.AnswerSheet;
+import com.missionhub.model.AnswerSheetDao;
 import com.missionhub.model.ContactAssignmentDao;
 import com.missionhub.model.EmailAddressDao;
 import com.missionhub.model.FollowupCommentDao;
@@ -39,12 +42,14 @@ public class GPerson {
 	public GPhoneNumber[] phone_numbers;
 	public GEmailAddress[] email_addresses;
 	public GContactAssignment[] contact_assignments;
+	public GContactAssignment[] assigned_tos;
 	public GFollowupComment[] followup_comments;
 	public GFollowupComment[] comments_on_me;
 	public GRejoicable[] rejoicables;
 	public GOrganizationalRole[] organizational_roles;
 	public GOrganizationalRole[] all_organizational_roles;
 	public GAddress current_address;
+	public GAnswerSheet[] answer_sheets;
 
 	public Boolean _assignToMe = false; // used by AddContactDialog
 	public HashMultimap<Long, String> _answers; // used by AddContactDialog
@@ -143,9 +148,18 @@ public class GPerson {
 
 					if (contact_assignments != null) {
 						Application.getDb().getContactAssignmentDao().queryBuilder()
-								.where(ContactAssignmentDao.Properties.Person_id.eq(id), ContactAssignmentDao.Properties.Organization_id.eq(Session.getInstance().getOrganizationId())).buildDelete()
+								.where(ContactAssignmentDao.Properties.Assigned_to_id.eq(id), ContactAssignmentDao.Properties.Organization_id.eq(Session.getInstance().getOrganizationId())).buildDelete()
 								.executeDelete();
 						for (final GContactAssignment assignment : contact_assignments) {
+							assignment.save(true);
+						}
+					}
+					
+					if (assigned_tos != null) {
+						Application.getDb().getContactAssignmentDao().queryBuilder()
+								.where(ContactAssignmentDao.Properties.Person_id.eq(id), ContactAssignmentDao.Properties.Organization_id.eq(Session.getInstance().getOrganizationId())).buildDelete()
+								.executeDelete();
+						for (final GContactAssignment assignment : assigned_tos) {
 							assignment.save(true);
 						}
 					}
@@ -187,6 +201,16 @@ public class GPerson {
 						Application.getDb().getOrganizationalRoleDao().queryBuilder().where(OrganizationalRoleDao.Properties.Person_id.eq(id)).buildDelete().executeDelete();
 						for (final GOrganizationalRole role : all_organizational_roles) {
 							role.save(true);
+						}
+					}
+					
+					if (answer_sheets != null) {
+						List<AnswerSheet> oldSheets = Application.getDb().getAnswerSheetDao().queryBuilder().where(AnswerSheetDao.Properties.Person_id.eq(id)).list();
+						for(AnswerSheet oldSheet : oldSheets) {
+							oldSheet.deleteWithRelations();
+						}
+						for(GAnswerSheet sheet : answer_sheets) {
+							sheet.save(id, true);
 						}
 					}
 
@@ -249,7 +273,7 @@ public class GPerson {
 					params.add("person[email_addresses_attributes][" + i + "][_destroy]", true);
 				} else {
 					if (!U.isNullEmpty(address.email)) {
-						params.add("person[email_addresses_attributes][" + i + "][number]", address.email);
+						params.add("person[email_addresses_attributes][" + i + "][email]", address.email);
 					}
 					if (!U.isNullEmpty(address.primary)) {
 						params.add("person[email_addresses_attributes][" + i + "][primary]", address.primary);

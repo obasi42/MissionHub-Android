@@ -187,6 +187,14 @@ public class AnswerSheet {
     }
 
     // KEEP METHODS - put your custom methods here
+	public void deleteWithRelations() {
+		if (daoSession == null) {
+            throw new DaoException("Entity is detached from DAO context");
+        }
+		
+		daoSession.getAnswerDao().queryBuilder().where(AnswerDao.Properties.Answer_sheet_id.eq(getId())).buildDelete().executeDelete();
+		delete();
+	}
     // KEEP METHODS END
 
 }

@@ -20,6 +20,7 @@ public class GSurvey {
 	public String updated_at;
 
 	public GQuestion[] questions;
+	public GQuestion[] all_questions;
 	public GSmsKeyword keyword;
 
 	public static final Object lock = new Object();
@@ -52,6 +53,12 @@ public class GSurvey {
 
 					if (questions != null) {
 						for (final GQuestion question : questions) {
+							question.save(true);
+						}
+					}
+					
+					if (all_questions != null) {
+						for (final GQuestion question : all_questions) {
 							question.save(true);
 						}
 					}

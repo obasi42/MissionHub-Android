@@ -101,10 +101,13 @@ public class ApiContactListProvider extends ContactListProvider {
 			public List<Person> call() throws Exception {
 				return Api.listPeople(
 						mOptions,
-						ApiOptions.builder()
-								//
-								.include(Include.contact_assignments).include(Include.current_address).include(Include.email_addresses).include(Include.organizational_roles)
-								.include(Include.phone_numbers).build()).get();
+						ApiOptions.builder() //
+								.include(Include.assigned_tos) //
+								.include(Include.current_address) //
+								.include(Include.email_addresses) //
+								.include(Include.organizational_roles) //
+								.include(Include.phone_numbers) //
+								.build()).get();
 			}
 
 			@Override

@@ -31,10 +31,7 @@ public class GPeople {
 
 				if (people != null) {
 					for (final GPerson person : people) {
-						final Person p = person.save(true);
-						if (p != null) {
-							ps.add(p);
-						}
+						ps.add(person.save(true));
 					}
 				}
 

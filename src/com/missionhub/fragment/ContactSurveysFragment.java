@@ -8,6 +8,7 @@ import roboguice.inject.InjectView;
 import roboguice.util.SafeAsyncTask;
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,6 +50,12 @@ public class ContactSurveysFragment extends BaseFragment {
 
 	/** updated organization */
 	private boolean mUpdatedOrganization = false;
+	
+	/** the progress item */
+	private ProgressItem mProgressItem = new ProgressItem();
+	
+	/** the empty item */
+	private EmptyItem mEmptyItem = new EmptyItem();
 
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
@@ -107,6 +114,8 @@ public class ContactSurveysFragment extends BaseFragment {
 					holder.answer = (TextView) view.findViewById(android.R.id.text2);
 				} else if (object instanceof EmptyItem) {
 					view = getLayoutInflater().inflate(R.layout.item_contact_surveys_empty, null);
+				} else if (object instanceof ProgressItem) {
+					view = getLayoutInflater().inflate(R.layout.item_contact_surveys_progress, null);
 				}
 				view.setTag(holder);
 			} else {
@@ -178,15 +187,13 @@ public class ContactSurveysFragment extends BaseFragment {
 		if (mAdapter == null || mPerson == null) return;
 		mAdapter.setNotifyOnChange(false);
 		mAdapter.clear();
-
-		mPerson.resetAnswerSheetList();
-
+		
 		boolean fetchQuestionData = false;
 
 		final List<AnswerSheet> sheets = mPerson.getAnswerSheetList();
 		for (final AnswerSheet sheet : sheets) {
+			
 			if (sheet.getSurvey() == null) {
-				fetchQuestionData = true;
 				continue;
 			}
 
@@ -200,6 +207,7 @@ public class ContactSurveysFragment extends BaseFragment {
 			final List<Answer> answers = sheet.getAnswerList();
 			for (final Answer answer : answers) {
 				if (answer.getQuestion() == null) {
+					Log.e("No Question", answer.getQuestion_id() + " ");
 					fetchQuestionData = true;
 					continue;
 				}
@@ -241,6 +249,8 @@ public class ContactSurveysFragment extends BaseFragment {
 	}
 
 	public static class EmptyItem extends DisabledItem {}
+	
+	public static class ProgressItem extends DisabledItem {}
 
 	private void updateOrganization() {
 		try {
@@ -250,6 +260,11 @@ public class ContactSurveysFragment extends BaseFragment {
 		}
 
 		getParent().addProgress("updateOrganization");
+		
+		mAdapter.setNotifyOnChange(false);
+		mAdapter.remove(mEmptyItem);
+		mAdapter.insert(mProgressItem, 0);
+		mAdapter.notifyDataSetChanged();
 
 		mOrganizationTask = new SafeAsyncTask<Organization>() {
 
@@ -257,13 +272,14 @@ public class ContactSurveysFragment extends BaseFragment {
 			public Organization call() throws Exception {
 				return Api.getOrganization(Session.getInstance().getOrganizationId(), ApiOptions.builder() //
 						.include(Include.keywords) //
-						.include(Include.questions) //
+						.include(Include.all_questions) //
 						.include(Include.surveys) //
 						.build()).get();
 			}
 
 			@Override
 			public void onSuccess(final Organization organization) {
+				mPerson.refresh();
 				notifyPersonUpdated();
 			}
 
@@ -271,7 +287,7 @@ public class ContactSurveysFragment extends BaseFragment {
 			public void onFinally() {
 				mUpdatedOrganization = true;
 				mOrganizationTask = null;
-
+				
 				if (getParent() != null) {
 					getParent().removeProgress("updateOrganization");
 				}

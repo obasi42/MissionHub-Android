@@ -11,6 +11,7 @@ import com.missionhub.model.ContactAssignmentDao;
 public class GContactAssignments {
 
 	public GContactAssignment[] contact_assignments;
+	public GContactAssignment contact_assignment;
 
 	/**
 	 * Saves the contact assignments to the SQLite database.
@@ -25,10 +26,18 @@ public class GContactAssignments {
 			public List<ContactAssignment> call() throws Exception {
 				synchronized (GContactAssignment.allLock) {
 					final List<ContactAssignment> assignments = new ArrayList<ContactAssignment>();
-					for (final GContactAssignment assignment : contact_assignments) {
-						final ContactAssignment assign = assignment.save(true);
+					if (contact_assignments != null) {
+						for (final GContactAssignment assignment : contact_assignments) {
+							final ContactAssignment assign = assignment.save(true);
+							if (assign != null) {
+								assignments.add(assign);
+							}
+						}
+					}
+					if (contact_assignment != null) {
+						final ContactAssignment assign = contact_assignment.save(true);
 						if (assign != null) {
-							assignments.add(assign);
+							assignments.add(contact_assignment.save(true));
 						}
 					}
 					return assignments;

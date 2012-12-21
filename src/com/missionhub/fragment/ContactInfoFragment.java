@@ -452,16 +452,16 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 		// assignment
 		final ContactAssignment assignment = mPerson.getContactAssignment();
 		if (assignment == null) {
-			mHeaderAssignment.setText("");
+			mHeaderAssignment.setText("Unassigned");
 		} else {
 			final Person assignedTo = Application.getDb().getPersonDao().load(assignment.getAssigned_to_id());
 			if (!U.isNullEmpty(assignedTo.getName())) {
 				mHeaderAssignment.setText(assignedTo.getName());
 			} else {
-				mHeaderAssignment.setText("Assignment Unknown");
+				mHeaderAssignment.setText("Assignment Loading...");
 			}
 		}
-
+		
 		// set the "more info" view
 		if (mPerson.getGenderEnum() != null) {
 			((TextView) mInfoGender.findViewById(android.R.id.text1)).setText(mPerson.getGenderEnum().toString());
@@ -1038,6 +1038,7 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 
 	@Override
 	public void onAssignmentCompleted() {
+		mPerson.resetContactAssignments();
 		notifyPersonUpdated();
 	}
 
