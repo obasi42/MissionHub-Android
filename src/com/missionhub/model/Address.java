@@ -7,6 +7,7 @@ import de.greenrobot.dao.DaoException;
 
 // KEEP INCLUDES - put your custom includes here
 import com.missionhub.model.gson.GAddress;
+import com.missionhub.util.U;
 // KEEP INCLUDES END
 /**
  * Entity mapped to table ADDRESS.
@@ -177,6 +178,15 @@ public class Address {
 		a.state = getState();
 		a.zip = getZip();
 		return a;
+	}
+	
+
+	public boolean isComplete() {
+		if (!U.isNullEmpty(getAddress1()) || !U.isNullEmpty(getAddress2()) || (!U.isNullEmpty(getCity()) && !U.isNullEmpty(getState()))) {
+			return true;
+		}
+		
+		return false;
 	}
     // KEEP METHODS END
 

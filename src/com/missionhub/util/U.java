@@ -154,6 +154,25 @@ public class U {
 		return false;
 	}
 
+	public static String concatinate(final CharSequence delemiter, final boolean ignoreEmpty, final CharSequence... items) {
+		final StringBuffer sb = new StringBuffer();
+
+		for (int i = 0; i < items.length; i++) {
+			final CharSequence string = items[i];
+			if (ignoreEmpty && U.isNullEmpty(string)) {
+				continue;
+			}
+
+			sb.append(string);
+
+			if (delemiter != null && i + 1 < items.length && (!ignoreEmpty || !U.isNullEmpty(items[i + 1]))) {
+				sb.append(delemiter);
+			}
+		}
+
+		return sb.toString();
+	}
+
 	/**
 	 * Converts a collection of items into a string of comma seperated values
 	 * 

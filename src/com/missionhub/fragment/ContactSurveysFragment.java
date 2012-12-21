@@ -203,7 +203,7 @@ public class ContactSurveysFragment extends BaseFragment {
 				continue;
 			}
 
-			ArrayList<QAItem> items = new ArrayList<QAItem>();
+			final ArrayList<QAItem> items = new ArrayList<QAItem>();
 			final List<Answer> answers = sheet.getAnswerList();
 			for (final Answer answer : answers) {
 				if (answer.getQuestion() == null) {
@@ -213,10 +213,10 @@ public class ContactSurveysFragment extends BaseFragment {
 				}
 				items.add(new QAItem(answer.getQuestion(), answer));
 			}
-			
+
 			if (!items.isEmpty()) {
 				mAdapter.add(new SurveyItem(sheet.getSurvey()));
-				for(QAItem item : items) {
+				for (final QAItem item : items) {
 					mAdapter.add(item);
 				}
 			}

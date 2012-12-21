@@ -6,6 +6,7 @@ import android.widget.Toast;
 
 import com.missionhub.R;
 import com.missionhub.application.Application;
+import com.missionhub.model.Address;
 
 public class IntentHelper {
 
@@ -153,6 +154,23 @@ public class IntentHelper {
 			} catch (final Exception f) {
 				Toast.makeText(Application.getContext(), R.string.intent_helper_no_facebook, Toast.LENGTH_LONG).show();
 			}
+		}
+	}
+
+	/**
+	 * Opens a map to an address
+	 * 
+	 * @param adress
+	 */
+	public static void openMap(final Address address) {
+		final String query = U.concatinate(", ", true, address.getAddress1(), address.getAddress2(), address.getCity(), address.getState(), address.getZip(), address.getCountry());
+
+		try {
+			final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://maps.google.com/maps?q=" + query));
+			addTaskFlags(intent);
+			Application.getContext().startActivity(intent);
+		} catch (final Exception e) {
+			Toast.makeText(Application.getContext(), getString(R.string.intent_helper_no_map), Toast.LENGTH_LONG).show();
 		}
 	}
 

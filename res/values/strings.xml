@@ -125,6 +125,7 @@
     <string name="intent_helper_send_email">Send Email</string>
     <string name="intent_helper_no_email">No email client available.</string>
     <string name="intent_helper_no_facebook">Could not open Facebook profile.</string>
+    <string name="intent_helper_no_map">Could not open map.</string>
 
     <!-- Status Labels -->
     <string name="rejoice_spiritual_conversation">Spiritual Conversation</string>

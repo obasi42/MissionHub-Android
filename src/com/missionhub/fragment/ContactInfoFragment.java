@@ -38,6 +38,7 @@ import com.missionhub.application.Session;
 import com.missionhub.exception.ExceptionHelper;
 import com.missionhub.fragment.dialog.ContactAssignmentDialogFragment;
 import com.missionhub.fragment.dialog.ContactAssignmentDialogFragment.ContactAssignmentListener;
+import com.missionhub.model.Address;
 import com.missionhub.model.ContactAssignment;
 import com.missionhub.model.EmailAddress;
 import com.missionhub.model.FollowupComment;
@@ -53,6 +54,7 @@ import com.missionhub.util.IntentHelper;
 import com.missionhub.util.TimeAgo;
 import com.missionhub.util.U;
 import com.missionhub.util.U.FollowupStatus;
+import com.missionhub.util.U.Gender;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.PauseOnScrollListener;
@@ -141,6 +143,8 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 	/** the more info collapse/expand text */
 	@InjectView(R.id.expand) private TextView mHeaderMoreText;
 
+	@InjectView(R.id.personal_info) private View mHeaderPersonalInfo;
+
 	/** the more info gender */
 	@InjectView(R.id.gender) private View mInfoGender;
 
@@ -149,6 +153,9 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 
 	/** the more info address */
 	@InjectView(R.id.address) private View mInfoAddress;
+
+	/** the links section */
+	@InjectView(R.id.links) private View mInfoLinks;
 
 	/** the more info facebook link */
 	@InjectView(R.id.facebook) private View mInfoFacebook;
@@ -260,7 +267,7 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 		mInfoAddress.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(final View v) {
-				openAddress();
+				IntentHelper.openMap(mPerson.getCurrentAddress());
 			}
 		});
 		mInfoFacebook.setOnClickListener(new OnClickListener() {
@@ -463,28 +470,59 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
 		}
 
 		// set the "more info" view
-		if (mPerson.getGenderEnum() != null) {
-			((TextView) mInfoGender.findViewById(android.R.id.text1)).setText(mPerson.getGenderEnum().toString());
-			mInfoGender.setVisibility(View.VISIBLE);
-		} else {
-			mInfoGender.setVisibility(View.GONE);
-		}
+		final Gender gender = mPerson.getGenderEnum();
+		final Date birthdate = mPerson.getBirth_date();
+		final Address address = mPerson.getCurrentAddress();
+		final Long fbUid = mPerson.getFb_uid();
 
-		if (!U.isNullEmpty(mPerson.getBirth_date())) {
-			try {
-				final SimpleDateFormat format = new SimpleDateFormat("MMMM dd", Locale.US);
-				((TextView) mInfoBirthday.findViewById(android.R.id.text1)).setText(format.format(mPerson.getBirth_date()));
-			} catch (final Exception e) {
-				((TextView) mInfoBirthday.findViewById(android.R.id.text1)).setText(mPerson.getBirth_date().toString());
+		if (gender != null || birthdate != null || address != null || fbUid != null) {
+
+			if (gender != null || birthdate != null || (address != null && address.isComplete())) {
+				if (gender != null) {
+					((TextView) mInfoGender.findViewById(android.R.id.text1)).setText(gender.toString());
+					mInfoGender.setVisibility(View.VISIBLE);
+				} else {
+					mInfoGender.setVisibility(View.GONE);
+				}
+
+				if (birthdate != null) {
+					try {
+						final SimpleDateFormat format = new SimpleDateFormat("MMMM dd", Locale.US);
+						((TextView) mInfoBirthday.findViewById(android.R.id.text1)).setText(format.format(birthdate));
+					} catch (final Exception e) {
+						((TextView) mInfoBirthday.findViewById(android.R.id.text1)).setText(birthdate.toString());
+					}
+					mInfoBirthday.setVisibility(View.VISIBLE);
+				} else {
+					mInfoBirthday.setVisibility(View.GONE);
+				}
+
+				if (address != null && address.isComplete()) {
+					final String line1 = U.concatinate(", ", true, address.getAddress1(), address.getAddress2());
+					final String line2 = U.concatinate(", ", true, address.getCity(), address.getState(), address.getZip(), address.getCountry());
+
+					((TextView) mInfoAddress.findViewById(android.R.id.text1)).setText(line1);
+					((TextView) mInfoAddress.findViewById(android.R.id.text2)).setText(line2);
+					mInfoAddress.setVisibility(View.VISIBLE);
+				} else {
+					mInfoAddress.setVisibility(View.GONE);
+				}
+
+				mHeaderPersonalInfo.setVisibility(View.VISIBLE);
+			} else {
+				mHeaderPersonalInfo.setVisibility(View.GONE);
 			}
-			mInfoBirthday.setVisibility(View.VISIBLE);
-		} else {
-			mInfoBirthday.setVisibility(View.GONE);
-		}
 
-		mInfoBirthday.findViewById(R.id.divider).setVisibility(View.GONE);
-		mInfoAddress.setVisibility(View.GONE);
-		mInfoAddress.findViewById(R.id.divider).setVisibility(View.GONE);
+			if (fbUid != null) {
+				mInfoLinks.setVisibility(View.VISIBLE);
+			} else {
+				mInfoLinks.setVisibility(View.GONE);
+			}
+
+			mHeaderMoreText.setVisibility(View.VISIBLE);
+		} else {
+			mHeaderMoreText.setVisibility(View.INVISIBLE);
+		}
 
 		updateMoreShowing();
 
