@@ -191,10 +191,12 @@ public class ContactSurveysFragment extends BaseFragment {
 
 		boolean fetchQuestionData = false;
 
+		mPerson.resetAddressList();
 		final List<AnswerSheet> sheets = mPerson.getAnswerSheetList();
 		for (final AnswerSheet sheet : sheets) {
 
 			if (sheet.getSurvey() == null) {
+				Log.e("NO SURVEY", sheet.getSurvey_id() + "");
 				continue;
 			}
 

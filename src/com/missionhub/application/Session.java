@@ -223,9 +223,8 @@ public class Session implements OnAccountsUpdateListener {
 							.include(Include.organizational_roles) //
 							.include(Include.surveys) //
 							.build()).get();
-
-					SettingsManager.getInstance().setUserSetting(getPersonId(), "organization_" + getOrganizationId() + "_updated", currentTime);
-
+					
+					SettingsManager.getInstance().setUserSetting(getPersonId(), "organization_" + organizationId + "_updated", currentTime);
 				}
 
 				return null;
@@ -295,7 +294,7 @@ public class Session implements OnAccountsUpdateListener {
 
 					// update the current organization
 					Application.postEvent(new SessionResumeStatusEvent(Application.getContext().getString(R.string.init_updating_current_organization)));
-					updateCurrentOrganization(false);
+					updateCurrentOrganization(false).get();
 
 					Application.postEvent(new SessionResumeSuccessEvent());
 				} catch (final Exception e) {
@@ -439,11 +438,13 @@ public class Session implements OnAccountsUpdateListener {
 	 */
 	public synchronized void setOrganizationId(final long organizationId) throws NoPersonException {
 		if (getPerson().isAdminOrLeader(organizationId)) {
-			mOrganizationId = organizationId;
-			SettingsManager.setSessionOrganizationId(getPersonId(), mOrganizationId);
-			Application.postEvent(new SessionOrganizationIdChanged(organizationId));
-
-			updateCurrentOrganization(true);
+			if (organizationId != getOrganizationId()) {
+				mOrganizationId = organizationId;
+				SettingsManager.setSessionOrganizationId(getPersonId(), mOrganizationId);
+				Application.postEvent(new SessionOrganizationIdChanged(organizationId));
+	
+				updateCurrentOrganization(true);
+			}
 		} else {
 			Application.showToast(R.string.session_not_admin, Toast.LENGTH_LONG);
 		}
