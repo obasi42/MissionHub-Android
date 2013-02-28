@@ -57,7 +57,7 @@
     <repositories>
         <repository>
             <id>missionhub-android-maven</id>
-            <url>https://github.com/CruGlobal/Missionhub-Android-Maven/raw/master</url>
+            <url>https://github.com/CruGlobal/Missionhub-Android-Maven/raw/master/releases</url>
         </repository>
     </repositories>
 
