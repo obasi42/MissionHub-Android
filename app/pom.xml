@@ -217,7 +217,7 @@
                                 <skip>false</skip>
                                 <verbose>true</verbose>
                                 <outputApk>
-                                    ${project.build.directory}/${project.artifactId}-${project.version}-signed-aligned.apk
+                                    ${project.build.directory}/${project.artifactId}-${project.version}.${missionhub.build.number}-signed-aligned.apk
                                 </outputApk>
                             </zipalign>
                         </configuration>
