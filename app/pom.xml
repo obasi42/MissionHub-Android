@@ -42,26 +42,6 @@
             <artifactId>guava</artifactId>
             <version>14.0</version>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>com.slidingmenu</groupId>-->
-            <!--<artifactId>slidingmenu</artifactId>-->
-            <!--<version>1.2</version>-->
-            <!--<type>apklib</type>-->
-            <!--<exclusions>-->
-                <!--<exclusion>-->
-                    <!--<groupId>com.google.android</groupId>-->
-                    <!--<artifactId>android</artifactId>-->
-                <!--</exclusion>-->
-                <!--<exclusion>-->
-                    <!--<groupId>com.actionbarsherlock</groupId>-->
-                    <!--<artifactId>actionbarsherlock</artifactId>-->
-                <!--</exclusion>-->
-                <!--<exclusion>-->
-                    <!--<groupId>com.google.android</groupId>-->
-                    <!--<artifactId>support-v4</artifactId>-->
-                <!--</exclusion>-->
-            <!--</exclusions>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>org.holoeverywhere</groupId>
             <artifactId>library</artifactId>
@@ -188,16 +168,38 @@
     <profiles>
         <profile>
             <id>release</id>
-            <!-- via this activation the profile is automatically used when the release is done with the maven release
-            plugin -->
-            <activation>
-                <property>
-                    <name>performRelease</name>
-                    <value>true</value>
-                </property>
-            </activation>
+            <properties>
+                <missionhub.build.number>1</missionhub.build.number>
+                <missionhub.sign.keystore />
+                <missionhub.sign.alias />
+                <missionhub.sign.storepass />
+                <missionhub.sign.keypass />
+            </properties>
             <build>
                 <plugins>
+                    <plugin>
+                        <groupId>com.jayway.maven.plugins.android.generation2</groupId>
+                        <artifactId>android-maven-plugin</artifactId>
+                        <inherited>true</inherited>
+                        <executions>
+                            <execution>
+                                <id>update-manifest</id>
+                                <phase>process-resources</phase>
+                                <goals>
+                                    <goal>manifest-update</goal>
+                                </goals>
+                                <configuration>
+                                    <manifest>
+                                        <debuggable>false</debuggable>
+                                        <versionName>${project.version}.${missionhub.build.number}</versionName>
+                                        <versionCode>${missionhub.build.number}</versionCode>
+                                        <versionCodeAutoIncrement>false</versionCodeAutoIncrement>
+                                        <versionCodeUpdateFromVersion>false</versionCodeUpdateFromVersion>
+                                    </manifest>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-jarsigner-plugin</artifactId>
@@ -213,16 +215,10 @@
                                 <configuration>
                                     <removeExistingSignatures>true</removeExistingSignatures>
                                     <archiveDirectory/>
-                                    <!-- These values can either be placed directly into to file below, or provided
-                                    via the command line during the build process as such:
-                                     "mvn clean release -Dbootstrap.sign.keystore=foobar" ... etc.
-                                     This will keep the keystore out of your file so no prying eyes can see.
-                                     Also, if you have a ci (Continuous Integration) profile, these values can be
-                                     passed in via the build server. -->
-                                    <keystore>${bootstrap.sign.keystore}</keystore>
-                                    <alias>${bootstrap.sign.alias}</alias>
-                                    <storepass>${bootstrap.sign.storepass}</storepass>
-                                    <keypass>${bootstrap.sign.keypass}</keypass>
+                                    <keystore>${missionhub.sign.keystore}</keystore>
+                                    <alias>${missionhub.sign.alias}</alias>
+                                    <storepass>${missionhub.sign.storepass}</storepass>
+                                    <keypass>${missionhub.sign.keypass}</keypass>
                                     <verbose>true</verbose>
                                 </configuration>
                             </execution>
@@ -244,9 +240,6 @@
                                     ${project.build.directory}/${project.artifactId}-${project.version}-signed-aligned.apk
                                 </outputApk>
                             </zipalign>
-                            <manifest>
-                                <debuggable>false</debuggable>
-                            </manifest>
                         </configuration>
                     </plugin>
                 </plugins>

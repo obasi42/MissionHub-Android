@@ -67,3 +67,9 @@
 -keepclassmembers class ** {
     public void onEvent*(**);
 }
+
+# Guava
+-keepattributes Signature,RuntimeVisibleAnnotations,AnnotationDefault
+-dontwarn sun.misc.Unsafe
+-dontwarn com.google.common.collect.MinMaxPriorityQueue
+-dontwarn com.google.common.util.concurrent.ServiceManager
