@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="24.0dip"
+    android:animateLayoutChanges="true"
+    android:background="@drawable/item_background"
+    android:padding="9.0dip" >
+
+    <EditText
+        android:id="@+id/comment"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="4.0dip"
+        android:layout_toLeftOf="@+id/save"
+        android:ems="10"
+        android:hint="@string/contact_add_comment"
+        android:inputType="textMultiLine" />
+
+    <View
+        android:id="@+id/save"
+        android:layout_width="32.0dip"
+        android:layout_height="32.0dip"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/ic_action_save" />
+
+    <ImageView
+        android:id="@+id/rejoice_christ"
+        android:layout_width="32.0dip"
+        android:layout_height="32.0dip"
+        android:layout_alignLeft="@+id/comment"
+        android:layout_below="@id/comment"
+        android:layout_centerVertical="true"
+        android:padding="6.0dip"
+        android:src="@drawable/ic_rejoice_christ_gray" />
+
+    <ImageView
+        android:id="@+id/rejoice_convo"
+        android:layout_width="32.0dip"
+        android:layout_height="32.0dip"
+        android:layout_alignTop="@id/rejoice_christ"
+        android:layout_toRightOf="@id/rejoice_christ"
+        android:padding="6.0dip"
+        android:src="@drawable/ic_rejoice_convo_gray" />
+
+    <ImageView
+        android:id="@+id/rejoice_gospel"
+        android:layout_width="32.0dip"
+        android:layout_height="32.0dip"
+        android:layout_alignTop="@id/rejoice_convo"
+        android:layout_toRightOf="@id/rejoice_convo"
+        android:padding="6.0dip"
+        android:src="@drawable/ic_rejoice_gospel_gray" />
+
+    <Spinner
+        android:id="@+id/status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/rejoice_gospel"
+        android:layout_marginTop="-4.0dip"
+        android:layout_toLeftOf="@id/save"
+        android:layout_toRightOf="@id/rejoice_gospel"
+        android:background="@drawable/gray_button"
+        tools:listitem="@layout/item_simple_status" />
+
+</RelativeLayout>

@@ -1,3 +1,0 @@
-<sync-adapter xmlns:android="http://schemas.android.com/apk/res/android"
-    android:accountType="com.missionhub"
-    android:contentAuthority="com.missionhub.sync" />

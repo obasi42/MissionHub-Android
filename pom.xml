@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
+
+    <version>2.0-SNAPSHOT</version>
+    <groupId>com.missionhub.android</groupId>
+    <artifactId>parent</artifactId>
+    <packaging>pom</packaging>
+
+    <name>MissionHub Android (Parent)</name>
+    <url>http://www.missionhub.com</url>
+    <inceptionYear>2011</inceptionYear>
+
+    <scm>
+		<url>https://github.com/CruGlobal/MissionHub-Android</url>
+		<connection>scm:git:git://github.com/CruGlobal/MissionHub-Android.git</connection>
+		<developerConnection>scm:git:git@github.com:CruGlobal/MissionHub-Android.git</developerConnection>
+	</scm>
+
+	<developers>
+		<developer>
+			<name>Chris Roemmich</name>
+			<email>chris.roemmich@cojourners.com</email>
+			<id>croemmich</id>
+			<url>https://cr-wd.com</url>
+			<timezone>-6</timezone>
+			<roles>
+				<role>developer</role>
+			</roles>
+		</developer>
+	</developers>
+
+	<licenses>
+		<license>
+			<name>Apache License Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<organization>
+		<name>Cru Global</name>
+		<url>http://www.cru.org</url>
+	</organization>
+
+	<issueManagement>
+		<system>JIRA</system>
+		<url>http://jira.uscm.org</url>
+	</issueManagement>
+
+    <modules>
+        <module>app</module>
+        <!--<module>integration-tests</module>-->
+    </modules>
+
+    <repositories>
+        <repository>
+            <id>missionhub-android-maven</id>
+            <url>https://github.com/CruGlobal/Missionhub-Android-Maven/raw/master</url>
+        </repository>
+    </repositories>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <java.version>1.6</java.version>
+        <android.version>4.2.2_r2</android.version>
+        <android.platform>17</android.platform>
+        <android-support.version>12</android-support.version>
+
+        <android-maven.version>3.5.1</android-maven.version>
+        <junit.version>4.11</junit.version>
+
+        <github.downloads.repositoryOwner>CruGlobal</github.downloads.repositoryOwner>
+        <github.downloads.repositoryName>MissionHub-Android</github.downloads.repositoryName>
+    </properties>
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>com.jayway.maven.plugins.android.generation2</groupId>
+                    <artifactId>android-maven-plugin</artifactId>
+                    <version>${android-maven.version}</version>
+                    <extensions>true</extensions>
+                    <configuration>
+                        <sdk>
+                            <platform>${android.platform}</platform>
+                        </sdk>
+                        <!--<undeployBeforeDeploy>true</undeployBeforeDeploy>-->
+                        <proguardFile>${project.build.directory}/proguard-gen.txt</proguardFile>
+                        <proguard>
+                            <skip>false</skip>
+                            <config>../proguard.txt</config>
+                        </proguard>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+</project>
