@@ -77,6 +77,14 @@
         <github.downloads.repositoryName>MissionHub-Android</github.downloads.repositoryName>
     </properties>
     <build>
+        <plugins>
+            <plugin>
+                <groupId>com.jayway.maven.plugins.android.generation2</groupId>
+                <artifactId>android-maven-plugin</artifactId>
+                <extensions>true</extensions>
+            </plugin>
+        </plugins>
+
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -88,7 +96,6 @@
                         <sdk>
                             <platform>${android.platform}</platform>
                         </sdk>
-                        <!--<undeployBeforeDeploy>true</undeployBeforeDeploy>-->
                         <proguardFile>${project.build.directory}/proguard-gen.txt</proguardFile>
                         <proguard>
                             <skip>false</skip>

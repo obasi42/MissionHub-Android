@@ -168,19 +168,59 @@
     <profiles>
         <profile>
             <id>release</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <properties>
                 <missionhub.build.number>1</missionhub.build.number>
-                <missionhub.sign.keystore />
-                <missionhub.sign.alias />
-                <missionhub.sign.storepass />
-                <missionhub.sign.keypass />
             </properties>
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jarsigner-plugin</artifactId>
+                        <version>1.2</version>
+                        <executions>
+                            <execution>
+                                <id>signing</id>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                                <phase>package</phase>
+                                <inherited>true</inherited>
+                                <configuration>
+                                    <archiveDirectory></archiveDirectory>
+                                    <includes>
+                                        <include>target/*.apk</include>
+                                    </includes>
+                                    <keystore>${missionhub.sign.keystore}</keystore>
+                                    <storepass>${missionhub.sign.storepass}</storepass>
+                                    <keypass>${missionhub.sign.keypass}</keypass>
+                                    <alias>${missionhub.sign.alias}</alias>
+                                    <arguments>
+                                        <argument>-sigalg</argument><argument>MD5withRSA</argument>
+                                        <argument>-digestalg</argument><argument>SHA1</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
                         <groupId>com.jayway.maven.plugins.android.generation2</groupId>
                         <artifactId>android-maven-plugin</artifactId>
                         <inherited>true</inherited>
+                        <configuration>
+                            <sign>
+                                <debug>false</debug>
+                            </sign>
+                            <zipalign>
+                                <skip>false</skip>
+                                <verbose>true</verbose>
+                                <outputApk>
+                                    ${project.build.directory}/${project.artifactId}-${project.version}-signed-aligned.apk
+                                </outputApk>
+                            </zipalign>
+                        </configuration>
                         <executions>
                             <execution>
                                 <id>update-manifest</id>
@@ -198,49 +238,14 @@
                                     </manifest>
                                 </configuration>
                             </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-jarsigner-plugin</artifactId>
-                        <executions>
                             <execution>
-                                <id>signing</id>
-                                <goals>
-                                    <goal>sign</goal>
-                                    <goal>verify</goal>
-                                </goals>
+                                <id>alignApk</id>
                                 <phase>package</phase>
-                                <inherited>true</inherited>
-                                <configuration>
-                                    <removeExistingSignatures>true</removeExistingSignatures>
-                                    <archiveDirectory/>
-                                    <keystore>${missionhub.sign.keystore}</keystore>
-                                    <alias>${missionhub.sign.alias}</alias>
-                                    <storepass>${missionhub.sign.storepass}</storepass>
-                                    <keypass>${missionhub.sign.keypass}</keypass>
-                                    <verbose>true</verbose>
-                                </configuration>
+                                <goals>
+                                    <goal>zipalign</goal>
+                                </goals>
                             </execution>
                         </executions>
-                    </plugin>
-                    <!-- the signed apk then needs to be zipaligned -->
-                    <plugin>
-                        <groupId>com.jayway.maven.plugins.android.generation2</groupId>
-                        <artifactId>android-maven-plugin</artifactId>
-                        <inherited>true</inherited>
-                        <configuration>
-                            <sign>
-                                <debug>false</debug>
-                            </sign>
-                            <zipalign>
-                                <skip>false</skip>
-                                <verbose>true</verbose>
-                                <outputApk>
-                                    ${project.build.directory}/${project.artifactId}-${project.version}-signed-aligned.apk
-                                </outputApk>
-                            </zipalign>
-                        </configuration>
                     </plugin>
                 </plugins>
             </build>
