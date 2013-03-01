@@ -84,10 +84,10 @@
                 <artifactId>android-maven-plugin</artifactId>
                 <extensions>true</extensions>
             </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>findbugs-maven-plugin</artifactId>
-            </plugin>
+            <!--<plugin>-->
+                <!--<groupId>org.codehaus.mojo</groupId>-->
+                <!--<artifactId>findbugs-maven-plugin</artifactId>-->
+            <!--</plugin>-->
         </plugins>
 
         <pluginManagement>
@@ -108,28 +108,29 @@
                         </proguard>
                     </configuration>
                 </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>findbugs-maven-plugin</artifactId>
-                    <version>${findbugs.version}</version>
-                </plugin>
+                <!--<plugin>-->
+                    <!--<groupId>org.codehaus.mojo</groupId>-->
+                    <!--<artifactId>findbugs-maven-plugin</artifactId>-->
+                    <!--<version>${findbugs.version}</version>-->
+                <!--</plugin>-->
             </plugins>
         </pluginManagement>
     </build>
 
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>findbugs-maven-plugin</artifactId>
-                <configuration>
-                    <threshold>Default</threshold>
-                    <effort>Max</effort>
-                    <onlyAnalyze>com.missionhub.android.*</onlyAnalyze>
-                    <findbugsXmlOutput>true</findbugsXmlOutput>
-                    <findbugsXmlOutputDirectory>target</findbugsXmlOutputDirectory>
-                </configuration>
-            </plugin>
+    <!--<reporting>-->
+        <!--<plugins>-->
+            <!--<plugin>-->
+                <!--<groupId>org.codehaus.mojo</groupId>-->
+                <!--<artifactId>findbugs-maven-plugin</artifactId>-->
+                <!--<version>${findbugs.version}</version>-->
+                <!--<configuration>-->
+                    <!--<threshold>Default</threshold>-->
+                    <!--<effort>Max</effort>-->
+                    <!--<onlyAnalyze>com.missionhub.android.*</onlyAnalyze>-->
+                    <!--<findbugsXmlOutput>true</findbugsXmlOutput>-->
+                    <!--<findbugsXmlOutputDirectory>target</findbugsXmlOutputDirectory>-->
+                <!--</configuration>-->
+            <!--</plugin>-->
             <!--<plugin>-->
                 <!--<groupId>org.apache.maven.plugins</groupId>-->
                 <!--<artifactId>maven-checkstyle-plugin</artifactId>-->
@@ -138,6 +139,6 @@
                     <!--<configLocation>checkstyle.xml</configLocation>-->
                 <!--</configuration>-->
             <!--</plugin>-->
-        </plugins>
-    </reporting>
+        <!--</plugins>-->
+    <!--</reporting>-->
 </project>
