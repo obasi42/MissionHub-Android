@@ -60,6 +60,10 @@
 ## MISSIONHUB SPECIFIC RULES ##
 ###############################
 
+# Keep all of MH.. it wouldn't be there if it wasn't needed :)
+-keep class com.missionhub.android.** { *; }
+-keep interface com.missionhub.android.** { *; }
+
 # RoboGuice
 -dontwarn roboguice.**
 
@@ -68,8 +72,30 @@
     public void onEvent*(**);
 }
 
+# GreenDao
+-keep public class com.missionhub.android.model.** {
+    public static <fields>;
+}
+
 # Guava
 -keepattributes Signature,RuntimeVisibleAnnotations,AnnotationDefault
 -dontwarn sun.misc.Unsafe
 -dontwarn com.google.common.collect.MinMaxPriorityQueue
 -dontwarn com.google.common.util.concurrent.ServiceManager
+
+# HoloEverywhere
+-keep,allowoptimization class org.holoeverywhere.** {
+    public *;
+    protected *;
+}
+-keep,allowoptimization interface org.holoeverywhere.** { *; }
+
+# Actionbarsherlock
+-keep class android.support.v4.app.** { *; }
+-keep interface android.support.v4.app.** { *; }
+-keep class com.actionbarsherlock.** { *; }
+-keep interface com.actionbarsherlock.** { *; }
+
+-keepattributes *Annotation*
+
+-keepattributes SourceFile,LineNumberTable
