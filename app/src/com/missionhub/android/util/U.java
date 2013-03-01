@@ -69,7 +69,7 @@ public class U {
                 final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US);
                 return df.parse(iso8601String);
             } catch (final Exception e2) {
-				/* ignore */
+                /* ignore */
             }
         }
         return null;
@@ -149,7 +149,7 @@ public class U {
     }
 
     public static String concatinate(final CharSequence delemiter, final boolean ignoreEmpty, final CharSequence... items) {
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < items.length; i++) {
             final CharSequence string = items[i];
@@ -174,7 +174,7 @@ public class U {
      * @return
      */
     public static String toCSV(final Collection<?> items) {
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         final Iterator<?> itr = items.iterator();
         while (itr.hasNext()) {
             final String item = String.valueOf(itr.next());
@@ -370,7 +370,7 @@ public class U {
     }
 
     public static String formatPhoneNumber(String phoneNumber) {
-        String fNum = null;
+        String fNum;
         phoneNumber = phoneNumber.replaceAll("[^0-9]", "");
 
         if (11 == phoneNumber.length()) {
@@ -394,9 +394,8 @@ public class U {
 
     public static boolean hasPhoneAbility(final Context ctx) {
         final TelephonyManager telephonyManager = (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
-        if (telephonyManager.getPhoneType() == TelephonyManager.PHONE_TYPE_NONE) return false;
+        return telephonyManager.getPhoneType() != TelephonyManager.PHONE_TYPE_NONE;
 
-        return true;
     }
 
     public static boolean superGetRetainInstance(final Fragment fragment) {

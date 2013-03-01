@@ -19,6 +19,7 @@
     <string name="action_no_permissions">You do not have the required permissions to perform this action.</string>
     <string name="action_add_contact">Add Contact</string>
     <string name="action_save">Save</string>
+    <string name="action_label">Label</string>
 
     <!-- Main Menu -->
     <string name="menu_dashboard">Dashboard</string>

@@ -133,11 +133,6 @@ public class Session implements OnAccountsUpdateListener {
      * called from the ui thread.
      *
      * @return
-     * @throws NoAccountException
-     * @throws OperationCanceledException
-     * @throws AuthenticatorException
-     * @throws IOException
-     * @throws BadAccessTokenException
      */
     public synchronized String getAccessToken() throws NoAccountException, OperationCanceledException, AuthenticatorException, IOException {
         if (mAccount == null) {
@@ -223,7 +218,7 @@ public class Session implements OnAccountsUpdateListener {
         try {
             mUpdateOrganizationTask.cancel(true);
         } catch (final Exception e) {
-			/* ignore */
+            /* ignore */
         }
 
         mUpdateOrganizationTask = new SafeAsyncTask<Void>() {
@@ -289,8 +284,9 @@ public class Session implements OnAccountsUpdateListener {
                 mAccount = account;
                 mPersonId = personId;
                 mOrganizationId = SettingsManager.getSessionOrganizationId(mPersonId);
+            } else {
+                mPersonId = -1;
             }
-            personId = -1;
         }
 
         if (mPersonId < 0) {
@@ -399,10 +395,6 @@ public class Session implements OnAccountsUpdateListener {
 
     /**
      * Deletes an account for the specified person. This should not be called from the main thread.
-     *
-     * @throws OperationCanceledException
-     * @throws AuthenticatorException
-     * @throws IOException
      */
     public void deleteAccount() {
         if (mAccount != null) {

@@ -20,17 +20,13 @@ import com.missionhub.android.contactlist.ContactListFragment.ContactListFragmen
 import com.missionhub.android.contactlist.ContactListProvider;
 import com.missionhub.android.exception.ExceptionHelper;
 import com.missionhub.android.fragment.dialog.ContactAssignmentDialogFragment;
-import com.missionhub.android.fragment.dialog.ContactAssignmentDialogFragment.ContactAssignmentListener;
+import com.missionhub.android.fragment.dialog.ContactLabelsDialogFragment;
 import com.missionhub.android.fragment.dialog.EditContactDialogFragment;
-import com.missionhub.android.fragment.dialog.EditContactDialogFragment.AddContactListener;
 import com.missionhub.android.model.Person;
 import com.missionhub.android.util.U;
 import org.holoeverywhere.LayoutInflater;
 
-import java.util.HashSet;
-import java.util.Set;
-
-public class AllContactsFragment extends MainFragment implements ContactListFragmentListener, ActionMode.Callback, ContactAssignmentListener, AddContactListener {
+public class AllContactsFragment extends MainFragment implements ContactListFragmentListener, ActionMode.Callback {
 
     /**
      * the contact list fragment
@@ -51,6 +47,10 @@ public class AllContactsFragment extends MainFragment implements ContactListFrag
      * the action mode
      */
     private ActionMode mActionMode;
+
+    public static int REQUEST_ASSIGNMENT = 1;
+    public static int REQUEST_LABELS = 2;
+    public static int REQUEST_EDIT_CONTACT = 3;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -98,8 +98,7 @@ public class AllContactsFragment extends MainFragment implements ContactListFrag
                 }
                 break;
             case R.id.action_add_contact:
-                final EditContactDialogFragment dialog = EditContactDialogFragment.show(getChildFragmentManager(), false);
-                dialog.setAddContactListener(this);
+                EditContactDialogFragment.showForResult(getSupportActivity(), getChildFragmentManager(), false, REQUEST_EDIT_CONTACT);
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -163,7 +162,7 @@ public class AllContactsFragment extends MainFragment implements ContactListFrag
 
     @Override
     public void onContactChecked(final ContactListFragment fragment, final Person person, final int position, final boolean checked) {
-        if (mActionMode == null && checked == true) {
+        if (mActionMode == null && checked) {
             mActionMode = getSupportActivity().startActionMode(this);
         }
     }
@@ -192,8 +191,10 @@ public class AllContactsFragment extends MainFragment implements ContactListFrag
     @Override
     public boolean onActionItemClicked(final ActionMode mode, final MenuItem item) {
         if (item.getItemId() == R.id.action_assign) {
-            final Set<Person> people = new HashSet<Person>(mFragment.getCheckedPeople());
-            ContactAssignmentDialogFragment.show(getChildFragmentManager(), people).setAssignmentListener(this);
+            ContactAssignmentDialogFragment.showForResult(getSupportActivity(), getChildFragmentManager(), mFragment.getCheckedPeople(), REQUEST_ASSIGNMENT);
+        }
+        if (item.getItemId() == R.id.action_label) {
+            ContactLabelsDialogFragment.showForResult(getSupportActivity(), getChildFragmentManager(), mFragment.getCheckedPeople(), REQUEST_LABELS);
         }
         mode.finish();
         return true;
@@ -211,22 +212,20 @@ public class AllContactsFragment extends MainFragment implements ContactListFrag
     }
 
     @Override
-    public void onAssignmentCompleted() {
-        mFragment.reload();
-    }
-
-    @Override
-    public void onAssignmentCanceled() {
-    }
-
-    @Override
-    public void onContactAdded(final Person contact) {
-        ContactActivity.start(getSupportActivity(), contact);
-        mFragment.reload();
-    }
-
-    @Override
-    public void onAddContactCanceled() {
-
+    public boolean onFragmentResult(int requestCode, int resultCode, Object data) {
+        if (requestCode == REQUEST_EDIT_CONTACT && resultCode == RESULT_OK) {
+            if (data != null && data instanceof Person) {
+                ContactActivity.start(getSupportActivity(), (Person) data);
+                mFragment.reload();
+                return true;
+            }
+        } else if (requestCode == REQUEST_ASSIGNMENT && resultCode == RESULT_OK) {
+            mFragment.reload();
+            return true;
+        } else if (requestCode == REQUEST_LABELS && resultCode == RESULT_OK) {
+            mFragment.reload();
+            return true;
+        }
+        return super.onFragmentResult(requestCode, resultCode, data);
     }
 }

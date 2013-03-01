@@ -4,16 +4,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnKeyListener;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.app.FragmentTransaction;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageView;
@@ -38,17 +33,13 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.PauseOnScrollListener;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 import org.holoeverywhere.LayoutInflater;
-import org.holoeverywhere.app.DialogFragment;
+import org.holoeverywhere.app.Activity;
 import org.holoeverywhere.app.Fragment;
 import org.holoeverywhere.widget.ListView;
 import org.holoeverywhere.widget.TextView;
 import org.holoeverywhere.widget.Toast;
 
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class ContactAssignmentDialogFragment extends RefreshableDialogFragment implements OnKeyListener, OnItemClickListener {
 
@@ -88,16 +79,6 @@ public class ContactAssignmentDialogFragment extends RefreshableDialogFragment i
     private Set<Person> mPeople = new HashSet<Person>();
 
     /**
-     * the contact assignment listener
-     */
-    private WeakReference<ContactAssignmentListener> mListener;
-
-    /**
-     * true after the dialog has been dismissed
-     */
-    private boolean mCanceled = false;
-
-    /**
      * the task used to process assignments
      */
     private SafeAsyncTask<Void> mTask;
@@ -110,31 +91,25 @@ public class ContactAssignmentDialogFragment extends RefreshableDialogFragment i
     public ContactAssignmentDialogFragment() {
     }
 
-    /**
-     * Creates a new assignment dialog for the given person
-     *
-     * @param person
-     * @return
-     */
-    public static ContactAssignmentDialogFragment getInstance(final Person person) {
-        final HashSet<Person> people = new HashSet<Person>();
-        people.add(person);
-        return getInstance(people);
+    public static ContactAssignmentDialogFragment show(Activity activity, FragmentManager fm, final Person person) {
+        return showForResult(activity, fm, person, null);
     }
 
-    /**
-     * Creates a new mass assignment dialog for a group of people
-     *
-     * @param people
-     * @return
-     */
-    public static ContactAssignmentDialogFragment getInstance(final Set<Person> people) {
-        final ContactAssignmentDialogFragment dialog = new ContactAssignmentDialogFragment();
+    public static ContactAssignmentDialogFragment show(Activity activity, FragmentManager fm, final Collection<Person> people) {
+        return showForResult(activity, fm, people, null);
+    }
+
+    public static ContactAssignmentDialogFragment showForResult(Activity activity, FragmentManager fm, final Person person, Integer requestCode) {
+        final List people = new ArrayList();
+        people.add(person);
+        return showForResult(activity, fm, people, requestCode);
+    }
+
+    public static ContactAssignmentDialogFragment showForResult(Activity activity, FragmentManager fm, final Collection<Person> people, Integer requestCode) {
         final Bundle args = new Bundle();
-        final HashSet<Person> copyList = new HashSet<Person>(people);
-        args.putSerializable("people", copyList);
-        dialog.setArguments(args);
-        return dialog;
+        final HashSet<Person> peopleSet = new HashSet<Person>(people);
+        args.putSerializable("people", peopleSet);
+        return ContactLabelsDialogFragment.show(ContactAssignmentDialogFragment.class, activity, fm, args, requestCode);
     }
 
     @Override
@@ -158,14 +133,13 @@ public class ContactAssignmentDialogFragment extends RefreshableDialogFragment i
     public View onCreateRefreshableView(final LayoutInflater inflater, final Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_assignment_dialog, null);
     }
+
     @Override
     public void onViewCreated(final View view) {
         super.onViewCreated(view);
 
         mPager = (LockedViewPager) view.findViewById(R.id.pager);
         mProgress = view.findViewById(R.id.progress_container);
-
-        mCanceled = false;
 
         if (mPagerAdapter == null) {
             mPagerAdapter = new FragmentStatePagerAdapter(getChildFragmentManager()) {
@@ -609,103 +583,6 @@ public class ContactAssignmentDialogFragment extends RefreshableDialogFragment i
         return getSupportActivity().onKeyDown(keyCode, event);
     }
 
-    public void setAssignmentListener(final ContactAssignmentListener listener) {
-        mListener = new WeakReference<ContactAssignmentListener>(listener);
-    }
-
-    public ContactAssignmentListener getAssignmentListener() {
-        if (mListener != null) {
-            return mListener.get();
-        }
-        return null;
-    }
-
-    /**
-     * Notifies the listener and dismisses the dialog
-     */
-    public void cancel() {
-        postCanceled();
-        dismiss();
-    }
-
-    /**
-     * Override to notify the assignment listener
-     */
-    @Override
-    public void dismiss() {
-        postComplete();
-        super.dismiss();
-    }
-
-    public void postComplete() {
-        final Handler handler = new Handler();
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    if (!mCanceled && getAssignmentListener() != null) {
-                        getAssignmentListener().onAssignmentCompleted();
-                    }
-                } catch (final Exception e) { /* ignore */}
-            }
-        });
-    }
-
-    public void postCanceled() {
-        mCanceled = true;
-        final Handler handler = new Handler();
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    if (getAssignmentListener() != null) {
-                        mCanceled = true;
-                        getAssignmentListener().onAssignmentCanceled();
-                    }
-                } catch (final Exception e) { /* ignore */}
-            }
-        });
-    }
-
-    public static interface ContactAssignmentListener {
-        public void onAssignmentCompleted();
-
-        public void onAssignmentCanceled();
-    }
-
-    /**
-     * Creates and shows the assignment dialog for given person
-     *
-     * @param fm
-     * @param person
-     * @return
-     */
-    public static ContactAssignmentDialogFragment show(final FragmentManager fm, final Person person) {
-        final HashSet<Person> people = new HashSet<Person>();
-        people.add(person);
-        return show(fm, people);
-    }
-
-    /**
-     * Creates and shows the mass assignment dialog for a group of people
-     *
-     * @param fm
-     * @param people
-     * @return
-     */
-    public static ContactAssignmentDialogFragment show(final FragmentManager fm, final Set<Person> people) {
-        final FragmentTransaction ft = fm.beginTransaction();
-        final Fragment prev = (Fragment) fm.findFragmentByTag("assignment_dialog");
-        if (prev != null) {
-            ft.remove(prev);
-        }
-        ft.addToBackStack(null);
-
-        final ContactAssignmentDialogFragment fragment = ContactAssignmentDialogFragment.getInstance(people);
-        fragment.show(ft, "assignment_dialog");
-        return fragment;
-    }
-
     private void doGroupAssignment(final Group group) {
 
     }
@@ -870,7 +747,7 @@ public class ContactAssignmentDialogFragment extends RefreshableDialogFragment i
 
     private void updateRefreshIcon() {
         if (mRefreshLeadersTask != null) {
-            startRefreshAnimation();;
+            startRefreshAnimation();
         } else {
             stopRefreshAnimation();
         }

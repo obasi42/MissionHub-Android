@@ -207,16 +207,20 @@ public abstract class ContactListFragment extends BaseFragment implements OnCont
     }
 
     public boolean isWorking() {
-        if (mProvider != null) {
-            return mProvider.isWorking();
-        }
-        return false;
+        return mProvider != null && mProvider.isWorking();
     }
 
     public void reload() {
         if (mProvider != null) {
             mProvider.reload();
         }
+    }
+
+    public int getCheckedItemCount() {
+        if (mListView != null) {
+            return mListView.getCheckedItemCount();
+        }
+        return 0;
     }
 
     public List<Person> getCheckedPeople() {
@@ -271,10 +275,7 @@ public abstract class ContactListFragment extends BaseFragment implements OnCont
 
     @Override
     public boolean onContactLongClick(final Person person, final int position, final long id) {
-        if (mFragmentListener != null) {
-            return mFragmentListener.onContactLongClick(this, person, position, id);
-        }
-        return false;
+        return mFragmentListener != null && mFragmentListener.onContactLongClick(this, person, position, id);
     }
 
     @Override

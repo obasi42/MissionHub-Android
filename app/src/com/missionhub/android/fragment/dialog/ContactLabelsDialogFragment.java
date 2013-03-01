@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.view.View;
 import android.view.ViewGroup;
 import com.missionhub.android.R;
@@ -14,11 +15,14 @@ import com.missionhub.android.model.Person;
 import com.missionhub.android.ui.ObjectArrayAdapter;
 import com.missionhub.android.ui.widget.SelectableListView;
 import com.missionhub.android.util.SafeAsyncTask;
+import org.holoeverywhere.app.Activity;
 import org.holoeverywhere.app.AlertDialog;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 public class ContactLabelsDialogFragment extends RefreshableDialogFragment {
 
@@ -60,19 +64,25 @@ public class ContactLabelsDialogFragment extends RefreshableDialogFragment {
     public ContactLabelsDialogFragment() {
     }
 
-    public static ContactLabelsDialogFragment getInstance(final Person person) {
-        final HashSet<Person> people = new HashSet<Person>();
-        people.add(person);
-        return getInstance(people);
+    public static ContactLabelsDialogFragment show(Activity activity, FragmentManager fm, final Person person) {
+        return showForResult(activity, fm, person, null);
     }
 
-    public static ContactLabelsDialogFragment getInstance(final Set<Person> people) {
-        final ContactLabelsDialogFragment dialog = new ContactLabelsDialogFragment();
+    public static ContactLabelsDialogFragment show(Activity activity, FragmentManager fm, final Collection<Person> people) {
+        return showForResult(activity, fm, people, null);
+    }
+
+    public static ContactLabelsDialogFragment showForResult(Activity activity, FragmentManager fm, final Person person, Integer requestCode) {
+        final List people = new ArrayList();
+        people.add(person);
+        return showForResult(activity, fm, people, requestCode);
+    }
+
+    public static ContactLabelsDialogFragment showForResult(Activity activity, FragmentManager fm, final Collection<Person> people, Integer requestCode) {
         final Bundle args = new Bundle();
-        final HashSet<Person> copyList = new HashSet<Person>(people);
-        args.putSerializable("people", copyList);
-        dialog.setArguments(args);
-        return dialog;
+        final HashSet<Person> peopleSet = new HashSet<Person>(people);
+        args.putSerializable("people", peopleSet);
+        return ContactLabelsDialogFragment.show(ContactLabelsDialogFragment.class, activity, fm, args, requestCode);
     }
 
     @Override
@@ -89,7 +99,7 @@ public class ContactLabelsDialogFragment extends RefreshableDialogFragment {
 
     @Override
     public void onCreateDialogTitle(DialogTitle title) {
-        title.setTitle("Assign Labels");
+        title.setTitle(R.string.action_label);
     }
 
     @Override
@@ -221,7 +231,7 @@ public class ContactLabelsDialogFragment extends RefreshableDialogFragment {
         try {
             mRefreshTask.cancel(true);
         } catch (final Exception e) {
-			/* ignore */
+            /* ignore */
         }
         super.onDestroy();
     }

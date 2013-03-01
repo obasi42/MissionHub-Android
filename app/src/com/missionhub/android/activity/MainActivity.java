@@ -5,13 +5,11 @@ import android.os.Bundle;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.Window;
 import com.missionhub.android.R;
-import com.missionhub.android.application.Session;
 import com.missionhub.android.application.Session.SessionInvalidTokenEvent;
 import com.missionhub.android.application.Session.SessionInvalidatedEvent;
 import com.missionhub.android.fragment.MainFragment;
 import com.missionhub.android.fragment.MainMenuFragment;
 import com.missionhub.android.fragment.MyContactsFragment;
-import com.missionhub.android.fragment.dialog.ContactLabelsDialogFragment;
 import com.missionhub.android.util.IntentHelper;
 import com.missionhub.android.util.U;
 import org.holoeverywhere.widget.Toast;
@@ -56,13 +54,6 @@ public class MainActivity extends BaseAuthenticatedMenuActivity {
             mMenuFragment = new MainMenuFragment();
             setFragment(mFragment);
             setMenuFragment(mMenuFragment);
-
-            try {
-                ContactLabelsDialogFragment.getInstance(Session.getInstance().getPerson()).show(getSupportFragmentManager(), "contact_lables");
-            } catch (Exception e) {
-                /* ignore */
-            }
-
         }
     }
 

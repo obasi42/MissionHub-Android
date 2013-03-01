@@ -265,7 +265,7 @@ public class ContactFragment extends BaseFragment implements OnNavigationListene
         try {
             mRefreshTask.cancel(true);
         } catch (final Exception e) {
-			/* ignore */
+            /* ignore */
         }
 
         addProgress("refreshPerson");

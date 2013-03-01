@@ -26,6 +26,7 @@ import com.missionhub.android.model.gson.GAccessToken;
 import com.missionhub.android.model.gson.GErrorsDepreciated;
 import com.missionhub.android.util.SafeAsyncTask;
 import com.missionhub.android.util.U;
+import org.holoeverywhere.app.Activity;
 import org.holoeverywhere.widget.ProgressBar;
 import org.holoeverywhere.widget.TextView;
 import org.holoeverywhere.widget.Toast;
@@ -198,8 +199,6 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
 
                     // fetch the access token and add an account
                     addAccountFromCode(code);
-
-                    return;
                 }
             }
         }
@@ -326,7 +325,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
                 mAccountManager.addAccountExplicitly(account, token, userdata);
                 mAccountManager.setPassword(account, token);
 
-                finishActivity(RESULT_OK, account, done.person.id);
+                finishActivity(Activity.RESULT_OK, account, done.person.id);
             }
 
             @Override
@@ -393,7 +392,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
             @Override
             public void onClick(final DialogInterface dialog, final int whichButton) {
                 dialog.dismiss();
-                setResult(RESULT_CANCELED);
+                setResult(Activity.RESULT_CANCELED);
                 finish();
             }
         });

@@ -1,7 +1,6 @@
 package com.missionhub.android.fragment;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -25,19 +24,16 @@ import com.missionhub.android.contactlist.ContactListFragment.ContactListFragmen
 import com.missionhub.android.contactlist.ContactListProvider;
 import com.missionhub.android.exception.ExceptionHelper;
 import com.missionhub.android.fragment.dialog.ContactAssignmentDialogFragment;
-import com.missionhub.android.fragment.dialog.ContactAssignmentDialogFragment.ContactAssignmentListener;
+import com.missionhub.android.fragment.dialog.ContactLabelsDialogFragment;
 import com.missionhub.android.fragment.dialog.EditContactDialogFragment;
-import com.missionhub.android.fragment.dialog.EditContactDialogFragment.AddContactListener;
 import com.missionhub.android.model.Person;
 import com.missionhub.android.util.U;
 import com.missionhub.android.util.U.FollowupStatus;
 import org.holoeverywhere.LayoutInflater;
 
 import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Set;
 
-public class MyContactsFragment extends MainFragment implements OnPageChangeListener, ContactListFragmentListener, ActionMode.Callback, ContactAssignmentListener, AddContactListener {
+public class MyContactsFragment extends MainFragment implements OnPageChangeListener, ContactListFragmentListener, ActionMode.Callback {
 
     /**
      * the view pager
@@ -77,6 +73,10 @@ public class MyContactsFragment extends MainFragment implements OnPageChangeList
     private ImageView mRefreshingView;
 
     private ActionMode mActionMode;
+
+    public static int REQUEST_ASSIGNMENT = 1;
+    public static int REQUEST_LABELS = 2;
+    public static int REQUEST_EDIT_CONTACT = 3;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -229,10 +229,7 @@ public class MyContactsFragment extends MainFragment implements OnPageChangeList
             ((ApiContactListProvider) fragment.getProvider()).start();
             fragment.clearChecked();
         }
-        if (mActionMode != null) {
-            mActionMode.finish();
-            mActionMode = null;
-        }
+        finishActionMode();
     }
 
     @Override
@@ -252,8 +249,7 @@ public class MyContactsFragment extends MainFragment implements OnPageChangeList
                 }
                 break;
             case R.id.action_add_contact:
-                final EditContactDialogFragment dialog = EditContactDialogFragment.show(getChildFragmentManager(), true);
-                dialog.setAddContactListener(this);
+                EditContactDialogFragment.showForResult(getSupportActivity(), getChildFragmentManager(), true, REQUEST_EDIT_CONTACT);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -388,18 +384,16 @@ public class MyContactsFragment extends MainFragment implements OnPageChangeList
 
     @Override
     public void onAllContactsUnchecked(final ContactListFragment fragment) {
-        if (mActionMode != null) {
-            mActionMode.finish();
-            mActionMode = null;
-        }
+        finishActionMode();
     }
 
     @Override
     public boolean onCreateActionMode(final ActionMode mode, final Menu menu) {
         menu.add(Menu.NONE, R.id.action_assign, Menu.NONE, R.string.action_assign).setIcon(R.drawable.ic_action_assign)
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+        menu.add(Menu.NONE, R.id.action_label, Menu.NONE, R.string.action_label).setIcon(R.drawable.ic_action_label)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
         return true;
-
     }
 
     @Override
@@ -410,43 +404,47 @@ public class MyContactsFragment extends MainFragment implements OnPageChangeList
     @Override
     public boolean onActionItemClicked(final ActionMode mode, final MenuItem item) {
         if (item.getItemId() == R.id.action_assign) {
-            final Set<Person> people = new HashSet<Person>(getCurrentFragment().getCheckedPeople());
-            ContactAssignmentDialogFragment.show(getChildFragmentManager(), people).setAssignmentListener(this);
+            ContactAssignmentDialogFragment.showForResult(getSupportActivity(), getChildFragmentManager(), getCurrentFragment().getCheckedPeople(), REQUEST_ASSIGNMENT);
         }
-        mode.finish();
+        if (item.getItemId() == R.id.action_label) {
+            ContactLabelsDialogFragment.showForResult(getSupportActivity(), getChildFragmentManager(), getCurrentFragment().getCheckedPeople(), REQUEST_LABELS);
+        }
         return true;
     }
 
     @Override
     public void onDestroyActionMode(final ActionMode mode) {
-        final Handler handler = new Handler();
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                getCurrentFragment().clearChecked();
+        if (getCurrentFragment().getCheckedItemCount() > 0) {
+            getCurrentFragment().clearChecked();
+        }
+        mActionMode = null;
+    }
+
+    @Override
+    public boolean onFragmentResult(int requestCode, int resultCode, Object data) {
+        if (requestCode == REQUEST_EDIT_CONTACT && resultCode == RESULT_OK) {
+            if (data != null && data instanceof Person) {
+                ContactActivity.start(getSupportActivity(), (Person) data);
+                mAll.reload();
+                mInProgress.reload();
+                return true;
             }
-        });
+        } else if (requestCode == REQUEST_ASSIGNMENT && resultCode == RESULT_OK) {
+            getCurrentFragment().reload();
+            finishActionMode();
+            return true;
+        } else if (requestCode == REQUEST_LABELS && resultCode == RESULT_OK) {
+            getCurrentFragment().reload();
+            finishActionMode();
+            return true;
+        }
+        return super.onFragmentResult(requestCode, resultCode, data);
     }
 
-    @Override
-    public void onAssignmentCompleted() {
-        getCurrentFragment().reload();
-    }
-
-    @Override
-    public void onAssignmentCanceled() {
-    }
-
-    @Override
-    public void onContactAdded(final Person contact) {
-        ContactActivity.start(getSupportActivity(), contact);
-        mAll.reload();
-        mInProgress.reload();
-    }
-
-    @Override
-    public void onAddContactCanceled() {
-        // TODO Auto-generated method stub
+    private void finishActionMode() {
+        if (mActionMode != null) {
+            mActionMode.finish();
+        }
     }
 
 }

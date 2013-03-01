@@ -87,10 +87,7 @@ public class Api {
      */
     public synchronized static boolean cancelCallById(final Object callId, final boolean mayInterruptIfRunning) {
         final ApiCall<?> call = sCalls.get(callId);
-        if (call != null) {
-            return call.cancel(mayInterruptIfRunning);
-        }
-        return false;
+        return call != null && call.cancel(mayInterruptIfRunning);
     }
 
 	/* People */
@@ -505,8 +502,8 @@ public class Api {
      * @return
      */
     private static String buildUrl(final Object... parts) {
-        final StringBuffer sb = new StringBuffer();
-        sb.append(Configuration.getApiUrl() + '/');
+        final StringBuilder sb = new StringBuilder(Configuration.getApiUrl());
+        sb.append('/');
         for (int i = 0; i < parts.length; i++) {
             final Object part = parts[i];
             if (part != null) {
@@ -627,7 +624,7 @@ public class Api {
                         exception = error.getException();
                     }
                 } catch (final Exception e) {
-					/* ignore */
+                    /* ignore */
                 }
             }
             if (exception != null) {

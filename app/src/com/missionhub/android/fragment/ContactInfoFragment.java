@@ -20,7 +20,7 @@ import com.missionhub.android.application.DrawableCache;
 import com.missionhub.android.application.Session;
 import com.missionhub.android.exception.ExceptionHelper;
 import com.missionhub.android.fragment.dialog.ContactAssignmentDialogFragment;
-import com.missionhub.android.fragment.dialog.ContactAssignmentDialogFragment.ContactAssignmentListener;
+import com.missionhub.android.fragment.dialog.FragmentResult;
 import com.missionhub.android.model.*;
 import com.missionhub.android.model.gson.GFollowupComment;
 import com.missionhub.android.model.gson.GRejoicable;
@@ -46,7 +46,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class ContactInfoFragment extends BaseFragment implements ContactAssignmentListener {
+public class ContactInfoFragment extends BaseFragment {
 
     /**
      * the logging tag
@@ -245,6 +245,10 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
      */
     private CommentStatusAdapter mCommentStatusAdapter;
 
+    public static int REQUEST_ASSIGNMENT = 1;
+    public static int REQUEST_LABELS = 2;
+    public static int REQUEST_EDIT_CONTACT = 3;
+
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -341,8 +345,7 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
         mHeaderAssignment.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(final View v) {
-                final ContactAssignmentDialogFragment dialog = ContactAssignmentDialogFragment.show(getFragmentManager(), mPerson);
-                dialog.setAssignmentListener(ContactInfoFragment.this);
+                ContactAssignmentDialogFragment.showForResult(getSupportActivity(), getChildFragmentManager(), mPerson, REQUEST_ASSIGNMENT);
             }
         });
         mHeaderMoreText.setOnClickListener(new OnClickListener() {
@@ -874,8 +877,6 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
         }
     }
 
-    ;
-
     /**
      * Called when a comment action is clicked
      *
@@ -1113,7 +1114,7 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
         if ((Boolean) mCommentRejoiceConvo.getTag()) {
             rejoicables.add(U.Rejoicable.spiritual_conversation.rejoicable());
         }
-        mComment.rejoicables = rejoicables.toArray(new GRejoicable[]{});
+        mComment.rejoicables = rejoicables.toArray(new GRejoicable[rejoicables.size()]);
     }
 
     /**
@@ -1178,12 +1179,12 @@ public class ContactInfoFragment extends BaseFragment implements ContactAssignme
     }
 
     @Override
-    public void onAssignmentCompleted() {
-        mPerson.resetContactAssignments();
-        notifyPersonUpdated();
-    }
-
-    @Override
-    public void onAssignmentCanceled() {
+    public boolean onFragmentResult(int requestCode, int resultCode, Object data) {
+        if (requestCode == REQUEST_ASSIGNMENT && resultCode == FragmentResult.RESULT_OK) {
+            mPerson.resetContactAssignments();
+            notifyPersonUpdated();
+            return true;
+        }
+        return super.onFragmentResult(requestCode, resultCode, data);
     }
 }

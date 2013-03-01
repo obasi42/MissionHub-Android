@@ -52,6 +52,7 @@ public abstract class RefreshableDialogFragment extends BaseDialogFragment {
 
     /**
      * Called when the dialog title is set up
+     *
      * @param title
      * @return
      */
@@ -64,6 +65,7 @@ public abstract class RefreshableDialogFragment extends BaseDialogFragment {
 
     /**
      * Override to create the dialog from an alert dialog builder
+     *
      * @param savedInstanceState
      * @return
      */
@@ -87,6 +89,7 @@ public abstract class RefreshableDialogFragment extends BaseDialogFragment {
 
     /**
      * Override to create the dialog from a custom view
+     *
      * @param inflater
      * @param savedInstanceState
      * @return
@@ -149,7 +152,7 @@ public abstract class RefreshableDialogFragment extends BaseDialogFragment {
 
         if (mDialogTitle.icon != 0) {
             mIcon.setImageResource(mDialogTitle.icon);
-        } else  if (mDialogTitle.iconD != null) {
+        } else if (mDialogTitle.iconD != null) {
             mIcon.setImageDrawable(mDialogTitle.iconD);
         } else {
             mTitle.setPadding(mIcon.getPaddingLeft(),
@@ -198,7 +201,8 @@ public abstract class RefreshableDialogFragment extends BaseDialogFragment {
      * Holds the data for the title
      */
     public static class DialogTitle {
-        private DialogTitle() {}
+        private DialogTitle() {
+        }
 
         private boolean created = false;
 
@@ -210,6 +214,7 @@ public abstract class RefreshableDialogFragment extends BaseDialogFragment {
 
         /**
          * Sets the dialog title resource
+         *
          * @param title
          */
         public void setTitle(int title) {
@@ -218,6 +223,7 @@ public abstract class RefreshableDialogFragment extends BaseDialogFragment {
 
         /**
          * Sets the dialog title text
+         *
          * @param title
          */
         public void setTitle(CharSequence title) {
@@ -226,6 +232,7 @@ public abstract class RefreshableDialogFragment extends BaseDialogFragment {
 
         /**
          * Sets the dialog icon resource
+         *
          * @param icon
          */
         public void setIcon(int icon) {
@@ -234,6 +241,7 @@ public abstract class RefreshableDialogFragment extends BaseDialogFragment {
 
         /**
          * Sets the dialog icon drawable
+         *
          * @param icon
          */
         public void setIcon(Drawable icon) {
@@ -243,6 +251,7 @@ public abstract class RefreshableDialogFragment extends BaseDialogFragment {
 
     /**
      * Sets the dialog title resource
+     *
      * @param title
      */
     public void setTitle(int title) {
@@ -252,6 +261,7 @@ public abstract class RefreshableDialogFragment extends BaseDialogFragment {
 
     /**
      * Sets the dialog title text
+     *
      * @param title
      */
     public void setTitle(CharSequence title) {
@@ -261,6 +271,7 @@ public abstract class RefreshableDialogFragment extends BaseDialogFragment {
 
     /**
      * Sets the dialog icon resource
+     *
      * @param icon
      */
     public void setIcon(int icon) {
@@ -270,6 +281,7 @@ public abstract class RefreshableDialogFragment extends BaseDialogFragment {
 
     /**
      * Sets the dialog icon drawable
+     *
      * @param icon
      */
     public void setIcon(Drawable icon) {

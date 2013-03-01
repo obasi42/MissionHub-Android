@@ -2,9 +2,7 @@ package com.missionhub.android.fragment.dialog;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.RadioGroup;
@@ -22,14 +20,14 @@ import com.missionhub.android.model.gson.GPhoneNumber;
 import com.missionhub.android.util.SafeAsyncTask;
 import com.missionhub.android.util.U;
 import org.holoeverywhere.ArrayAdapter;
+import org.holoeverywhere.app.Activity;
 import org.holoeverywhere.app.AlertDialog;
 import org.holoeverywhere.app.Dialog;
-import org.holoeverywhere.app.Fragment;
+import org.holoeverywhere.widget.Button;
 import org.holoeverywhere.widget.EditText;
 import org.holoeverywhere.widget.Spinner;
 import org.holoeverywhere.widget.Toast;
 
-import java.lang.ref.WeakReference;
 import java.util.Arrays;
 
 public class EditContactDialogFragment extends BaseDialogFragment {
@@ -40,11 +38,6 @@ public class EditContactDialogFragment extends BaseDialogFragment {
     private SafeAsyncTask<Person> mTask;
 
     /**
-     * the add contact listener interface
-     */
-    private WeakReference<AddContactListener> mListener;
-
-    /**
      * contact form view
      */
     private View mForm;
@@ -53,6 +46,8 @@ public class EditContactDialogFragment extends BaseDialogFragment {
      * the progress view
      */
     private View mProgress;
+
+    private Button mSaveButton;
 
     /**
      * if the contact should be assigned to the current user
@@ -80,6 +75,16 @@ public class EditContactDialogFragment extends BaseDialogFragment {
     public EditContactDialogFragment() {
     }
 
+    public static EditContactDialogFragment show(Activity activity, FragmentManager fm, final boolean assignToMe) {
+        return showForResult(activity, fm, assignToMe, null);
+    }
+
+    public static EditContactDialogFragment showForResult(Activity activity, FragmentManager fm, final boolean assignToMe, Integer requestCode) {
+        final Bundle args = new Bundle();
+        args.putBoolean("assignToMe", assignToMe);
+        return EditContactDialogFragment.show(EditContactDialogFragment.class, activity, fm, args, requestCode);
+    }
+
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,14 +92,6 @@ public class EditContactDialogFragment extends BaseDialogFragment {
         if (getArguments() != null) {
             mAssignToMe = getArguments().getBoolean("assignToMe", false);
         }
-    }
-
-    public static EditContactDialogFragment getInstance(final boolean assignToMe) {
-        final EditContactDialogFragment dialog = new EditContactDialogFragment();
-        final Bundle args = new Bundle();
-        args.putBoolean("assignToMe", assignToMe);
-        dialog.setArguments(args);
-        return dialog;
     }
 
     @Override
@@ -161,7 +158,8 @@ public class EditContactDialogFragment extends BaseDialogFragment {
         dialog.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
             public void onShow(DialogInterface dialog) {
-                ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new OnClickListener() {
+                mSaveButton = ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_POSITIVE);
+                mSaveButton.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         saveContact();
@@ -171,17 +169,6 @@ public class EditContactDialogFragment extends BaseDialogFragment {
         });
 
         return dialog;
-    }
-
-    public void setAddContactListener(final AddContactListener listener) {
-        mListener = new WeakReference<AddContactListener>(listener);
-    }
-
-    public AddContactListener getAddContactListener() {
-        if (mListener != null) {
-            return mListener.get();
-        }
-        return null;
     }
 
     /**
@@ -288,40 +275,6 @@ public class EditContactDialogFragment extends BaseDialogFragment {
         }
     }
 
-    public void postComplete(final Person contact) {
-        final Handler handler = new Handler();
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    if (getAddContactListener() != null) {
-                        getAddContactListener().onContactAdded(contact);
-                    }
-                } catch (final Exception e) { /* ignore */}
-            }
-        });
-    }
-
-    public void postCanceled() {
-        final Handler handler = new Handler();
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    if (getAddContactListener() != null) {
-                        getAddContactListener().onAddContactCanceled();
-                    }
-                } catch (final Exception e) { /* ignore */}
-            }
-        });
-    }
-
-    public static interface AddContactListener {
-        public void onContactAdded(Person contact);
-
-        public void onAddContactCanceled();
-    }
-
     private void saveContact() {
         if (mPerson == null) return;
 
@@ -351,7 +304,7 @@ public class EditContactDialogFragment extends BaseDialogFragment {
 
             @Override
             public void onSuccess(final Person contact) {
-                postComplete(contact);
+                setResult(RESULT_OK, contact);
                 dismiss();
             }
 
@@ -382,40 +335,25 @@ public class EditContactDialogFragment extends BaseDialogFragment {
         if (mTask != null) {
             mTask.cancel(true);
         }
-        postCanceled();
         super.onCancel(dialog);
-    }
-
-    /**
-     * Creates and shows the add contact dialog
-     *
-     * @param fm
-     * @param assignToMe
-     * @return
-     */
-    public static EditContactDialogFragment show(final FragmentManager fm, final boolean assignToMe) {
-        final FragmentTransaction ft = fm.beginTransaction();
-        final Fragment prev = (Fragment) fm.findFragmentByTag("add_contact_dialog");
-        if (prev != null) {
-            ft.remove(prev);
-        }
-        ft.addToBackStack(null);
-
-        final EditContactDialogFragment fragment = EditContactDialogFragment.getInstance(assignToMe);
-        fragment.show(ft, "add_contact_dialog");
-        return fragment;
     }
 
     public void showProgress() {
         if (U.isNull(mForm, mProgress)) return;
         mForm.setVisibility(View.GONE);
         mProgress.setVisibility(View.VISIBLE);
+        if (mSaveButton != null) {
+            mSaveButton.setEnabled(false);
+        }
     }
 
     public void hideProgress() {
         if (U.isNull(mForm, mProgress)) return;
         mProgress.setVisibility(View.GONE);
         mForm.setVisibility(View.VISIBLE);
+        if (mSaveButton != null) {
+            mSaveButton.setEnabled(true);
+        }
     }
 
     public String getIdFromTitle(final String title, final int titlesResource, final int idsResource) {
