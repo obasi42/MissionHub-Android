@@ -201,7 +201,6 @@ public class ContactListView extends SelectableListView implements OnItemChecked
             final Object item = getItemAtPosition(position);
             if (item instanceof ContactItem) {
                 mOnContactCheckedListener.onContactChecked(((ContactItem) item).person, position, checked);
-
             }
         }
     }

@@ -183,7 +183,11 @@ public class SelectableListView extends ListView {
     public void setItemChecked(final int position, final boolean checked) {
         super.setItemChecked(position, checked);
         if (mOnItemCheckedListener != null) {
-            mOnItemCheckedListener.onSetItemChecked(position, checked);
+            try {
+                mOnItemCheckedListener.onSetItemChecked(position, checked);
+            } catch (Exception e) {
+                super.setItemChecked(position, false);
+            }
             checkForAllUnchecked();
         }
     }

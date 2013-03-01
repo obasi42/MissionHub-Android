@@ -50,22 +50,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class ContactAssignmentDialogFragment extends BaseDialogFragment implements OnKeyListener, OnItemClickListener {
-
-    /**
-     * the title icon
-     */
-    private ImageView mIcon;
-
-    /**
-     * the alert title view
-     */
-    private TextView mAlertTitle;
-
-    /**
-     * the refresh button
-     */
-    private ImageView mRefresh;
+public class ContactAssignmentDialogFragment extends RefreshableDialogFragment implements OnKeyListener, OnItemClickListener {
 
     /**
      * the view pager
@@ -122,11 +107,6 @@ public class ContactAssignmentDialogFragment extends BaseDialogFragment implemen
      */
     private SafeAsyncTask<Void> mRefreshLeadersTask;
 
-    /**
-     * the refresh icon animation
-     */
-    private Animation mRefreshAnimation;
-
     public ContactAssignmentDialogFragment() {
     }
 
@@ -160,7 +140,6 @@ public class ContactAssignmentDialogFragment extends BaseDialogFragment implemen
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setStyle(DialogFragment.STYLE_NO_TITLE, R.style.Theme_Sherlock_Light_Dialog);
 
         if (getArguments() != null) {
             @SuppressWarnings("unchecked") final HashSet<Person> people = (HashSet<Person>) getArguments().getSerializable("people");
@@ -171,19 +150,18 @@ public class ContactAssignmentDialogFragment extends BaseDialogFragment implemen
     }
 
     @Override
-    public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
-        mRefreshAnimation = AnimationUtils.loadAnimation(inflater.getContext(), R.anim.clockwise_refresh);
-        mRefreshAnimation.setRepeatCount(Animation.INFINITE);
-        return inflater.inflate(R.layout.fragment_assignment_dialog, null);
+    public void onCreateDialogTitle(DialogTitle title) {
+        title.setTitle(R.string.assignment_title);
     }
 
+    @Override
+    public View onCreateRefreshableView(final LayoutInflater inflater, final Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_assignment_dialog, null);
+    }
     @Override
     public void onViewCreated(final View view) {
         super.onViewCreated(view);
 
-        mIcon = (ImageView) view.findViewById(R.id.icon);
-        mAlertTitle = (TextView) view.findViewById(R.id.alertTitle);
-        mRefresh = (ImageView) view.findViewById(R.id.action_refresh);
         mPager = (LockedViewPager) view.findViewById(R.id.pager);
         mProgress = view.findViewById(R.id.progress_container);
 
@@ -234,13 +212,6 @@ public class ContactAssignmentDialogFragment extends BaseDialogFragment implemen
         if (mTask != null) {
             showProgress();
         }
-
-        mRefresh.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(final View v) {
-                refresh();
-            }
-        });
     }
 
     @Override
@@ -257,11 +228,11 @@ public class ContactAssignmentDialogFragment extends BaseDialogFragment implemen
         mPage = 0;
         mPager.setCurrentItem(0, animate);
         if (mPeople.size() > 1) {
-            mAlertTitle.setText(R.string.assignment_title_mass);
+            setTitle(R.string.assignment_title_mass);
         } else {
-            mAlertTitle.setText(R.string.assignment_title);
+            setTitle(R.string.assignment_title);
         }
-        mRefresh.setVisibility(View.GONE);
+        hideRefresh();
     }
 
     /**
@@ -271,7 +242,7 @@ public class ContactAssignmentDialogFragment extends BaseDialogFragment implemen
         mSelectionFragment.showGroups();
         mPage = 1;
         mPager.setCurrentItem(1, animate);
-        mAlertTitle.setText(R.string.assignment_title_group);
+        setTitle(R.string.assignment_title_group);
     }
 
     /**
@@ -281,8 +252,9 @@ public class ContactAssignmentDialogFragment extends BaseDialogFragment implemen
         mSelectionFragment.showLeaders();
         mPage = 1;
         mPager.setCurrentItem(1, animate);
-        mAlertTitle.setText(R.string.assignment_title_leader);
-        mRefresh.setVisibility(View.VISIBLE);
+
+        setTitle(R.string.assignment_title_leader);
+        showRefresh();
     }
 
     public static class AssignNoneItem {
@@ -840,7 +812,8 @@ public class ContactAssignmentDialogFragment extends BaseDialogFragment implemen
         }
     }
 
-    public void refresh() {
+    @Override
+    public void onRefresh() {
         if (mSelectionFragment.mSelection == IndexFragment.GROUPS) {
 
         } else if (mSelectionFragment.mSelection == IndexFragment.LEADERS) {
@@ -897,11 +870,9 @@ public class ContactAssignmentDialogFragment extends BaseDialogFragment implemen
 
     private void updateRefreshIcon() {
         if (mRefreshLeadersTask != null) {
-            mRefresh.setEnabled(false);
-            mRefresh.startAnimation(mRefreshAnimation);
+            startRefreshAnimation();;
         } else {
-            mRefresh.setEnabled(true);
-            mRefresh.clearAnimation();
+            stopRefreshAnimation();
         }
     }
 }

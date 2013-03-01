@@ -6,9 +6,6 @@ import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.ImageView;
 import com.missionhub.android.R;
 import com.missionhub.android.api.Api;
 import com.missionhub.android.application.Application;
@@ -18,13 +15,12 @@ import com.missionhub.android.ui.ObjectArrayAdapter;
 import com.missionhub.android.ui.widget.SelectableListView;
 import com.missionhub.android.util.SafeAsyncTask;
 import org.holoeverywhere.app.AlertDialog;
-import org.holoeverywhere.app.Dialog;
 
 import java.lang.ref.WeakReference;
 import java.util.HashSet;
 import java.util.Set;
 
-public class ContactLabelsDialogFragment extends BaseDialogFragment {
+public class ContactLabelsDialogFragment extends RefreshableDialogFragment {
 
     /**
      * the people being acted on
@@ -61,16 +57,6 @@ public class ContactLabelsDialogFragment extends BaseDialogFragment {
      */
     private View mProgress;
 
-    /**
-     * the refresh button
-     */
-    private ImageView mRefresh;
-
-    /**
-     * the refresh animation
-     */
-    private Animation mRefreshAnimation;
-
     public ContactLabelsDialogFragment() {
     }
 
@@ -102,7 +88,17 @@ public class ContactLabelsDialogFragment extends BaseDialogFragment {
     }
 
     @Override
-    public Dialog onCreateDialog(final Bundle savedInstanceState) {
+    public void onCreateDialogTitle(DialogTitle title) {
+        title.setTitle("Assign Labels");
+    }
+
+    @Override
+    public void onRefresh() {
+        refreshLabels();
+    }
+
+    @Override
+    public AlertDialog.Builder onCreateRefreshableDialog(final Bundle savedInstanceState) {
         final View view = getSupportActivity().getLayoutInflater().inflate(R.layout.fragment_labels_dialog, null);
         mProgress = view.findViewById(R.id.progress_container);
         mList = (SelectableListView) view.findViewById(android.R.id.list);
@@ -115,19 +111,7 @@ public class ContactLabelsDialogFragment extends BaseDialogFragment {
         }
         mList.setAdapter(mAdapter);
 
-        final View title = getSupportActivity().getLayoutInflater().inflate(R.layout.fragment_refresh_dialog_title, null);
-        mRefresh = (ImageView) title.findViewById(R.id.action_refresh);
-        mRefresh.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                refreshLabels();
-            }
-        });
-        mRefreshAnimation = AnimationUtils.loadAnimation(getSupportActivity(), R.anim.clockwise_refresh);
-        mRefreshAnimation.setRepeatCount(Animation.INFINITE);
-
         final AlertDialog.Builder builder = new AlertDialog.Builder(getSupportActivity());
-        builder.setCustomTitle(title);
         builder.setView(view);
         builder.setPositiveButton("Save", new OnClickListener() {
             @Override
@@ -145,7 +129,7 @@ public class ContactLabelsDialogFragment extends BaseDialogFragment {
 
         updateState();
 
-        return builder.create();
+        return builder;
     }
 
     private void buildAdapter() {
@@ -154,14 +138,10 @@ public class ContactLabelsDialogFragment extends BaseDialogFragment {
     }
 
     private void updateState() {
-        if (mRefresh != null && mRefreshAnimation != null) {
-            if (mRefreshTask != null) {
-                mRefresh.setEnabled(false);
-                mRefresh.startAnimation(mRefreshAnimation);
-            } else {
-                mRefresh.setEnabled(true);
-                mRefresh.clearAnimation();
-            }
+        if (mRefreshTask != null) {
+            startRefreshAnimation();
+        } else {
+            stopRefreshAnimation();
         }
         if (mList != null && mProgress != null) {
             if (mSaveTask != null) {

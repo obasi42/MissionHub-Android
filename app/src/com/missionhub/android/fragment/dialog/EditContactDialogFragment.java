@@ -25,7 +25,6 @@ import org.holoeverywhere.ArrayAdapter;
 import org.holoeverywhere.app.AlertDialog;
 import org.holoeverywhere.app.Dialog;
 import org.holoeverywhere.app.Fragment;
-import org.holoeverywhere.widget.Button;
 import org.holoeverywhere.widget.EditText;
 import org.holoeverywhere.widget.Spinner;
 import org.holoeverywhere.widget.Toast;
@@ -59,11 +58,6 @@ public class EditContactDialogFragment extends BaseDialogFragment {
      * if the contact should be assigned to the current user
      */
     private boolean mAssignToMe = false;
-
-    /**
-     * the save button
-     */
-    private Button mSave;
 
     /**
      * the person data holder
@@ -105,7 +99,7 @@ public class EditContactDialogFragment extends BaseDialogFragment {
 
     @Override
     public Dialog onCreateDialog(final Bundle savedInstanceState) {
-        final View view = getSupportActivity().getLayoutInflater().inflate(R.layout.fragment_add_contact_dialog, null);
+        final View view = getSupportActivity().getLayoutInflater().inflate(R.layout.fragment_edit_contact_dialog, null);
         mName = (EditText) view.findViewById(R.id.name);
         mGender = (RadioGroup) view.findViewById(R.id.gender);
         mPhone = (EditText) view.findViewById(R.id.phone);
@@ -137,28 +131,46 @@ public class EditContactDialogFragment extends BaseDialogFragment {
             restoreFromPerson(mPerson);
         }
 
-        final View title = getSupportActivity().getLayoutInflater().inflate(R.layout.fragment_add_contact_dialog_title, null);
-        mSave = (Button) title.findViewById(R.id.save);
-        mSave.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(final View v) {
-                saveContact();
-            }
-        });
-
         mForm = view.findViewById(R.id.form);
         mProgress = view.findViewById(R.id.progress_container);
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(getSupportActivity());
-        builder.setCustomTitle(title);
+        builder.setTitle(R.string.action_add_contact);
         builder.setView(view);
         builder.setOnCancelListener(this);
+
+        builder.setPositiveButton(R.string.action_save, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // do nothing here
+                // the on click is assigned directly to the button to prevent the dialog from dismissing when pressed.
+            }
+        });
+        builder.setNeutralButton(R.string.action_cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dismiss();
+            }
+        });
 
         if (mTask != null) {
             showProgress();
         }
 
-        return builder.create();
+        final Dialog dialog = builder.create();
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialog) {
+                ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        saveContact();
+                    }
+                });
+            }
+        });
+
+        return dialog;
     }
 
     public void setAddContactListener(final AddContactListener listener) {
@@ -397,14 +409,12 @@ public class EditContactDialogFragment extends BaseDialogFragment {
     public void showProgress() {
         if (U.isNull(mForm, mProgress)) return;
         mForm.setVisibility(View.GONE);
-        mSave.setVisibility(View.GONE);
         mProgress.setVisibility(View.VISIBLE);
     }
 
     public void hideProgress() {
         if (U.isNull(mForm, mProgress)) return;
         mProgress.setVisibility(View.GONE);
-        mSave.setVisibility(View.VISIBLE);
         mForm.setVisibility(View.VISIBLE);
     }
 
