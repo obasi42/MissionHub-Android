@@ -1,8 +1,8 @@
 package com.missionhub.android.activity;
 
 import android.os.Bundle;
+import com.google.analytics.tracking.android.EasyTracker;
 import com.missionhub.android.fragment.dialog.FragmentResult;
-import com.missionhub.android.util.EasyTracker;
 import org.holoeverywhere.app.Activity;
 
 /**
@@ -12,29 +12,15 @@ import org.holoeverywhere.app.Activity;
 public abstract class BaseActivity extends Activity implements FragmentResult {
 
     @Override
-    public void onCreate(final Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        EasyTracker.getTracker().setContext(this);
-    }
-
-    @Override
     public void onStart() {
         super.onStart();
-        EasyTracker.getTracker().trackActivityStart(this);
-    }
-
-    @Override
-    public Object onRetainCustomNonConfigurationInstance() {
-        final Object o = super.onRetainCustomNonConfigurationInstance();
-        EasyTracker.getTracker().trackActivityRetainNonConfigurationInstance();
-        return o;
+        //EasyTracker.getInstance().activityStart(this);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        EasyTracker.getTracker().trackActivityStop(this);
+        //EasyTracker.getInstance().activityStop(this);
     }
 
     @Override
