@@ -198,8 +198,10 @@
                                     <keypass>${missionhub.sign.keypass}</keypass>
                                     <alias>${missionhub.sign.alias}</alias>
                                     <arguments>
-                                        <argument>-sigalg</argument><argument>MD5withRSA</argument>
-                                        <argument>-digestalg</argument><argument>SHA1</argument>
+                                        <argument>-sigalg</argument>
+                                        <argument>MD5withRSA</argument>
+                                        <argument>-digestalg</argument>
+                                        <argument>SHA1</argument>
                                     </arguments>
                                 </configuration>
                             </execution>
@@ -220,8 +222,19 @@
                                     ${project.build.directory}/${project.artifactId}-${project.version}.${missionhub.build.number}-signed-aligned.apk
                                 </outputApk>
                             </zipalign>
+                            <lint>
+                                <skip>false</skip>
+                                <failOnError>false</failOnError>
+                            </lint>
                         </configuration>
                         <executions>
+                            <execution>
+                                <id>lint</id>
+                                <goals>
+                                    <goal>lint</goal>
+                                </goals>
+                                <phase>install</phase>
+                            </execution>
                             <execution>
                                 <id>update-manifest</id>
                                 <phase>process-resources</phase>

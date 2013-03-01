@@ -72,6 +72,7 @@
 
         <android-maven.version>3.5.1</android-maven.version>
         <junit.version>4.11</junit.version>
+        <findbugs.version>2.5.2</findbugs.version>
 
         <github.downloads.repositoryOwner>CruGlobal</github.downloads.repositoryOwner>
         <github.downloads.repositoryName>MissionHub-Android</github.downloads.repositoryName>
@@ -82,6 +83,10 @@
                 <groupId>com.jayway.maven.plugins.android.generation2</groupId>
                 <artifactId>android-maven-plugin</artifactId>
                 <extensions>true</extensions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>findbugs-maven-plugin</artifactId>
             </plugin>
         </plugins>
 
@@ -103,7 +108,36 @@
                         </proguard>
                     </configuration>
                 </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>findbugs-maven-plugin</artifactId>
+                    <version>${findbugs.version}</version>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
+
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>findbugs-maven-plugin</artifactId>
+                <configuration>
+                    <threshold>Default</threshold>
+                    <effort>Max</effort>
+                    <onlyAnalyze>com.missionhub.android.*</onlyAnalyze>
+                    <findbugsXmlOutput>true</findbugsXmlOutput>
+                    <findbugsXmlOutputDirectory>target</findbugsXmlOutputDirectory>
+                </configuration>
+            </plugin>
+            <!--<plugin>-->
+                <!--<groupId>org.apache.maven.plugins</groupId>-->
+                <!--<artifactId>maven-checkstyle-plugin</artifactId>-->
+                <!--<version>2.10</version>-->
+                <!--<configuration>-->
+                    <!--<configLocation>checkstyle.xml</configLocation>-->
+                <!--</configuration>-->
+            <!--</plugin>-->
+        </plugins>
+    </reporting>
 </project>
