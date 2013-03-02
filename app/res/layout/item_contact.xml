@@ -1,4 +1,4 @@
-<com.missionhub.android.contactlist.ContactItemView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.missionhub.contactlist.ContactItemView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/list_item_background"
@@ -45,4 +45,4 @@
             android:text="TextView" />
     </LinearLayout>
 
-</com.missionhub.android.contactlist.ContactItemView>
+</com.missionhub.contactlist.ContactItemView>

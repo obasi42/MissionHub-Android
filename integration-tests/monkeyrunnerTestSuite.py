@@ -9,10 +9,10 @@ device = MonkeyRunner.waitForConnection()
 device.installPackage('../app/target/com-missionhub-android-1.0.apk')
 
 # sets a variable with the package's internal name
-package = 'com.missionhub.android'
+package = 'com.missionhub'
 
 # sets a variable with the name of an Activity in the package
-activity = 'com.missionhub.android.ui.CarouselActivity'
+activity = 'com.missionhub.ui.CarouselActivity'
 
 # sets the name of the component to start
 runComponent = package + '/' + activity

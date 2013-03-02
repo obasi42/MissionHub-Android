@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <version>2.0-SNAPSHOT</version>
-    <groupId>com.missionhub.android</groupId>
+    <groupId>com.missionhub</groupId>
     <artifactId>parent</artifactId>
     <packaging>pom</packaging>
 
@@ -126,7 +126,7 @@
                 <!--<configuration>-->
                     <!--<threshold>Default</threshold>-->
                     <!--<effort>Max</effort>-->
-                    <!--<onlyAnalyze>com.missionhub.android.*</onlyAnalyze>-->
+                    <!--<onlyAnalyze>com.missionhub.*</onlyAnalyze>-->
                     <!--<findbugsXmlOutput>true</findbugsXmlOutput>-->
                     <!--<findbugsXmlOutputDirectory>target</findbugsXmlOutputDirectory>-->
                 <!--</configuration>-->

@@ -61,8 +61,8 @@
 ###############################
 
 # Keep all of MH.. it wouldn't be there if it wasn't needed :)
--keep class com.missionhub.android.** { *; }
--keep interface com.missionhub.android.** { *; }
+-keep class com.missionhub.** { *; }
+-keep interface com.missionhub.** { *; }
 
 # RoboGuice
 -dontwarn roboguice.**
@@ -73,7 +73,7 @@
 }
 
 # GreenDao
--keep public class com.missionhub.android.model.** {
+-keep public class com.missionhub.model.** {
     public static <fields>;
 }
 

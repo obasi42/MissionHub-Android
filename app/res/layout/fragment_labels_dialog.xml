@@ -29,7 +29,7 @@
             android:text="Saving Labels" />
     </RelativeLayout>
 
-    <com.missionhub.android.ui.widget.SelectableListView
+    <com.missionhub.ui.widget.SelectableListView
         android:id="@android:id/list"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" />

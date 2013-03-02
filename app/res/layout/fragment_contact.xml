@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center" />
 
-    <com.missionhub.android.ui.widget.LockedViewPager
+    <com.missionhub.ui.widget.LockedViewPager
         android:id="@+id/pager"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" />

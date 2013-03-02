@@ -4,6 +4,6 @@
 <resources>
 
     <string name="hello">Hello World!</string>
-    <string name="app_name">com.missionhub.android.testsTest</string>
+    <string name="app_name">com.missionhub.testsTest</string>
 
 </resources>
