@@ -91,25 +91,25 @@ public class ContactAssignmentDialogFragment extends RefreshableDialogFragment i
     public ContactAssignmentDialogFragment() {
     }
 
-    public static ContactAssignmentDialogFragment show(Activity activity, FragmentManager fm, final Person person) {
-        return showForResult(activity, fm, person, null);
+    public static ContactAssignmentDialogFragment show(FragmentManager fm, final Person person) {
+        return showForResult(fm, person, null);
     }
 
-    public static ContactAssignmentDialogFragment show(Activity activity, FragmentManager fm, final Collection<Person> people) {
-        return showForResult(activity, fm, people, null);
+    public static ContactAssignmentDialogFragment show(FragmentManager fm, final Collection<Person> people) {
+        return showForResult(fm, people, null);
     }
 
-    public static ContactAssignmentDialogFragment showForResult(Activity activity, FragmentManager fm, final Person person, Integer requestCode) {
+    public static ContactAssignmentDialogFragment showForResult(FragmentManager fm, final Person person, Integer requestCode) {
         final List people = new ArrayList();
         people.add(person);
-        return showForResult(activity, fm, people, requestCode);
+        return showForResult(fm, people, requestCode);
     }
 
-    public static ContactAssignmentDialogFragment showForResult(Activity activity, FragmentManager fm, final Collection<Person> people, Integer requestCode) {
+    public static ContactAssignmentDialogFragment showForResult(FragmentManager fm, final Collection<Person> people, Integer requestCode) {
         final Bundle args = new Bundle();
         final HashSet<Person> peopleSet = new HashSet<Person>(people);
         args.putSerializable("people", peopleSet);
-        return ContactLabelsDialogFragment.show(ContactAssignmentDialogFragment.class, activity, fm, args, requestCode);
+        return ContactLabelsDialogFragment.show(ContactAssignmentDialogFragment.class, fm, args, requestCode);
     }
 
     @Override

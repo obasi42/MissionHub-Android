@@ -224,6 +224,14 @@ public class Organization {
 				.whereOr(OrganizationDao.Properties.Ancestry.eq(getId()), OrganizationDao.Properties.Ancestry.eq(getAncestry() + "/" + getId())) //
 				.orderAsc(OrganizationDao.Properties.Name).list();
 	}
+
+    public List<Role> getAllRoles() {
+        if (daoSession == null) {
+            throw new DaoException("Entity is detached from DAO context");
+        }
+
+        return daoSession.getRoleDao().queryBuilder().where(RoleDao.Properties.Organization_id.in(0, getId())).list();
+    }
     // KEEP METHODS END
 
 }

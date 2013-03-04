@@ -58,15 +58,25 @@ public class BaseDialogFragment extends DialogFragment implements FragmentResult
     }
 
     @Override
-    public void onDestroy() {
+    public synchronized void onDestroy() {
         if (mRequestCode != Integer.MIN_VALUE) {
-            Fragment fragment = getParentFragment();
-            if (fragment != null && fragment instanceof FragmentResult) {
-                ((FragmentResult) fragment).onFragmentResult(mRequestCode, mResultCode, mResultData);
+            try {
+                Fragment fragment = getParentFragment();
+                if (fragment != null && fragment instanceof FragmentResult) {
+                    if (((FragmentResult) fragment).onFragmentResult(mRequestCode, mResultCode, mResultData)) {
+                        return;
+                    }
+                }
+            } catch (Exception e) {
+                // result of ui spam
             }
-            Activity activity = getSupportActivity();
-            if (activity != null && activity instanceof FragmentResult) {
-                ((FragmentResult) activity).onFragmentResult(mRequestCode, mResultCode, mResultData);
+            try {
+                Activity activity = getSupportActivity();
+                if (activity != null && activity instanceof FragmentResult) {
+                    ((FragmentResult) activity).onFragmentResult(mRequestCode, mResultCode, mResultData);
+                }
+            } catch (Exception e) {
+                // result of ui spam
             }
         }
         super.onDestroy();
@@ -87,32 +97,30 @@ public class BaseDialogFragment extends DialogFragment implements FragmentResult
         return true;
     }
 
-    protected static <T extends BaseDialogFragment> T show(Class<T> clss, Activity activity, FragmentManager fm) {
-        return show(clss, activity, fm, null, null);
+    protected static <T extends BaseDialogFragment> T show(Class<T> clss, FragmentManager fm) {
+        return show(clss, fm, null, null);
     }
 
-    protected static <T extends BaseDialogFragment> T show(Class<T> clss, Activity activity, FragmentManager fm, Bundle args) {
-        return show(clss, activity, fm, args, null);
+    protected static <T extends BaseDialogFragment> T show(Class<T> clss, FragmentManager fm, Bundle args) {
+        return show(clss, fm, args, null);
     }
 
-    protected static <T extends BaseDialogFragment> T show(Class<T> clss, Activity activity, FragmentManager fm, Bundle args, Integer requestCode) {
-        T fragment = DialogFragment.findInstance(activity, clss, true);
-        if (args == null) {
-            args = new Bundle();
+    protected static <T extends BaseDialogFragment> T show(Class<T> clazz, FragmentManager fm, Bundle args, Integer requestCode) {
+        T fragment = findInstance(fm, clazz, true);
+        try {
+            fragment.setArguments(args);
+        } catch (Exception e) {
+            // result of ui spam
         }
-        if (requestCode != null) {
-            args.putInt("requestCode", requestCode);
-        }
-        fragment.setArguments(args);
         fragment.show(fm);
         return fragment;
     }
 
-    protected static <T extends BaseDialogFragment> T showForResult(Class<T> clss, Activity activity, FragmentManager fm, Integer requestCode) {
-        return show(clss, activity, fm, null, requestCode);
+    protected static <T extends BaseDialogFragment> T showForResult(Class<T> clss, FragmentManager fm, Integer requestCode) {
+        return show(clss, fm, null, requestCode);
     }
 
-    protected static <T extends BaseDialogFragment> T showForResult(Class<T> clss, Activity activity, FragmentManager fm, Bundle args, Integer requestCode) {
-        return show(clss, activity, fm, args, requestCode);
+    protected static <T extends BaseDialogFragment> T showForResult(Class<T> clss, FragmentManager fm, Bundle args, Integer requestCode) {
+        return show(clss, fm, args, requestCode);
     }
 }

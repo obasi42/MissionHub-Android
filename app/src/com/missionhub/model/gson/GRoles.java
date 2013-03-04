@@ -2,6 +2,7 @@ package com.missionhub.model.gson;
 
 import com.missionhub.application.Application;
 import com.missionhub.model.Role;
+import com.missionhub.model.RoleDao;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,10 +26,29 @@ public class GRoles {
             @Override
             public List<Role> call() throws Exception {
                 synchronized (lock) {
+                    final List<Long> orgIds = new ArrayList<Long>();
+                    boolean deletedSystem = false;
+
                     final List<Role> retRoles = new ArrayList<Role>();
                     for (final GRole role : roles) {
-                        final Role r = role.save(true);
-                        if (r != null) {
+                        if (role != null) {
+                            if (role.organization_id == 0 && !deletedSystem) {
+                                final List<Long> keys = Application.getDb().getRoleDao().queryBuilder().where(RoleDao.Properties.Organization_id.eq(0)).listKeys();
+                                for(Long key : keys) {
+                                    Application.getDb().getRoleDao().deleteByKey(key);
+                                }
+                                deletedSystem = true;
+                            }
+
+                            if (role.organization_id != 0 && !orgIds.contains(role.organization_id)) {
+                                final List<Long> keys = Application.getDb().getRoleDao().queryBuilder().where(RoleDao.Properties.Organization_id.eq(role.organization_id)).listKeys();
+                                for(Long key : keys) {
+                                    Application.getDb().getRoleDao().deleteByKey(key);
+                                }
+                                orgIds.add(role.organization_id);
+                            }
+
+                            final Role r = role.save(true);
                             retRoles.add(r);
                         }
                     }
@@ -42,5 +62,4 @@ public class GRoles {
             return Application.getDb().callInTx(callable);
         }
     }
-
 }

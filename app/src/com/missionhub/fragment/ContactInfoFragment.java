@@ -345,7 +345,7 @@ public class ContactInfoFragment extends BaseFragment {
         mHeaderAssignment.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(final View v) {
-                ContactAssignmentDialogFragment.showForResult(getSupportActivity(), getChildFragmentManager(), mPerson, REQUEST_ASSIGNMENT);
+                ContactAssignmentDialogFragment.showForResult(getChildFragmentManager(), mPerson, REQUEST_ASSIGNMENT);
             }
         });
         mHeaderMoreText.setOnClickListener(new OnClickListener() {

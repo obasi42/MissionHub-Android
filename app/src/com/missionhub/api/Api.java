@@ -213,6 +213,21 @@ public class Api {
         return new ApiCall<List<Role>>(ApiOptions.builder().method(HttpMethod.GET).url(buildUrl("roles")).responseParser(rolesParser).params(params).merge(options).build());
     }
 
+    /* Organizational Roles (Labels) */
+
+    public static ApiCall<List<Person>> bulkUpdateRoles(final Collection<Long> personIds, final Collection<Long> addRoles, final Collection<Long> removeRoles, final ApiOptions options) {
+        final HttpParams params = new HttpParams();
+        params.add("include_archived", true);
+        params.add("filters[ids]", U.toCSV(personIds));
+        if (!U.isNullEmpty(addRoles)) {
+            params.add("add_roles", U.toCSV(addRoles));
+        }
+        if (!U.isNullEmpty(removeRoles)) {
+            params.add("remove_roles", U.toCSV(removeRoles));
+        }
+        return new ApiCall<List<Person>>(ApiOptions.builder().method(HttpMethod.POST).url(buildUrl("organizational_roles", "bulk")).responseParser(organizationalRolesParser).params(params).merge(options).build());
+    }
+
 	/* Contact Assignments */
 
     public static ApiCall<List<ContactAssignment>> bulkUpdateContactAssignments(final Collection<GContactAssignment> assignments) {
@@ -452,6 +467,14 @@ public class Api {
         public List<Role> parseResponse(final HttpResponse response) throws Exception {
             final GRoles roles = sGson.fromJson(response.responseBody, GRoles.class);
             return roles.save(false);
+        }
+    };
+
+    public static final ApiResponseParser<List<Person>> organizationalRolesParser = new ApiResponseParser<List<Person>>() {
+        @Override
+        public List<Person> parseResponse(final HttpResponse response) throws Exception {
+            final GPeople people = sGson.fromJson(response.responseBody, GPeople.class);
+            return people.save(false);
         }
     };
 

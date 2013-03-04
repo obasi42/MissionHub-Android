@@ -162,6 +162,15 @@
     <string name="rejoicable_gospel">Gospel Presentation</string>
     <string name="rejoicable_convo">Spiritual Conversation</string>
 
+    <!-- Roles -->
+    <string name="role_admin">Admin</string>
+    <string name="role_admin_hint">Access all options in this organization.</string>
+    <string name="role_contact">Contact</string>
+    <string name="role_involved">Involved</string>
+    <string name="role_leader">Leader</string>
+    <string name="role_alumni">Alumni</string>
+    <string name="role_sent">100% Sent</string>
+
     <!-- Add Contact Dialog -->
     <string name="add_contact_title">Add Contact</string>
     <string name="add_contact_section_bio">Bio</string>

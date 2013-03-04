@@ -249,7 +249,7 @@ public class MyContactsFragment extends MainFragment implements OnPageChangeList
                 }
                 break;
             case R.id.action_add_contact:
-                EditContactDialogFragment.showForResult(getSupportActivity(), getChildFragmentManager(), true, REQUEST_EDIT_CONTACT);
+                EditContactDialogFragment.showForResult(getChildFragmentManager(), true, REQUEST_EDIT_CONTACT);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -404,10 +404,10 @@ public class MyContactsFragment extends MainFragment implements OnPageChangeList
     @Override
     public boolean onActionItemClicked(final ActionMode mode, final MenuItem item) {
         if (item.getItemId() == R.id.action_assign) {
-            ContactAssignmentDialogFragment.showForResult(getSupportActivity(), getChildFragmentManager(), getCurrentFragment().getCheckedPeople(), REQUEST_ASSIGNMENT);
+            ContactAssignmentDialogFragment.showForResult(getChildFragmentManager(), getCurrentFragment().getCheckedPeople(), REQUEST_ASSIGNMENT);
         }
         if (item.getItemId() == R.id.action_label) {
-            ContactLabelsDialogFragment.showForResult(getSupportActivity(), getChildFragmentManager(), getCurrentFragment().getCheckedPeople(), REQUEST_LABELS);
+            ContactLabelsDialogFragment.showForResult(getChildFragmentManager(), getCurrentFragment().getCheckedPeople(), REQUEST_LABELS);
         }
         return true;
     }

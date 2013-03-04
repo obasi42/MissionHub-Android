@@ -98,7 +98,7 @@ public class AllContactsFragment extends MainFragment implements ContactListFrag
                 }
                 break;
             case R.id.action_add_contact:
-                EditContactDialogFragment.showForResult(getSupportActivity(), getChildFragmentManager(), false, REQUEST_EDIT_CONTACT);
+                EditContactDialogFragment.showForResult(getChildFragmentManager(), false, REQUEST_EDIT_CONTACT);
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -191,10 +191,10 @@ public class AllContactsFragment extends MainFragment implements ContactListFrag
     @Override
     public boolean onActionItemClicked(final ActionMode mode, final MenuItem item) {
         if (item.getItemId() == R.id.action_assign) {
-            ContactAssignmentDialogFragment.showForResult(getSupportActivity(), getChildFragmentManager(), mFragment.getCheckedPeople(), REQUEST_ASSIGNMENT);
+            ContactAssignmentDialogFragment.showForResult(getChildFragmentManager(), mFragment.getCheckedPeople(), REQUEST_ASSIGNMENT);
         }
         if (item.getItemId() == R.id.action_label) {
-            ContactLabelsDialogFragment.showForResult(getSupportActivity(), getChildFragmentManager(), mFragment.getCheckedPeople(), REQUEST_LABELS);
+            ContactLabelsDialogFragment.showForResult(getChildFragmentManager(), mFragment.getCheckedPeople(), REQUEST_LABELS);
         }
         mode.finish();
         return true;

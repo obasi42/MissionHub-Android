@@ -47,6 +47,9 @@ public class EditContactDialogFragment extends BaseDialogFragment {
      */
     private View mProgress;
 
+    /**
+     * the dialog save button
+     */
     private Button mSaveButton;
 
     /**
@@ -75,14 +78,14 @@ public class EditContactDialogFragment extends BaseDialogFragment {
     public EditContactDialogFragment() {
     }
 
-    public static EditContactDialogFragment show(Activity activity, FragmentManager fm, final boolean assignToMe) {
-        return showForResult(activity, fm, assignToMe, null);
+    public static EditContactDialogFragment show(FragmentManager fm, final boolean assignToMe) {
+        return showForResult(fm, assignToMe, null);
     }
 
-    public static EditContactDialogFragment showForResult(Activity activity, FragmentManager fm, final boolean assignToMe, Integer requestCode) {
+    public static EditContactDialogFragment showForResult(FragmentManager fm, final boolean assignToMe, Integer requestCode) {
         final Bundle args = new Bundle();
         args.putBoolean("assignToMe", assignToMe);
-        return EditContactDialogFragment.show(EditContactDialogFragment.class, activity, fm, args, requestCode);
+        return EditContactDialogFragment.show(EditContactDialogFragment.class, fm, args, requestCode);
     }
 
     @Override
@@ -139,8 +142,7 @@ public class EditContactDialogFragment extends BaseDialogFragment {
         builder.setPositiveButton(R.string.action_save, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                // do nothing here
-                // the on click is assigned directly to the button to prevent the dialog from dismissing when pressed.
+                saveContact();
             }
         });
         builder.setNeutralButton(R.string.action_cancel, new DialogInterface.OnClickListener() {
@@ -154,19 +156,8 @@ public class EditContactDialogFragment extends BaseDialogFragment {
             showProgress();
         }
 
-        final Dialog dialog = builder.create();
-        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-            @Override
-            public void onShow(DialogInterface dialog) {
-                mSaveButton = ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_POSITIVE);
-                mSaveButton.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        saveContact();
-                    }
-                });
-            }
-        });
+        final AlertDialog dialog = builder.create();
+        mSaveButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
 
         return dialog;
     }

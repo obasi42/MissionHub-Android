@@ -169,8 +169,7 @@ public class InitActivity extends BaseActivity {
             mAccountDialog = new PickAccountDialog();
             mAccountDialog.setCancelable(false);
         }
-
-        mAccountDialog.show(getSupportFragmentManager(), "mAccountDialog");
+        mAccountDialog.show(getSupportFragmentManager());
     }
 
     public void onEventMainThread(final AccountPickedEvent event) {

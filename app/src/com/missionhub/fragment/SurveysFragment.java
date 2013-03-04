@@ -60,7 +60,7 @@ public class SurveysFragment extends MainFragment {
 
         if (mWebView == null) {
             mWebView = new WebView(mContainer.getContext());
-            mWebView.setLayoutParams(new ViewGroup.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
+            mWebView.setLayoutParams(new ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
             mWebView.getSettings().setJavaScriptEnabled(true);
             mWebView.getSettings().setAppCacheEnabled(true);
             mWebView.getSettings().setLoadsImagesAutomatically(true);

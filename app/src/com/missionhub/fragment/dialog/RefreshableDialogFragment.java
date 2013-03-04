@@ -12,6 +12,7 @@ import org.holoeverywhere.LayoutInflater;
 import org.holoeverywhere.app.AlertDialog;
 import org.holoeverywhere.app.Dialog;
 import org.holoeverywhere.app.DialogFragment;
+import org.holoeverywhere.widget.Button;
 import org.holoeverywhere.widget.LinearLayout;
 import org.holoeverywhere.widget.TextView;
 
@@ -51,6 +52,11 @@ public abstract class RefreshableDialogFragment extends BaseDialogFragment {
     private ImageView mIcon;
 
     /**
+     * The created alert dialog
+     */
+    private AlertDialog mDialog;
+
+    /**
      * Called when the dialog title is set up
      *
      * @param title
@@ -84,7 +90,9 @@ public abstract class RefreshableDialogFragment extends BaseDialogFragment {
         builder.setCustomTitle(createTitleView(LayoutInflater.from(getSupportActivity())));
         builder.setOnCancelListener(this);
 
-        return builder.create();
+        mDialog = builder.create();
+
+        return mDialog;
     }
 
     /**
@@ -297,6 +305,15 @@ public abstract class RefreshableDialogFragment extends BaseDialogFragment {
     public void showRefresh() {
         if (mRefresh != null)
             mRefresh.setVisibility(View.VISIBLE);
+    }
+
+    public void setButtonEnabled(int buttonId, boolean enabled) {
+        if (mDialog != null) {
+            final Button button = mDialog.getButton(buttonId);
+            if (button != null) {
+                button.setEnabled(enabled);
+            }
+        }
     }
 
 }
