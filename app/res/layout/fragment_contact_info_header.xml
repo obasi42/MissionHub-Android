@@ -312,6 +312,32 @@
         </LinearLayout>
 
         <LinearLayout
+                android:id="@+id/labels"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+            <TextView
+                    style="@style/MissionHub.ContactInfoSectionLabel"
+                    android:text="@string/contact_label_labels" />
+
+            <View
+                    android:id="@+id/divider"
+                    android:layout_width="fill_parent"
+                    android:layout_height="1.0dip"
+                    android:background="@color/gray" />
+
+            <LinearLayout style="@style/MissionHub.ContactInfoSection"
+                    android:id="@+id/labels_holder"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    >
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/links"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"

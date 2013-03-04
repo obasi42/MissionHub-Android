@@ -576,7 +576,7 @@ public class Person {
 		if (role == U.Role.admin) {
 			Organization organization = daoSession.getOrganizationDao().load(organizationId);
 			
-			if (!U.isNullEmpty(organization.getAncestry())) {
+			if (!U.isNullEmpty(organization, organization.getAncestry())) {
 				String[] ancestors = organization.getAncestry().trim().split("/");
 				
 				for(String ancestor : ancestors) {

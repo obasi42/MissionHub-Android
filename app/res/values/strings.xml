@@ -63,6 +63,7 @@
     <string name="contact_label_gender">Gender</string>
     <string name="contact_label_links">Links</string>
     <string name="contact_label_address">Address</string>
+    <string name="contact_label_labels">Labels</string>
     <string name="contact_surveys_no_key">Unknown Keyword</string>
     <string name="contact_surveys_no_q">Unknown Question</string>
     <string name="contact_surveys_no_a">Not answered</string>
@@ -146,12 +147,13 @@
     <string name="status_completed">Completed</string>
     <string name="status_do_not_contact">Do Not Contact</string>
 
-    <!-- Roles -->
+    <!-- Roles (Labels) -->
     <string name="role_admin">Admin</string>
     <string name="role_contact">Contact</string>
     <string name="role_involved">Involved</string>
     <string name="role_leader">Leader</string>
     <string name="role_alumni">Alumni</string>
+    <string name="role_sent">100% Sent</string>
 
     <!-- Genders -->
     <string name="gender_male">Male</string>
@@ -161,15 +163,6 @@
     <string name="rejoicable_christ">Prayed To Receive Christ</string>
     <string name="rejoicable_gospel">Gospel Presentation</string>
     <string name="rejoicable_convo">Spiritual Conversation</string>
-
-    <!-- Roles -->
-    <string name="role_admin">Admin</string>
-    <string name="role_admin_hint">Access all options in this organization.</string>
-    <string name="role_contact">Contact</string>
-    <string name="role_involved">Involved</string>
-    <string name="role_leader">Leader</string>
-    <string name="role_alumni">Alumni</string>
-    <string name="role_sent">100% Sent</string>
 
     <!-- Add Contact Dialog -->
     <string name="add_contact_title">Add Contact</string>

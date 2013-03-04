@@ -137,8 +137,8 @@ public class EditContactDialogFragment extends BaseDialogFragment {
         final AlertDialog.Builder builder = new AlertDialog.Builder(getSupportActivity());
         builder.setTitle(R.string.action_add_contact);
         builder.setView(view);
+        builder.setButtonBehavior(0);
         builder.setOnCancelListener(this);
-
         builder.setPositiveButton(R.string.action_save, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {

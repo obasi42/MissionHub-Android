@@ -3,6 +3,7 @@ package com.missionhub.fragment;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.View;
@@ -27,56 +28,27 @@ import com.missionhub.fragment.dialog.ContactAssignmentDialogFragment;
 import com.missionhub.fragment.dialog.ContactLabelsDialogFragment;
 import com.missionhub.fragment.dialog.EditContactDialogFragment;
 import com.missionhub.model.Person;
+import com.missionhub.ui.widget.LockedViewPager;
 import com.missionhub.util.U;
 import com.missionhub.util.U.FollowupStatus;
 import org.holoeverywhere.LayoutInflater;
 
 import java.util.EnumSet;
 
-public class MyContactsFragment extends MainFragment implements OnPageChangeListener, ContactListFragmentListener, ActionMode.Callback {
+public class MyContactsFragment extends ContactListMainFragment implements OnPageChangeListener {
 
-    /**
-     * the view pager
-     */
-    private ViewPager mPager;
-
-    /**
-     * the view pager adapter
-     */
+    private LockedViewPager mPager;
+    private PagerTabStrip mTabStrip;
     private FragmentStatePagerAdapter mAdapter;
 
-    /**
-     * the all contacts fragment
-     */
     private MyAllContactsFragment mAll;
-
-    /**
-     * the in-progress contacts fragment
-     */
+    private ApiContactListProvider mAllProvider;
     private MyInProgressContactsFragment mInProgress;
-
-    /**
-     * the completed contacts fragment
-     */
+    private ApiContactListProvider mInProgressProvider;
     private MyCompletedContactsFragment mCompleted;
+    private ApiContactListProvider mCompletedProvider;
 
-    /**
-     * the current pager page
-     */
     private int mPage = 1;
-
-    /**
-     * the refresh menu item
-     */
-    private MenuItem mRefreshItem;
-
-    private ImageView mRefreshingView;
-
-    private ActionMode mActionMode;
-
-    public static int REQUEST_ASSIGNMENT = 1;
-    public static int REQUEST_LABELS = 2;
-    public static int REQUEST_EDIT_CONTACT = 3;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -126,8 +98,7 @@ public class MyContactsFragment extends MainFragment implements OnPageChangeList
     }
 
     @Override
-    public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
-        mRefreshingView = (ImageView) inflater.inflate(R.layout.refresh_icon, null);
+    public View onCreateView(final LayoutInflater inflater, final Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_my_contacts, null);
     }
 
@@ -135,8 +106,10 @@ public class MyContactsFragment extends MainFragment implements OnPageChangeList
     public void onViewCreated(final View view) {
         super.onViewCreated(view);
 
-        mPager = (ViewPager) view.findViewById(R.id.pager);
+        mPager = (LockedViewPager) view.findViewById(R.id.pager);
+        mTabStrip = (PagerTabStrip) view.findViewById(R.id.pager_title_strip);
 
+        mPager.setPagingLocked(false);
         mPager.setOffscreenPageLimit(2);
         mPager.setOnPageChangeListener(this);
         mPager.setAdapter(mAdapter);
@@ -146,12 +119,7 @@ public class MyContactsFragment extends MainFragment implements OnPageChangeList
     @Override
     public void onCreateOptionsMenu(final Menu menu, final MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-
-        menu.add(Menu.NONE, R.id.action_add_contact, Menu.NONE, R.string.action_add_contact).setIcon(R.drawable.ic_action_add_contact)
-                .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
-
-        mRefreshItem = menu.add(Menu.NONE, R.id.action_refresh, Menu.NONE, R.string.action_refresh).setIcon(R.drawable.ic_action_refresh)
-                .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+        getSearchHelper().getSearchView().setQueryHint("Search My Contacts...");
     }
 
     @Override
@@ -162,18 +130,19 @@ public class MyContactsFragment extends MainFragment implements OnPageChangeList
         getSupportActivity().getSupportActionBar().setTitle(R.string.my_contacts_title);
     }
 
-    public static class MyAllContactsFragment extends ContactListFragment {
+    public class MyAllContactsFragment extends ContactListFragment {
         @Override
         public ContactListProvider onCreateContactProvider() {
             final PersonListOptions options = PersonListOptions.builder() //
                     .assignedTo(Session.getInstance().getPersonId()) //
                     .build();
 
-            return new ApiContactListProvider(getSupportActivity(), options, false);
+            mAllProvider = new ApiContactListProvider(getSupportActivity(), options, false);
+            return mAllProvider;
         }
     }
 
-    public static class MyInProgressContactsFragment extends ContactListFragment {
+    public class MyInProgressContactsFragment extends ContactListFragment {
         @Override
         public ContactListProvider onCreateContactProvider() {
             final PersonListOptions options = PersonListOptions.builder() //
@@ -181,11 +150,12 @@ public class MyContactsFragment extends MainFragment implements OnPageChangeList
                     .followupStatus(EnumSet.of(FollowupStatus.uncontacted, FollowupStatus.attempted_contact, FollowupStatus.contacted)) //
                     .build();
 
-            return new ApiContactListProvider(getSupportActivity(), options);
+            mInProgressProvider = new ApiContactListProvider(getSupportActivity(), options);
+            return mInProgressProvider;
         }
     }
 
-    public static class MyCompletedContactsFragment extends ContactListFragment {
+    public class MyCompletedContactsFragment extends ContactListFragment {
         @Override
         public ContactListProvider onCreateContactProvider() {
             final PersonListOptions options = PersonListOptions.builder() //
@@ -193,28 +163,8 @@ public class MyContactsFragment extends MainFragment implements OnPageChangeList
                     .followupStatus(FollowupStatus.completed) //
                     .build();
 
-            return new ApiContactListProvider(getSupportActivity(), options, false);
-        }
-    }
-
-    /**
-     * Updates the refresh icon based on the tasks
-     */
-    public void updateRefreshIcon() {
-        if (mRefreshItem == null || mRefreshingView == null) return;
-
-        final ContactListFragment fragment = getCurrentFragment();
-
-        if (fragment == null || !fragment.isVisible()) return;
-
-        if (fragment.isWorking()) {
-            final Animation rotation = AnimationUtils.loadAnimation(getSupportActivity(), R.anim.clockwise_refresh);
-            rotation.setRepeatCount(Animation.INFINITE);
-            mRefreshingView.startAnimation(rotation);
-            mRefreshItem.setActionView(mRefreshingView);
-        } else {
-            mRefreshingView.clearAnimation();
-            mRefreshItem.setActionView(null);
+            mCompletedProvider = new ApiContactListProvider(getSupportActivity(), options, false);
+            return mCompletedProvider;
         }
     }
 
@@ -224,7 +174,7 @@ public class MyContactsFragment extends MainFragment implements OnPageChangeList
 
     @Override
     public void onPageScrolled(final int position, final float positionOffset, final int positionOffsetPixels) {
-        final ContactListFragment fragment = getCurrentFragment();
+        final ContactListFragment fragment = getContactListFragment();
         if (fragment != null) {
             ((ApiContactListProvider) fragment.getProvider()).start();
             fragment.clearChecked();
@@ -239,23 +189,7 @@ public class MyContactsFragment extends MainFragment implements OnPageChangeList
     }
 
     @Override
-    public boolean onOptionsItemSelected(final MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_refresh:
-                final ContactListFragment fragment = getCurrentFragment();
-                if (fragment != null) {
-                    fragment.reload();
-                    return true;
-                }
-                break;
-            case R.id.action_add_contact:
-                EditContactDialogFragment.showForResult(getChildFragmentManager(), true, REQUEST_EDIT_CONTACT);
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    public ContactListFragment getCurrentFragment() {
+    public ContactListFragment getContactListFragment() {
         switch (mPage) {
             case 0:
                 return mAll;
@@ -267,183 +201,33 @@ public class MyContactsFragment extends MainFragment implements OnPageChangeList
         return null;
     }
 
-    // /** the search menu item helper */
-    // private SearchMenuItemHelper mSearchMenuItemHelper;
-    //
-    // /** the contact list options provider */
-    // ContactListOptionsProvider mProvider;
-    //
-    // /** the provider for search results */
-    // ContactListOptionsProvider mSearchProvider;
-    //
-    // /** the contact list options */
-    // ContactListOptions mOptions = new ContactListOptions();
-    //
-    // @Override
-    // public void onCreate(final Bundle savedInstanceState) {
-    // super.onCreate(savedInstanceState);
-    //
-    // if (savedInstanceState != null) {
-    // mProvider = (ContactListOptionsProvider)
-    // ObjectStore.getInstance().retrieveObject(savedInstanceState.getString("mProvider"));
-    // mSearchProvider = (ContactListOptionsProvider)
-    // ObjectStore.getInstance().retrieveObject(savedInstanceState.getString("mSearchProvider"));
-    // }
-    //
-    // setHasOptionsMenu(true);
-    // }
-    //
-    // @Override
-    // public void onAttach(final Activity activity) {
-    // super.onAttach(activity);
-    //
-    // mSearchMenuItemHelper = new SearchMenuItemHelper(this);
-    // mSearchMenuItemHelper.setListener(this);
-    // }
-    //
-    // @Override
-    // public void onActivityCreated(Bundle savedInstanceState) {
-    // super.onActivityCreated(savedInstanceState);
-    //
-    // if (mSearchMenuItemHelper != null) mSearchMenuItemHelper.onRestoreInstanceState(savedInstanceState);
-    // }
-    //
-    // @Override
-    // public void onCreateOptionsMenu(final Menu menu, final MenuInflater inflater) {
-    // super.onCreateOptionsMenu(menu, inflater);
-    //
-    // mSearchMenuItemHelper.onCreateOptionsMenu(menu, inflater);
-    // }
-    //
-    // @Override
-    // public ContactListProvider onCreateProvider() {
-    // if (mProvider == null)
-    // mProvider = new ContactListOptionsProvider(mOptions);
-    //
-    // if (mSearchProvider == null)
-    // mSearchProvider = new ContactListOptionsProvider();
-    //
-    // return mProvider;
-    // }
-    //
-    // @Override
-    // public void onSearchTextChange(final String query) {
-    // if (query.length() == 0) {
-    // setProvider(mProvider);
-    // } else {
-    // final ContactListOptions options = new ContactListOptions();
-    // options.addFilter("name", query);
-    // mSearchProvider.setOptions(options);
-    // setProvider(mSearchProvider);
-    // }
-    // }
-    //
-    // @Override
-    // public void onSearchSubmit(final String query) {
-    // onSearchTextChange(query);
-    // }
-    //
-    // @Override
-    // public void onSaveInstanceState(Bundle outState) {
-    // super.onSaveInstanceState(outState);
-    //
-    // outState.putString("mProvider", ObjectStore.getInstance().storeObject(mProvider, this));
-    // outState.putString("mSearchProvider", ObjectStore.getInstance().storeObject(mSearchProvider, this));
-    //
-    // if (mSearchMenuItemHelper != null) mSearchMenuItemHelper.onSaveInstanceState(outState);
-    // }
-
-    @Override
-    public void onContactListProviderException(final ContactListFragment fragment, final Exception exception) {
-        final ExceptionHelper ex = new ExceptionHelper(getSupportActivity(), exception);
-        ex.makeToast();
-    }
-
-    @Override
-    public void onWorkingChanged(final ContactListFragment fragment, final boolean working) {
-        updateRefreshIcon();
-
-    }
-
-    @Override
-    public boolean onContactLongClick(final ContactListFragment fragment, final Person person, final int position, final long id) {
-        return false;
-    }
-
-    @Override
-    public void onContactClick(final ContactListFragment fragment, final Person person, final int position, final long id) {
-        ContactActivity.start(getSupportActivity(), person);
-    }
-
-    @Override
-    public void onContactChecked(final ContactListFragment fragment, final Person person, final int position, final boolean checked) {
-        if (mActionMode == null && checked == true) {
-            mActionMode = getSupportActivity().startActionMode(this);
+    private ApiContactListProvider getCurrentProvider() {
+        switch (mPage) {
+            case 0:
+                return mAllProvider;
+            case 1:
+                return mInProgressProvider;
+            case 2:
+                return mCompletedProvider;
         }
+        return null;
     }
 
     @Override
-    public void onAllContactsUnchecked(final ContactListFragment fragment) {
-        finishActionMode();
-    }
+    public void onSearchTextChange(final String query) {
+        if (query.length() == 0) {
+            getContactListFragment().setProvider(getCurrentProvider());
+            mPager.setPagingLocked(false);
+            mTabStrip.setVisibility(View.VISIBLE);
+        } else {
+            mPager.setPagingLocked(true);
+            mTabStrip.setVisibility(View.GONE);
 
-    @Override
-    public boolean onCreateActionMode(final ActionMode mode, final Menu menu) {
-        menu.add(Menu.NONE, R.id.action_assign, Menu.NONE, R.string.action_assign).setIcon(R.drawable.ic_action_assign)
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
-        menu.add(Menu.NONE, R.id.action_label, Menu.NONE, R.string.action_label).setIcon(R.drawable.ic_action_label)
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
-        return true;
-    }
-
-    @Override
-    public boolean onPrepareActionMode(final ActionMode mode, final Menu menu) {
-        return false;
-    }
-
-    @Override
-    public boolean onActionItemClicked(final ActionMode mode, final MenuItem item) {
-        if (item.getItemId() == R.id.action_assign) {
-            ContactAssignmentDialogFragment.showForResult(getChildFragmentManager(), getCurrentFragment().getCheckedPeople(), REQUEST_ASSIGNMENT);
-        }
-        if (item.getItemId() == R.id.action_label) {
-            ContactLabelsDialogFragment.showForResult(getChildFragmentManager(), getCurrentFragment().getCheckedPeople(), REQUEST_LABELS);
-        }
-        return true;
-    }
-
-    @Override
-    public void onDestroyActionMode(final ActionMode mode) {
-        if (getCurrentFragment().getCheckedItemCount() > 0) {
-            getCurrentFragment().clearChecked();
-        }
-        mActionMode = null;
-    }
-
-    @Override
-    public boolean onFragmentResult(int requestCode, int resultCode, Object data) {
-        if (requestCode == REQUEST_EDIT_CONTACT && resultCode == RESULT_OK) {
-            if (data != null && data instanceof Person) {
-                ContactActivity.start(getSupportActivity(), (Person) data);
-                mAll.reload();
-                mInProgress.reload();
-                return true;
-            }
-        } else if (requestCode == REQUEST_ASSIGNMENT && resultCode == RESULT_OK) {
-            getCurrentFragment().reload();
-            finishActionMode();
-            return true;
-        } else if (requestCode == REQUEST_LABELS && resultCode == RESULT_OK) {
-            getCurrentFragment().reload();
-            finishActionMode();
-            return true;
-        }
-        return super.onFragmentResult(requestCode, resultCode, data);
-    }
-
-    private void finishActionMode() {
-        if (mActionMode != null) {
-            mActionMode.finish();
+            PersonListOptions options = mAllProvider.getOptions();
+            options.addFilter("name_or_email_like", query);
+            ApiContactListProvider searchProvider = new ApiContactListProvider(getSupportActivity(), options);
+            getContactListFragment().setProvider(searchProvider);
+            searchProvider.reload();
         }
     }
 

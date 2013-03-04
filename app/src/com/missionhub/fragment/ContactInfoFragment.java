@@ -3,6 +3,7 @@ package com.missionhub.fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -20,6 +21,7 @@ import com.missionhub.application.DrawableCache;
 import com.missionhub.application.Session;
 import com.missionhub.exception.ExceptionHelper;
 import com.missionhub.fragment.dialog.ContactAssignmentDialogFragment;
+import com.missionhub.fragment.dialog.ContactLabelsDialogFragment;
 import com.missionhub.fragment.dialog.FragmentResult;
 import com.missionhub.model.*;
 import com.missionhub.model.gson.GFollowupComment;
@@ -201,6 +203,11 @@ public class ContactInfoFragment extends BaseFragment {
     private View mInfoAddress;
 
     /**
+     * The labels layout
+     */
+    private LinearLayout mInfoLabels;
+
+    /**
      * the links section
      */
     private View mInfoLinks;
@@ -285,6 +292,7 @@ public class ContactInfoFragment extends BaseFragment {
         mInfoGender = view.findViewById(R.id.gender);
         mInfoBirthday = view.findViewById(R.id.birthday);
         mInfoAddress = view.findViewById(R.id.address);
+        mInfoLabels = (LinearLayout) view.findViewById(R.id.labels);
         mInfoLinks = view.findViewById(R.id.links);
         mInfoFacebook = view.findViewById(R.id.facebook);
 
@@ -569,8 +577,9 @@ public class ContactInfoFragment extends BaseFragment {
         final Date birthdate = mPerson.getBirth_date();
         final Address address = mPerson.getCurrentAddress();
         final Long fbUid = mPerson.getFb_uid();
+        final List<Long> labels = mPerson.getLables(Session.getInstance().getOrganizationId());
 
-        if (gender != null || birthdate != null || address != null || fbUid != null) {
+        if (gender != null || birthdate != null || address != null || fbUid != null || !labels.isEmpty()) {
 
             if (gender != null || birthdate != null || (address != null && address.isComplete())) {
                 if (gender != null) {
@@ -606,6 +615,30 @@ public class ContactInfoFragment extends BaseFragment {
                 mHeaderPersonalInfo.setVisibility(View.VISIBLE);
             } else {
                 mHeaderPersonalInfo.setVisibility(View.GONE);
+            }
+
+            if (!labels.isEmpty()) {
+                LinearLayout holder = (LinearLayout) mInfoLabels.findViewById(R.id.labels_holder);
+                holder.removeAllViews();
+
+                List<Role> roles = Application.getDb().getRoleDao().queryBuilder().where(RoleDao.Properties.Id.in(labels)).list();
+                for(Role role : roles) {
+                    if (role != null) {
+                        View view = getLayoutInflater().inflate(R.layout.item_contact_info_labels);
+                        TextView labelText = (TextView) view.findViewById(R.id.text);
+                        labelText.setText(role.getTranslatedName());
+                        holder.addView(view);
+                    }
+                }
+                mInfoLabels.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ContactLabelsDialogFragment.showForResult(getChildFragmentManager(), mPerson, REQUEST_LABELS);
+                    }
+                });
+                mInfoLabels.setVisibility(View.VISIBLE);
+            } else {
+                mInfoLabels.setVisibility(View.GONE);
             }
 
             if (fbUid != null) {
@@ -1182,6 +1215,10 @@ public class ContactInfoFragment extends BaseFragment {
     public boolean onFragmentResult(int requestCode, int resultCode, Object data) {
         if (requestCode == REQUEST_ASSIGNMENT && resultCode == FragmentResult.RESULT_OK) {
             mPerson.resetContactAssignments();
+            notifyPersonUpdated();
+            return true;
+        } else if (requestCode == REQUEST_LABELS && requestCode == FragmentResult.RESULT_OK) {
+            mPerson.resetLabels();
             notifyPersonUpdated();
             return true;
         }

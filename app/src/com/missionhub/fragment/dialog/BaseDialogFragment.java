@@ -33,6 +33,7 @@ public class BaseDialogFragment extends DialogFragment implements FragmentResult
             mResultCode = RESULT_OK;
         }
         super.onDismiss(dialog);
+        onClose();
     }
 
     @Override
@@ -57,8 +58,7 @@ public class BaseDialogFragment extends DialogFragment implements FragmentResult
         super.onDestroyView();
     }
 
-    @Override
-    public synchronized void onDestroy() {
+    private void onClose() {
         if (mRequestCode != Integer.MIN_VALUE) {
             try {
                 Fragment fragment = getParentFragment();
@@ -79,7 +79,6 @@ public class BaseDialogFragment extends DialogFragment implements FragmentResult
                 // result of ui spam
             }
         }
-        super.onDestroy();
     }
 
     public void setResult(int code) {
@@ -108,6 +107,9 @@ public class BaseDialogFragment extends DialogFragment implements FragmentResult
     protected static <T extends BaseDialogFragment> T show(Class<T> clazz, FragmentManager fm, Bundle args, Integer requestCode) {
         T fragment = findInstance(fm, clazz, true);
         try {
+            if (requestCode > 0) {
+                args.putInt("requestCode", requestCode);
+            }
             fragment.setArguments(args);
         } catch (Exception e) {
             // result of ui spam

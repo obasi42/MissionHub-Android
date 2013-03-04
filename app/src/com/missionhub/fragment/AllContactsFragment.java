@@ -13,6 +13,7 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.missionhub.R;
 import com.missionhub.activity.ContactActivity;
+import com.missionhub.api.ContactListOptions;
 import com.missionhub.api.PersonListOptions;
 import com.missionhub.contactlist.ApiContactListProvider;
 import com.missionhub.contactlist.ContactListFragment;
@@ -26,43 +27,13 @@ import com.missionhub.model.Person;
 import com.missionhub.util.U;
 import org.holoeverywhere.LayoutInflater;
 
-public class AllContactsFragment extends MainFragment implements ContactListFragmentListener, ActionMode.Callback {
+public class AllContactsFragment extends ContactListMainFragment {
 
-    /**
-     * the contact list fragment
-     */
     ContactListFragment mFragment;
-
-    /**
-     * the refresh menu item
-     */
-    private MenuItem mRefreshItem;
-
-    /**
-     * view to set as action view while refreshing
-     */
-    private ImageView mRefreshingView;
-
-    /**
-     * the action mode
-     */
-    private ActionMode mActionMode;
-
-    public static int REQUEST_ASSIGNMENT = 1;
-    public static int REQUEST_LABELS = 2;
-    public static int REQUEST_EDIT_CONTACT = 3;
+    ApiContactListProvider mProvider;
 
     @Override
-    public void onCreate(final Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-        if (!U.superGetRetainInstance(this)) {
-            setRetainInstance(true);
-        }
-    }
-
-    @Override
-    public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
+    public View onCreateView(final LayoutInflater inflater, final Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.content_frame, null);
 
         if (mFragment == null) {
@@ -71,54 +42,18 @@ public class AllContactsFragment extends MainFragment implements ContactListFrag
             getChildFragmentManager().beginTransaction().add(R.id.content_frame, mFragment).commit();
         }
 
-        // create the refreshing actionbar view
-        mRefreshingView = (ImageView) inflater.inflate(R.layout.refresh_icon, null);
-
         return view;
     }
 
     @Override
     public void onCreateOptionsMenu(final Menu menu, final MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-
-        menu.add(Menu.NONE, R.id.action_add_contact, Menu.NONE, R.string.action_add_contact).setIcon(R.drawable.ic_action_add_contact)
-                .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
-
-        mRefreshItem = menu.add(Menu.NONE, R.id.action_refresh, Menu.NONE, R.string.action_refresh).setIcon(R.drawable.ic_action_refresh)
-                .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+        getSearchHelper().getSearchView().setQueryHint("Search All Contacts...");
     }
 
     @Override
-    public boolean onOptionsItemSelected(final MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_refresh:
-                if (mFragment != null) {
-                    mFragment.reload();
-                    return true;
-                }
-                break;
-            case R.id.action_add_contact:
-                EditContactDialogFragment.showForResult(getChildFragmentManager(), false, REQUEST_EDIT_CONTACT);
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    /**
-     * Updates the refresh icon based on the tasks
-     */
-    public void updateRefreshIcon() {
-        if (mRefreshItem == null || mRefreshingView == null) return;
-
-        if (mFragment != null && mFragment.isWorking()) {
-            final Animation rotation = AnimationUtils.loadAnimation(getSupportActivity(), R.anim.clockwise_refresh);
-            rotation.setRepeatCount(Animation.INFINITE);
-            mRefreshingView.startAnimation(rotation);
-            mRefreshItem.setActionView(mRefreshingView);
-        } else {
-            mRefreshingView.clearAnimation();
-            mRefreshItem.setActionView(null);
-        }
+    public ContactListFragment getContactListFragment() {
+        return mFragment;
     }
 
     @Override
@@ -129,103 +64,27 @@ public class AllContactsFragment extends MainFragment implements ContactListFrag
         getSupportActivity().getSupportActionBar().setTitle("All Contacts");
     }
 
-    public static class AllContactsFragmentFragment extends ContactListFragment {
+    public class AllContactsFragmentFragment extends ContactListFragment {
         @Override
         public ContactListProvider onCreateContactProvider() {
             final PersonListOptions options = PersonListOptions.builder().build();
 
-            return new ApiContactListProvider(getSupportActivity(), options);
+            mProvider = new ApiContactListProvider(getSupportActivity(), options);
+            return mProvider;
         }
     }
 
     @Override
-    public void onContactListProviderException(final ContactListFragment fragment, final Exception exception) {
-        final ExceptionHelper ex = new ExceptionHelper(getSupportActivity(), exception);
-        ex.makeToast();
-    }
-
-    @Override
-    public void onWorkingChanged(final ContactListFragment fragment, final boolean working) {
-        updateRefreshIcon();
-    }
-
-    @Override
-    public boolean onContactLongClick(final ContactListFragment fragment, final Person person, final int position, final long id) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public void onContactClick(final ContactListFragment fragment, final Person person, final int position, final long id) {
-        ContactActivity.start(getSupportActivity(), person);
-    }
-
-    @Override
-    public void onContactChecked(final ContactListFragment fragment, final Person person, final int position, final boolean checked) {
-        if (mActionMode == null && checked) {
-            mActionMode = getSupportActivity().startActionMode(this);
+    public void onSearchTextChange(final String query) {
+        if (query.length() == 0) {
+            getContactListFragment().setProvider(mProvider);
+        } else {
+            PersonListOptions options = mProvider.getOptions();
+            options.addFilter("name_or_email_like", query);
+            ApiContactListProvider searchProvider = new ApiContactListProvider(getSupportActivity(), options);
+            getContactListFragment().setProvider(searchProvider);
+            searchProvider.reload();
         }
     }
 
-    @Override
-    public void onAllContactsUnchecked(final ContactListFragment fragment) {
-        if (mActionMode != null) {
-            mActionMode.finish();
-            mActionMode = null;
-        }
-    }
-
-    @Override
-    public boolean onCreateActionMode(final ActionMode mode, final Menu menu) {
-        menu.add(Menu.NONE, R.id.action_assign, Menu.NONE, R.string.action_assign).setIcon(R.drawable.ic_action_assign)
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
-        return true;
-
-    }
-
-    @Override
-    public boolean onPrepareActionMode(final ActionMode mode, final Menu menu) {
-        return false;
-    }
-
-    @Override
-    public boolean onActionItemClicked(final ActionMode mode, final MenuItem item) {
-        if (item.getItemId() == R.id.action_assign) {
-            ContactAssignmentDialogFragment.showForResult(getChildFragmentManager(), mFragment.getCheckedPeople(), REQUEST_ASSIGNMENT);
-        }
-        if (item.getItemId() == R.id.action_label) {
-            ContactLabelsDialogFragment.showForResult(getChildFragmentManager(), mFragment.getCheckedPeople(), REQUEST_LABELS);
-        }
-        mode.finish();
-        return true;
-    }
-
-    @Override
-    public void onDestroyActionMode(final ActionMode mode) {
-        final Handler handler = new Handler();
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                mFragment.clearChecked();
-            }
-        });
-    }
-
-    @Override
-    public boolean onFragmentResult(int requestCode, int resultCode, Object data) {
-        if (requestCode == REQUEST_EDIT_CONTACT && resultCode == RESULT_OK) {
-            if (data != null && data instanceof Person) {
-                ContactActivity.start(getSupportActivity(), (Person) data);
-                mFragment.reload();
-                return true;
-            }
-        } else if (requestCode == REQUEST_ASSIGNMENT && resultCode == RESULT_OK) {
-            mFragment.reload();
-            return true;
-        } else if (requestCode == REQUEST_LABELS && resultCode == RESULT_OK) {
-            mFragment.reload();
-            return true;
-        }
-        return super.onFragmentResult(requestCode, resultCode, data);
-    }
 }

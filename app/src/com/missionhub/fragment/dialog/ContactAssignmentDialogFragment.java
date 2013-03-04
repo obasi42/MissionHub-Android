@@ -737,12 +737,12 @@ public class ContactAssignmentDialogFragment extends RefreshableDialogFragment i
 
     @Override
     public void onDestroy() {
+        super.onDestroy();
         try {
             mRefreshLeadersTask.cancel(true);
         } catch (final Exception e) {
             /* ignore */
         }
-        super.onDestroy();
     }
 
     private void updateRefreshIcon() {

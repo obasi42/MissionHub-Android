@@ -144,10 +144,10 @@ public class ContactLabelsDialogFragment extends RefreshableDialogFragment imple
         builder.setNeutralButton("Cancel", new OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
+                cancel();
             }
         });
-        builder.setBlockDismiss(true);
+        builder.setButtonBehavior(0);
 
         updateState();
 
@@ -450,11 +450,11 @@ public class ContactLabelsDialogFragment extends RefreshableDialogFragment imple
 
     @Override
     public void onDestroy() {
+        super.onDestroy();
         try {
             mRefreshTask.cancel(true);
         } catch (final Exception e) {
             /* ignore */
         }
-        super.onDestroy();
     }
 }

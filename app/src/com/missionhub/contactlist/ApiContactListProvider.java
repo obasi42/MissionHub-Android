@@ -4,6 +4,7 @@ import android.content.Context;
 import com.missionhub.api.Api;
 import com.missionhub.api.Api.Include;
 import com.missionhub.api.ApiOptions;
+import com.missionhub.api.ListOptions;
 import com.missionhub.api.PersonListOptions;
 import com.missionhub.model.Person;
 import com.missionhub.util.SafeAsyncTask;
@@ -78,7 +79,7 @@ public class ApiContactListProvider extends ContactListProvider {
 
     public PersonListOptions getOptions() {
         if (mOptions != null) {
-            return (PersonListOptions) mOptions.clone();
+            return new PersonListOptions((ListOptions) mOptions.clone());
         }
         return null;
     }

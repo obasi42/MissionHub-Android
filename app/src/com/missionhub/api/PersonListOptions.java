@@ -7,7 +7,7 @@ import java.util.Set;
 
 public class PersonListOptions extends ListOptions {
 
-    private PersonListOptions(final ListOptions filters) {
+    public PersonListOptions(final ListOptions filters) {
         super(filters);
     }
 
