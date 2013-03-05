@@ -2,20 +2,27 @@ package com.missionhub.application;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.util.Log;
+import com.missionhub.R;
 import com.missionhub.model.DaoMaster;
 import com.missionhub.model.DaoMaster.OpenHelper;
 import com.missionhub.model.DaoSession;
 import com.missionhub.model.MissionHubOpenHelper;
-import com.missionhub.util.ErrbitNotifier;
-import com.missionhub.util.facebook.FacebookImageDownloader;
-import com.nostra13.universalimageloader.cache.disc.impl.UnlimitedDiscCache;
-import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
+import com.nostra13.universalimageloader.cache.disc.impl.LimitedAgeDiscCache;
+import com.nostra13.universalimageloader.cache.memory.MemoryCacheAware;
+import com.nostra13.universalimageloader.cache.memory.impl.LRULimitedMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.nostra13.universalimageloader.utils.StorageUtils;
 import de.greenrobot.event.EventBus;
+import org.acra.ACRA;
+import org.acra.ACRAConfiguration;
+import org.acra.ACRAConfigurationException;
+import org.acra.ReportingInteractionMode;
+import org.acra.annotation.ReportsCrashes;
 import org.holoeverywhere.widget.Toast;
 
 import java.util.concurrent.ExecutorService;
@@ -24,6 +31,7 @@ import java.util.concurrent.Executors;
 /**
  * The MissionHub application context
  */
+@ReportsCrashes(formKey = "")
 public class Application extends org.holoeverywhere.app.Application {
 
     /**
@@ -64,23 +72,53 @@ public class Application extends org.holoeverywhere.app.Application {
         super.onCreate();
         sApplication = this;
 
-        // register the errbit notifier
-        ErrbitNotifier.register();
+        if (Configuration.isACRAEnabled()) {
+            try {
+                ACRAConfiguration config = ACRA.getConfig();
+                config.setFormKey(Configuration.getACRAFormKey());
+                config.setResToastText(R.string.crash_dialog_title);
+                config.setResDialogCommentPrompt(R.string.crash_dialog_comment_prompt);
+                config.setResDialogText(R.string.crash_dialog_text);
+                config.setResDialogTitle(R.string.crash_dialog_title);
+                config.setResDialogIcon(R.drawable.ic_launcher);
+                config.setResDialogOkToast(R.string.crash_dialog_ok_toast);
+                config.setMode(ReportingInteractionMode.DIALOG);
+                ACRA.init(this);
+            } catch (ACRAConfigurationException e) {
+                Log.e("MissionHub", e.getMessage(), e);
+            }
+        }
 
         // set the last last version id for future upgrades
         SettingsManager.setApplicationLastVersionId(getVersionCode());
 
         // setup the image loader
-        final DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder().cacheInMemory().cacheOnDisc().build();
-
-        final ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(Application.getContext()).threadPriority(Thread.NORM_PRIORITY - 2).memoryCacheSize(10 * 1024 * 1024)
-                .defaultDisplayImageOptions(defaultOptions).discCacheFileNameGenerator(new Md5FileNameGenerator())
-                .discCache(new UnlimitedDiscCache(StorageUtils.getOwnCacheDirectory(Application.getContext(), ".missionhub/cache"))).tasksProcessingOrder(QueueProcessingType.LIFO)
-                .imageDownloader(new FacebookImageDownloader(this)).build();
-
-        ImageLoader.getInstance().init(config);
+        initImageLoader();
 
         registerEventSubscriber(this, ToastEvent.class);
+    }
+
+    private void initImageLoader() {
+        final DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
+                .cacheInMemory()
+                .cacheOnDisc()
+                .build();
+
+        int memoryCacheSize = (int) (Runtime.getRuntime().maxMemory() / 8);
+        MemoryCacheAware<String, Bitmap> memoryCache = new LRULimitedMemoryCache(memoryCacheSize);
+
+        LimitedAgeDiscCache diskCache = new LimitedAgeDiscCache(StorageUtils.getCacheDirectory(this), 60 * 60 * 24 * 3);
+
+        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this)
+                .defaultDisplayImageOptions(defaultOptions)
+                .discCache(diskCache)
+                .memoryCache(memoryCache)
+                .threadPoolSize(3)
+                .threadPriority(Thread.NORM_PRIORITY - 2)
+                .tasksProcessingOrder(QueueProcessingType.LIFO)
+                .build();
+
+        ImageLoader.getInstance().init(config);
     }
 
     /**

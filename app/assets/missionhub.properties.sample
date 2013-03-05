@@ -17,18 +17,13 @@ OAUTH_CLIENT_ID=
 OAUTH_CLIENT_SECRET=
 OAUTH_SCOPE=userinfo,contacts,contact_assignment,followup_comments,roles,organization_info,groups,communication
 
-# caching
-CACHE_FILE_ENABLED=true
-CACHE_FILE_SIZE=10m
-
 # google analytics
 ANALYTICS_ENABLED=false
-ANALYTICS_KEY=UA-325725-21
+ANALYTICS_KEY=UA-
 ANALYTICS_DEBUG=true
 ANALYTICS_DRY_RUN=true
 ANAYLTICS_ANONYMIZE_IP=false
 
-# errbit notifier
-ERRBIT_ENABLED=false
-ERRBIT_API_URL=
-ERRBIT_API_KEY=
+# android crash reporter
+ACRA_ENABLED=false
+ACRA_FORM_KEY=

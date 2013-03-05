@@ -24,6 +24,7 @@ import com.missionhub.exception.ExceptionHelper;
 import com.missionhub.fragment.BaseFragment;
 import com.missionhub.model.*;
 import com.missionhub.model.gson.GContactAssignment;
+import com.missionhub.ui.AnimateOnceImageLoadingListener;
 import com.missionhub.ui.ObjectArrayAdapter;
 import com.missionhub.ui.widget.LockedViewPager;
 import com.missionhub.util.SafeAsyncTask;
@@ -32,6 +33,7 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.PauseOnScrollListener;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
+import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
 import org.holoeverywhere.LayoutInflater;
 import org.holoeverywhere.app.Activity;
 import org.holoeverywhere.app.Fragment;
@@ -280,13 +282,15 @@ public class ContactAssignmentDialogFragment extends RefreshableDialogFragment i
 
     public static class ContactAssignmentAdapter extends ObjectArrayAdapter {
 
+        final int mPicturePx = Math.round(U.dpToPixel(50));
         final DisplayImageOptions mImageLoaderOptions;
+        final AnimateOnceImageLoadingListener mImageLoadingListener;
 
         public ContactAssignmentAdapter(final Context context) {
             super(context);
 
-            mImageLoaderOptions = new DisplayImageOptions.Builder().displayer(new FadeInBitmapDisplayer(200)).showImageForEmptyUri(R.drawable.default_contact)
-                    .showStubImage(R.drawable.default_contact).cacheInMemory().cacheOnDisc().build();
+            mImageLoaderOptions = U.getContactImageDisplayOptions();
+            mImageLoadingListener = new AnimateOnceImageLoadingListener(250);
         }
 
         @Override
@@ -318,9 +322,8 @@ public class ContactAssignmentDialogFragment extends RefreshableDialogFragment i
                 final LeaderItem item = (LeaderItem) object;
                 holder.text1.setText(item.leader.getName());
 
-                if (!U.isNullEmpty(item.leader.getPicture())) {
-                    ImageLoader.getInstance().displayImage(item.leader.getPicture(), holder.icon, mImageLoaderOptions);
-                }
+                String url = U.getProfilePicture(item.leader, mPicturePx, mPicturePx);
+                ImageLoader.getInstance().displayImage(url, holder.icon, mImageLoaderOptions, mImageLoadingListener);
             } else if (object instanceof GroupItem) {
                 final GroupItem item = (GroupItem) object;
                 holder.text1.setText(item.group.getName());
@@ -337,9 +340,9 @@ public class ContactAssignmentDialogFragment extends RefreshableDialogFragment i
             } else if (object instanceof AssignMeItem) {
                 final AssignMeItem item = (AssignMeItem) object;
                 holder.text1.setText("Me");
-                if (!U.isNullEmpty(item.me.getPicture())) {
-                    ImageLoader.getInstance().displayImage(item.me.getPicture(), holder.icon, mImageLoaderOptions);
-                }
+
+                String url = U.getProfilePicture(item.me, mPicturePx, mPicturePx);
+                ImageLoader.getInstance().displayImage(url, holder.icon, mImageLoaderOptions, mImageLoadingListener);
             }
 
             return view;

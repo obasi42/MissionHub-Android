@@ -10,6 +10,7 @@ import com.missionhub.authenticator.Authenticator;
 import com.missionhub.exception.MissionHubException;
 import com.missionhub.model.Person;
 import com.missionhub.util.SafeAsyncTask;
+import org.acra.ACRA;
 import org.holoeverywhere.widget.Toast;
 
 import java.io.IOException;
@@ -286,6 +287,15 @@ public class Session implements OnAccountsUpdateListener {
                 mOrganizationId = SettingsManager.getSessionOrganizationId(mPersonId);
             } else {
                 mPersonId = -1;
+            }
+        }
+
+        if (Configuration.isACRAEnabled()) {
+            try {
+            ACRA.getErrorReporter().putCustomData("mPersonId", String.valueOf(mPersonId));
+            ACRA.getErrorReporter().putCustomData("mOrganizationId", String.valueOf(mOrganizationId));
+            } catch (Exception e) {
+                /* ignore */
             }
         }
 

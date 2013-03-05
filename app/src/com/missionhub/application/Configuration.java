@@ -51,6 +51,18 @@ public class Configuration {
         }
     }
 
+    public static boolean isACRAEnabled() {
+        return Boolean.parseBoolean(Configuration.getInstance().sProperties.getProperty("ACRA_ENABLED", "FALSE"));
+    }
+
+    public static String getACRAFormUri() {
+        return Configuration.getInstance().sProperties.getProperty("ACRA_FORM_URI", "");
+    }
+
+    public static String getACRAFormKey() {
+        return Configuration.getInstance().sProperties.getProperty("ACRA_FORM_KEY", "");
+    }
+
     public static enum Environment {
         DEVELOPMENT, TEST, PRODUCTION
     }

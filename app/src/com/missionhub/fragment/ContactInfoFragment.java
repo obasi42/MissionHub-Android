@@ -2,6 +2,7 @@ package com.missionhub.fragment;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -26,6 +27,7 @@ import com.missionhub.fragment.dialog.FragmentResult;
 import com.missionhub.model.*;
 import com.missionhub.model.gson.GFollowupComment;
 import com.missionhub.model.gson.GRejoicable;
+import com.missionhub.ui.AnimateOnceImageLoadingListener;
 import com.missionhub.ui.ObjectArrayAdapter;
 import com.missionhub.ui.ObjectArrayAdapter.SupportEnable;
 import com.missionhub.util.IntentHelper;
@@ -37,16 +39,14 @@ import com.missionhub.util.U.Gender;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.PauseOnScrollListener;
+import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 import org.holoeverywhere.LayoutInflater;
 import org.holoeverywhere.app.AlertDialog;
 import org.holoeverywhere.widget.*;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 public class ContactInfoFragment extends BaseFragment {
 
@@ -229,11 +229,13 @@ public class ContactInfoFragment extends BaseFragment {
     public static int REQUEST_LABELS = 2;
     public static int REQUEST_EDIT_CONTACT = 3;
 
+    private AnimateOnceImageLoadingListener mLoadingListener = new AnimateOnceImageLoadingListener(250);
+
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mImageLoaderOptions = new DisplayImageOptions.Builder().displayer(new FadeInBitmapDisplayer(200)).showImageForEmptyUri(R.drawable.default_contact).cacheInMemory().cacheOnDisc().build();
+        mImageLoaderOptions = U.getContactImageDisplayOptions();
     }
 
     @Override
@@ -446,14 +448,12 @@ public class ContactInfoFragment extends BaseFragment {
         }
 
         // avatar
-        if (!U.isNullEmpty(mPerson.getPicture())) {
-            if (mPerson.getPicture().contains("facebook.com") && !U.isNullEmpty(mPerson.getFb_uid())) {
-                ImageLoader.getInstance().displayImage("fb://" + mPerson.getFb_uid(), mHeaderAvatar, mImageLoaderOptions);
-            } else {
-                ImageLoader.getInstance().displayImage(mPerson.getPicture(), mHeaderAvatar, mImageLoaderOptions);
-            }
+        int px = Math.round(U.dpToPixel(128));
+        String picture = U.getProfilePicture(mPerson, px, px);
+        if (!U.isNullEmpty(picture)) {
+            ImageLoader.getInstance().displayImage(picture, mHeaderAvatar, mImageLoaderOptions, mLoadingListener);
         } else {
-            ImageLoader.getInstance().displayImage(null, mHeaderAvatar, mImageLoaderOptions);
+            mHeaderAvatar.setImageDrawable(DrawableCache.getDrawable(R.drawable.default_contact));
         }
 
         // calling/messaging
@@ -657,6 +657,8 @@ public class ContactInfoFragment extends BaseFragment {
      */
     private static class CommentArrayAdapter extends ObjectArrayAdapter {
 
+        private AnimateOnceImageLoadingListener mLoadingListener = new AnimateOnceImageLoadingListener(250);
+
         /**
          * time ago object to generate recent dates
          */
@@ -677,8 +679,7 @@ public class ContactInfoFragment extends BaseFragment {
         public CommentArrayAdapter(final Context context) {
             super(context);
 
-            mImageLoaderOptions = new DisplayImageOptions.Builder().displayer(new FadeInBitmapDisplayer(200)).showImageForEmptyUri(R.drawable.default_contact)
-                    .showStubImage(R.drawable.default_contact).cacheInMemory().cacheOnDisc().build();
+            mImageLoaderOptions = U.getContactImageDisplayOptions();
         }
 
         @Override
@@ -713,13 +714,18 @@ public class ContactInfoFragment extends BaseFragment {
 
                 if (i.comment != null) {
                     if (i.getCommenter() != null) {
-                        if (!U.isNullEmpty(i.getCommenter().getName())) {
+                        Person person = i.getCommenter();
+
+                        if (!U.isNullEmpty(person.getName())) {
                             holder.name.setText(i.getCommenter().getName());
                             holder.name.setVisibility(View.VISIBLE);
                         } else {
                             holder.name.setVisibility(View.GONE);
                         }
-                        ImageLoader.getInstance().displayImage(i.getCommenter().getPicture(), holder.avatar, mImageLoaderOptions);
+
+                        int px = Math.round(U.dpToPixel(40));
+                        String picture = U.getProfilePicture(person, px, px);
+                        ImageLoader.getInstance().displayImage(picture, holder.avatar, mImageLoaderOptions, mLoadingListener);
                     }
 
                     if (!U.isNullEmpty(i.comment.getUpdated_at())) {

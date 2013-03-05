@@ -11,6 +11,7 @@ import com.missionhub.R;
 import com.missionhub.application.Application;
 import com.missionhub.model.Person;
 import com.missionhub.model.gson.GRejoicable;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import org.holoeverywhere.app.Activity;
 
 import java.text.DateFormat;
@@ -423,5 +424,27 @@ public class U {
         }
 
         return new ArrayList<Person>(sorted.values());
+    }
+
+    public static String getProfilePicture(Person person, int width, int height) {
+        String url = person.getPicture();
+
+        if (url == null || url.contains("facebook.com") || url.contains("fbcdn.net")) {
+            if (!U.isNullEmpty(person.getFb_uid())) {
+                return "http://graph.facebook.com/" + person.getFb_uid() + "/picture?width=" + width + "&height=" + height;
+            }
+        }
+
+        return url;
+    }
+
+    public static DisplayImageOptions getContactImageDisplayOptions() {
+        return new DisplayImageOptions.Builder()
+                .cacheInMemory()
+                .cacheOnDisc()
+                .showImageForEmptyUri(R.drawable.default_contact)
+                .showImageOnFail(R.drawable.default_contact)
+                .showStubImage(R.drawable.default_contact)
+                .build();
     }
 }

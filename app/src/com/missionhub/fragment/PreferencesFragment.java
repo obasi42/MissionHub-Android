@@ -11,8 +11,10 @@ import com.missionhub.application.Session;
 import com.missionhub.application.Session.NoPersonException;
 import com.missionhub.application.Session.SessionOrganizationIdChanged;
 import com.missionhub.model.Organization;
+import com.missionhub.model.Person;
 import com.missionhub.ui.ObjectArrayAdapter;
 import com.missionhub.util.TreeDataStructure;
+import com.missionhub.util.U;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
@@ -80,11 +82,13 @@ public class PreferencesFragment extends BaseFragment {
         mOrganizations.setOnItemSelectedListener(new OrganizationSelectedListener());
 
         try {
-            mName.setText(Session.getInstance().getPerson().getName());
-            ImageLoader.getInstance().displayImage("fb://" + Session.getInstance().getPerson().getFb_uid(), mPicture, mImageLoaderOptions);
-            // TODO: set picture;
-        } catch (final NoPersonException e) { /* this should be impossible */}
+            final Person person = Session.getInstance().getPerson();
 
+            mName.setText(Session.getInstance().getPerson().getName());
+
+            String picture = U.getProfilePicture(person, 100, 100);
+            ImageLoader.getInstance().displayImage(picture, mPicture, mImageLoaderOptions);
+        } catch (final NoPersonException e) { /* this should be impossible */}
     }
 
     @Override

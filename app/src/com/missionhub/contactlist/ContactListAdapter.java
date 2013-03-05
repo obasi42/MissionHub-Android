@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import com.missionhub.R;
 import com.missionhub.application.DrawableCache;
 import com.missionhub.model.Person;
+import com.missionhub.ui.AnimateOnceImageLoadingListener;
 import com.missionhub.ui.ObjectArrayAdapter;
 import com.missionhub.util.U;
 import com.missionhub.util.U.Gender;
@@ -23,6 +24,10 @@ public class ContactListAdapter extends ObjectArrayAdapter {
 
     private final DisplayImageOptions mImageLoaderOptions;
 
+    private final AnimateOnceImageLoadingListener mImageLoaderListener;
+
+    private final int mAvatarSizePx = Math.round(U.dpToPixel(50));
+
     public ContactListAdapter(final Context context) {
         this(context, R.layout.item_contact);
     }
@@ -36,7 +41,8 @@ public class ContactListAdapter extends ObjectArrayAdapter {
         mContactItemLayout = contactItemLayout;
         mProgressItemLayout = progressItemLayout;
 
-        mImageLoaderOptions = new DisplayImageOptions.Builder().showImageForEmptyUri(R.drawable.default_contact).showStubImage(R.drawable.default_contact).cacheInMemory().cacheOnDisc().build();
+        mImageLoaderOptions = U.getContactImageDisplayOptions();
+        mImageLoaderListener = new AnimateOnceImageLoadingListener(250);
     }
 
     @Override
@@ -97,11 +103,8 @@ public class ContactListAdapter extends ObjectArrayAdapter {
             if (item.person != null) {
 
                 if (holder.avatar != null) {
-                    if (!U.isNullEmpty(item.person.getPicture())) {
-                        ImageLoader.getInstance().displayImage(item.person.getPicture(), holder.avatar, mImageLoaderOptions);
-                    } else {
-                        holder.avatar.setImageDrawable(DrawableCache.getDrawable(R.drawable.default_contact));
-                    }
+                    String url = U.getProfilePicture(item.person, mAvatarSizePx, mAvatarSizePx);
+                    ImageLoader.getInstance().displayImage(url, holder.avatar, mImageLoaderOptions, mImageLoaderListener);
                 }
 
                 if (holder.name != null) {

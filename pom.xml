@@ -59,6 +59,11 @@
             <id>missionhub-android-maven</id>
             <url>https://github.com/CruGlobal/Missionhub-Android-Maven/raw/master/releases</url>
         </repository>
+        <repository>
+            <id>bugsense repo</id>
+            <name>The BugSense Repository</name>
+            <url>http://mvn.bugsense.com/</url>
+        </repository>
     </repositories>
 
     <properties>
