@@ -180,7 +180,7 @@ public class SelectableListView extends ListView {
      * Override setItemChecked to attach the OnItemCheckedListener
      */
     @Override
-    public void setItemChecked(final int position, final boolean checked) {
+    public synchronized void setItemChecked(final int position, final boolean checked) {
         super.setItemChecked(position, checked);
         if (mOnItemCheckedListener != null) {
             try {
@@ -192,25 +192,31 @@ public class SelectableListView extends ListView {
         }
     }
 
-    /**
-     * Clears all checked items
-     */
     public void clearChecked() {
-        final SparseBooleanArray cItem = getCheckedItemPositions();
-        for (int i = 0; i < cItem.size(); i++) {
-            if (cItem.valueAt(i)) {
-                super.setItemChecked(cItem.keyAt(i), false);
+        clearChoices();
+    }
+
+    @Override
+    public synchronized void clearChoices() {
+        SparseBooleanArray positions = getCheckedItemPositions();
+        for (int i=0; i < positions.size(); i++) {
+            if (positions.valueAt(i)) {
+                setItemChecked(i, false);
             }
         }
-        checkForAllUnchecked();
+        super.clearChoices();
+        if (mOnItemCheckedListener != null) {
+            mOnItemCheckedListener.onAllUnchecked();
+        }
     }
+
 
     /**
      * Checks to see if all items are unchecked. Notifies the OnItemCheckedListener if set.
      */
     private void checkForAllUnchecked() {
         if (mOnItemCheckedListener != null) {
-            @SuppressWarnings("deprecation") final int checkedCount = getCheckItemIds().length;
+            final int checkedCount = getCheckedItemIds().length;
             if (checkedCount == 0) {
                 mOnItemCheckedListener.onAllUnchecked();
             }
