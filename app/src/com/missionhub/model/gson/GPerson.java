@@ -212,6 +212,7 @@ public class GPerson {
                         for (final GOrganizationalRole role : organizational_roles) {
                             role.save(true);
                         }
+                        person.resetLabels();
                     }
 
                     if (all_organizational_roles != null) {
@@ -223,6 +224,7 @@ public class GPerson {
                         for (final GOrganizationalRole role : all_organizational_roles) {
                             role.save(true);
                         }
+                        person.resetLabels();
                     }
 
                     if (answer_sheets != null) {

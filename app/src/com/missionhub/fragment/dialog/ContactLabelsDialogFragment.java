@@ -162,7 +162,10 @@ public class ContactLabelsDialogFragment extends RefreshableDialogFragment imple
         mAdapter.setNotifyOnChange(false);
         mAdapter.clear();
 
+        boolean isAdmin = Session.getInstance().isAdmin();
         for(Role role : systemRoles) {
+            if (!isAdmin && role.getId() == 1) continue;
+
             mAdapter.add(new RoleItem(role, determineSelected(labelCounts, role.getId())));
         }
         for(Role role : organizationRoles) {
