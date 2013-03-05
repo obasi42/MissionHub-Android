@@ -1216,7 +1216,7 @@ public class ContactInfoFragment extends BaseFragment {
             mPerson.resetContactAssignments();
             notifyPersonUpdated();
             return true;
-        } else if (requestCode == REQUEST_LABELS && requestCode == FragmentResult.RESULT_OK) {
+        } else if (requestCode == REQUEST_LABELS && resultCode == FragmentResult.RESULT_OK) {
             mPerson.resetLabels();
             notifyPersonUpdated();
             return true;
