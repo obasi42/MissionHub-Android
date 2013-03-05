@@ -36,39 +36,11 @@ import java.util.*;
 
 public class ContactLabelsDialogFragment extends RefreshableDialogFragment implements AdapterView.OnItemClickListener {
 
-    /**
-     * the people being acted on
-     */
-    private HashSet<Person> mPeople;
-
-    /**
-     * the task used to save labels
-     */
+    private final HashSet<Person> mPeople = new HashSet<Person>();
     private SafeAsyncTask<Void> mSaveTask;
-
-    /**
-     * the task used to refresh labels
-     */
     private SafeAsyncTask<Void> mRefreshTask;
-
-    /**
-     * the add contact listener interface
-     */
-    private WeakReference<LabelDialogListner> mListener;
-
-    /**
-     * the list view
-     */
     private ListView mList;
-
-    /**
-     * the list adapter
-     */
     private ObjectArrayAdapter mAdapter;
-
-    /**
-     * the progress view
-     */
     private View mProgress;
 
     public ContactLabelsDialogFragment() {
@@ -83,15 +55,19 @@ public class ContactLabelsDialogFragment extends RefreshableDialogFragment imple
     }
 
     public static ContactLabelsDialogFragment showForResult(FragmentManager fm, final Person person, Integer requestCode) {
-        final List people = new ArrayList();
+        final List<Person> people = new ArrayList<Person>();
         people.add(person);
         return showForResult(fm, people, requestCode);
     }
 
     public static ContactLabelsDialogFragment showForResult(FragmentManager fm, final Collection<Person> people, Integer requestCode) {
         final Bundle args = new Bundle();
-        final HashSet<Person> peopleSet = new HashSet<Person>(people);
-        args.putSerializable("people", peopleSet);
+
+        final HashSet<Long> peopleIds = new HashSet<Long>();
+        for(Person p : people) {
+            peopleIds.add(p.getId());
+        }
+        args.putSerializable("peopleIds", peopleIds);
         return ContactLabelsDialogFragment.show(ContactLabelsDialogFragment.class, fm, args, requestCode);
     }
 
@@ -100,9 +76,15 @@ public class ContactLabelsDialogFragment extends RefreshableDialogFragment imple
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
-            @SuppressWarnings("unchecked") final HashSet<Person> people = (HashSet<Person>) getArguments().getSerializable("people");
-            if (people != null) {
-                mPeople = new HashSet<Person>(people);
+            @SuppressWarnings("unchecked") final HashSet<Long> peopleIds = (HashSet<Long>) getArguments().getSerializable("peopleIds");
+            if (peopleIds != null) {
+                mPeople.clear();
+                for(Long id : peopleIds) {
+                    Person person = Application.getDb().getPersonDao().load(id);
+                    if (person != null) {
+                        mPeople.add(person);
+                    }
+                }
             }
         }
     }
@@ -331,10 +313,6 @@ public class ContactLabelsDialogFragment extends RefreshableDialogFragment imple
 
     }
 
-    public static interface LabelDialogListner {
-
-    }
-
     private synchronized void save() {
         if (mAdapter == null || mPeople == null) return;
         try {
@@ -450,11 +428,11 @@ public class ContactLabelsDialogFragment extends RefreshableDialogFragment imple
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         try {
             mRefreshTask.cancel(true);
         } catch (final Exception e) {
             /* ignore */
         }
+        super.onDestroy();
     }
 }

@@ -1,9 +1,14 @@
 package com.missionhub.ui;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnFocusChangeListener;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
@@ -26,7 +31,6 @@ public class SearchMenuItemHelper implements OnQueryTextListener, OnFocusChangeL
     private MenuItem mSearchItem;
     private final long mDelay = 300;
     private String mQuery;
-    private boolean mExpanded;
 
     public SearchMenuItemHelper(final Fragment fragment) {
         mFragment = fragment;
@@ -34,24 +38,6 @@ public class SearchMenuItemHelper implements OnQueryTextListener, OnFocusChangeL
         if (fragment instanceof SearchMenuItemListener) {
             mListener = (SearchMenuItemListener) fragment;
         }
-    }
-
-    public void onSaveInstanceState(final Bundle outState) {
-        if (mSearchItem != null && mSearchItem.isActionViewExpanded()) {
-            mExpanded = true;
-        } else {
-            mExpanded = false;
-        }
-    }
-
-    public void onViewCreated(View view) {
-        if (mSearchItem != null && mExpanded) {
-            mSearchItem.expandActionView();
-        }
-    }
-
-    public SearchView getSearchView() {
-        return mSearchView;
     }
 
     public void onCreateOptionsMenu(final Menu menu, final MenuInflater inflater) {
@@ -63,6 +49,10 @@ public class SearchMenuItemHelper implements OnQueryTextListener, OnFocusChangeL
 
         mSearchItem = menu.add(Menu.NONE, R.id.action_search, Menu.NONE, R.string.action_search).setIcon(R.drawable.ic_action_search)
                 .setActionView(mSearchView).setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
+    }
+
+    public SearchView getSearchView() {
+        return mSearchView;
     }
 
     private final Runnable delayedSearch = new Runnable() {
@@ -93,22 +83,17 @@ public class SearchMenuItemHelper implements OnQueryTextListener, OnFocusChangeL
 
     @Override
     public boolean onQueryTextSubmit(final String query) {
-        if (mListener == null) return false;
-
-        mListener.onSearchSubmit(query);
+        if (mSearchView != null) {
+            mSearchView.clearFocus();
+        }
+        onQueryTextChange(query);
 
         return true;
-    }
-
-    public void setListener(final SearchMenuItemListener listener) {
-        mListener = listener;
     }
 
     public interface SearchMenuItemListener {
 
         public void onSearchTextChange(String query);
-
-        public void onSearchSubmit(String query);
 
     }
 
@@ -118,4 +103,5 @@ public class SearchMenuItemHelper implements OnQueryTextListener, OnFocusChangeL
             mSearchItem.collapseActionView();
         }
     }
+
 }

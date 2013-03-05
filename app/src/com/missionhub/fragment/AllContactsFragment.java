@@ -86,5 +86,4 @@ public class AllContactsFragment extends ContactListMainFragment {
             searchProvider.reload();
         }
     }
-
 }

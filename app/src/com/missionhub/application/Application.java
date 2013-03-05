@@ -57,11 +57,6 @@ public class Application extends org.holoeverywhere.app.Application {
     private static final String DB_NAME = "missionhub.db";
 
     /**
-     * the generic (context-less!) object store - this is to hold on to the object as long as the application is alive
-     */
-    private static final ObjectStore mObjectStore = ObjectStore.getInstance();
-
-    /**
      * called when the application is created.
      */
     @Override
@@ -121,7 +116,7 @@ public class Application extends org.holoeverywhere.app.Application {
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        EventBus.getDefault().post(new OnLowMemoryEvent());
+        postEvent(new OnLowMemoryEvent());
     }
 
     /**
@@ -224,14 +219,6 @@ public class Application extends org.holoeverywhere.app.Application {
     public static void unregisterEventSubscriber(final Object subscriber, final Class<?>... eventTypes) {
         EventBus.getDefault().unregister(subscriber, eventTypes);
     }
-
-    /**
-     * Returns the context-less store for objects
-     */
-    public static ObjectStore getObjectStore() {
-        return mObjectStore;
-    }
-
     public static void showToast(final int message, final int duration) {
         showToast(Application.getContext().getString(message), duration);
     }

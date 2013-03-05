@@ -43,7 +43,6 @@ public class GPerson {
     public GAddress current_address;
     public GAnswerSheet[] answer_sheets;
 
-    public Boolean _assignToMe = false; // used by AddContactDialog
     public HashMultimap<Long, String> _answers; // used by AddContactDialog
 
     public static final Object lock = new Object();
@@ -323,10 +322,6 @@ public class GPerson {
             if (!U.isNullEmpty(current_address.zip)) {
                 params.add("person[current_address_attributes][zip]", current_address.zip);
             }
-        }
-
-        if (_assignToMe != null) {
-            params.add("assign_to_me", _assignToMe);
         }
 
         if (_answers != null) {

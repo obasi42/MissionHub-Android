@@ -69,6 +69,11 @@ public abstract class ContactListFragment extends BaseFragment implements OnCont
      */
     private ContactListFragmentListener mFragmentListener;
 
+    /**
+     * the list view progress item
+     */
+    private ProgressItem mProgressItem;
+
     public ContactListFragment() {
     }
 
@@ -97,25 +102,28 @@ public abstract class ContactListFragment extends BaseFragment implements OnCont
             mListView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
         }
 
+        mProgressItem = onCreateProgressItem();
+
         if (mProvider == null) {
             mProvider = onCreateContactProvider();
             Application.registerEventSubscriber(mProvider, SessionOrganizationIdChanged.class);
-
-            final ProgressItem item = onCreateProgressItem();
-            if (item != null) {
-                mProvider.setProgressItem(item);
-            }
-
+            configureProvider();
             mProvider.afterCreate();
+        } else {
+            configureProvider();
         }
 
+        return view;
+    }
+
+    private void configureProvider() {
         mProvider.setContext(getSupportActivity());
         mProvider.setOnContactListExceptionListener(mOnContactListProviderExceptionListener);
         mProvider.setOnContactListWorkingListener(mOnContactListAdapterWorkingListener);
+        mProvider.setProgressItem(mProgressItem);
+        mProvider.setContactList(mListView);
 
         mListView.setProvider(mProvider);
-
-        return view;
     }
 
     public abstract ContactListProvider onCreateContactProvider();
@@ -144,9 +152,7 @@ public abstract class ContactListFragment extends BaseFragment implements OnCont
      */
     public void setProvider(final ContactListProvider provider) {
         mProvider = provider;
-        if (mListView != null) {
-            mListView.setProvider(mProvider);
-        }
+        configureProvider();
     }
 
     /**

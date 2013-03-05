@@ -76,7 +76,7 @@ public class ContactAssignmentDialogFragment extends RefreshableDialogFragment i
     /**
      * the list of people to assign
      */
-    private Set<Person> mPeople = new HashSet<Person>();
+    final private Set<Person> mPeople = new HashSet<Person>();
 
     /**
      * the task used to process assignments
@@ -107,9 +107,13 @@ public class ContactAssignmentDialogFragment extends RefreshableDialogFragment i
 
     public static ContactAssignmentDialogFragment showForResult(FragmentManager fm, final Collection<Person> people, Integer requestCode) {
         final Bundle args = new Bundle();
-        final HashSet<Person> peopleSet = new HashSet<Person>(people);
-        args.putSerializable("people", peopleSet);
-        return ContactLabelsDialogFragment.show(ContactAssignmentDialogFragment.class, fm, args, requestCode);
+
+        final HashSet<Long> peopleIds = new HashSet<Long>();
+        for(Person p : people) {
+            peopleIds.add(p.getId());
+        }
+        args.putSerializable("peopleIds", peopleIds);
+        return ContactAssignmentDialogFragment.show(ContactAssignmentDialogFragment.class, fm, args, requestCode);
     }
 
     @Override
@@ -117,9 +121,15 @@ public class ContactAssignmentDialogFragment extends RefreshableDialogFragment i
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
-            @SuppressWarnings("unchecked") final HashSet<Person> people = (HashSet<Person>) getArguments().getSerializable("people");
-            if (people != null) {
-                mPeople = new HashSet<Person>(people);
+            @SuppressWarnings("unchecked") final HashSet<Long> peopleIds = (HashSet<Long>) getArguments().getSerializable("peopleIds");
+            if (peopleIds != null) {
+                mPeople.clear();
+                for(Long id : peopleIds) {
+                    Person person = Application.getDb().getPersonDao().load(id);
+                    if (person != null) {
+                        mPeople.add(person);
+                    }
+                }
             }
         }
     }
@@ -737,12 +747,12 @@ public class ContactAssignmentDialogFragment extends RefreshableDialogFragment i
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         try {
             mRefreshLeadersTask.cancel(true);
         } catch (final Exception e) {
             /* ignore */
         }
+        super.onDestroy();
     }
 
     private void updateRefreshIcon() {

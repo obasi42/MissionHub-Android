@@ -53,11 +53,6 @@ public class EditContactDialogFragment extends BaseDialogFragment {
     private Button mSaveButton;
 
     /**
-     * if the contact should be assigned to the current user
-     */
-    private boolean mAssignToMe = false;
-
-    /**
      * the person data holder
      */
     private GPerson mPerson;
@@ -79,22 +74,11 @@ public class EditContactDialogFragment extends BaseDialogFragment {
     }
 
     public static EditContactDialogFragment show(FragmentManager fm, final boolean assignToMe) {
-        return showForResult(fm, assignToMe, null);
+        return showForResult(fm, null);
     }
 
-    public static EditContactDialogFragment showForResult(FragmentManager fm, final boolean assignToMe, Integer requestCode) {
-        final Bundle args = new Bundle();
-        args.putBoolean("assignToMe", assignToMe);
-        return EditContactDialogFragment.show(EditContactDialogFragment.class, fm, args, requestCode);
-    }
-
-    @Override
-    public void onCreate(final Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        if (getArguments() != null) {
-            mAssignToMe = getArguments().getBoolean("assignToMe", false);
-        }
+    public static EditContactDialogFragment showForResult(FragmentManager fm, Integer requestCode) {
+        return EditContactDialogFragment.show(EditContactDialogFragment.class, fm, null, requestCode);
     }
 
     @Override
@@ -270,7 +254,6 @@ public class EditContactDialogFragment extends BaseDialogFragment {
         if (mPerson == null) return;
 
         writeToPerson(mPerson);
-        mPerson._assignToMe = mAssignToMe;
 
         if (!mPerson.isValid()) {
             Toast.makeText(getSupportActivity(), R.string.add_contact_name_required, Toast.LENGTH_SHORT).show();

@@ -59,17 +59,6 @@ public abstract class ContactListMainFragment extends MainFragment implements Co
         if (mActionMode != null) {
             mActionMode = getSupportActivity().startActionMode(this);
         }
-        if (mSearchHelper != null) {
-            mSearchHelper.onViewCreated(view);
-        }
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        if (mSearchHelper != null) {
-            mSearchHelper.onSaveInstanceState(outState);
-        }
     }
 
     public SearchMenuItemHelper getSearchHelper() {
@@ -120,7 +109,7 @@ public abstract class ContactListMainFragment extends MainFragment implements Co
                 }
                 break;
             case R.id.action_add_contact:
-                EditContactDialogFragment.showForResult(getChildFragmentManager(), true, REQUEST_EDIT_CONTACT);
+                EditContactDialogFragment.showForResult(getChildFragmentManager(), REQUEST_EDIT_CONTACT);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -217,11 +206,6 @@ public abstract class ContactListMainFragment extends MainFragment implements Co
         if (mActionMode != null) {
             mActionMode.finish();
         }
-    }
-
-    @Override
-    public void onSearchSubmit(final String query) {
-        onSearchTextChange(query);
     }
 
 }
