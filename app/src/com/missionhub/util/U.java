@@ -159,7 +159,7 @@ public class U {
 
             sb.append(string);
 
-            if (delemiter != null && i + 1 < items.length && (!ignoreEmpty || !U.isNullEmpty(items[i + 1]))) {
+            if (delemiter != null && i + 1 < items.length) {
                 sb.append(delemiter);
             }
         }
