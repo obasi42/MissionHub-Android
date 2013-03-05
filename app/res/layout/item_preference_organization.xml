@@ -1,8 +1,8 @@
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@android:id/text1"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:layout_gravity="center_vertical"
-    android:gravity="center_vertical"
-    android:padding="@dimen/listview_item_padding"
-    android:textSize="18.0dip" />
+          android:id="@android:id/text1"
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"
+          android:layout_gravity="center_vertical"
+          android:gravity="center_vertical"
+          android:padding="@dimen/listview_item_padding"
+          android:textSize="18.0dip"/>

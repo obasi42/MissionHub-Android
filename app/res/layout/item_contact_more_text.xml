@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content">
+
+    <LinearLayout
+            style="@style/MissionHub.ContactInfoContent"
+            android:orientation="vertical"
+            android:gravity="center_vertical">
+
+        <TextView
+                android:id="@android:id/text1"
+                style="@style/MissionHub.ContactInfoItem"
+                android:gravity="center_vertical"/>
+
+        <TextView
+                android:id="@android:id/text2"
+                style="@style/MissionHub.ContactInfoItemLabel"
+                android:gravity="center_vertical"/>
+
+    </LinearLayout>
+
+    <View
+            android:id="@+id/divider"
+            style="@style/MissionHub.Divider"/>
+
+</LinearLayout>

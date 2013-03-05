@@ -8,16 +8,16 @@
     <item name="menu_item_groups" type="id"/>
     <item name="menu_item_preferences" type="id"/>
     <item name="menu_item_logout" type="id"/>
-    <item name="menu_item_about" type="id" />
+    <item name="menu_item_about" type="id"/>
     <item name="menu_item_help" type="id"/>
-    
+
     <!-- Action Items -->
-    <item name="action_restart" type="id" />
-    <item name="action_refresh" type="id" />
-    <item name="action_assign" type="id" />
-    <item name="action_label" type="id" />
-    <item name="action_add_contact" type="id" />
-    <item name="action_edit_contact" type="id" />
-    <item name="action_search" type="id" />
+    <item name="action_restart" type="id"/>
+    <item name="action_refresh" type="id"/>
+    <item name="action_assign" type="id"/>
+    <item name="action_label" type="id"/>
+    <item name="action_add_contact" type="id"/>
+    <item name="action_edit_contact" type="id"/>
+    <item name="action_search" type="id"/>
 
 </resources>

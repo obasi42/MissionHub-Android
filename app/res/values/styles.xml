@@ -65,7 +65,7 @@
 
     <style name="MissionHub.ContactInfoItemLabel">
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_width">fill_parent</item>
         <item name="android:textSize">12.0dip</item>
         <item name="android:textColor">#ff999999</item>
         <item name="android:ellipsize">marquee</item>

@@ -73,6 +73,11 @@ public class ContactInfoFragment extends BaseFragment {
     /**
      * the task used for refresh comments
      */
+    private SafeAsyncTask<Void> mRefreshLabelsTask;
+
+    /**
+     * the task used for refresh comments
+     */
     private SafeAsyncTask<Person> mRefreshCommentsTask;
 
     /**
@@ -185,38 +190,6 @@ public class ContactInfoFragment extends BaseFragment {
      */
     private TextView mHeaderMoreText;
 
-    private View mHeaderPersonalInfo;
-
-    /**
-     * the more info gender
-     */
-    private View mInfoGender;
-
-    /**
-     * the more info birthday
-     */
-    private View mInfoBirthday;
-
-    /**
-     * the more info address
-     */
-    private View mInfoAddress;
-
-    /**
-     * The labels layout
-     */
-    private LinearLayout mInfoLabels;
-
-    /**
-     * the links section
-     */
-    private View mInfoLinks;
-
-    /**
-     * the more info facebook link
-     */
-    private View mInfoFacebook;
-
     /**
      * the comment comment
      */
@@ -287,14 +260,6 @@ public class ContactInfoFragment extends BaseFragment {
         mHeaderAssignment = (Button) view.findViewById(R.id.assign);
         mHeaderMore = (ViewGroup) view.findViewById(R.id.more);
         mHeaderMoreText = (TextView) view.findViewById(R.id.expand);
-        mHeaderPersonalInfo = view.findViewById(R.id.personal_info);
-
-        mInfoGender = view.findViewById(R.id.gender);
-        mInfoBirthday = view.findViewById(R.id.birthday);
-        mInfoAddress = view.findViewById(R.id.address);
-        mInfoLabels = (LinearLayout) view.findViewById(R.id.labels);
-        mInfoLinks = view.findViewById(R.id.links);
-        mInfoFacebook = view.findViewById(R.id.facebook);
 
         mCommentComment = (EditText) view.findViewById(R.id.comment);
         mCommentSave = view.findViewById(R.id.save);
@@ -365,18 +330,6 @@ public class ContactInfoFragment extends BaseFragment {
                     mMoreShowing = true;
                 }
                 updateMoreShowing();
-            }
-        });
-        mInfoAddress.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(final View v) {
-                IntentHelper.openMap(mPerson.getCurrentAddress());
-            }
-        });
-        mInfoFacebook.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(final View v) {
-                IntentHelper.openFacebookProfile(mPerson.getFb_uid());
             }
         });
     }
@@ -572,81 +525,89 @@ public class ContactInfoFragment extends BaseFragment {
             }
         }
 
-        // set the "more info" view
+        MoreInfoAdapter more = new MoreInfoAdapter(getSupportActivity());
+
         final Gender gender = mPerson.getGenderEnum();
-        final Date birthdate = mPerson.getBirth_date();
-        final Address address = mPerson.getCurrentAddress();
-        final Long fbUid = mPerson.getFb_uid();
-        final List<Long> labels = mPerson.getLables(Session.getInstance().getOrganizationId());
-
-        if (gender != null || birthdate != null || address != null || fbUid != null || !labels.isEmpty()) {
-
-            if (gender != null || birthdate != null || (address != null && address.isComplete())) {
-                if (gender != null) {
-                    ((TextView) mInfoGender.findViewById(android.R.id.text1)).setText(gender.toString());
-                    mInfoGender.setVisibility(View.VISIBLE);
-                } else {
-                    mInfoGender.setVisibility(View.GONE);
-                }
-
-                if (birthdate != null) {
-                    try {
-                        final SimpleDateFormat format = new SimpleDateFormat("MMMM dd", Locale.US);
-                        ((TextView) mInfoBirthday.findViewById(android.R.id.text1)).setText(format.format(birthdate));
-                    } catch (final Exception e) {
-                        ((TextView) mInfoBirthday.findViewById(android.R.id.text1)).setText(birthdate.toString());
-                    }
-                    mInfoBirthday.setVisibility(View.VISIBLE);
-                } else {
-                    mInfoBirthday.setVisibility(View.GONE);
-                }
-
-                if (address != null && address.isComplete()) {
-                    final String line1 = U.concatinate(", ", true, address.getAddress1(), address.getAddress2());
-                    final String line2 = U.concatinate(", ", true, address.getCity(), address.getState(), address.getZip(), address.getCountry());
-
-                    ((TextView) mInfoAddress.findViewById(android.R.id.text1)).setText(line1);
-                    ((TextView) mInfoAddress.findViewById(android.R.id.text2)).setText(line2);
-                    mInfoAddress.setVisibility(View.VISIBLE);
-                } else {
-                    mInfoAddress.setVisibility(View.GONE);
-                }
-
-                mHeaderPersonalInfo.setVisibility(View.VISIBLE);
-            } else {
-                mHeaderPersonalInfo.setVisibility(View.GONE);
+        String birthdate = null;
+        if (mPerson.getBirth_date() != null) {
+            final SimpleDateFormat format = new SimpleDateFormat("MMMM dd", Locale.US);
+            try {
+                birthdate = format.format(mPerson.getBirth_date());
+            } catch (Exception e) {
+                birthdate = mPerson.getBirth_date().toString();
             }
+        }
+        final Address address = mPerson.getCurrentAddress();
 
-            if (!labels.isEmpty()) {
-                LinearLayout holder = (LinearLayout) mInfoLabels.findViewById(R.id.labels_holder);
-                holder.removeAllViews();
+        if (!U.isNullEmpty(gender, birthdate) || (address != null && address.isComplete())) {
+            more.add(new MoreInfoAdapter.SectionHeaderItem(getString(R.string.contact_label_personal)));
 
-                List<Role> roles = Application.getDb().getRoleDao().queryBuilder().where(RoleDao.Properties.Id.in(labels)).list();
-                for(Role role : roles) {
-                    if (role != null) {
-                        View view = getLayoutInflater().inflate(R.layout.item_contact_info_labels);
-                        TextView labelText = (TextView) view.findViewById(R.id.text);
-                        labelText.setText(role.getTranslatedName());
-                        holder.addView(view);
-                    }
-                }
-                mInfoLabels.setOnClickListener(new OnClickListener() {
+            if (!U.isNullEmpty(gender)) {
+                more.add(new MoreInfoAdapter.TextItem(gender.toString(), getString(R.string.contact_label_gender)));
+            }
+            if (!U.isNullEmpty(birthdate)) {
+                more.add(new MoreInfoAdapter.TextItem(birthdate, getString(R.string.contact_label_birthday)));
+            }
+            if (!U.isNullEmpty(address) && address.isComplete()) {
+                final String line1 = U.concatinate(", ", true, address.getAddress1(), address.getAddress2());
+                final String line2 = U.concatinate(", ", true, address.getCity(), address.getState(), address.getZip(), address.getCountry());
+                MoreInfoAdapter.TextItem item = new MoreInfoAdapter.TextItem(line1, line2);
+                item.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        ContactLabelsDialogFragment.showForResult(getChildFragmentManager(), mPerson, REQUEST_LABELS);
+                        IntentHelper.openMap(mPerson.getCurrentAddress());
                     }
                 });
-                mInfoLabels.setVisibility(View.VISIBLE);
-            } else {
-                mInfoLabels.setVisibility(View.GONE);
+                more.add(item);
+            }
+        }
+
+        final Long fbUid = mPerson.getFb_uid();
+        if (fbUid != null) {
+            more.add(new MoreInfoAdapter.SectionHeaderItem(getString(R.string.contact_label_links)));
+
+            MoreInfoAdapter.IconTextItem item = new MoreInfoAdapter.IconTextItem(getString(R.string.facebook), R.drawable.ic_facebook);
+            item.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    IntentHelper.openFacebookProfile(mPerson.getFb_uid());
+                }
+            });
+            more.add(item);
+        }
+
+        final List<Long> labelIds = mPerson.getLables(Session.getInstance().getOrganizationId());
+        if (!labelIds.isEmpty()) {
+            more.add(new MoreInfoAdapter.SectionHeaderItem(getString(R.string.contact_label_labels)));
+
+            boolean needLabelUpdate = false;
+            for(long labelId : labelIds) {
+                final Role label = Application.getDb().getRoleDao().load(labelId);
+                if (label != null) {
+                    MoreInfoAdapter.IconTextItem item = new MoreInfoAdapter.IconTextItem(label.getTranslatedName(), R.drawable.ic_label);
+                    item.setOnClickListener(new OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            ContactLabelsDialogFragment.showForResult(getChildFragmentManager(), mPerson, REQUEST_LABELS);
+                        }
+                    });
+                    more.add(item);
+                } else {
+                    needLabelUpdate = true;
+                }
             }
 
-            if (fbUid != null) {
-                mInfoLinks.setVisibility(View.VISIBLE);
-            } else {
-                mInfoLinks.setVisibility(View.GONE);
+            if (needLabelUpdate) {
+                refreshLabels();
             }
+        }
 
+        mHeaderMore.removeAllViews();
+        for(int i=0; i<more.getCount(); i++) {
+            mHeaderMore.addView(more.getView(i, null, null));
+        }
+
+        if (!more.isEmpty()) {
             mHeaderMoreText.setVisibility(View.VISIBLE);
         } else {
             mHeaderMoreText.setVisibility(View.INVISIBLE);
@@ -1097,6 +1058,48 @@ public class ContactInfoFragment extends BaseFragment {
         Application.getExecutor().execute(mRefreshCommentsTask.future());
     }
 
+    private synchronized void refreshLabels() {
+        try {
+            mRefreshLabelsTask.cancel(true);
+        } catch (final Exception e) {
+            /* ignore */
+        }
+
+        getParent().addProgress("refreshLabels");
+
+        mRefreshLabelsTask = new SafeAsyncTask<Void>() {
+
+            @Override
+            public Void call() throws Exception {
+                Api.listRoles().get();
+                return null;
+            }
+
+            @Override
+            public void onSuccess(Void t) {
+                notifyPersonUpdated();
+            }
+
+            @Override
+            public void onFinally() {
+                mRefreshLabelsTask = null;
+                if (getParent() != null) {
+                    getParent().removeProgress("refreshLabels");
+                }
+            }
+
+            @Override
+            public void onException(final Exception e) {
+            }
+
+            @Override
+            public void onInterrupted(final Exception e) {
+            }
+        };
+        Application.getExecutor().execute(mRefreshLabelsTask.future());
+    }
+
+
     /**
      * The status spinner adapter
      */
@@ -1207,10 +1210,6 @@ public class ContactInfoFragment extends BaseFragment {
         return (ContactFragment) getParentFragment();
     }
 
-    public void openAddress() {
-        // TODO:
-    }
-
     @Override
     public boolean onFragmentResult(int requestCode, int resultCode, Object data) {
         if (requestCode == REQUEST_ASSIGNMENT && resultCode == FragmentResult.RESULT_OK) {
@@ -1223,5 +1222,142 @@ public class ContactInfoFragment extends BaseFragment {
             return true;
         }
         return super.onFragmentResult(requestCode, resultCode, data);
+    }
+
+    /**
+     * Creates the information for the more info section
+     */
+    public static class MoreInfoAdapter extends ObjectArrayAdapter {
+
+        public MoreInfoAdapter(Context context, int maxViewTypes) {
+            super(context, maxViewTypes);
+        }
+
+        public MoreInfoAdapter(Context context) {
+            super(context);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View view = null;
+            Object object = getItem(position);
+
+            if (object instanceof SectionHeaderItem) {
+                SectionHeaderItem item = (SectionHeaderItem) object;
+                view = getLayoutInflater().inflate(R.layout.item_contact_more_header);
+                TextView header = (TextView) view.findViewById(android.R.id.text1);
+
+                if (!U.isNullEmpty(item.text1)) {
+                    header.setText(item.text1);
+                    header.setVisibility(View.VISIBLE);
+                } else {
+                    header.setVisibility(View.GONE);
+                }
+            } else if (object instanceof TextItem) {
+                TextItem item = (TextItem) object;
+                view = getLayoutInflater().inflate(R.layout.item_contact_more_text);
+                TextView text1 = (TextView) view.findViewById(android.R.id.text1);
+                TextView text2 = (TextView) view.findViewById(android.R.id.text2);
+
+                if (!U.isNullEmpty(item.text1)) {
+                    text1.setText(item.text1);
+                    text1.setVisibility(View.VISIBLE);
+                } else {
+                    text1.setVisibility(View.GONE);
+                }
+
+                if (!U.isNullEmpty(item.text2)) {
+                    text2.setText(item.text2);
+                    text2.setVisibility(View.VISIBLE);
+                } else {
+                    text2.setVisibility(View.GONE);
+                }
+            } else if (object instanceof IconTextItem) {
+                IconTextItem item = (IconTextItem) object;
+                view = getLayoutInflater().inflate(R.layout.item_contact_more_icontext);
+                ImageView icon = (ImageView) view.findViewById(android.R.id.icon1);
+                TextView text1 = (TextView) view.findViewById(android.R.id.text1);
+
+                if (item.drawableId != 0) {
+                    icon.setImageDrawable(DrawableCache.getDrawable(item.drawableId));
+                    icon.setVisibility(View.VISIBLE);
+                } else {
+                    icon.setVisibility(View.INVISIBLE);
+                }
+
+                if (!U.isNullEmpty(item.text1)) {
+                    text1.setText(item.text1);
+                    text1.setVisibility(View.VISIBLE);
+                } else {
+                    text1.setVisibility(View.GONE);
+                }
+            }
+
+            if (!(object instanceof SectionHeaderItem)) {
+                Object nextItem = null;
+                try {
+                    nextItem = getItem(position+1);
+                } catch (Exception e) { /* ignore */ }
+                if (nextItem == null || nextItem instanceof SectionHeaderItem) {
+                    View divider = view.findViewById(R.id.divider);
+                    if (divider != null) {
+                        divider.setVisibility(View.GONE);
+                    }
+                }
+            }
+
+            if (object instanceof SimpleTextItem) {
+                SimpleTextItem item = (SimpleTextItem) object;
+                if (item.onClickListener != null) {
+                    view.setOnClickListener(item.onClickListener);
+                }
+            }
+
+            return view;
+        }
+
+        public static abstract class SimpleTextItem {
+
+            public String text1;
+            public OnClickListener onClickListener;
+
+            public SimpleTextItem(String text1) {
+                this.text1 = text1;
+            }
+
+            public void setOnClickListener(OnClickListener onClickListener) {
+                this.onClickListener = onClickListener;
+            }
+
+        }
+
+        public static class SectionHeaderItem extends SimpleTextItem {
+            public SectionHeaderItem(String text1) {
+                super(text1);
+            }
+        }
+
+        public static class TextItem extends SimpleTextItem {
+            public String text2;
+
+            public TextItem(String text1) {
+                super(text1);
+            }
+
+            public TextItem(String text1, String text2) {
+                super(text1);
+                this.text2 = text2;
+            }
+        }
+
+        public static class IconTextItem extends SimpleTextItem {
+            public int drawableId;
+
+            public IconTextItem(String text1, int drawableId) {
+                super(text1);
+                this.drawableId = drawableId;
+            }
+        }
+
     }
 }

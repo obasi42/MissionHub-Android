@@ -1,6 +1,6 @@
 <resources>
     <dimen name="main_menu_width">260dp</dimen>
-   
+
     <dimen name="listview_item_padding">8.0dip</dimen>
     <dimen name="listview_item_min_height">48.0dip</dimen>
 </resources>
