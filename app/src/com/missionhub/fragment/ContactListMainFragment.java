@@ -43,7 +43,6 @@ public abstract class ContactListMainFragment extends MainFragment implements Co
         if (!U.superGetRetainInstance(this)) {
             setRetainInstance(true);
         }
-        mSearchHelper = new SearchMenuItemHelper(this);
     }
 
     @Override
@@ -62,6 +61,9 @@ public abstract class ContactListMainFragment extends MainFragment implements Co
     }
 
     public SearchMenuItemHelper getSearchHelper() {
+        if (mSearchHelper == null) {
+            mSearchHelper = new SearchMenuItemHelper(this);
+        }
         return mSearchHelper;
     }
 
@@ -72,7 +74,7 @@ public abstract class ContactListMainFragment extends MainFragment implements Co
         menu.add(Menu.NONE, R.id.action_add_contact, Menu.NONE, R.string.action_add_contact).setIcon(R.drawable.ic_action_add_contact)
                 .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-        mSearchHelper.onCreateOptionsMenu(menu, inflater);
+        getSearchHelper().onCreateOptionsMenu(menu, inflater);
 
         mRefreshItem = menu.add(Menu.NONE, R.id.action_refresh, Menu.NONE, R.string.action_refresh).setIcon(R.drawable.ic_action_refresh)
                 .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
