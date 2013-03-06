@@ -129,7 +129,6 @@ public class ContactLabelsDialogFragment extends RefreshableDialogFragment imple
                 cancel();
             }
         });
-        builder.setButtonBehavior(0);
 
         updateState();
 

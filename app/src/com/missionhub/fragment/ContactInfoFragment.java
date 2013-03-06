@@ -231,6 +231,8 @@ public class ContactInfoFragment extends BaseFragment {
 
     private AnimateOnceImageLoadingListener mLoadingListener = new AnimateOnceImageLoadingListener(250);
 
+    public ContactInfoFragment() {}
+
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

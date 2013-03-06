@@ -36,6 +36,8 @@ public abstract class ContactListMainFragment extends MainFragment implements Co
 
     private SearchMenuItemHelper mSearchHelper;
 
+    public ContactListMainFragment() {}
+
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -186,9 +188,9 @@ public abstract class ContactListMainFragment extends MainFragment implements Co
 
     @Override
     public boolean onFragmentResult(int requestCode, int resultCode, Object data) {
-        if (requestCode == REQUEST_EDIT_CONTACT && resultCode == RESULT_OK) {
-            if (data != null && data instanceof Person) {
-                ContactActivity.start(getSupportActivity(), (Person) data);
+       if (requestCode == REQUEST_EDIT_CONTACT && resultCode == RESULT_OK) {
+            if (data != null) {
+                ContactActivity.start(getSupportActivity(), (Long) data);
                 getContactListFragment().reload();
                 return true;
             }

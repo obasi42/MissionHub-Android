@@ -30,6 +30,8 @@ public class SurveysFragment extends MainFragment {
     private ViewGroup mContainer;
     private WebView mWebView;
 
+    public SurveysFragment() {}
+
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

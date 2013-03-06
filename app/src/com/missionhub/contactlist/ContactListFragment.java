@@ -40,6 +40,11 @@ public abstract class ContactListFragment extends BaseFragment implements OnCont
     private ContactListProvider mProvider;
 
     /**
+     * the alternative provider (for search)
+     */
+    private ContactListProvider mAltProvider;
+
+    /**
      * the on contact checked listener
      */
     private OnContactCheckedListener mOnContactCheckedListener;
@@ -117,13 +122,20 @@ public abstract class ContactListFragment extends BaseFragment implements OnCont
     }
 
     private void configureProvider() {
-        mProvider.setContext(getSupportActivity());
-        mProvider.setOnContactListExceptionListener(mOnContactListProviderExceptionListener);
-        mProvider.setOnContactListWorkingListener(mOnContactListAdapterWorkingListener);
-        mProvider.setProgressItem(mProgressItem);
-        mProvider.setContactList(mListView);
-
-        mListView.setProvider(mProvider);
+        for (ContactListProvider provider : new ContactListProvider[] { mProvider, mAltProvider }) {
+            if (provider != null) {
+                provider.setContext(getSupportActivity());
+                provider.setOnContactListExceptionListener(mOnContactListProviderExceptionListener);
+                provider.setOnContactListWorkingListener(mOnContactListAdapterWorkingListener);
+                provider.setProgressItem(mProgressItem);
+                provider.setContactList(mListView);
+            }
+        }
+        if (mAltProvider != null) {
+            mListView.setProvider(mAltProvider);
+        } else {
+            mListView.setProvider(mProvider);
+        }
     }
 
     public abstract ContactListProvider onCreateContactProvider();
@@ -152,6 +164,16 @@ public abstract class ContactListFragment extends BaseFragment implements OnCont
      */
     public void setProvider(final ContactListProvider provider) {
         mProvider = provider;
+        configureProvider();
+    }
+
+    public void setAltProvider(final ContactListProvider provider) {
+        mAltProvider = provider;
+        configureProvider();
+    }
+
+    public void removeAltProvider() {
+        mAltProvider = null;
         configureProvider();
     }
 

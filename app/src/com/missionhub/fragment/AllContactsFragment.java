@@ -30,7 +30,8 @@ import org.holoeverywhere.LayoutInflater;
 public class AllContactsFragment extends ContactListMainFragment {
 
     ContactListFragment mFragment;
-    ApiContactListProvider mProvider;
+
+    public AllContactsFragment() {}
 
     @Override
     public View onCreateView(final LayoutInflater inflater, final Bundle savedInstanceState) {
@@ -64,25 +65,26 @@ public class AllContactsFragment extends ContactListMainFragment {
         getSupportActivity().getSupportActionBar().setTitle("All Contacts");
     }
 
-    public class AllContactsFragmentFragment extends ContactListFragment {
+    public static class AllContactsFragmentFragment extends ContactListFragment {
+        public AllContactsFragmentFragment(){}
+
         @Override
         public ContactListProvider onCreateContactProvider() {
             final PersonListOptions options = PersonListOptions.builder().build();
 
-            mProvider = new ApiContactListProvider(getSupportActivity(), options);
-            return mProvider;
+            return new ApiContactListProvider(getSupportActivity(), options);
         }
     }
 
     @Override
     public void onSearchTextChange(final String query) {
         if (query.length() == 0) {
-            getContactListFragment().setProvider(mProvider);
+            getContactListFragment().removeAltProvider();
         } else {
-            PersonListOptions options = mProvider.getOptions();
+            PersonListOptions options = ((ApiContactListProvider) getContactListFragment().getProvider()).getOptions();
             options.addFilter("name_or_email_like", query);
             ApiContactListProvider searchProvider = new ApiContactListProvider(getSupportActivity(), options);
-            getContactListFragment().setProvider(searchProvider);
+            getContactListFragment().setAltProvider(searchProvider);
             searchProvider.reload();
         }
     }

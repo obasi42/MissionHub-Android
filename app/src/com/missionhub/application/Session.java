@@ -167,15 +167,8 @@ public class Session implements OnAccountsUpdateListener {
                 mAccountManager.setUserData(mAccount, Authenticator.KEY_PERSON_ID, String.valueOf(getPerson().getId()));
                 mAccountManager.setUserData(mAccount, AccountManager.KEY_ACCOUNT_NAME, getPerson().getName());
 
-                Log.e("HERE", "BEFORE REFRESH ALL");
-
                 getPerson().refreshAll();
-
-                Log.e("HERE", "BEFORE UPDATE LABELS");
-
                 updateLabels();
-
-                Log.e("HERE", "BEFORE ORG HIERARCHY");
 
                 // update the person's organization hierarchy, as it is too expensive to do from the ui thread.
                 getPerson().resetOrganizationHierarchy();
@@ -292,8 +285,8 @@ public class Session implements OnAccountsUpdateListener {
 
         if (Configuration.isACRAEnabled()) {
             try {
-            ACRA.getErrorReporter().putCustomData("mPersonId", String.valueOf(mPersonId));
-            ACRA.getErrorReporter().putCustomData("mOrganizationId", String.valueOf(mOrganizationId));
+                ACRA.getErrorReporter().putCustomData("mPersonId", String.valueOf(mPersonId));
+                ACRA.getErrorReporter().putCustomData("mOrganizationId", String.valueOf(mOrganizationId));
             } catch (Exception e) {
                 /* ignore */
             }

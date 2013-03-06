@@ -364,6 +364,8 @@ public class ContactAssignmentDialogFragment extends RefreshableDialogFragment i
     }
 
     public static abstract class AssignmentFragment extends BaseFragment {
+        public AssignmentFragment() {}
+
         public ContactAssignmentDialogFragment getDialog() {
             return (ContactAssignmentDialogFragment) getParentFragment();
         }
@@ -384,6 +386,8 @@ public class ContactAssignmentDialogFragment extends RefreshableDialogFragment i
         public static final int INDEX = 0;
         public static final int LEADERS = 1;
         public static final int GROUPS = 2;
+
+        public IndexFragment() {}
 
         @Override
         public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
@@ -482,6 +486,8 @@ public class ContactAssignmentDialogFragment extends RefreshableDialogFragment i
          * the search adapter
          */
         private ContactAssignmentAdapter mSearchAdapter;
+
+        public SelectionFragment() {}
 
         @Override
         public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {

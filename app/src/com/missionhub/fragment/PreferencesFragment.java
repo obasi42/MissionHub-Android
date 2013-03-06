@@ -33,6 +33,8 @@ public class PreferencesFragment extends BaseFragment {
     private int mDefaultSpinnerIndex = 0;
     private DisplayImageOptions mImageLoaderOptions;
 
+    public PreferencesFragment() {}
+
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

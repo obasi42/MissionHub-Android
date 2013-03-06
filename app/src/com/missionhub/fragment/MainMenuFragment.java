@@ -31,6 +31,8 @@ public class MainMenuFragment extends BaseFragment implements OnItemClickListene
      */
     private MainMenuAdapter mAdapter;
 
+    public MainMenuFragment() {}
+
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

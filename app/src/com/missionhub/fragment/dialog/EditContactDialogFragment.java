@@ -3,8 +3,8 @@ package com.missionhub.fragment.dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
+import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.RadioGroup;
 import com.missionhub.R;
 import com.missionhub.api.Api;
@@ -20,7 +20,6 @@ import com.missionhub.model.gson.GPhoneNumber;
 import com.missionhub.util.SafeAsyncTask;
 import com.missionhub.util.U;
 import org.holoeverywhere.ArrayAdapter;
-import org.holoeverywhere.app.Activity;
 import org.holoeverywhere.app.AlertDialog;
 import org.holoeverywhere.app.Dialog;
 import org.holoeverywhere.widget.Button;
@@ -73,10 +72,6 @@ public class EditContactDialogFragment extends BaseDialogFragment {
     public EditContactDialogFragment() {
     }
 
-    public static EditContactDialogFragment show(FragmentManager fm, final boolean assignToMe) {
-        return showForResult(fm, null);
-    }
-
     public static EditContactDialogFragment showForResult(FragmentManager fm, Integer requestCode) {
         return EditContactDialogFragment.show(EditContactDialogFragment.class, fm, null, requestCode);
     }
@@ -121,8 +116,6 @@ public class EditContactDialogFragment extends BaseDialogFragment {
         final AlertDialog.Builder builder = new AlertDialog.Builder(getSupportActivity());
         builder.setTitle(R.string.action_add_contact);
         builder.setView(view);
-        builder.setButtonBehavior(0);
-        builder.setOnCancelListener(this);
         builder.setPositiveButton(R.string.action_save, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -132,18 +125,16 @@ public class EditContactDialogFragment extends BaseDialogFragment {
         builder.setNeutralButton(R.string.action_cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                dismiss();
+                cancel();
             }
         });
+        builder.setBlockDismiss(true);
 
         if (mTask != null) {
             showProgress();
         }
 
-        final AlertDialog dialog = builder.create();
-        mSaveButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
-
-        return dialog;
+        return builder.create();
     }
 
     /**
@@ -153,6 +144,17 @@ public class EditContactDialogFragment extends BaseDialogFragment {
     public void onDestroyView() {
         writeToPerson(mPerson);
         super.onDestroyView();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (getDialog() != null) {
+            mSaveButton = ((AlertDialog) getDialog()).getButton(DialogInterface.BUTTON_POSITIVE);
+            if (mTask != null) {
+                mSaveButton.setEnabled(false);
+            }
+        }
     }
 
     public void restoreFromPerson(final GPerson person) {
@@ -278,7 +280,7 @@ public class EditContactDialogFragment extends BaseDialogFragment {
 
             @Override
             public void onSuccess(final Person contact) {
-                setResult(RESULT_OK, contact);
+                setResult(RESULT_OK, contact.getId());
                 dismiss();
             }
 
@@ -306,9 +308,9 @@ public class EditContactDialogFragment extends BaseDialogFragment {
 
     @Override
     public void onCancel(final DialogInterface dialog) {
-        if (mTask != null) {
+        try {
             mTask.cancel(true);
-        }
+        } catch (Exception e) { /* ignore */ }
         super.onCancel(dialog);
     }
 
@@ -316,6 +318,7 @@ public class EditContactDialogFragment extends BaseDialogFragment {
         if (U.isNull(mForm, mProgress)) return;
         mForm.setVisibility(View.GONE);
         mProgress.setVisibility(View.VISIBLE);
+
         if (mSaveButton != null) {
             mSaveButton.setEnabled(false);
         }
@@ -325,6 +328,7 @@ public class EditContactDialogFragment extends BaseDialogFragment {
         if (U.isNull(mForm, mProgress)) return;
         mProgress.setVisibility(View.GONE);
         mForm.setVisibility(View.VISIBLE);
+
         if (mSaveButton != null) {
             mSaveButton.setEnabled(true);
         }

@@ -11,9 +11,11 @@ import org.holoeverywhere.app.DialogFragment;
 public class BaseDialogFragment extends DialogFragment implements FragmentResult {
 
     private boolean mSetResult = false;
-    private int mRequestCode;
+    private int mRequestCode = Integer.MIN_VALUE;
     private int mResultCode = RESULT_OK;
     private Object mResultData;
+
+    public BaseDialogFragment() {}
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -45,7 +47,7 @@ public class BaseDialogFragment extends DialogFragment implements FragmentResult
     }
 
     public void cancel() {
-        setResult(RESULT_CANCELED);
+        setResult(RESULT_CANCELED, mResultData);
         dismiss();
     }
 
@@ -106,6 +108,9 @@ public class BaseDialogFragment extends DialogFragment implements FragmentResult
 
     protected static <T extends BaseDialogFragment> T show(Class<T> clazz, FragmentManager fm, Bundle args, Integer requestCode) {
         T fragment = findInstance(fm, clazz, true);
+        if (args == null) {
+            args = new Bundle();
+        }
         try {
             if (requestCode > 0) {
                 args.putInt("requestCode", requestCode);

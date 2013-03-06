@@ -42,13 +42,12 @@ public class MyContactsFragment extends ContactListMainFragment implements OnPag
     private FragmentStatePagerAdapter mAdapter;
 
     private MyAllContactsFragment mAll;
-    private ApiContactListProvider mAllProvider;
     private MyInProgressContactsFragment mInProgress;
-    private ApiContactListProvider mInProgressProvider;
     private MyCompletedContactsFragment mCompleted;
-    private ApiContactListProvider mCompletedProvider;
 
     private int mPage = 1;
+
+    public MyContactsFragment() {}
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -130,19 +129,22 @@ public class MyContactsFragment extends ContactListMainFragment implements OnPag
         getSupportActivity().getSupportActionBar().setTitle(R.string.my_contacts_title);
     }
 
-    public class MyAllContactsFragment extends ContactListFragment {
+    public static class MyAllContactsFragment extends ContactListFragment {
+        public MyAllContactsFragment() {}
+
         @Override
         public ContactListProvider onCreateContactProvider() {
             final PersonListOptions options = PersonListOptions.builder() //
                     .assignedTo(Session.getInstance().getPersonId()) //
                     .build();
 
-            mAllProvider = new ApiContactListProvider(getSupportActivity(), options, false);
-            return mAllProvider;
+            return new ApiContactListProvider(getSupportActivity(), options, false);
         }
     }
 
-    public class MyInProgressContactsFragment extends ContactListFragment {
+    public static class MyInProgressContactsFragment extends ContactListFragment {
+        public MyInProgressContactsFragment() {}
+
         @Override
         public ContactListProvider onCreateContactProvider() {
             final PersonListOptions options = PersonListOptions.builder() //
@@ -150,12 +152,13 @@ public class MyContactsFragment extends ContactListMainFragment implements OnPag
                     .followupStatus(EnumSet.of(FollowupStatus.uncontacted, FollowupStatus.attempted_contact, FollowupStatus.contacted)) //
                     .build();
 
-            mInProgressProvider = new ApiContactListProvider(getSupportActivity(), options);
-            return mInProgressProvider;
+            return new ApiContactListProvider(getSupportActivity(), options);
         }
     }
 
-    public class MyCompletedContactsFragment extends ContactListFragment {
+    public static class MyCompletedContactsFragment extends ContactListFragment {
+        public MyCompletedContactsFragment() {}
+
         @Override
         public ContactListProvider onCreateContactProvider() {
             final PersonListOptions options = PersonListOptions.builder() //
@@ -163,8 +166,7 @@ public class MyContactsFragment extends ContactListMainFragment implements OnPag
                     .followupStatus(FollowupStatus.completed) //
                     .build();
 
-            mCompletedProvider = new ApiContactListProvider(getSupportActivity(), options, false);
-            return mCompletedProvider;
+            return new ApiContactListProvider(getSupportActivity(), options, false);
         }
     }
 
@@ -201,32 +203,20 @@ public class MyContactsFragment extends ContactListMainFragment implements OnPag
         return null;
     }
 
-    private ApiContactListProvider getCurrentProvider() {
-        switch (mPage) {
-            case 0:
-                return mAllProvider;
-            case 1:
-                return mInProgressProvider;
-            case 2:
-                return mCompletedProvider;
-        }
-        return null;
-    }
-
     @Override
     public void onSearchTextChange(final String query) {
         if (query.length() == 0) {
-            getContactListFragment().setProvider(getCurrentProvider());
+            getContactListFragment().removeAltProvider();
             mPager.setPagingLocked(false);
             mTabStrip.setVisibility(View.VISIBLE);
         } else {
             mPager.setPagingLocked(true);
             mTabStrip.setVisibility(View.GONE);
 
-            PersonListOptions options = mAllProvider.getOptions();
+            PersonListOptions options = ((ApiContactListProvider) mAll.getProvider()).getOptions();
             options.addFilter("name_or_email_like", query);
             ApiContactListProvider searchProvider = new ApiContactListProvider(getSupportActivity(), options);
-            getContactListFragment().setProvider(searchProvider);
+            getContactListFragment().setAltProvider(searchProvider);
             searchProvider.reload();
         }
     }
