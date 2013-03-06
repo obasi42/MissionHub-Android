@@ -584,9 +584,9 @@ public class Api {
 
             appendLoggingParams(params);
 
-            Log.e("API", method.name() + ": " + url);
-            Log.e("API", headers.toString());
-            Log.e("API", params.toString());
+            Log.d("API", method.name() + ": " + url);
+            Log.d("API", headers.toString());
+            Log.d("API", params.toString());
 
             // create the client and get the response
             final HttpClient client = new HttpClient();
@@ -688,6 +688,6 @@ public class Api {
      * Enum of all available includes
      */
     public enum Include {
-        answers, surveys, answer_sheets, all_organizational_roles, organizational_roles, followup_comments, contact_assignments, assigned_tos, current_address, user, phone_numbers, person_transfers, email_addresses, all_questions, elements, keyword, contacts, admins, leaders, people, groups, keywords, assigned_to, person, comments_on_me, rejoicables
+        answers, surveys, answer_sheets, all_organizational_roles, all_organization_and_children, organizational_roles, followup_comments, contact_assignments, assigned_tos, current_address, user, phone_numbers, person_transfers, email_addresses, all_questions, elements, keyword, contacts, admins, leaders, people, groups, keywords, assigned_to, person, comments_on_me, rejoicables
     }
 }

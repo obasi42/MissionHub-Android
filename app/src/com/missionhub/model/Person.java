@@ -69,7 +69,7 @@ public class Person {
 
     // KEEP FIELDS - put your custom fields here
 	private SetMultimap<Long, Long> mLabels; // organizationId, label
-	private SetMultimap<Long, U.Role> mRoleCache;
+	private SetMultimap<Long, RoleEntry> mRoleCache;
 	private TreeDataStructure<Long> mOrganizationHierarchy;
 	private Map<Long, FollowupStatus> mStatuses;
 	private EmailAddress mPrimaryEmailAddress;
@@ -553,37 +553,58 @@ public class Person {
 	public synchronized boolean hasRole(U.Role role) {
 		return hasRole(role, Session.getInstance().getOrganizationId());
 	}
+
+    public static class RoleEntry extends AbstractMap.SimpleEntry<U.Role, Boolean> {
+        public RoleEntry(U.Role role, Boolean permission) {
+            super(role, permission);
+        }
+    }
 	
 	public synchronized boolean hasRole(U.Role role, final long organizationId) {
 		if (mRoleCache == null) {
-			mRoleCache = Multimaps.synchronizedSetMultimap(HashMultimap.<Long, U.Role> create());
+			mRoleCache = Multimaps.synchronizedSetMultimap(HashMultimap.<Long, RoleEntry> create());
 		}
-		
-		if (mRoleCache.containsEntry(organizationId, role)) {
-			return true;
-		}
+
+        if (mRoleCache.containsKey(organizationId)) {
+            Set<RoleEntry> roles = mRoleCache.get(organizationId);
+            for (RoleEntry entry : roles) {
+                if (entry.getKey() == role) {
+                    return entry.getValue();
+                }
+            }
+        }
 		
 		if (hasLabel(organizationId, role.id())) {
-			mRoleCache.put(organizationId, role);
+			mRoleCache.put(organizationId, new RoleEntry(role, true));
 			return true;
 		}
 		
 		if (daoSession == null) {
 			throw new DaoException("Entity is detached from DAO context");
 		}
-		
-		// check sub orgs for admins
-		if (role == U.Role.admin) {
+
+		// check sub orgs for admins and leaders
+		if (role == U.Role.admin || role == U.Role.leader) {
 			Organization organization = daoSession.getOrganizationDao().load(organizationId);
 			if (organization != null && !U.isNullEmpty(organization.getAncestry())) {
-				String[] ancestors = organization.getAncestry().trim().split("/");
-				
-				for(String ancestor : ancestors) {
-					if (hasLabel(Long.parseLong(ancestor), role.id())) {
-						mRoleCache.put(organizationId, role);
-						return true;
-					}
-				}
+
+                // find the parent with a permission
+                List<String> ancestors = Arrays.asList(organization.getAncestry().trim().split("/"));
+                Collections.reverse(ancestors);
+                Organization parent = null;
+                for(String ancestor : ancestors) {
+                    if (hasLabel(Long.parseLong(ancestor), role.id())) {
+                        parent = Application.getDb().getOrganizationDao().load(Long.parseLong(ancestor));
+                        break;
+                    }
+                }
+                if (parent != null && parent.getShow_sub_orgs()) {
+                    mRoleCache.put(organizationId, new RoleEntry(role, true));
+                    return true;
+                } else {
+                    mRoleCache.put(organizationId, new RoleEntry(role, false));
+                    return false;
+                }
 			}
 		}
 		
@@ -666,7 +687,7 @@ public class Person {
 					.list();
 			
 			for (final Organization organization : organizations) {
-				recursiveBuildOrganizationHierarchy(tree, organization, hasLabel(organization.getId(), U.Role.admin.id()));
+				recursiveBuildOrganizationHierarchy(tree, organization);
 			}
 			
 			mOrganizationHierarchy = tree;
@@ -674,7 +695,7 @@ public class Person {
 		return mOrganizationHierarchy;
 	}
 
-	private synchronized void recursiveBuildOrganizationHierarchy(final TreeDataStructure<Long> tree, final Organization organization, final boolean isAdmin) {
+	private synchronized void recursiveBuildOrganizationHierarchy(final TreeDataStructure<Long> tree, final Organization organization) {
 		if (organization.getAncestry() != null) {
 			TreeDataStructure<Long> parent = tree;
 			boolean hasPermissions = false;
@@ -702,11 +723,11 @@ public class Person {
 			}
 		}
 		
-		// parse sub orgs for admins
-		if (organization.getShow_sub_orgs() && isAdmin) {
+		// parse sub orgs
+		if (organization.getShow_sub_orgs()) {
 			final List<Organization> subOrgs = organization.getSubOrganizations();
 			for (final Organization subOrg : subOrgs) {
-				recursiveBuildOrganizationHierarchy(tree, subOrg, isAdmin);
+				recursiveBuildOrganizationHierarchy(tree, subOrg);
 			}
 		}
 	}

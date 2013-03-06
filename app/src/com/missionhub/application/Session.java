@@ -1,7 +1,6 @@
 package com.missionhub.application;
 
 import android.accounts.*;
-import android.util.Log;
 import com.missionhub.R;
 import com.missionhub.api.Api;
 import com.missionhub.api.Api.Include;
@@ -152,6 +151,7 @@ public class Session implements OnAccountsUpdateListener {
             @Override
             public Person call() throws Exception {
                 Api.getPersonMe(ApiOptions.builder() //
+                        .include(Include.all_organization_and_children) //
                         .include(Api.Include.all_organizational_roles) //
                         .include(Api.Include.answer_sheets) //
                         .include(Api.Include.answers) //
@@ -183,29 +183,6 @@ public class Session implements OnAccountsUpdateListener {
         mUpdatePersonTask = new FutureTask<Person>(callable);
         Application.getExecutor().submit(mUpdatePersonTask);
         return mUpdatePersonTask;
-    }
-
-    /**
-     * Updates the basic organization data the user has access to
-     */
-    public FutureTask<Void> updateUserOrganizations() {
-        if (mUpdateOrganizationsTask != null) return mUpdateOrganizationsTask;
-        final Callable<Void> callable = new Callable<Void>() {
-            @Override
-            public Void call() throws Exception {
-                final long lastUpdated = Long.parseLong(SettingsManager.getInstance().getUserSetting(getPersonId(), "organizations_last_updated", "0"));
-                SettingsManager.getInstance().setUserSetting(getPersonId(), "organizations_last_updated", System.currentTimeMillis() - 1000);
-
-                Api.listOrganizations(ApiOptions.builder().since(lastUpdated).build()).get();
-
-                mUpdateOrganizationsTask = null;
-                return null;
-            }
-        };
-
-        mUpdateOrganizationsTask = new FutureTask<Void>(callable);
-        Application.getExecutor().submit(mUpdateOrganizationsTask);
-        return mUpdateOrganizationsTask;
     }
 
     private FutureTask<Void> updateCurrentOrganization(final boolean force) {
@@ -309,10 +286,6 @@ public class Session implements OnAccountsUpdateListener {
             @Override
             public void run() {
                 try {
-                    // update the organizations
-                    Application.postEvent(new SessionResumeStatusEvent(Application.getContext().getString(R.string.init_updating_orgs)));
-                    updateUserOrganizations().get();
-
                     // update the person
                     Application.postEvent(new SessionResumeStatusEvent(Application.getContext().getString(R.string.init_updating_person)));
                     updatePerson().get();
@@ -353,6 +326,15 @@ public class Session implements OnAccountsUpdateListener {
             mUpdateOrganizationsTask = null;
         } catch (final Exception e) {
 			/* ignore */
+        }
+
+        if (Configuration.isACRAEnabled()) {
+            try {
+                ACRA.getErrorReporter().removeCustomData("mPersonId");
+                ACRA.getErrorReporter().removeCustomData("mOrganizationId");
+            } catch (Exception e) {
+                /* ignore */
+            }
         }
 
         // clear database cache

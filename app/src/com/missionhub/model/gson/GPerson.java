@@ -40,6 +40,7 @@ public class GPerson {
     public GRejoicable[] rejoicables;
     public GOrganizationalRole[] organizational_roles;
     public GOrganizationalRole[] all_organizational_roles;
+    public GOrganization[] all_organization_and_children;
     public GAddress current_address;
     public GAnswerSheet[] answer_sheets;
 
@@ -225,6 +226,12 @@ public class GPerson {
                             role.save(true);
                         }
                         person.resetLabels();
+                    }
+
+                    if (all_organization_and_children != null) {
+                        for (GOrganization organization : all_organization_and_children) {
+                            organization.save(true);
+                        }
                     }
 
                     if (answer_sheets != null) {
