@@ -218,8 +218,12 @@
 
     <!-- Crash Reporting -->
     <string name="crash_dialog_title">MissionHub Has Crashed</string>
-    <string name="crash_dialog_text">An unexpected error occurred forcing the application to stop. Please help us fix this by sending us error data, all you have to do is click OK.</string>
-    <string name="crash_dialog_comment_prompt">You can add comments about the problem below. If you include your email address we will followup with you when the issue has been resolved.</string>
+    <string name="crash_dialog_text">An unexpected error occurred forcing the application to stop. Please help us fix
+        this by sending us error data, all you have to do is click OK.
+    </string>
+    <string name="crash_dialog_comment_prompt">You can add comments about the problem below. If you include your email
+        address we will followup with you when the issue has been resolved.
+    </string>
     <string name="crash_dialog_ok_toast">Thank you!</string>
 
 </resources>

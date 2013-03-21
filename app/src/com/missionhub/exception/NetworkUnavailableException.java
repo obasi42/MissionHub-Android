@@ -1,4 +1,4 @@
-package com.missionhub.network;
+package com.missionhub.exception;
 
 import com.missionhub.R;
 import com.missionhub.application.Application;

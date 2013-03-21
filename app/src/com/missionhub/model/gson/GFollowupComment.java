@@ -3,11 +3,11 @@ package com.missionhub.model.gson;
 import com.missionhub.application.Application;
 import com.missionhub.model.FollowupComment;
 import com.missionhub.model.FollowupCommentDao;
-import com.missionhub.network.HttpParams;
 import com.missionhub.util.U;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 public class GFollowupComment {
@@ -117,32 +117,32 @@ public class GFollowupComment {
         }
     }
 
-    public void toParams(final HttpParams params) {
+    public void toParams(final Map<String, String> params) {
         if (id > 0) {
-            params.add("followup_comment[id]", id);
+            params.put("followup_comment[id]", String.valueOf(id));
         }
         if (contact_id > 0) {
-            params.add("followup_comment[contact_id]", contact_id);
+            params.put("followup_comment[contact_id]", String.valueOf(contact_id));
         }
         if (commenter_id > 0) {
-            params.add("followup_comment[commenter_id]", commenter_id);
+            params.put("followup_comment[commenter_id]", String.valueOf(commenter_id));
         }
         if (!U.isNullEmpty(comment)) {
-            params.add("followup_comment[comment]", comment);
+            params.put("followup_comment[comment]", comment);
         }
         if (!U.isNullEmpty(status)) {
-            params.add("followup_comment[status]", status);
+            params.put("followup_comment[status]", status);
         }
         if (rejoicables != null) {
             for (int i = 0; i < rejoicables.length; i++) {
                 final GRejoicable rejoicable = rejoicables[i];
                 if (rejoicable.id > 0) {
-                    params.add("followup_comment[rejoicables_attributes][" + i + "][id]", rejoicable.id);
+                    params.put("followup_comment[rejoicables_attributes][" + i + "][id]", String.valueOf(rejoicable.id));
                 }
                 if (U.isNullEmpty(rejoicable.what) && rejoicable.id > 0) {
-                    params.add("followup_comment[rejoicables_attributes][" + i + "][_destroy]", true);
+                    params.put("followup_comment[rejoicables_attributes][" + i + "][_destroy]", String.valueOf(true));
                 } else if (!U.isNullEmpty(rejoicable.what)) {
-                    params.add("followup_comment[rejoicables_attributes][" + i + "][what]", rejoicable.what);
+                    params.put("followup_comment[rejoicables_attributes][" + i + "][what]", rejoicable.what);
                 }
             }
         }

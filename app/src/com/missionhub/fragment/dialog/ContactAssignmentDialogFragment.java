@@ -32,10 +32,7 @@ import com.missionhub.util.U;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.PauseOnScrollListener;
-import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
-import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
 import org.holoeverywhere.LayoutInflater;
-import org.holoeverywhere.app.Activity;
 import org.holoeverywhere.app.Fragment;
 import org.holoeverywhere.widget.ListView;
 import org.holoeverywhere.widget.TextView;
@@ -111,7 +108,7 @@ public class ContactAssignmentDialogFragment extends RefreshableDialogFragment i
         final Bundle args = new Bundle();
 
         final HashSet<Long> peopleIds = new HashSet<Long>();
-        for(Person p : people) {
+        for (Person p : people) {
             peopleIds.add(p.getId());
         }
         args.putSerializable("peopleIds", peopleIds);
@@ -126,7 +123,7 @@ public class ContactAssignmentDialogFragment extends RefreshableDialogFragment i
             @SuppressWarnings("unchecked") final HashSet<Long> peopleIds = (HashSet<Long>) getArguments().getSerializable("peopleIds");
             if (peopleIds != null) {
                 mPeople.clear();
-                for(Long id : peopleIds) {
+                for (Long id : peopleIds) {
                     Person person = Application.getDb().getPersonDao().load(id);
                     if (person != null) {
                         mPeople.add(person);
@@ -364,7 +361,8 @@ public class ContactAssignmentDialogFragment extends RefreshableDialogFragment i
     }
 
     public static abstract class AssignmentFragment extends BaseFragment {
-        public AssignmentFragment() {}
+        public AssignmentFragment() {
+        }
 
         public ContactAssignmentDialogFragment getDialog() {
             return (ContactAssignmentDialogFragment) getParentFragment();
@@ -387,7 +385,8 @@ public class ContactAssignmentDialogFragment extends RefreshableDialogFragment i
         public static final int LEADERS = 1;
         public static final int GROUPS = 2;
 
-        public IndexFragment() {}
+        public IndexFragment() {
+        }
 
         @Override
         public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
@@ -487,7 +486,8 @@ public class ContactAssignmentDialogFragment extends RefreshableDialogFragment i
          */
         private ContactAssignmentAdapter mSearchAdapter;
 
-        public SelectionFragment() {}
+        public SelectionFragment() {
+        }
 
         @Override
         public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {

@@ -15,7 +15,8 @@ public class BaseDialogFragment extends DialogFragment implements FragmentResult
     private int mResultCode = RESULT_OK;
     private Object mResultData;
 
-    public BaseDialogFragment() {}
+    public BaseDialogFragment() {
+    }
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {

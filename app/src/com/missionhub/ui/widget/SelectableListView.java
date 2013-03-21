@@ -199,7 +199,7 @@ public class SelectableListView extends ListView {
     @Override
     public synchronized void clearChoices() {
         SparseBooleanArray positions = getCheckedItemPositions();
-        for (int i=0; i < positions.size(); i++) {
+        for (int i = 0; i < positions.size(); i++) {
             if (positions.valueAt(i)) {
                 setItemChecked(i, false);
             }

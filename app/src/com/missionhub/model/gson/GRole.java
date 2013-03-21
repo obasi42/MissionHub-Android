@@ -3,9 +3,9 @@ package com.missionhub.model.gson;
 import com.missionhub.application.Application;
 import com.missionhub.model.Role;
 import com.missionhub.model.RoleDao;
-import com.missionhub.network.HttpParams;
 import com.missionhub.util.U;
 
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 public class GRole {
@@ -53,18 +53,18 @@ public class GRole {
         }
     }
 
-    public void toParams(final HttpParams params) {
+    public void toParams(final Map<String, String> params) {
         if (id > 0) {
-            params.add("role[id]", id);
+            params.put("role[id]", String.valueOf(id));
         }
         if (organization_id > 0) {
-            params.add("role[organization_id]", organization_id);
+            params.put("role[organization_id]", String.valueOf(organization_id));
         }
         if (!U.isNullEmpty(name)) {
-            params.add("role[name]", name);
+            params.put("role[name]", name);
         }
         if (!U.isNullEmpty(i18n)) {
-            params.add("role[i18n]", i18n);
+            params.put("role[i18n]", i18n);
         }
     }
 

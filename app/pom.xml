@@ -45,7 +45,7 @@
         <dependency>
             <groupId>org.holoeverywhere</groupId>
             <artifactId>library</artifactId>
-            <version>1.4.3-SNAPSHOT</version>
+            <version>1.5.1-SNAPSHOT</version>
             <type>apklib</type>
             <exclusions>
                 <exclusion>
@@ -57,7 +57,7 @@
         <dependency>
             <groupId>org.holoeverywhere</groupId>
             <artifactId>addon-slidingmenu</artifactId>
-            <version>1.4.3-SNAPSHOT</version>
+            <version>1.5.1-SNAPSHOT</version>
             <type>apklib</type>
             <exclusions>
                 <exclusion>
@@ -69,7 +69,7 @@
         <dependency>
             <groupId>org.holoeverywhere</groupId>
             <artifactId>addon-preferences</artifactId>
-            <version>1.4.3-SNAPSHOT</version>
+            <version>1.5.1-SNAPSHOT</version>
             <type>apklib</type>
             <exclusions>
                 <exclusion>
@@ -150,6 +150,11 @@
             <groupId>ch.acra</groupId>
             <artifactId>acra</artifactId>
             <version>4.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.kevinsawicki</groupId>
+            <artifactId>http-request</artifactId>
+            <version>4.1</version>
         </dependency>
     </dependencies>
     <build>

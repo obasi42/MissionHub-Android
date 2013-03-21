@@ -2,9 +2,7 @@ package com.missionhub.fragment;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -39,14 +37,15 @@ import com.missionhub.util.U.Gender;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.PauseOnScrollListener;
-import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
-import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 import org.holoeverywhere.LayoutInflater;
 import org.holoeverywhere.app.AlertDialog;
 import org.holoeverywhere.widget.*;
 
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 public class ContactInfoFragment extends BaseFragment {
 
@@ -231,7 +230,8 @@ public class ContactInfoFragment extends BaseFragment {
 
     private AnimateOnceImageLoadingListener mLoadingListener = new AnimateOnceImageLoadingListener(250);
 
-    public ContactInfoFragment() {}
+    public ContactInfoFragment() {
+    }
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -583,7 +583,7 @@ public class ContactInfoFragment extends BaseFragment {
             more.add(new MoreInfoAdapter.SectionHeaderItem(getString(R.string.contact_label_labels)));
 
             boolean needLabelUpdate = false;
-            for(long labelId : labelIds) {
+            for (long labelId : labelIds) {
                 final Role label = Application.getDb().getRoleDao().load(labelId);
                 if (label != null) {
                     MoreInfoAdapter.IconTextItem item = new MoreInfoAdapter.IconTextItem(label.getTranslatedName(), R.drawable.ic_label);
@@ -605,7 +605,7 @@ public class ContactInfoFragment extends BaseFragment {
         }
 
         mHeaderMore.removeAllViews();
-        for(int i=0; i<more.getCount(); i++) {
+        for (int i = 0; i < more.getCount(); i++) {
             mHeaderMore.addView(more.getView(i, null, null));
         }
 
@@ -1304,7 +1304,7 @@ public class ContactInfoFragment extends BaseFragment {
             if (!(object instanceof SectionHeaderItem)) {
                 Object nextItem = null;
                 try {
-                    nextItem = getItem(position+1);
+                    nextItem = getItem(position + 1);
                 } catch (Exception e) { /* ignore */ }
                 if (nextItem == null || nextItem instanceof SectionHeaderItem) {
                     View divider = view.findViewById(R.id.divider);

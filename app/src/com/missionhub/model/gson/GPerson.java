@@ -4,10 +4,10 @@ import com.google.common.collect.HashMultimap;
 import com.missionhub.application.Application;
 import com.missionhub.application.Session;
 import com.missionhub.model.*;
-import com.missionhub.network.HttpParams;
 import com.missionhub.util.U;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
@@ -264,31 +264,31 @@ public class GPerson {
      *
      * @param params
      */
-    public void toParams(final HttpParams params) {
+    public void toParams(final Map<String, String> params) {
         if (!U.isNullEmpty(first_name)) {
-            params.add("person[first_name]", first_name);
+            params.put("person[first_name]", first_name);
         }
         if (!U.isNullEmpty(last_name)) {
-            params.add("person[last_name]", last_name);
+            params.put("person[last_name]", last_name);
         }
         if (!U.isNullEmpty(gender)) {
-            params.add("person[gender]", gender);
+            params.put("person[gender]", gender);
         }
 
         if (phone_numbers != null) {
             for (int i = 0; i < phone_numbers.length; i++) {
                 final GPhoneNumber number = phone_numbers[i];
                 if (number.id > 0) {
-                    params.add("person[phone_numbers_attributes][" + i + "][id]", number.id);
+                    params.put("person[phone_numbers_attributes][" + i + "][id]", String.valueOf(number.id));
                 }
                 if (!U.isNullEmpty(number.number)) {
-                    params.add("person[phone_numbers_attributes][" + i + "][number]", number.number);
+                    params.put("person[phone_numbers_attributes][" + i + "][number]", number.number);
                 }
                 if (!U.isNullEmpty(number.location)) {
-                    params.add("person[phone_numbers_attributes][" + i + "][location]", number.location);
+                    params.put("person[phone_numbers_attributes][" + i + "][location]", number.location);
                 }
                 if (!U.isNullEmpty(number.primary)) {
-                    params.add("person[phone_numbers_attributes][" + i + "][primary]", number.primary);
+                    params.put("person[phone_numbers_attributes][" + i + "][primary]", String.valueOf(number.primary));
                 }
             }
         }
@@ -297,16 +297,16 @@ public class GPerson {
             for (int i = 0; i < email_addresses.length; i++) {
                 final GEmailAddress address = email_addresses[i];
                 if (address.id > 0) {
-                    params.add("person[email_addresses_attributes][" + i + "][id]", address.id);
+                    params.put("person[email_addresses_attributes][" + i + "][id]", String.valueOf(address.id));
                 }
                 if (address.id > 0 && U.isNullEmpty(address.email)) {
-                    params.add("person[email_addresses_attributes][" + i + "][_destroy]", true);
+                    params.put("person[email_addresses_attributes][" + i + "][_destroy]", String.valueOf(true));
                 } else {
                     if (!U.isNullEmpty(address.email)) {
-                        params.add("person[email_addresses_attributes][" + i + "][email]", address.email);
+                        params.put("person[email_addresses_attributes][" + i + "][email]", address.email);
                     }
                     if (!U.isNullEmpty(address.primary)) {
-                        params.add("person[email_addresses_attributes][" + i + "][primary]", address.primary);
+                        params.put("person[email_addresses_attributes][" + i + "][primary]", String.valueOf(address.primary));
                     }
                 }
             }
@@ -314,22 +314,22 @@ public class GPerson {
 
         if (current_address != null) {
             if (!U.isNullEmpty(current_address.address1)) {
-                params.add("person[current_address_attributes][address1]", current_address.address1);
+                params.put("person[current_address_attributes][address1]", current_address.address1);
             }
             if (!U.isNullEmpty(current_address.address2)) {
-                params.add("person[current_address_attributes][address2]", current_address.address2);
+                params.put("person[current_address_attributes][address2]", current_address.address2);
             }
             if (!U.isNullEmpty(current_address.city)) {
-                params.add("person[current_address_attributes][city]", current_address.city);
+                params.put("person[current_address_attributes][city]", current_address.city);
             }
             if (!U.isNullEmpty(current_address.country)) {
-                params.add("person[current_address_attributes][country]", current_address.country);
+                params.put("person[current_address_attributes][country]", current_address.country);
             }
             if (!U.isNullEmpty(current_address.state)) {
-                params.add("person[current_address_attributes][state]", current_address.state);
+                params.put("person[current_address_attributes][state]", current_address.state);
             }
             if (!U.isNullEmpty(current_address.zip)) {
-                params.add("person[current_address_attributes][zip]", current_address.zip);
+                params.put("person[current_address_attributes][zip]", current_address.zip);
             }
         }
 
@@ -338,12 +338,12 @@ public class GPerson {
                 final Set<String> values = _answers.get(key);
                 if (values.size() <= 1) {
                     for (final String value : values) {
-                        params.add("answers[" + key + "]", value);
+                        params.put("answers[" + key + "]", value);
                     }
                 } else {
                     int count = 0;
                     for (final String value : values) {
-                        params.add("answers[" + key + "][" + count + "]", value);
+                        params.put("answers[" + key + "][" + count + "]", value);
                         count++;
                     }
                 }

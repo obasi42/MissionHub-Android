@@ -1,41 +1,31 @@
 package com.missionhub.api;
 
 import com.missionhub.api.Api.ApiResponseParser;
-import com.missionhub.network.HttpClient.HttpMethod;
-import com.missionhub.network.HttpClient.ResponseType;
-import com.missionhub.network.HttpHeaders;
-import com.missionhub.network.HttpParams;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
 
 public class ApiOptions {
 
-    protected Object id;
-    protected HttpMethod method;
+    protected String method;
     protected String url;
-    protected HttpHeaders headers;
-    protected HttpParams params;
+    protected Map<String, String> headers;
+    protected Map<String, String> params;
     protected Boolean authenticated;
-    protected ResponseType responseType;
     protected Set<String> includes;
-    protected ExecutorService executor;
     protected ApiResponseParser<?> responseParser;
     protected Long since;
     protected Long limit;
     protected Long offset;
 
     private ApiOptions(final Builder<?> builder) {
-        id = builder.id;
         method = builder.method;
         url = builder.url;
         headers = builder.headers;
         params = builder.params;
         authenticated = builder.authenticated;
-        responseType = builder.responseType;
         includes = builder.includes;
-        executor = builder.executor;
         responseParser = builder.responseParser;
         since = builder.since;
         limit = builder.limit;
@@ -44,15 +34,12 @@ public class ApiOptions {
 
     public static class Builder<T extends Builder<T>> {
 
-        private Object id;
-        private HttpMethod method;
+        private String method;
         private String url;
-        private HttpHeaders headers;
-        private HttpParams params;
+        private Map<String, String> headers;
+        private Map<String, String> params;
         private Boolean authenticated;
-        private ResponseType responseType;
         private Set<String> includes;
-        private ExecutorService executor;
         private ApiResponseParser<?> responseParser;
         private Long since;
         private Long limit;
@@ -63,12 +50,7 @@ public class ApiOptions {
             return (T) this;
         }
 
-        public T id(final Object id) {
-            this.id = id;
-            return self();
-        }
-
-        public T method(final HttpMethod method) {
+        public T method(final String method) {
             this.method = method;
             return self();
         }
@@ -78,28 +60,18 @@ public class ApiOptions {
             return self();
         }
 
-        public T headers(final HttpHeaders headers) {
+        public T headers(final Map<String, String> headers) {
             this.headers = headers;
             return self();
         }
 
-        public T params(final HttpParams params) {
+        public T params(final Map<String, String> params) {
             this.params = params;
             return self();
         }
 
         public T authenticated(final boolean authenticated) {
             this.authenticated = authenticated;
-            return self();
-        }
-
-        public T responseType(final ResponseType type) {
-            this.responseType = type;
-            return self();
-        }
-
-        public T executor(final ExecutorService executor) {
-            this.executor = executor;
             return self();
         }
 
@@ -127,9 +99,6 @@ public class ApiOptions {
 
         public T merge(final ApiOptions options) {
             if (options != null) {
-                if (options.id != null) {
-                    id = options.id;
-                }
                 if (options.method != null) {
                     method = options.method;
                 }
@@ -140,21 +109,18 @@ public class ApiOptions {
                     if (headers == null) {
                         headers = options.headers;
                     } else {
-                        headers.addAll(options.headers);
+                        headers.putAll(options.headers);
                     }
                 }
                 if (options.params != null) {
                     if (params == null) {
                         params = options.params;
                     } else {
-                        params.addAll(options.params);
+                        params.putAll(options.params);
                     }
                 }
                 if (options.authenticated != null) {
                     authenticated = options.authenticated;
-                }
-                if (options.responseType != null) {
-                    responseType = options.responseType;
                 }
                 if (options.includes != null) {
                     if (includes == null) {
@@ -162,9 +128,6 @@ public class ApiOptions {
                     } else {
                         includes.addAll(options.includes);
                     }
-                }
-                if (options.executor != null) {
-                    executor = options.executor;
                 }
                 if (options.responseParser != null) {
                     responseParser = options.responseParser;

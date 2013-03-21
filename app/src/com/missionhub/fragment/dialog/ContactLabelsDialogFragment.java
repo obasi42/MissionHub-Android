@@ -17,21 +17,17 @@ import com.missionhub.api.ApiOptions;
 import com.missionhub.application.Application;
 import com.missionhub.application.Session;
 import com.missionhub.exception.ExceptionHelper;
-import com.missionhub.model.Organization;
 import com.missionhub.model.Person;
 import com.missionhub.model.Role;
 import com.missionhub.model.RoleDao;
 import com.missionhub.ui.ObjectArrayAdapter;
 import com.missionhub.ui.widget.SelectableListView;
 import com.missionhub.util.SafeAsyncTask;
-import com.missionhub.util.U;
-import org.holoeverywhere.app.Activity;
 import org.holoeverywhere.app.AlertDialog;
 import org.holoeverywhere.widget.ListView;
 import org.holoeverywhere.widget.TextView;
 import org.holoeverywhere.widget.Toast;
 
-import java.lang.ref.WeakReference;
 import java.util.*;
 
 public class ContactLabelsDialogFragment extends RefreshableDialogFragment implements AdapterView.OnItemClickListener {
@@ -64,7 +60,7 @@ public class ContactLabelsDialogFragment extends RefreshableDialogFragment imple
         final Bundle args = new Bundle();
 
         final HashSet<Long> peopleIds = new HashSet<Long>();
-        for(Person p : people) {
+        for (Person p : people) {
             peopleIds.add(p.getId());
         }
         args.putSerializable("peopleIds", peopleIds);
@@ -79,7 +75,7 @@ public class ContactLabelsDialogFragment extends RefreshableDialogFragment imple
             @SuppressWarnings("unchecked") final HashSet<Long> peopleIds = (HashSet<Long>) getArguments().getSerializable("peopleIds");
             if (peopleIds != null) {
                 mPeople.clear();
-                for(Long id : peopleIds) {
+                for (Long id : peopleIds) {
                     Person person = Application.getDb().getPersonDao().load(id);
                     if (person != null) {
                         mPeople.add(person);
@@ -146,10 +142,10 @@ public class ContactLabelsDialogFragment extends RefreshableDialogFragment imple
 
         // determine which roles are in use and how many people are using them
         HashMap<Long, Integer> labelCounts = new HashMap<Long, Integer>(); // role id, count of people having label
-        for(Person p : mPeople) {
+        for (Person p : mPeople) {
             p.resetLabels();
             final List<Long> labelIds = p.getLables(Session.getInstance().getOrganizationId());
-            for(long labelId : labelIds) {
+            for (long labelId : labelIds) {
                 Integer count = labelCounts.get(labelId);
                 if (count == null) {
                     count = 0;
@@ -162,12 +158,12 @@ public class ContactLabelsDialogFragment extends RefreshableDialogFragment imple
         mAdapter.clear();
 
         boolean isAdmin = Session.getInstance().isAdmin();
-        for(Role role : systemRoles) {
+        for (Role role : systemRoles) {
             if (!isAdmin && role.getId() == 1) continue;
 
             mAdapter.add(new RoleItem(role, determineSelected(labelCounts, role.getId())));
         }
-        for(Role role : organizationRoles) {
+        for (Role role : organizationRoles) {
             mAdapter.add(new RoleItem(role, determineSelected(labelCounts, role.getId())));
         }
 
@@ -255,7 +251,7 @@ public class ContactLabelsDialogFragment extends RefreshableDialogFragment imple
         public View getView(int position, View convertView, ViewGroup parent) {
             RoleItem item = (RoleItem) getItem(position);
 
-            View view  = convertView;
+            View view = convertView;
             ViewHolder holder;
             if (view == null) {
                 holder = new ViewHolder();
@@ -346,7 +342,7 @@ public class ContactLabelsDialogFragment extends RefreshableDialogFragment imple
 
                 final List<Long> addRoles = new ArrayList<Long>();
                 final List<Long> removeRoles = new ArrayList<Long>();
-                for(RoleItem item : roleItems) {
+                for (RoleItem item : roleItems) {
                     if (item.selected == RoleItem.SELECTED_ALL) {
                         addRoles.add(item.role.getId());
                     } else if (item.selected == RoleItem.SELECTED_NONE) {

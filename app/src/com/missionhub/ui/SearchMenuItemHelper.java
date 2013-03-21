@@ -1,22 +1,14 @@
 package com.missionhub.ui;
 
-import android.content.Context;
-import android.os.Bundle;
 import android.os.Handler;
-import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnFocusChangeListener;
-import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.SubMenu;
 import com.actionbarsherlock.widget.SearchView;
 import com.actionbarsherlock.widget.SearchView.OnQueryTextListener;
 import com.missionhub.R;
-import com.missionhub.contactlist.ContactListFragment;
 import com.missionhub.util.U;
 import org.holoeverywhere.app.Fragment;
 
@@ -41,7 +33,7 @@ public class SearchMenuItemHelper implements OnQueryTextListener, OnFocusChangeL
     }
 
     public void onCreateOptionsMenu(final Menu menu, final MenuInflater inflater) {
-        mSearchView = new SearchView(mFragment.getSupportActivity().getSupportActionBar().getThemedContext());
+        mSearchView = new SearchView(mFragment.getSupportActionBarContext());
         mSearchView.setIconifiedByDefault(true);
         mSearchView.setOnQueryTextListener(this);
         mSearchView.setOnQueryTextFocusChangeListener(this);

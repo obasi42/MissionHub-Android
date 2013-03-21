@@ -9,6 +9,7 @@ import com.missionhub.model.DaoMaster;
 import com.missionhub.model.DaoMaster.OpenHelper;
 import com.missionhub.model.DaoSession;
 import com.missionhub.model.MissionHubOpenHelper;
+import com.missionhub.util.NetworkUtils;
 import com.nostra13.universalimageloader.cache.disc.impl.LimitedAgeDiscCache;
 import com.nostra13.universalimageloader.cache.memory.MemoryCacheAware;
 import com.nostra13.universalimageloader.cache.memory.impl.LRULimitedMemoryCache;
@@ -89,6 +90,10 @@ public class Application extends org.holoeverywhere.app.Application {
             }
         }
 
+        // set up the networking
+        NetworkUtils.disableConnectionReuseIfNecessary();
+        NetworkUtils.enableHttpResponseCache(this);
+
         // set the last last version id for future upgrades
         SettingsManager.setApplicationLastVersionId(getVersionCode());
 
@@ -99,26 +104,29 @@ public class Application extends org.holoeverywhere.app.Application {
     }
 
     private void initImageLoader() {
-        final DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
-                .cacheInMemory()
-                .cacheOnDisc()
-                .build();
+        DisplayImageOptions.Builder defaultOptions = new DisplayImageOptions.Builder();
+        defaultOptions.cacheInMemory();
+        if (Configuration.isCacheFileEnabled()) {
+            defaultOptions.cacheOnDisc();
+        }
 
         int memoryCacheSize = (int) (Runtime.getRuntime().maxMemory() / 8);
         MemoryCacheAware<String, Bitmap> memoryCache = new LRULimitedMemoryCache(memoryCacheSize);
 
-        LimitedAgeDiscCache diskCache = new LimitedAgeDiscCache(StorageUtils.getCacheDirectory(this), 60 * 60 * 24 * 3);
+        ImageLoaderConfiguration.Builder config = new ImageLoaderConfiguration.Builder(this);
+        config.defaultDisplayImageOptions(defaultOptions.build());
+        config.memoryCache(memoryCache);
+        config.threadPoolSize(3);
+        config.threadPriority(Thread.NORM_PRIORITY - 2);
+        config.tasksProcessingOrder(QueueProcessingType.LIFO);
 
-        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this)
-                .defaultDisplayImageOptions(defaultOptions)
-                .discCache(diskCache)
-                .memoryCache(memoryCache)
-                .threadPoolSize(3)
-                .threadPriority(Thread.NORM_PRIORITY - 2)
-                .tasksProcessingOrder(QueueProcessingType.LIFO)
-                .build();
+        if (Configuration.isCacheFileEnabled()) {
+            Log.e("CACHE AGE", "" + Configuration.getCacheFileAge());
+            LimitedAgeDiscCache diskCache = new LimitedAgeDiscCache(StorageUtils.getCacheDirectory(this), Configuration.getCacheFileAge());
+            config.discCache(diskCache);
+        }
 
-        ImageLoader.getInstance().init(config);
+        ImageLoader.getInstance().init(config.build());
     }
 
     /**
@@ -257,6 +265,7 @@ public class Application extends org.holoeverywhere.app.Application {
     public static void unregisterEventSubscriber(final Object subscriber, final Class<?>... eventTypes) {
         EventBus.getDefault().unregister(subscriber, eventTypes);
     }
+
     public static void showToast(final int message, final int duration) {
         showToast(Application.getContext().getString(message), duration);
     }

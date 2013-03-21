@@ -4,30 +4,16 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerTabStrip;
-import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.ImageView;
-import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 import com.missionhub.R;
-import com.missionhub.activity.ContactActivity;
 import com.missionhub.api.PersonListOptions;
 import com.missionhub.application.Session;
 import com.missionhub.contactlist.ApiContactListProvider;
 import com.missionhub.contactlist.ContactListFragment;
-import com.missionhub.contactlist.ContactListFragment.ContactListFragmentListener;
 import com.missionhub.contactlist.ContactListProvider;
-import com.missionhub.exception.ExceptionHelper;
-import com.missionhub.fragment.dialog.ContactAssignmentDialogFragment;
-import com.missionhub.fragment.dialog.ContactLabelsDialogFragment;
-import com.missionhub.fragment.dialog.EditContactDialogFragment;
-import com.missionhub.model.Person;
 import com.missionhub.ui.widget.LockedViewPager;
 import com.missionhub.util.U;
 import com.missionhub.util.U.FollowupStatus;
@@ -47,7 +33,8 @@ public class MyContactsFragment extends ContactListMainFragment implements OnPag
 
     private int mPage = 1;
 
-    public MyContactsFragment() {}
+    public MyContactsFragment() {
+    }
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -130,7 +117,8 @@ public class MyContactsFragment extends ContactListMainFragment implements OnPag
     }
 
     public static class MyAllContactsFragment extends ContactListFragment {
-        public MyAllContactsFragment() {}
+        public MyAllContactsFragment() {
+        }
 
         @Override
         public ContactListProvider onCreateContactProvider() {
@@ -143,7 +131,8 @@ public class MyContactsFragment extends ContactListMainFragment implements OnPag
     }
 
     public static class MyInProgressContactsFragment extends ContactListFragment {
-        public MyInProgressContactsFragment() {}
+        public MyInProgressContactsFragment() {
+        }
 
         @Override
         public ContactListProvider onCreateContactProvider() {
@@ -157,7 +146,8 @@ public class MyContactsFragment extends ContactListMainFragment implements OnPag
     }
 
     public static class MyCompletedContactsFragment extends ContactListFragment {
-        public MyCompletedContactsFragment() {}
+        public MyCompletedContactsFragment() {
+        }
 
         @Override
         public ContactListProvider onCreateContactProvider() {

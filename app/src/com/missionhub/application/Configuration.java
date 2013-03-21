@@ -119,8 +119,12 @@ public class Configuration {
         return Boolean.parseBoolean(cache);
     }
 
-    public static String getCacheFileSize() {
-        return Configuration.getInstance().sProperties.getProperty("CACHE_FILE_SIZE", "10m");
+    public static long getCacheFileAge() {
+        return parseInterval(Configuration.getInstance().sProperties.getProperty("CACHE_FILE_AGE", "3d"));
+    }
+
+    public static long getCacheHttpSize() {
+        return parseSize(Configuration.getInstance().sProperties.getProperty("CACHE_HTTP_SIZE", "10m"));
     }
 
     public static boolean isAnalyticsEnabled() {
@@ -176,5 +180,33 @@ public class Configuration {
             s = s.substring(0, s.length() - 1);
         }
         return s;
+    }
+
+    private static long parseSize(String text) {
+        double d = Double.parseDouble(text.toUpperCase().replaceAll("[GMK]$", ""));
+        long l = Math.round(d * 1024 * 1024 * 1024L);
+        switch (text.charAt(Math.max(0, text.length() - 1))) {
+            default:  l /= 1024;
+            case 'K': l /= 1024;
+            case 'M': l /= 1024;
+            case 'G': return l;
+        }
+    }
+
+    private static long parseInterval(String text) {
+        long interval = 0;
+        String[] parts = text.toUpperCase().split(" ");
+        for(String part : parts) {
+            long value = Long.parseLong(part.replaceAll("[^0-9]+", ""));
+            switch (part.charAt(Math.max(0, part.length() - 1))) {
+                case 'M': interval += value * 60; break;
+                case 'H': interval += value * 60 * 60; break;
+                case 'D': interval += value * 60 * 60 * 24; break;
+                case 'W': interval += value * 60 * 60 * 24 * 7; break;
+                case 'Y': interval += value * 60 * 60 * 24 * 7 * 365; break;
+                default:  interval += value;
+            }
+        }
+        return interval;
     }
 }

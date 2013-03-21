@@ -3,7 +3,6 @@ package com.missionhub.fragment.dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
-import android.util.Log;
 import android.view.View;
 import android.widget.RadioGroup;
 import com.missionhub.R;

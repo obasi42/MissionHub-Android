@@ -5,7 +5,6 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.missionhub.api.ListOptions.ListFilterOrderJson.Filter;
 import com.missionhub.api.ListOptions.ListFilterOrderJson.Order;
-import com.missionhub.network.HttpParams;
 import com.missionhub.util.U;
 
 import java.util.*;
@@ -75,7 +74,7 @@ public class ListOptions {
     /**
      * adds the filters to the http params
      */
-    protected HttpParams toParams(final HttpParams params) {
+    protected void toParams(final Map<String, String> params) {
         final Iterator<String> itr = mFilters.keySet().iterator();
         while (itr.hasNext()) {
             final String filter = itr.next();
@@ -88,7 +87,7 @@ public class ListOptions {
                     value.append(",");
                 }
             }
-            params.add("filters[" + stripUnsafeChars(filter) + "]", value.toString());
+            params.put("filters[" + stripUnsafeChars(filter) + "]", value.toString());
         }
 
         final StringBuffer sb = new StringBuffer();
@@ -100,17 +99,15 @@ public class ListOptions {
                 sb.append(",");
             }
         }
-        if (!mOrderBy.isEmpty()) params.add("order", sb.toString());
+        if (!mOrderBy.isEmpty()) params.put("order", sb.toString());
 
         if (mLimit != null) {
-            params.add("limit", mLimit);
+            params.put("limit", String.valueOf(mLimit));
         }
 
         if (mOffset != null) {
-            params.add("offset", mOffset);
+            params.put("offset", String.valueOf(mOffset));
         }
-
-        return params;
     }
 
     private String stripUnsafeChars(final String string) {

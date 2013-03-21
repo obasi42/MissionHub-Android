@@ -1,29 +1,14 @@
 package com.missionhub.fragment;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.ImageView;
-import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 import com.missionhub.R;
-import com.missionhub.activity.ContactActivity;
-import com.missionhub.api.ContactListOptions;
 import com.missionhub.api.PersonListOptions;
 import com.missionhub.contactlist.ApiContactListProvider;
 import com.missionhub.contactlist.ContactListFragment;
-import com.missionhub.contactlist.ContactListFragment.ContactListFragmentListener;
 import com.missionhub.contactlist.ContactListProvider;
-import com.missionhub.exception.ExceptionHelper;
-import com.missionhub.fragment.dialog.ContactAssignmentDialogFragment;
-import com.missionhub.fragment.dialog.ContactLabelsDialogFragment;
-import com.missionhub.fragment.dialog.EditContactDialogFragment;
-import com.missionhub.model.Person;
 import com.missionhub.util.U;
 import org.holoeverywhere.LayoutInflater;
 
@@ -31,7 +16,8 @@ public class AllContactsFragment extends ContactListMainFragment {
 
     ContactListFragment mFragment;
 
-    public AllContactsFragment() {}
+    public AllContactsFragment() {
+    }
 
     @Override
     public View onCreateView(final LayoutInflater inflater, final Bundle savedInstanceState) {
@@ -66,7 +52,8 @@ public class AllContactsFragment extends ContactListMainFragment {
     }
 
     public static class AllContactsFragmentFragment extends ContactListFragment {
-        public AllContactsFragmentFragment(){}
+        public AllContactsFragmentFragment() {
+        }
 
         @Override
         public ContactListProvider onCreateContactProvider() {

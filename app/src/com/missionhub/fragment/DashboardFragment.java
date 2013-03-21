@@ -8,7 +8,8 @@ import org.holoeverywhere.widget.TextView;
 
 public class DashboardFragment extends MainFragment {
 
-    public DashboardFragment() {}
+    public DashboardFragment() {
+    }
 
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {

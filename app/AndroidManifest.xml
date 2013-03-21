@@ -46,11 +46,7 @@
         <activity android:label="@string/pref_activity_title" android:name=".activity.PreferencesActivity" android:theme="@style/Theme.MissionHub"/>
         <activity android:label="@string/contact_activity_title" android:name=".activity.ContactActivity" android:theme="@style/Theme.MissionHub"/>
 
-        <activity android:name="org.acra.CrashReportDialog"
-                  android:theme="@android:style/Theme.Dialog"
-                  android:launchMode="singleInstance"
-                  android:excludeFromRecents="true"
-                  android:finishOnTaskLaunch="true" />
+        <activity android:excludeFromRecents="true" android:finishOnTaskLaunch="true" android:launchMode="singleInstance" android:name="org.acra.CrashReportDialog" android:theme="@android:style/Theme.Dialog"/>
     </application>
 
 </manifest>

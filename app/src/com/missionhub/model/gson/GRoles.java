@@ -34,7 +34,7 @@ public class GRoles {
                         if (role != null) {
                             if (role.organization_id == 0 && !deletedSystem) {
                                 final List<Long> keys = Application.getDb().getRoleDao().queryBuilder().where(RoleDao.Properties.Organization_id.eq(0)).listKeys();
-                                for(Long key : keys) {
+                                for (Long key : keys) {
                                     Application.getDb().getRoleDao().deleteByKey(key);
                                 }
                                 deletedSystem = true;
@@ -42,7 +42,7 @@ public class GRoles {
 
                             if (role.organization_id != 0 && !orgIds.contains(role.organization_id)) {
                                 final List<Long> keys = Application.getDb().getRoleDao().queryBuilder().where(RoleDao.Properties.Organization_id.eq(role.organization_id)).listKeys();
-                                for(Long key : keys) {
+                                for (Long key : keys) {
                                     Application.getDb().getRoleDao().deleteByKey(key);
                                 }
                                 orgIds.add(role.organization_id);

@@ -9,7 +9,6 @@ import android.webkit.WebViewClient;
 import com.missionhub.R;
 import com.missionhub.api.ApiException;
 import com.missionhub.application.Application;
-import com.missionhub.network.NetworkUnavailableException;
 import org.holoeverywhere.widget.Toast;
 
 import java.util.concurrent.ExecutionException;

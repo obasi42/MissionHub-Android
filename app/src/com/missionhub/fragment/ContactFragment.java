@@ -80,7 +80,8 @@ public class ContactFragment extends BaseFragment implements OnNavigationListene
      */
     private final ProgressItemHelper mProgressHelper = new ProgressItemHelper();
 
-    public ContactFragment() {}
+    public ContactFragment() {
+    }
 
     /**
      * instantiate a new fragment for the given person

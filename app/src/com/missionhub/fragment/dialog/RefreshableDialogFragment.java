@@ -2,7 +2,6 @@ package com.missionhub.fragment.dialog;
 
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -57,7 +56,8 @@ public abstract class RefreshableDialogFragment extends BaseDialogFragment {
      */
     private AlertDialog mDialog;
 
-    public RefreshableDialogFragment() {}
+    public RefreshableDialogFragment() {
+    }
 
     /**
      * Called when the dialog title is set up

@@ -319,7 +319,7 @@ public class Session implements OnAccountsUpdateListener {
             mUpdatePersonTask.cancel(true);
             mUpdatePersonTask = null;
         } catch (final Exception e) {
-			/* ignore */
+            /* ignore */
         }
         try {
             mUpdateOrganizationsTask.cancel(true);

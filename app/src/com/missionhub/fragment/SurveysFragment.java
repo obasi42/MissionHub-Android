@@ -30,7 +30,8 @@ public class SurveysFragment extends MainFragment {
     private ViewGroup mContainer;
     private WebView mWebView;
 
-    public SurveysFragment() {}
+    public SurveysFragment() {
+    }
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -106,7 +107,7 @@ public class SurveysFragment extends MainFragment {
         final SafeAsyncTask<String> task = new SafeAsyncTask<String>() {
             @Override
             public String call() throws Exception {
-                return Api.getSurveyUrl().get();
+                return Api.getSurveyUrl();
             }
 
             @Override

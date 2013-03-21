@@ -14,4 +14,8 @@ public class AccessTokenException extends ApiException {
         super(error);
     }
 
+    public AccessTokenException() {
+        super("Invalid Access Token");
+    }
+
 }

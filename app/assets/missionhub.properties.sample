@@ -17,6 +17,12 @@ OAUTH_CLIENT_ID=
 OAUTH_CLIENT_SECRET=
 OAUTH_SCOPE=userinfo,contacts,contact_assignment,followup_comments,roles,organization_info,groups,communication
 
+# caching
+CACHE_FILE_ENABLED=true
+CACHE_FILE_AGE=3d
+CACHE_HTTP_ENABLED=true
+CACHE_HTTP_SIZE=10m
+
 # google analytics
 ANALYTICS_ENABLED=false
 ANALYTICS_KEY=UA-

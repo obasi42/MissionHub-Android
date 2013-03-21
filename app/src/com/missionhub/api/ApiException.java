@@ -46,4 +46,11 @@ public class ApiException extends MissionHubException {
     public String getCode() {
         return mCode;
     }
+
+    public static ApiException wrap(Exception e) {
+        if (e instanceof ApiException) {
+            return (ApiException) e;
+        }
+        return new ApiException(e);
+    }
 }

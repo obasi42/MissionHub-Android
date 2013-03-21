@@ -122,7 +122,7 @@ public abstract class ContactListFragment extends BaseFragment implements OnCont
     }
 
     private void configureProvider() {
-        for (ContactListProvider provider : new ContactListProvider[] { mProvider, mAltProvider }) {
+        for (ContactListProvider provider : new ContactListProvider[]{mProvider, mAltProvider}) {
             if (provider != null) {
                 provider.setContext(getSupportActivity());
                 provider.setOnContactListExceptionListener(mOnContactListProviderExceptionListener);

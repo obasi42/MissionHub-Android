@@ -63,7 +63,8 @@ public class ContactSurveysFragment extends BaseFragment {
      */
     private final EmptyItem mEmptyItem = new EmptyItem();
 
-    public ContactSurveysFragment() {}
+    public ContactSurveysFragment() {
+    }
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
