@@ -1,12 +1,13 @@
 package com.missionhub.api;
 
+import com.missionhub.exception.ExceptionHelper;
 import com.missionhub.exception.MissionHubException;
 import com.missionhub.model.gson.GErrorsDepreciated;
 
 /**
  * All API errors extend or directly use this exception type.
  */
-public class ApiException extends MissionHubException {
+public class ApiException extends MissionHubException implements ExceptionHelper.ExceptionHelperException {
 
     private static final long serialVersionUID = 1L;
 
@@ -52,5 +53,24 @@ public class ApiException extends MissionHubException {
             return (ApiException) e;
         }
         return new ApiException(e);
+    }
+
+    @Override
+    public String getDialogTitle() {
+        return getTitle();
+    }
+
+    @Override
+    public String getDialogMessage() {
+        if (getCode() != null) {
+            return getMessage() + "\ncode: " + getCode();
+        } else {
+            return getMessage();
+        }
+    }
+
+    @Override
+    public int getDialogIconId() {
+        return 0;
     }
 }

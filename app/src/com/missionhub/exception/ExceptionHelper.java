@@ -7,11 +7,10 @@ import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.webkit.WebViewClient;
 import com.missionhub.R;
-import com.missionhub.api.ApiException;
 import com.missionhub.application.Application;
 import org.holoeverywhere.widget.Toast;
 
-import java.util.concurrent.ExecutionException;
+import java.net.UnknownHostException;
 
 /**
  * Helps display error dialogs from exceptions
@@ -191,20 +190,16 @@ public class ExceptionHelper {
      * sets the exception and rebuilds the dialog if needed
      */
     public void setException(final Throwable throwable) {
-
         Log.e("ExceptionHelper", throwable.getMessage(), throwable);
 
         mThrowable = throwable;
 
-        // find the initial issue if it was wrapped in an ExecutionException
-        if (mThrowable instanceof ExecutionException) {
-            final Throwable it = ((ExecutionException) mThrowable).getCause();
-            if (it != null) {
-                mThrowable = it;
-            }
+        // unwrap the exception if possible
+        while (mThrowable.getCause() != null) {
+            mThrowable = mThrowable.getCause();
         }
 
-        // calculate the title and message from the exception
+        // Exception types
         if (mThrowable instanceof ExceptionHelperException) {
             setTitle(((ExceptionHelperException) mThrowable).getDialogTitle());
             setMessage(((ExceptionHelperException) mThrowable).getDialogMessage());
@@ -212,9 +207,6 @@ public class ExceptionHelper {
             if (icon != 0 && icon != -1) {
                 setIcon(icon);
             }
-        } else if (mThrowable instanceof ApiException) {
-            setTitle(((ApiException) mThrowable).getTitle());
-            setMessage(mThrowable.getMessage() + "\ncode: " + ((ApiException) mThrowable).getCode());
         } else if (mThrowable instanceof WebViewException) {
             setTitle(getString(R.string.exception_helper_network_error));
             final int code = ((WebViewException) mThrowable).getCode();
@@ -226,11 +218,15 @@ public class ExceptionHelper {
                     setMessage(getString(R.string.exception_helper_mh_not_responding));
                     break;
                 case WebViewClient.ERROR_HOST_LOOKUP:
-                    setException(new NetworkUnavailableException());
-                    return;
+                    setTitle(getString(R.string.network_unavailable_exception_title));
+                    setMessage(getString(R.string.network_unavailable_exception));
+                    break;
                 default:
                     setMessage(mThrowable.getMessage() + "\nweb view client code: " + ((WebViewException) mThrowable).getCode());
             }
+        } else if (mThrowable instanceof UnknownHostException) {
+            setTitle(getString(R.string.network_unavailable_exception_title));
+            setMessage(getString(R.string.network_unavailable_exception));
         } else {
             setMessage(mThrowable.getMessage());
         }
