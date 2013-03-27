@@ -34,3 +34,4 @@ proguard-project.txt
 missionhub.properties
 .DS_Store
 tmp
+atlassian-ide-plugin.xml

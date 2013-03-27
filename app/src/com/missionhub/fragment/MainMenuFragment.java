@@ -46,8 +46,8 @@ public class MainMenuFragment extends BaseFragment implements OnItemClickListene
     }
 
     @Override
-    public void onViewCreated(final View view) {
-        super.onViewCreated(view);
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
         mListView = (ListView) view.findViewById(android.R.id.list);
 
@@ -246,6 +246,6 @@ public class MainMenuFragment extends BaseFragment implements OnItemClickListene
                 getMainActivity().openHelp();
                 break;
         }
-        getMainActivity().showContent();
+        getMainActivity().getAddonSlider().showContentDelayed();
     }
 }

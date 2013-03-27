@@ -89,8 +89,8 @@ public class MyContactsFragment extends ContactListMainFragment implements OnPag
     }
 
     @Override
-    public void onViewCreated(final View view) {
-        super.onViewCreated(view);
+    public void onViewCreated(final View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
         mPager = (LockedViewPager) view.findViewById(R.id.pager);
         mTabStrip = (PagerTabStrip) view.findViewById(R.id.pager_title_strip);
@@ -113,6 +113,7 @@ public class MyContactsFragment extends ContactListMainFragment implements OnPag
         super.onActivityCreated(savedInstanceState);
 
         U.resetActionBar(getSupportActivity());
+
         getSupportActivity().getSupportActionBar().setTitle(R.string.my_contacts_title);
     }
 

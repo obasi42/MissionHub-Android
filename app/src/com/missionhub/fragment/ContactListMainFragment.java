@@ -57,7 +57,8 @@ public abstract class ContactListMainFragment extends MainFragment implements Co
     public abstract View onCreateView(final LayoutInflater inflater, final Bundle savedInstanceState);
 
     @Override
-    public void onViewCreated(View view) {
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         if (mActionMode != null) {
             mActionMode = getSupportActivity().startActionMode(this);
         }

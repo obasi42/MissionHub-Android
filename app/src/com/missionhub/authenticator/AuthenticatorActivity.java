@@ -291,39 +291,10 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
 
             @Override
             protected void onSuccess(final GAccessToken done) {
-
                 final Person person = Application.getDb().getPersonDao().load(done.person.id);
-
-                final String accountId = String.valueOf(person.getName());
                 final String token = done.access_token;
 
-                // check for duplicate account
-                final Account[] accounts = mAccountManager.getAccountsByType(Authenticator.ACCOUNT_TYPE);
-                for (final Account account : accounts) {
-                    final long personId = Long.parseLong(mAccountManager.getUserData(account, Authenticator.KEY_PERSON_ID));
-                    if (personId == done.person.id) {
-                        // we have a duplicate, show a toast and cancel the authenticator
-                        Toast.makeText(Application.getContext(), String.format(getString(R.string.auth_duplicate_account), person.getName()), Toast.LENGTH_LONG).show();
-                        finishActivity(RESULT_DUPLICATE, account, personId);
-                        return;
-                    }
-                }
-
-                // if there are no other accounts, set this as the last used so it is resumed on next launch
-                // if there are are other accounts, clear the session id to allow the user to pick an account on next
-                // launch
-                if (accounts.length == 0) {
-                    SettingsManager.setSessionLastUserId(done.person.id);
-                } else {
-                    SettingsManager.setSessionLastUserId(-1);
-                }
-
-                // add the new account, for now we will use the access token as the password
-                final Account account = new Account(accountId, Authenticator.ACCOUNT_TYPE);
-                final Bundle userdata = new Bundle();
-                userdata.putString(Authenticator.KEY_PERSON_ID, String.valueOf(done.person.id));
-                mAccountManager.addAccountExplicitly(account, token, userdata);
-                mAccountManager.setPassword(account, token);
+                Account account = addAccountForPerson(person, token, AuthenticatorActivity.this);
 
                 finishActivity(Activity.RESULT_OK, account, done.person.id);
             }
@@ -338,18 +309,55 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
                 mAuthTask = null;
                 hideProgress();
             }
-
-            private void finishActivity(final int result, final Account account, final long personId) {
-                final Intent intent = new Intent();
-                intent.putExtra(AccountManager.KEY_ACCOUNT_NAME, account.name);
-                intent.putExtra(AccountManager.KEY_ACCOUNT_TYPE, account.type);
-                intent.putExtra(Authenticator.KEY_PERSON_ID, personId);
-                setAccountAuthenticatorResult(intent.getExtras());
-                setResult(result, intent);
-                finish();
-            }
         };
         Application.getExecutor().execute(task.future());
+    }
+
+    private void finishActivity(final int result, final Account account, final long personId) {
+        final Intent intent = new Intent();
+        intent.putExtra(AccountManager.KEY_ACCOUNT_NAME, account.name);
+        intent.putExtra(AccountManager.KEY_ACCOUNT_TYPE, account.type);
+        intent.putExtra(Authenticator.KEY_PERSON_ID, personId);
+        setAccountAuthenticatorResult(intent.getExtras());
+        setResult(result, intent);
+        finish();
+    }
+
+    public static Account addAccountForPerson(Person person, String accessToken, AuthenticatorActivity activity) {
+        final AccountManager accountManager = AccountManager.get(Application.getContext());
+        final String accountId = String.valueOf(person.getName());
+
+        // check for duplicate account
+        final Account[] accounts = accountManager.getAccountsByType(Authenticator.ACCOUNT_TYPE);
+        for (final Account account : accounts) {
+            final long personId = Long.parseLong(accountManager.getUserData(account, Authenticator.KEY_PERSON_ID));
+            if (personId == person.getId()) {
+                // account already exists
+                if (activity != null) {
+                    Toast.makeText(activity, String.format(activity.getString(R.string.auth_duplicate_account), person.getName()), Toast.LENGTH_LONG).show();
+                    activity.finishActivity(RESULT_DUPLICATE, account, personId);
+                }
+                return account;
+            }
+        }
+
+        // if there are no other accounts, set this as the last used so it is resumed on next launch
+        // if there are are other accounts, clear the session id to allow the user to pick an account on next
+        // launch
+        if (accounts.length == 0) {
+            SettingsManager.setSessionLastUserId(person.getId());
+        } else {
+            SettingsManager.setSessionLastUserId(-1);
+        }
+
+        // add the new account, for now we will use the access token as the password
+        final Account account = new Account(accountId, Authenticator.ACCOUNT_TYPE);
+        final Bundle userdata = new Bundle();
+        userdata.putString(Authenticator.KEY_PERSON_ID, String.valueOf(person.getId()));
+        accountManager.addAccountExplicitly(account, accessToken, userdata);
+        accountManager.setPassword(account, accessToken);
+
+        return account;
     }
 
     /**

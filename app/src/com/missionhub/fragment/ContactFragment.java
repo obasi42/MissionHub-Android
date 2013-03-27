@@ -156,8 +156,8 @@ public class ContactFragment extends BaseFragment implements OnNavigationListene
     }
 
     @Override
-    public void onViewCreated(final View view) {
-        super.onViewCreated(view);
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
         mPager = (LockedViewPager) view.findViewById(R.id.pager);
         mProgress = (ProgressBar) view.findViewById(R.id.progress);

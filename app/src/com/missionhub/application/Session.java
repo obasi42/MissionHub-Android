@@ -6,9 +6,11 @@ import com.missionhub.api.Api;
 import com.missionhub.api.Api.Include;
 import com.missionhub.api.ApiOptions;
 import com.missionhub.authenticator.Authenticator;
+import com.missionhub.authenticator.AuthenticatorActivity;
 import com.missionhub.exception.MissionHubException;
 import com.missionhub.model.Person;
 import com.missionhub.util.SafeAsyncTask;
+import com.missionhub.util.U;
 import org.acra.ACRA;
 import org.holoeverywhere.widget.Toast;
 
@@ -246,38 +248,6 @@ public class Session implements OnAccountsUpdateListener {
      * Attempts to resume the previous user's session
      */
     public synchronized void resumeSession() {
-        Application.postEvent(new SessionResumeStatusEvent(Application.getContext().getString(R.string.init_resuming)));
-
-        long personId = SettingsManager.getSessionLastUserId();
-        if (personId >= 0) {
-            final Account account = findAccount(personId);
-            if (account != null) {
-                mAccount = account;
-                mPersonId = personId;
-                mOrganizationId = SettingsManager.getSessionOrganizationId(mPersonId);
-            } else {
-                mPersonId = -1;
-            }
-        }
-
-        if (Configuration.isACRAEnabled()) {
-            try {
-                ACRA.getErrorReporter().putCustomData("mPersonId", String.valueOf(mPersonId));
-                ACRA.getErrorReporter().putCustomData("mOrganizationId", String.valueOf(mOrganizationId));
-            } catch (Exception e) {
-                /* ignore */
-            }
-        }
-
-        if (mPersonId < 0) {
-            if (canPickAccount()) {
-                Application.postEvent(new SessionPickAccountEvent());
-            } else {
-                Application.postEvent(new SessionResumeErrorEvent(new NoAccountException()));
-            }
-            return;
-        }
-
         if (mResuming.get()) return;
         mResuming.set(true);
 
@@ -286,6 +256,50 @@ public class Session implements OnAccountsUpdateListener {
             @Override
             public void run() {
                 try {
+                    Application.postEvent(new SessionResumeStatusEvent(Application.getContext().getString(R.string.init_resuming)));
+
+                    if (Configuration.getEnvironment() == Configuration.Environment.DEVELOPMENT && !U.isNullEmpty(Configuration.getLoginAs())) {
+                        final String accessToken = Configuration.getLoginAs();
+                        Person person = Api.getPersonMe(accessToken).get();
+                        AuthenticatorActivity.addAccountForPerson(person, accessToken, null);
+                        SettingsManager.setSessionLastUserId(person.getId());
+                    }
+
+                    long personId = SettingsManager.getSessionLastUserId();
+                    if (personId >= 0) {
+                        final Account account = findAccount(personId);
+                        if (account != null) {
+                            mAccount = account;
+                            mPersonId = personId;
+                            mOrganizationId = SettingsManager.getSessionOrganizationId(mPersonId);
+                        } else {
+                            mPersonId = -1;
+                        }
+                    }
+
+                    if (Configuration.isACRAEnabled()) {
+                        try {
+                            ACRA.getErrorReporter().putCustomData("mPersonId", String.valueOf(mPersonId));
+                            ACRA.getErrorReporter().putCustomData("mOrganizationId", String.valueOf(mOrganizationId));
+                        } catch (Exception e) {
+                            /* ignore */
+                        }
+                    }
+
+                    if (mPersonId < 0) {
+                        if (canPickAccount()) {
+                            Application.postEvent(new SessionPickAccountEvent());
+                        } else {
+                            Application.postEvent(new SessionResumeErrorEvent(new NoAccountException()));
+                        }
+                        mResuming.set(false);
+                        return;
+                    }
+
+
+                    // resume the session
+
+
                     // update the person
                     Application.postEvent(new SessionResumeStatusEvent(Application.getContext().getString(R.string.init_updating_person)));
                     updatePerson().get();
@@ -325,7 +339,7 @@ public class Session implements OnAccountsUpdateListener {
             mUpdateOrganizationsTask.cancel(true);
             mUpdateOrganizationsTask = null;
         } catch (final Exception e) {
-			/* ignore */
+            /* ignore */
         }
 
         if (Configuration.isACRAEnabled()) {

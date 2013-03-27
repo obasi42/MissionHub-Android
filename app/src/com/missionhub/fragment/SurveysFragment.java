@@ -89,8 +89,8 @@ public class SurveysFragment extends MainFragment {
     }
 
     @Override
-    public void onViewCreated(final View view) {
-        super.onViewCreated(view);
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
         Application.registerEventSubscriber(this, SessionOrganizationIdChanged.class);
     }
@@ -137,7 +137,9 @@ public class SurveysFragment extends MainFragment {
             }
             if (progress == 100) {
                 if (getSupportActivity() != null) {
-                    mWebView.setVisibility(View.VISIBLE);
+                    if (mWebView != null) {
+                        mWebView.setVisibility(View.VISIBLE);
+                    }
                     getSupportActivity().setSupportProgressBarIndeterminateVisibility(Boolean.FALSE);
                 }
             }

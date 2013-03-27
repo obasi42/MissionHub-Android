@@ -144,8 +144,8 @@ public class ContactAssignmentDialogFragment extends RefreshableDialogFragment i
     }
 
     @Override
-    public void onViewCreated(final View view) {
-        super.onViewCreated(view);
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
         mPager = (LockedViewPager) view.findViewById(R.id.pager);
         mProgress = view.findViewById(R.id.progress_container);

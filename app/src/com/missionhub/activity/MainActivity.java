@@ -11,13 +11,14 @@ import com.missionhub.fragment.MainFragment;
 import com.missionhub.fragment.MainMenuFragment;
 import com.missionhub.fragment.MyContactsFragment;
 import com.missionhub.util.IntentHelper;
-import com.missionhub.util.U;
+import org.holoeverywhere.addon.AddonSlider;
+import org.holoeverywhere.slider.SliderView;
 import org.holoeverywhere.widget.Toast;
 
 /**
  * The main activity controls the attachment of the main fragments such as My Contacts, All Contacts, Surveys, etc.
  */
-public class MainActivity extends BaseAuthenticatedMenuActivity {
+public class MainActivity extends BaseAuthenticatedActivity {
 
     /**
      * the main content fragment
@@ -30,38 +31,51 @@ public class MainActivity extends BaseAuthenticatedMenuActivity {
     private MainMenuFragment mMenuFragment;
 
     @Override
+    protected void onPreInit(Holo config, Bundle savedInstanceState) {
+        super.onPreInit(config, savedInstanceState);
+        config.requireSlider = true;
+    }
+
+    @Override
     public void onCreate(final Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+        super.onCreate(savedInstanceState);
+
         setContentView(R.layout.content_frame);
 
-        // setup the menu
-        getSlidingMenu().setFadeEnabled(false);
-        getSlidingMenu().setBehindScrollScale(1f);
-        getSlidingMenu().setBehindWidthRes(R.dimen.main_menu_width);
-        getSlidingMenu().setShadowDrawable(R.drawable.main_menu_shadow);
-        getSlidingMenu().setShadowWidth(Math.round(U.dpToPixel(2)));
-        setBehindContentView(R.layout.menu_frame);
+        // setup the slider addon
+        final AddonSlider.AddonSliderA slider = getAddonSlider();
+        slider.setDragWithActionBar(true);
+        slider.disableShadow();
+        slider.setTranslateFactor(0f);
+        slider.setTouchMode(SliderView.TouchMode.Left);
+        slider.setLeftView(getLayoutInflater().inflate(R.layout.menu_frame));
+        slider.setLeftViewWidth((int) getResources().getDimension(R.dimen.main_menu_width));
 
-        // show the up button to access the menu
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
+        // setup the fragments
         if (savedInstanceState != null) {
-            mFragment = (MainFragment) getSupportFragmentManager().findFragmentById(R.layout.content_frame);
-            mMenuFragment = (MainMenuFragment) getSupportFragmentManager().findFragmentById(R.layout.menu_frame);
+            mFragment = (MainFragment) getSupportFragmentManager().findFragmentById(R.id.content_frame);
+            mMenuFragment = (MainMenuFragment) getSupportFragmentManager().findFragmentById(R.id.menu_frame);
         } else {
             mFragment = new MyContactsFragment();
             mMenuFragment = new MainMenuFragment();
             setFragment(mFragment);
             setMenuFragment(mMenuFragment);
         }
+
+        // show the up button to access the menu
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    public AddonSlider.AddonSliderA getAddonSlider() {
+        return addon(AddonSlider.class);
     }
 
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                toggle(); // toggle the menu
+                getAddonSlider().toggle();
                 return true;
         }
         return super.onOptionsItemSelected(item);

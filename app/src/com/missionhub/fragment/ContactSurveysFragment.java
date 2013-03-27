@@ -77,8 +77,8 @@ public class ContactSurveysFragment extends BaseFragment {
     }
 
     @Override
-    public void onViewCreated(final View view) {
-        super.onViewCreated(view);
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
         mListView = (ListView) view.findViewById(android.R.id.list);
 

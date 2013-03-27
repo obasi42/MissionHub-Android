@@ -56,7 +56,7 @@
         </dependency>
         <dependency>
             <groupId>org.holoeverywhere</groupId>
-            <artifactId>addon-slidingmenu</artifactId>
+            <artifactId>addon-slider</artifactId>
             <version>1.5.1-SNAPSHOT</version>
             <type>apklib</type>
             <exclusions>
@@ -233,17 +233,17 @@
                                 </outputApk>
                             </zipalign>
                             <!--<lint>-->
-                                <!--<skip>false</skip>-->
-                                <!--<failOnError>false</failOnError>-->
+                            <!--<skip>false</skip>-->
+                            <!--<failOnError>false</failOnError>-->
                             <!--</lint>-->
                         </configuration>
                         <executions>
                             <!--<execution>-->
-                                <!--<id>lint</id>-->
-                                <!--<goals>-->
-                                    <!--<goal>lint</goal>-->
-                                <!--</goals>-->
-                                <!--<phase>install</phase>-->
+                            <!--<id>lint</id>-->
+                            <!--<goals>-->
+                            <!--<goal>lint</goal>-->
+                            <!--</goals>-->
+                            <!--<phase>install</phase>-->
                             <!--</execution>-->
                             <execution>
                                 <id>update-manifest</id>

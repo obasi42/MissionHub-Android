@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
@@ -125,8 +124,6 @@ public class InitActivity extends BaseActivity {
     }
 
     public void onEventMainThread(final SessionResumeSuccessEvent event) {
-        Log.e("HERE", "SUCCESS");
-
         final Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();

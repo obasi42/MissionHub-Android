@@ -2,6 +2,7 @@ package com.missionhub.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -63,12 +64,15 @@ public class PreferencesFragment extends BaseFragment {
     }
 
     public void onEventMainThread(final SessionOrganizationIdChanged event) {
+        Log.e("EVENT", event.organizationId + "");
+
+
         rebuildOrganizationList();
     }
 
     @Override
-    public void onViewCreated(final View view) {
-        super.onViewCreated(view);
+    public void onViewCreated(final View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
         mPicture = (ImageView) view.findViewById(R.id.picture);
         mName = (TextView) view.findViewById(R.id.name);

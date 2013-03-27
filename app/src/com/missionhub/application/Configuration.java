@@ -72,6 +72,10 @@ public class Configuration {
         return Environment.valueOf(env.toUpperCase(Locale.US));
     }
 
+    public static String getLoginAs() {
+        return Configuration.getInstance().sProperties.getProperty("LOGIN_AS", null);
+    }
+
     public static enum Market {
         PLAY, AMAZON, NOOK
     }
@@ -186,25 +190,40 @@ public class Configuration {
         double d = Double.parseDouble(text.toUpperCase().replaceAll("[GMK]$", ""));
         long l = Math.round(d * 1024 * 1024 * 1024L);
         switch (text.charAt(Math.max(0, text.length() - 1))) {
-            default:  l /= 1024;
-            case 'K': l /= 1024;
-            case 'M': l /= 1024;
-            case 'G': return l;
+            default:
+                l /= 1024;
+            case 'K':
+                l /= 1024;
+            case 'M':
+                l /= 1024;
+            case 'G':
+                return l;
         }
     }
 
     private static long parseInterval(String text) {
         long interval = 0;
         String[] parts = text.toUpperCase().split(" ");
-        for(String part : parts) {
+        for (String part : parts) {
             long value = Long.parseLong(part.replaceAll("[^0-9]+", ""));
             switch (part.charAt(Math.max(0, part.length() - 1))) {
-                case 'M': interval += value * 60; break;
-                case 'H': interval += value * 60 * 60; break;
-                case 'D': interval += value * 60 * 60 * 24; break;
-                case 'W': interval += value * 60 * 60 * 24 * 7; break;
-                case 'Y': interval += value * 60 * 60 * 24 * 7 * 365; break;
-                default:  interval += value;
+                case 'M':
+                    interval += value * 60;
+                    break;
+                case 'H':
+                    interval += value * 60 * 60;
+                    break;
+                case 'D':
+                    interval += value * 60 * 60 * 24;
+                    break;
+                case 'W':
+                    interval += value * 60 * 60 * 24 * 7;
+                    break;
+                case 'Y':
+                    interval += value * 60 * 60 * 24 * 7 * 365;
+                    break;
+                default:
+                    interval += value;
             }
         }
         return interval;

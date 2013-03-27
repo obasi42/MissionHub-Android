@@ -50,7 +50,13 @@ public class Api {
     }
 
     public static ApiRequest<Person> getPersonMe() {
-        return getPersonMe(null);
+        return getPersonMe((ApiOptions) null);
+    }
+
+    public static ApiRequest<Person> getPersonMe(final String accessToken) {
+        HashMap<String, String> headers = new HashMap<String, String>();
+        headers.put(HttpRequest.HEADER_AUTHORIZATION, "Bearer " + accessToken);
+        return getPersonMe(ApiOptions.builder().authenticated(false).headers(headers).build());
     }
 
     public static ApiRequest<Person> getPersonMe(final ApiOptions options) {

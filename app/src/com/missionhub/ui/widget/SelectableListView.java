@@ -226,7 +226,7 @@ public class SelectableListView extends ListView {
     /**
      * Sets the width in dip of the selection box
      *
-     * @param width
+     * @param widthDip
      */
     public void setSelectionWidth(final int widthDip) {
         mSelectionWidth = (int) U.dpToPixel(widthDip);
@@ -263,7 +263,6 @@ public class SelectableListView extends ListView {
      * Sets a list item as activated
      *
      * @param position  the item position or -1 to clear the activated item
-     * @param activated
      */
     public void setItemActivated(int position) {
         if (getAdapter() == null) {

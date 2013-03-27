@@ -185,7 +185,6 @@
     <string name="add_contact_progress">Please wait. Adding contact…</string>
 
     <!-- Assignment Dialog -->
-    <string name="assignment_progress">Please wait. Assigning contact(s)…</string>
     <string name="assignment_title">Assign To</string>
     <string name="assignment_title_mass">Mass Assign To</string>
     <string name="assignment_title_leader">Assign to Leader</string>

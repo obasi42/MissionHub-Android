@@ -9,11 +9,14 @@ import android.view.MotionEvent;
 
 public class LockedViewPager extends ViewPager {
 
-    private boolean mLocked;
+    private boolean mLocked = true;
 
-    public LockedViewPager(final Context context, final AttributeSet attrs) {
+    public LockedViewPager(Context context) {
+        super(context);
+    }
+
+    public LockedViewPager(Context context, AttributeSet attrs) {
         super(context, attrs);
-        mLocked = true;
     }
 
     @Override
