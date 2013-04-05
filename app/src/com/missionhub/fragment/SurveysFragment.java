@@ -103,6 +103,13 @@ public class SurveysFragment extends MainFragment {
         getSupportActivity().getSupportActionBar().setTitle("Surveys");
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        Application.trackView("Surveys");
+    }
+
     public void goInitialUrl() {
         final SafeAsyncTask<String> task = new SafeAsyncTask<String>() {
             @Override

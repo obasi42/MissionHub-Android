@@ -95,6 +95,13 @@ public class ContactSurveysFragment extends BaseFragment {
         }
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        Application.trackView("Contact/Surveys");
+    }
+
     public static class SurveysArrayAdapter extends ObjectArrayAdapter {
 
         final int answeredColor;

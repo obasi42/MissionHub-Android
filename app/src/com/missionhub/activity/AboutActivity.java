@@ -26,6 +26,13 @@ public class AboutActivity extends BaseActivity {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+
+        Application.trackView("About");
+    }
+
+    @Override
     public boolean onMenuItemSelected(final int featureId, final MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             finish();

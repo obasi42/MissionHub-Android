@@ -552,17 +552,17 @@ public class Api {
 
     private void logRequest(String url, String method, Map<String, String> headers, Map<String, String> params, boolean authenticated) {
         if (Configuration.getEnvironment() == Configuration.Environment.DEVELOPMENT) {
-            Log.e(TAG, method + " " + url);
+            Log.i(TAG, method + " " + url);
             if (headers != null) {
-                Log.w(TAG, "==== headers ====");
+                Log.d(TAG, "==== headers ====");
                 for (Map.Entry<String, String> entry : headers.entrySet()) {
-                    Log.w(TAG, entry.getKey() + " : " + entry.getValue());
+                    Log.d(TAG, entry.getKey() + " : " + entry.getValue());
                 }
             }
             if (params != null) {
-                Log.w(TAG, "==== params ====");
+                Log.d(TAG, "==== params ====");
                 for (Map.Entry<String, String> entry : params.entrySet()) {
-                    Log.w(TAG, entry.getKey() + " : " + entry.getValue());
+                    Log.d(TAG, entry.getKey() + " : " + entry.getValue());
                 }
             }
         }

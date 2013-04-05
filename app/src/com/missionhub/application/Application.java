@@ -4,6 +4,8 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.util.Log;
+import com.google.analytics.tracking.android.GoogleAnalytics;
+import com.google.analytics.tracking.android.Tracker;
 import com.missionhub.R;
 import com.missionhub.model.DaoMaster;
 import com.missionhub.model.DaoMaster.OpenHelper;
@@ -88,6 +90,17 @@ public class Application extends org.holoeverywhere.app.Application {
             } catch (ACRAConfigurationException e) {
                 Log.e("MissionHub", e.getMessage(), e);
             }
+        }
+
+        if (Configuration.isAnalyticsEnabled()) {
+            GoogleAnalytics ga = GoogleAnalytics.getInstance(this);
+            ga.setDebug(Configuration.isAnalyticsDebug());
+
+            Tracker tracker = ga.getTracker(Configuration.getAnalyticsKey());
+            tracker.setAnonymizeIp(Configuration.isAnalyticsAnonymizeIp());
+            tracker.setUseSecure(true);
+
+            ga.setDefaultTracker(tracker);
         }
 
         // set up the networking
@@ -289,6 +302,41 @@ public class Application extends org.holoeverywhere.app.Application {
         public ToastEvent(final String message, final int duration) {
             this.message = message;
             this.duration = duration;
+        }
+    }
+
+    public static Tracker getTracker() {
+        if (Configuration.isAnalyticsEnabled()) {
+            return GoogleAnalytics.getInstance(sApplication).getDefaultTracker();
+        }
+        return null;
+    }
+
+    public static void trackView(String view) {
+        if (getTracker() != null) {
+            getTracker().sendView(view);
+        }
+    }
+
+    public static void trackException(String thread, Throwable e, boolean fatal) {
+        if (getTracker() != null) {
+            getTracker().sendException(thread, e, fatal);
+        }
+    }
+
+    public static void trackEvent(String category, String action, String label) {
+        trackEvent(category, action, label, 0);
+    }
+
+    public static void trackEvent(String category, String action, String label, long value) {
+        if (getTracker() != null) {
+            getTracker().sendEvent(category, action, label, value);
+        }
+    }
+
+    public static void trackNewSession() {
+        if (getTracker() != null) {
+            getTracker().setStartSession(true);
         }
     }
 }

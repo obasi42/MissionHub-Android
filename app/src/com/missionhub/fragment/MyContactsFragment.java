@@ -11,6 +11,7 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.github.croemmich.drilldown.LockableViewPager;
 import com.missionhub.R;
 import com.missionhub.api.PersonListOptions;
+import com.missionhub.application.Application;
 import com.missionhub.application.Session;
 import com.missionhub.contactlist.ApiContactListProvider;
 import com.missionhub.contactlist.ContactListFragment;
@@ -116,8 +117,22 @@ public class MyContactsFragment extends ContactListMainFragment implements OnPag
         getSupportActivity().getSupportActionBar().setTitle(R.string.my_contacts_title);
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        Application.trackView("My Contacts");
+    }
+
     public static class MyAllContactsFragment extends ContactListFragment {
         public MyAllContactsFragment() {
+        }
+
+        @Override
+        public void onResume() {
+            super.onResume();
+
+            Application.trackView("My Contacts/All");
         }
 
         @Override
@@ -135,6 +150,13 @@ public class MyContactsFragment extends ContactListMainFragment implements OnPag
         }
 
         @Override
+        public void onResume() {
+            super.onResume();
+
+            Application.trackView("My Contacts/In-Progress");
+        }
+
+        @Override
         public ContactListProvider onCreateContactProvider() {
             final PersonListOptions options = PersonListOptions.builder() //
                     .assignedTo(Session.getInstance().getPersonId()) //
@@ -147,6 +169,13 @@ public class MyContactsFragment extends ContactListMainFragment implements OnPag
 
     public static class MyCompletedContactsFragment extends ContactListFragment {
         public MyCompletedContactsFragment() {
+        }
+
+        @Override
+        public void onResume() {
+            super.onResume();
+
+            Application.trackView("My Contacts/Completed");
         }
 
         @Override

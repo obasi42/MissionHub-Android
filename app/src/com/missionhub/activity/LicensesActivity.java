@@ -5,6 +5,7 @@ import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import com.actionbarsherlock.view.MenuItem;
+import com.missionhub.application.Application;
 
 public class LicensesActivity extends BaseActivity {
 
@@ -29,6 +30,13 @@ public class LicensesActivity extends BaseActivity {
         mWebView.loadUrl("file:///android_asset/licenses.html");
 
         setContentView(mWebView);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        Application.trackView("Licenses");
     }
 
     @Override

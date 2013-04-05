@@ -295,10 +295,9 @@ public class Session implements OnAccountsUpdateListener {
                         return;
                     }
 
+                    Application.trackNewSession();
 
                     // resume the session
-
-
                     // update the person
                     Application.postEvent(new SessionResumeStatusEvent(Application.getContext().getString(R.string.init_updating_person)));
                     updatePerson().get();
@@ -349,6 +348,9 @@ public class Session implements OnAccountsUpdateListener {
                 /* ignore */
             }
         }
+
+        Application.trackEvent("session", "logout", "logout");
+        Application.trackNewSession();
 
         // clear database cache
         Application.getDb().clear();

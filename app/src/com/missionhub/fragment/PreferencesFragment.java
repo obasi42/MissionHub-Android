@@ -58,6 +58,13 @@ public class PreferencesFragment extends BaseFragment {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+
+        Application.trackView("Preferences");
+    }
+
+    @Override
     public void onDetach() {
         Application.unregisterEventSubscriber(this);
         super.onDetach();

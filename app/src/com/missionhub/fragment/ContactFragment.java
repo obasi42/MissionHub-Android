@@ -146,6 +146,13 @@ public class ContactFragment extends BaseFragment implements OnNavigationListene
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+
+        Application.trackView("Contact");
+    }
+
+    @Override
     public void onDestroy() {
         try {
             mRefreshTask.cancel(true);

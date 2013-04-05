@@ -304,6 +304,13 @@ public class ContactInfoFragment extends BaseFragment {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+
+        Application.trackView("Contact/Info");
+    }
+
+    @Override
     public void onDestroy() {
         try {
             mRefreshCommentsTask.cancel(true);

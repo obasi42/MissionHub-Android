@@ -6,6 +6,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.missionhub.R;
 import com.missionhub.api.PersonListOptions;
+import com.missionhub.application.Application;
 import com.missionhub.contactlist.ApiContactListProvider;
 import com.missionhub.contactlist.ContactListFragment;
 import com.missionhub.contactlist.ContactListProvider;
@@ -61,6 +62,13 @@ public class AllContactsFragment extends ContactListMainFragment {
 
             return new ApiContactListProvider(getSupportActivity(), options);
         }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        Application.trackView("All Contacts");
     }
 
     @Override
