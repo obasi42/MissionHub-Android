@@ -192,6 +192,8 @@ public class ExceptionHelper {
     public void setException(final Throwable throwable) {
         Log.e("ExceptionHelper", throwable.getMessage(), throwable);
 
+        Application.trackException(Thread.currentThread().getName(), throwable, false);
+
         mThrowable = throwable;
 
         // unwrap the exception if possible

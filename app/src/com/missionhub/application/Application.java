@@ -75,6 +75,8 @@ public class Application extends org.holoeverywhere.app.Application {
         super.onCreate();
         sApplication = this;
 
+        UpgradeManager.doUpgrade();
+
         if (Configuration.isACRAEnabled()) {
             try {
                 ACRAConfiguration config = ACRA.getConfig();
@@ -106,9 +108,6 @@ public class Application extends org.holoeverywhere.app.Application {
         // set up the networking
         NetworkUtils.disableConnectionReuseIfNecessary();
         NetworkUtils.enableHttpResponseCache(this);
-
-        // set the last last version id for future upgrades
-        SettingsManager.setApplicationLastVersionId(getVersionCode());
 
         // setup the image loader
         initImageLoader();
