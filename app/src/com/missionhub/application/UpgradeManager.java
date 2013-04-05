@@ -59,8 +59,6 @@ public class UpgradeManager {
             from++;
         }
 
-        getInstance().toV45();
-
         getInstance().onSuccess(to);
     }
 
