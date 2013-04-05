@@ -424,10 +424,8 @@ public class ContactAssignmentDialogFragment extends RefreshableDialogFragment i
                         .where(ContactAssignmentDao.Properties.Person_id.eq(person.getId()), ContactAssignmentDao.Properties.Organization_id.eq(Session.getInstance().getOrganizationId())).list();
 
                 if (assignments.size() > 0) {
+                    showNone = true;
                     for (final ContactAssignment assignment : assignments) {
-                        if (assignment.getAssigned_to_id().compareTo(Session.getInstance().getPersonId()) == 0) {
-                            showNone = true;
-                        }
                         if (assignment.getAssigned_to_id().compareTo(Session.getInstance().getPersonId()) != 0) {
                             showMe = true;
                         }
