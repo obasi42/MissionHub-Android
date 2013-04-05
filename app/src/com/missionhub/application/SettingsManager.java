@@ -15,16 +15,6 @@ public class SettingsManager {
      */
     private static SettingsManager sSettingsManager;
 
-    /**
-     * the settings db session
-     */
-    private SettingDao sd;
-
-    /**
-     * the user settings db session
-     */
-    private UserSettingDao usd;
-
     private SettingsManager() {
     }
 
@@ -34,9 +24,6 @@ public class SettingsManager {
     public synchronized static SettingsManager getInstance() {
         if (sSettingsManager == null) {
             sSettingsManager = new SettingsManager();
-            sSettingsManager.sd = Application.getDb().getSettingDao();
-            sSettingsManager.usd = Application.getDb().getUserSettingDao();
-
         }
         return sSettingsManager;
     }
@@ -62,7 +49,7 @@ public class SettingsManager {
      * @return the setting
      */
     public Setting findSettingByKey(final String key) {
-        Setting setting = sd.queryBuilder().where(SettingDao.Properties.Key.eq(key)).unique();
+        Setting setting = Application.getDb().getSettingDao().queryBuilder().where(SettingDao.Properties.Key.eq(key)).unique();
         if (setting == null) {
             setting = new Setting();
             setting.setKey(key);
@@ -105,7 +92,7 @@ public class SettingsManager {
     public void setSetting(final String key, final String value) {
         final Setting setting = findSettingByKey(key);
         setting.setValue(String.valueOf(value));
-        sd.insertOrReplace(setting);
+        Application.getDb().getSettingDao().insertOrReplace(setting);
     }
 
     /**
@@ -115,7 +102,7 @@ public class SettingsManager {
      */
     public void deleteSetting(final String key) {
         final Setting setting = findSettingByKey(key);
-        if (setting != null) sd.delete(setting);
+        if (setting != null) Application.getDb().getSettingDao().delete(setting);
     }
 
     // |**********************************|//
@@ -129,7 +116,7 @@ public class SettingsManager {
      * @return
      */
     public UserSetting findUserSettingByKey(final long personId, final String key) {
-        UserSetting setting = usd.queryBuilder().where(UserSettingDao.Properties.Key.eq(key), UserSettingDao.Properties.Person_id.eq(personId)).unique();
+        UserSetting setting = Application.getDb().getUserSettingDao().queryBuilder().where(UserSettingDao.Properties.Key.eq(key), UserSettingDao.Properties.Person_id.eq(personId)).unique();
         if (setting == null) {
             setting = new UserSetting();
             setting.setPerson_id(personId);
@@ -176,7 +163,7 @@ public class SettingsManager {
     public void setUserSetting(final long personId, final String key, final Object value) {
         final UserSetting setting = findUserSettingByKey(personId, key);
         setting.setValue(String.valueOf(value));
-        usd.insertOrReplace(setting);
+        Application.getDb().getUserSettingDao().insertOrReplace(setting);
     }
 
     /**
@@ -187,7 +174,7 @@ public class SettingsManager {
      */
     public void deleteUserSetting(final long personId, final String key) {
         final UserSetting setting = findUserSettingByKey(personId, key);
-        if (setting != null) usd.delete(setting);
+        if (setting != null) Application.getDb().getUserSettingDao().delete(setting);
     }
 
     // |**********************************|//

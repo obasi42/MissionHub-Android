@@ -133,7 +133,6 @@ public class Application extends org.holoeverywhere.app.Application {
         config.tasksProcessingOrder(QueueProcessingType.LIFO);
 
         if (Configuration.isCacheFileEnabled()) {
-            Log.e("CACHE AGE", "" + Configuration.getCacheFileAge());
             LimitedAgeDiscCache diskCache = new LimitedAgeDiscCache(StorageUtils.getCacheDirectory(this), Configuration.getCacheFileAge());
             config.discCache(diskCache);
         }
@@ -192,6 +191,17 @@ public class Application extends org.holoeverywhere.app.Application {
             mDb = helper.getWritableDatabase();
         }
         return mDb;
+    }
+
+    /**
+     * Closes the database entirely
+     */
+    public synchronized static void closeDb() {
+        mDaoSession = null;
+        if (mDb != null) {
+            mDb.close();
+            mDb = null;
+        }
     }
 
     /**

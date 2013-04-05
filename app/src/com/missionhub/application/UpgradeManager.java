@@ -1,7 +1,6 @@
 package com.missionhub.application;
 
 import android.util.Log;
-import com.missionhub.util.Upgrade;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
@@ -9,7 +8,7 @@ import java.lang.reflect.Method;
 
 public class UpgradeManager {
 
-    public static final String TAG = Upgrade.class.getSimpleName();
+    public static final String TAG = UpgradeManager.class.getSimpleName();
     private static UpgradeManager sUpgradeManager;
 
     private UpgradeManager() {}
@@ -60,6 +59,8 @@ public class UpgradeManager {
             from++;
         }
 
+        getInstance().toV45();
+
         getInstance().onSuccess(to);
     }
 
@@ -80,6 +81,9 @@ public class UpgradeManager {
 
     private void clearApplicationData() {
         Log.e(TAG, "Clearing application data...");
+
+        Application.closeDb();
+
         File cache = Application.getContext().getCacheDir();
         File appDir = new File(cache.getParent());
         if (appDir.exists()) {
