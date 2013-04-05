@@ -2,9 +2,11 @@
              xmlns:tools="http://schemas.android.com/tools"
              android:id="@+id/fragment_contact_info"
              android:layout_width="fill_parent"
-             android:layout_height="fill_parent">
+             android:layout_height="fill_parent"
+             android:descendantFocusability="beforeDescendants"
+             android:focusableInTouchMode="true">
 
-    <android.widget.ListView
+    <ListView
             android:id="@android:id/list"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
@@ -15,6 +17,6 @@
             android:paddingTop="5.0dip"
             tools:listheader="@layout/fragment_contact_info_header"
             tools:listitem="@layout/item_contact_comment">
-    </android.widget.ListView>
+    </ListView>
 
 </FrameLayout>

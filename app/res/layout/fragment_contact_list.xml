@@ -10,18 +10,12 @@
             android:animateLayoutChanges="true"
             android:background="@drawable/item_background"/>
 
-    <RelativeLayout
+    <TextView
             android:id="@android:id/empty"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent">
-
-        <TextView
-                android:id="@android:id/text1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:text="No Contacts"
-                android:textAppearance="?android:attr/textAppearanceMedium"/>
-    </RelativeLayout>
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No Contacts"
+            android:textAppearance="?android:attr/textAppearanceMedium"/>
 
 </FrameLayout>

@@ -8,24 +8,18 @@
               android:paddingLeft="16dip"
               android:paddingRight="12dip">
 
-    <LinearLayout
+    <TextView
+            android:id="@android:id/text1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:gravity="center_vertical"
-            android:orientation="vertical">
-
-        <TextView
-                android:id="@android:id/text1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:ellipsize="marquee"
-                android:gravity="center_vertical|left"
-                android:singleLine="true"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="?textColorAlertDialogListItem"
-                />
-    </LinearLayout>
+            android:layout_gravity="center_vertical"
+            android:ellipsize="marquee"
+            android:gravity="center_vertical|left"
+            android:singleLine="true"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="?textColorAlertDialogListItem"
+            />
 
     <ImageView
             android:id="@+id/checkbox"

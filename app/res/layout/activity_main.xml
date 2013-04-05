@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:id="@+id/main_frame"
-             android:layout_width="fill_parent"
-             android:layout_height="fill_parent">
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
 
     <FrameLayout
             android:id="@+id/leftView"
@@ -13,5 +10,4 @@
             android:id="@+id/contentView"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"/>
-
-</FrameLayout>
+</merge>

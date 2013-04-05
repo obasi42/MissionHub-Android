@@ -244,6 +244,7 @@ public class ContactInfoFragment extends BaseFragment {
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_contact_info, null);
         mListView = (ListView) view.findViewById(android.R.id.list);
+        mListView.setDescendantFocusability(ListView.FOCUS_AFTER_DESCENDANTS);
 
         mHeader = inflater.inflate(R.layout.fragment_contact_info_header, null);
         mHeaderComment = inflater.inflate(R.layout.fragment_contact_info_comment, null);
@@ -251,26 +252,26 @@ public class ContactInfoFragment extends BaseFragment {
         mListView.addHeaderView(mHeader);
         mListView.addHeaderView(mHeaderComment);
 
-        mHeaderGivenName = (TextView) view.findViewById(R.id.given_name);
-        mHeaderFamilyName = (TextView) view.findViewById(R.id.family_name);
-        mHeaderAvatar = (ImageView) view.findViewById(R.id.avatar_image);
-        mHeaderActionCall = (ImageView) view.findViewById(R.id.action_call);
-        mHeaderActionMessage = (ImageView) view.findViewById(R.id.action_message);
-        mHeaderActionEmail = (ImageView) view.findViewById(R.id.action_email);
-        mHeaderContainerPhone = view.findViewById(R.id.phone_container);
-        mHeaderContainerEmail = view.findViewById(R.id.email_container);
-        mHeaderPhone = (TextView) view.findViewById(R.id.phone);
-        mHeaderEmail = (TextView) view.findViewById(R.id.email);
-        mHeaderAssignment = (Button) view.findViewById(R.id.assign);
-        mHeaderMore = (ViewGroup) view.findViewById(R.id.more);
-        mHeaderMoreText = (TextView) view.findViewById(R.id.expand);
+        mHeaderGivenName = (TextView) mHeader.findViewById(R.id.given_name);
+        mHeaderFamilyName = (TextView) mHeader.findViewById(R.id.family_name);
+        mHeaderAvatar = (ImageView) mHeader.findViewById(R.id.avatar_image);
+        mHeaderActionCall = (ImageView) mHeader.findViewById(R.id.action_call);
+        mHeaderActionMessage = (ImageView) mHeader.findViewById(R.id.action_message);
+        mHeaderActionEmail = (ImageView) mHeader.findViewById(R.id.action_email);
+        mHeaderContainerPhone = mHeader.findViewById(R.id.phone_container);
+        mHeaderContainerEmail = mHeader.findViewById(R.id.email_container);
+        mHeaderPhone = (TextView) mHeader.findViewById(R.id.phone);
+        mHeaderEmail = (TextView) mHeader.findViewById(R.id.email);
+        mHeaderAssignment = (Button) mHeader.findViewById(R.id.assign);
+        mHeaderMore = (ViewGroup) mHeader.findViewById(R.id.more);
+        mHeaderMoreText = (TextView) mHeader.findViewById(R.id.expand);
 
-        mCommentComment = (EditText) view.findViewById(R.id.comment);
-        mCommentSave = view.findViewById(R.id.save);
-        mCommentRejoiceChrist = (ImageView) view.findViewById(R.id.rejoice_christ);
-        mCommentRejoiceGospel = (ImageView) view.findViewById(R.id.rejoice_gospel);
-        mCommentRejoiceConvo = (ImageView) view.findViewById(R.id.rejoice_convo);
-        mCommentStatus = (Spinner) view.findViewById(R.id.status);
+        mCommentComment = (EditText) mHeaderComment.findViewById(R.id.comment);
+        mCommentSave = mHeaderComment.findViewById(R.id.save);
+        mCommentRejoiceChrist = (ImageView) mHeaderComment.findViewById(R.id.rejoice_christ);
+        mCommentRejoiceGospel = (ImageView) mHeaderComment.findViewById(R.id.rejoice_gospel);
+        mCommentRejoiceConvo = (ImageView) mHeaderComment.findViewById(R.id.rejoice_convo);
+        mCommentStatus = (Spinner) mHeaderComment.findViewById(R.id.status);
 
         return view;
     }

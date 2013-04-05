@@ -3,7 +3,8 @@
                                             android:layout_height="wrap_content"
                                             android:background="@drawable/list_item_background"
                                             android:minHeight="64.0dip"
-                                            android:padding="8.0dip">
+                                            android:padding="8.0dip"
+                                            android:animateLayoutChanges="false">
 
     <ImageView
             android:id="@+id/avatar"
@@ -23,28 +24,24 @@
             android:layout_centerVertical="true"
             android:layout_marginRight="4.0dip"/>
 
-    <LinearLayout
-            android:id="@+id/name_container"
+    <TextView
+            android:id="@+id/name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
             android:layout_marginLeft="8.0dip"
             android:layout_toLeftOf="@+id/checkmark"
             android:layout_toRightOf="@+id/avatar"
-            android:orientation="vertical">
+            android:text="Large Text"
+            android:textAppearance="?android:attr/textAppearanceLarge"/>
 
-        <TextView
-                android:id="@+id/name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Large Text"
-                android:textAppearance="?android:attr/textAppearanceLarge"/>
-
-        <TextView
-                android:id="@+id/status"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="TextView"/>
-    </LinearLayout>
+    <TextView
+            android:id="@+id/status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8.0dip"
+            android:layout_toLeftOf="@+id/checkmark"
+            android:layout_toRightOf="@+id/avatar"
+            android:layout_below="@id/name"
+            android:text="TextView"/>
 
 </com.missionhub.contactlist.ContactItemView>

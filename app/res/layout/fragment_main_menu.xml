@@ -8,6 +8,4 @@
           android:divider="@null"
           android:dividerHeight="0dip"
           android:listSelector="@drawable/abs__list_selector_holo_light"
-          tools:listitem="@layout/item_main_menu_item">
-
-</ListView>
+          tools:listitem="@layout/item_main_menu_item"/>
