@@ -2,6 +2,7 @@ package com.missionhub.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.Window;
 import com.missionhub.R;
@@ -41,7 +42,7 @@ public class MainActivity extends BaseAuthenticatedActivity {
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.content_frame);
+        setContentView(R.layout.activity_main);
 
         // setup the slider addon
         final AddonSlider.AddonSliderA slider = getAddonSlider();
@@ -49,13 +50,12 @@ public class MainActivity extends BaseAuthenticatedActivity {
         slider.disableShadow();
         slider.setTranslateFactor(0f);
         slider.setTouchMode(SliderView.TouchMode.Left);
-        slider.setLeftView(getLayoutInflater().inflate(R.layout.menu_frame));
         slider.setLeftViewWidth((int) getResources().getDimension(R.dimen.main_menu_width));
 
         // setup the fragments
         if (savedInstanceState != null) {
-            mFragment = (MainFragment) getSupportFragmentManager().findFragmentById(R.id.content_frame);
-            mMenuFragment = (MainMenuFragment) getSupportFragmentManager().findFragmentById(R.id.menu_frame);
+            mFragment = (MainFragment) getSupportFragmentManager().findFragmentById(R.id.contentView);
+            mMenuFragment = (MainMenuFragment) getSupportFragmentManager().findFragmentById(R.id.leftView);
         } else {
             mFragment = new MyContactsFragment();
             mMenuFragment = new MainMenuFragment();
@@ -100,7 +100,7 @@ public class MainActivity extends BaseAuthenticatedActivity {
      * @return true if the fragment was switched
      */
     public boolean switchFragment(final Class<? extends MainFragment> clss) {
-        if (mFragment != null && mFragment.getClass() == clss) return false;
+        if (mFragment != null && ((Object) mFragment).getClass() == clss) return false;
         try {
             return switchFragment(clss.newInstance());
         } catch (final Exception e) { /* ignore */}
@@ -108,12 +108,12 @@ public class MainActivity extends BaseAuthenticatedActivity {
     }
 
     private void setFragment(final MainFragment fragment) {
-        getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out).replace(R.id.content_frame, fragment).commit();
+        getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out).replace(R.id.contentView, fragment).commit();
         mFragment = fragment;
     }
 
     private void setMenuFragment(final MainMenuFragment fragment) {
-        getSupportFragmentManager().beginTransaction().replace(R.id.menu_frame, fragment).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.leftView, fragment).commit();
         mMenuFragment = fragment;
     }
 
@@ -164,6 +164,15 @@ public class MainActivity extends BaseAuthenticatedActivity {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
         finish();
+    }
+
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        if (!getAddonSlider().isContentShowed()) {
+            getAddonSlider().showContentDelayed();
+            return true;
+        }
+        return super.onKeyUp(keyCode, event);
     }
 
 }

@@ -119,7 +119,6 @@ public class Session implements OnAccountsUpdateListener {
      * Returns the user's primary organization
      *
      * @return
-     * @throws NoPersonException
      */
     public synchronized long getPrimaryOrganizationId() {
         try {
@@ -470,7 +469,7 @@ public class Session implements OnAccountsUpdateListener {
     }
 
 	/*--------------------*\
-	 * Event Types
+     * Event Types
 	\*--------------------*/
 
     /**

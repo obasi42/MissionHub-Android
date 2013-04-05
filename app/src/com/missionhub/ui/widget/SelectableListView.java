@@ -262,7 +262,7 @@ public class SelectableListView extends ListView {
     /**
      * Sets a list item as activated
      *
-     * @param position  the item position or -1 to clear the activated item
+     * @param position the item position or -1 to clear the activated item
      */
     public void setItemActivated(int position) {
         if (getAdapter() == null) {
@@ -284,10 +284,7 @@ public class SelectableListView extends ListView {
      * @return
      */
     public boolean isItemActivated(final int position) {
-        if (mActivatedItem == position) {
-            return true;
-        }
-        return false;
+        return mActivatedItem == position;
     }
 
     /**

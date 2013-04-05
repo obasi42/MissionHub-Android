@@ -10,8 +10,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.webkit.*;
-import ch.boye.httpclientandroidlib.client.utils.URIBuilder;
 import com.actionbarsherlock.view.Window;
+import com.github.kevinsawicki.http.HttpRequest;
 import com.google.gson.Gson;
 import com.missionhub.R;
 import com.missionhub.api.Api;
@@ -34,6 +34,7 @@ import org.holoeverywhere.widget.Toast;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
+import java.util.HashMap;
 import java.util.concurrent.FutureTask;
 
 /**
@@ -51,11 +52,6 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
      * the activity result when a duplicate account exists
      */
     public static final int RESULT_DUPLICATE = 1;
-
-    /**
-     * the system account manager
-     */
-    private AccountManager mAccountManager;
 
     /**
      * the web view used for authentication
@@ -84,8 +80,6 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 
         setContentView(R.layout.activity_authenticator);
-
-        mAccountManager = AccountManager.get(this);
 
         mWebView = (WebView) findViewById(R.id.webview);
         mProgress = (ProgressBar) findViewById(android.R.id.progress);
@@ -230,16 +224,16 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
      * @throws MalformedURLException
      */
     private String getAuthenticationUrl() throws URISyntaxException, MalformedURLException {
-        final URIBuilder builder = new URIBuilder(Configuration.getOauthUrl() + "/authorize");
-        builder.addParameter("android", "true");
-        builder.addParameter("display", "touch");
-        builder.addParameter("simple", "true");
-        builder.addParameter("response_type", "code");
-        builder.addParameter("redirect_uri", Configuration.getOauthUrl() + "/done.json");
-        builder.addParameter("client_id", Configuration.getOauthClientId());
-        builder.addParameter("scope", Configuration.getOauthScope());
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("android", "true");
+        params.put("display", "touch");
+        params.put("simple", "true");
+        params.put("response_type", "code");
+        params.put("redirect_uri", Configuration.getOauthUrl() + "/done.json");
+        params.put("client_id", Configuration.getOauthClientId());
+        params.put("scope", Configuration.getOauthScope());
 
-        return builder.build().toURL().toString();
+        return HttpRequest.append(Configuration.getOauthUrl() + "/authorize", params);
     }
 
     /**

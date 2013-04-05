@@ -8,13 +8,13 @@ import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.View;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
+import com.github.croemmich.drilldown.LockableViewPager;
 import com.missionhub.R;
 import com.missionhub.api.PersonListOptions;
 import com.missionhub.application.Session;
 import com.missionhub.contactlist.ApiContactListProvider;
 import com.missionhub.contactlist.ContactListFragment;
 import com.missionhub.contactlist.ContactListProvider;
-import com.missionhub.ui.widget.LockedViewPager;
 import com.missionhub.util.U;
 import com.missionhub.util.U.FollowupStatus;
 import org.holoeverywhere.LayoutInflater;
@@ -23,7 +23,7 @@ import java.util.EnumSet;
 
 public class MyContactsFragment extends ContactListMainFragment implements OnPageChangeListener {
 
-    private LockedViewPager mPager;
+    private LockableViewPager mPager;
     private PagerTabStrip mTabStrip;
     private FragmentStatePagerAdapter mAdapter;
 
@@ -92,11 +92,10 @@ public class MyContactsFragment extends ContactListMainFragment implements OnPag
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mPager = (LockedViewPager) view.findViewById(R.id.pager);
+        mPager = (LockableViewPager) view.findViewById(R.id.pager);
         mTabStrip = (PagerTabStrip) view.findViewById(R.id.pager_title_strip);
 
-        mPager.setPagingLocked(false);
-        mPager.setOffscreenPageLimit(2);
+        mPager.setOffscreenPageLimit(3);
         mPager.setOnPageChangeListener(this);
         mPager.setAdapter(mAdapter);
         mPager.setCurrentItem(mPage);
@@ -198,10 +197,10 @@ public class MyContactsFragment extends ContactListMainFragment implements OnPag
     public void onSearchTextChange(final String query) {
         if (query.length() == 0) {
             getContactListFragment().removeAltProvider();
-            mPager.setPagingLocked(false);
+            mPager.setPagingLocked(LockableViewPager.LOCK_NONE);
             mTabStrip.setVisibility(View.VISIBLE);
         } else {
-            mPager.setPagingLocked(true);
+            mPager.setPagingLocked(LockableViewPager.LOCK_BOTH);
             mTabStrip.setVisibility(View.GONE);
 
             PersonListOptions options = ((ApiContactListProvider) mAll.getProvider()).getOptions();

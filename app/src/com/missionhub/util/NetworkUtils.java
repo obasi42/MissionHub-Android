@@ -53,7 +53,9 @@ public class NetworkUtils {
                 final long httpCacheSize = Configuration.getCacheHttpSize();
                 final File httpCacheDir = new File(application.getCacheDir(), "http");
                 Class.forName("android.net.http.HttpResponseCache").getMethod("install", File.class, long.class).invoke(null, httpCacheDir, httpCacheSize);
-            } catch (final Exception httpResponseCacheNotAvailable) {}
+            } catch (final Exception httpResponseCacheNotAvailable) {
+                /* ignore */
+            }
         }
     }
 }

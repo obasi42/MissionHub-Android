@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageView;
+import com.github.croemmich.drilldown.LockableViewPager;
 import com.missionhub.R;
 import com.missionhub.api.Api;
 import com.missionhub.api.Api.Include;
@@ -26,7 +27,6 @@ import com.missionhub.model.*;
 import com.missionhub.model.gson.GContactAssignment;
 import com.missionhub.ui.AnimateOnceImageLoadingListener;
 import com.missionhub.ui.ObjectArrayAdapter;
-import com.missionhub.ui.widget.LockedViewPager;
 import com.missionhub.util.SafeAsyncTask;
 import com.missionhub.util.U;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -45,7 +45,7 @@ public class ContactAssignmentDialogFragment extends RefreshableDialogFragment i
     /**
      * the view pager
      */
-    private LockedViewPager mPager;
+    private LockableViewPager mPager;
 
     /**
      * the progress view
@@ -99,7 +99,7 @@ public class ContactAssignmentDialogFragment extends RefreshableDialogFragment i
     }
 
     public static ContactAssignmentDialogFragment showForResult(FragmentManager fm, final Person person, Integer requestCode) {
-        final List people = new ArrayList();
+        final List<Person> people = new ArrayList<Person>();
         people.add(person);
         return showForResult(fm, people, requestCode);
     }
@@ -147,7 +147,7 @@ public class ContactAssignmentDialogFragment extends RefreshableDialogFragment i
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mPager = (LockedViewPager) view.findViewById(R.id.pager);
+        mPager = (LockableViewPager) view.findViewById(R.id.pager);
         mProgress = view.findViewById(R.id.progress_container);
 
         if (mPagerAdapter == null) {
@@ -173,7 +173,7 @@ public class ContactAssignmentDialogFragment extends RefreshableDialogFragment i
             };
         }
         mPager.setOffscreenPageLimit(1);
-        mPager.setPagingLocked(true);
+        mPager.setPagingLocked(LockableViewPager.LOCK_BOTH);
         mPager.setAdapter(mPagerAdapter);
 
         if (mPage == 0) {
@@ -711,7 +711,7 @@ public class ContactAssignmentDialogFragment extends RefreshableDialogFragment i
     @Override
     public void onRefresh() {
         if (mSelectionFragment.mSelection == IndexFragment.GROUPS) {
-
+            // TODO: groups
         } else if (mSelectionFragment.mSelection == IndexFragment.LEADERS) {
             if (mRefreshLeadersTask != null) return;
 

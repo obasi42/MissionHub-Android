@@ -3,7 +3,7 @@
              android:layout_width="fill_parent"
              android:layout_height="fill_parent">
 
-    <com.missionhub.ui.widget.LockedViewPager
+    <com.github.croemmich.drilldown.LockableViewPager
             android:id="@+id/pager"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent">
@@ -17,6 +17,6 @@
                 android:paddingBottom="4.0dip"
                 android:paddingTop="4.0dip"
                 android:textColor="#fff"/>
-    </com.missionhub.ui.widget.LockedViewPager>
+    </com.github.croemmich.drilldown.LockableViewPager>
 
 </FrameLayout>

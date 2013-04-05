@@ -24,6 +24,7 @@ public class BaseDialogFragment extends DialogFragment implements FragmentResult
         if (!U.superGetRetainInstance(this)) {
             setRetainInstance(true);
         }
+        setDestoryChildFragments(false);
 
         if (getArguments() != null) {
             mRequestCode = getArguments().getInt("requestCode", Integer.MIN_VALUE);

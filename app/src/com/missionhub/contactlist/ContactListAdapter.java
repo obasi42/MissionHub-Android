@@ -5,7 +5,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import com.missionhub.R;
-import com.missionhub.application.DrawableCache;
 import com.missionhub.model.Person;
 import com.missionhub.ui.AnimateOnceImageLoadingListener;
 import com.missionhub.ui.ObjectArrayAdapter;
@@ -13,7 +12,6 @@ import com.missionhub.util.U;
 import com.missionhub.util.U.Gender;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import org.holoeverywhere.widget.ListView;
 import org.holoeverywhere.widget.TextView;
 
 public class ContactListAdapter extends ObjectArrayAdapter {
@@ -83,7 +81,6 @@ public class ContactListAdapter extends ObjectArrayAdapter {
                 view = getLayoutInflater().inflate(mProgressItemLayout, null);
                 holder.progressText = (TextView) view.findViewById(R.id.progress_text);
             }
-
             view.setTag(holder);
         } else {
             holder = (ViewHolder) view.getTag();
@@ -91,14 +88,6 @@ public class ContactListAdapter extends ObjectArrayAdapter {
 
         if (object instanceof ContactItem) {
             final ContactItem item = (ContactItem) object;
-
-            if (holder.checkmark != null) {
-                if (((ListView) parent).isItemChecked(position)) {
-                    holder.checkmark.setImageDrawable(DrawableCache.getDrawable(R.drawable.check_on_normal_holo_light));
-                } else {
-                    holder.checkmark.setImageDrawable(DrawableCache.getDrawable(R.drawable.check_off_normal_holo_light));
-                }
-            }
 
             if (item.person != null) {
 

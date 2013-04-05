@@ -1,6 +1,7 @@
 package com.missionhub.api;
 
 import android.os.Build;
+import android.util.Log;
 import com.github.kevinsawicki.http.HttpRequest;
 import com.google.gson.Gson;
 import com.missionhub.application.Application;
@@ -23,6 +24,8 @@ public class Api {
      * the singleton gson parser
      */
     protected static final Gson sGson = new Gson();
+
+    public static final String TAG = Api.class.getSimpleName();
 
     private Api() {
     }
@@ -371,7 +374,7 @@ public class Api {
      * @return
      */
     public static ApiRequest<GAccessToken> getAccessToken(final String code) {
-        final Map params = new HashMap<String, String>();
+        final Map<String, String> params = new HashMap<String, String>();
         params.put("client_id", Configuration.getOauthClientId());
         params.put("client_secret", Configuration.getOauthClientSecret());
         params.put("code", code);
@@ -526,6 +529,8 @@ public class Api {
             }
         }
 
+        logRequest(url, method, headers, params, authenticated);
+
         appendLoggingParams(params);
 
         HttpRequest request;
@@ -543,6 +548,24 @@ public class Api {
         }
 
         return request;
+    }
+
+    private void logRequest(String url, String method, Map<String, String> headers, Map<String, String> params, boolean authenticated) {
+        if (Configuration.getEnvironment() == Configuration.Environment.DEVELOPMENT) {
+            Log.e(TAG, method + " " + url);
+            if (headers != null) {
+                Log.w(TAG, "==== headers ====");
+                for (Map.Entry<String, String> entry : headers.entrySet()) {
+                    Log.w(TAG, entry.getKey() + " : " + entry.getValue());
+                }
+            }
+            if (params != null) {
+                Log.w(TAG, "==== params ====");
+                for (Map.Entry<String, String> entry : params.entrySet()) {
+                    Log.w(TAG, entry.getKey() + " : " + entry.getValue());
+                }
+            }
+        }
     }
 
     /**

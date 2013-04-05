@@ -56,13 +56,18 @@
 
     <repositories>
         <repository>
-            <id>missionhub-android-maven</id>
-            <url>https://github.com/CruGlobal/Missionhub-Android-Maven/raw/master/releases</url>
-        </repository>
-        <repository>
-            <id>bugsense repo</id>
-            <name>The BugSense Repository</name>
-            <url>http://mvn.bugsense.com/</url>
+            <id>nexus.cr-wd.com</id>
+            <url>http://nexus.cr-wd.com/content/repositories</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+                <checksumPolicy>warn</checksumPolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+                <checksumPolicy>fail</checksumPolicy>
+            </snapshots>
         </repository>
     </repositories>
 
@@ -73,34 +78,29 @@
         <java.version>1.6</java.version>
         <android.version>4.2.2_r2</android.version>
         <android.platform>17</android.platform>
-        <android-support.version>12</android-support.version>
-
-        <android-maven.version>3.5.1</android-maven.version>
-        <junit.version>4.11</junit.version>
-        <findbugs.version>2.5.2</findbugs.version>
 
         <github.downloads.repositoryOwner>CruGlobal</github.downloads.repositoryOwner>
         <github.downloads.repositoryName>MissionHub-Android</github.downloads.repositoryName>
     </properties>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>com.jayway.maven.plugins.android.generation2</groupId>
-                <artifactId>android-maven-plugin</artifactId>
-                <extensions>true</extensions>
-            </plugin>
-            <!--<plugin>-->
-                <!--<groupId>org.codehaus.mojo</groupId>-->
-                <!--<artifactId>findbugs-maven-plugin</artifactId>-->
-            <!--</plugin>-->
-        </plugins>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>android</groupId>
+                <artifactId>android</artifactId>
+                <version>${android.version}</version>
+                <scope>provided</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
         <pluginManagement>
             <plugins>
                 <plugin>
                     <groupId>com.jayway.maven.plugins.android.generation2</groupId>
                     <artifactId>android-maven-plugin</artifactId>
-                    <version>${android-maven.version}</version>
+                    <version>3.5.1</version>
                     <extensions>true</extensions>
                     <configuration>
                         <sdk>
@@ -113,37 +113,15 @@
                         </proguard>
                     </configuration>
                 </plugin>
-                <!--<plugin>-->
-                    <!--<groupId>org.codehaus.mojo</groupId>-->
-                    <!--<artifactId>findbugs-maven-plugin</artifactId>-->
-                    <!--<version>${findbugs.version}</version>-->
-                <!--</plugin>-->
             </plugins>
         </pluginManagement>
-    </build>
 
-    <!--<reporting>-->
-        <!--<plugins>-->
-            <!--<plugin>-->
-                <!--<groupId>org.codehaus.mojo</groupId>-->
-                <!--<artifactId>findbugs-maven-plugin</artifactId>-->
-                <!--<version>${findbugs.version}</version>-->
-                <!--<configuration>-->
-                    <!--<threshold>Default</threshold>-->
-                    <!--<effort>Max</effort>-->
-                    <!--<onlyAnalyze>com.missionhub.*</onlyAnalyze>-->
-                    <!--<findbugsXmlOutput>true</findbugsXmlOutput>-->
-                    <!--<findbugsXmlOutputDirectory>target</findbugsXmlOutputDirectory>-->
-                <!--</configuration>-->
-            <!--</plugin>-->
-            <!--<plugin>-->
-                <!--<groupId>org.apache.maven.plugins</groupId>-->
-                <!--<artifactId>maven-checkstyle-plugin</artifactId>-->
-                <!--<version>2.10</version>-->
-                <!--<configuration>-->
-                    <!--<configLocation>checkstyle.xml</configLocation>-->
-                <!--</configuration>-->
-            <!--</plugin>-->
-        <!--</plugins>-->
-    <!--</reporting>-->
+        <plugins>
+            <plugin>
+                <groupId>com.jayway.maven.plugins.android.generation2</groupId>
+                <artifactId>android-maven-plugin</artifactId>
+                <extensions>true</extensions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

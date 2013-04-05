@@ -1,7 +1,6 @@
 package com.missionhub.util;
 
 import android.content.Context;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.telephony.TelephonyManager;
 import android.util.TypedValue;

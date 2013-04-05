@@ -10,6 +10,7 @@ import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.github.croemmich.drilldown.LockableViewPager;
 import com.missionhub.R;
 import com.missionhub.api.Api;
 import com.missionhub.api.Api.Include;
@@ -19,7 +20,6 @@ import com.missionhub.exception.ExceptionHelper;
 import com.missionhub.model.Person;
 import com.missionhub.ui.NavigationSpinnerAdapter;
 import com.missionhub.ui.ProgressItemHelper;
-import com.missionhub.ui.widget.LockedViewPager;
 import com.missionhub.util.SafeAsyncTask;
 import com.missionhub.util.U;
 import org.holoeverywhere.LayoutInflater;
@@ -48,7 +48,7 @@ public class ContactFragment extends BaseFragment implements OnNavigationListene
     /**
      * the view pager
      */
-    private LockedViewPager mPager;
+    private LockableViewPager mPager;
 
     /**
      * the progress view
@@ -159,7 +159,7 @@ public class ContactFragment extends BaseFragment implements OnNavigationListene
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mPager = (LockedViewPager) view.findViewById(R.id.pager);
+        mPager = (LockableViewPager) view.findViewById(R.id.pager);
         mProgress = (ProgressBar) view.findViewById(R.id.progress);
 
         if (mPerson != null) {
@@ -195,7 +195,6 @@ public class ContactFragment extends BaseFragment implements OnNavigationListene
                 }
             };
         }
-        mPager.setPagingLocked(false);
         mPager.setOnPageChangeListener(this);
         mPager.setOffscreenPageLimit(2);
         mPager.setAdapter(mAdapter);

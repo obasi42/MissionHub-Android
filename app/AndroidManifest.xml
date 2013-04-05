@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          android:versionCode="1"
-          android:versionName="2.0-SNAPSHOT.1"
-          package="com.missionhub">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="1" android:versionName="2.0-SNAPSHOT.1" package="com.missionhub">
 
-    <uses-sdk
-            android:minSdkVersion="8"
-            android:targetSdkVersion="17"/>
+    <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="16"/>
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
@@ -22,23 +17,13 @@
     <uses-permission android:name="android.permission.READ_SYNC_SETTINGS"/>
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS"/>
 
-    <application
-            android:allowBackup="true"
-            android:icon="@drawable/ic_launcher"
-            android:label="@string/app_name"
-            android:name=".application.Application"
-            android:theme="@style/Theme.MissionHub">
-        <service
-                android:exported="true"
-                android:name=".authenticator.AuthenticationService"
-                android:permission="normal">
+    <application android:allowBackup="true" android:debuggable="false" android:icon="@drawable/ic_launcher" android:label="@string/app_name" android:name=".application.Application" android:theme="@style/Theme.MissionHub">
+        <service android:exported="true" android:name=".authenticator.AuthenticationService" android:permission="normal">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator"/>
             </intent-filter>
 
-            <meta-data
-                    android:name="android.accounts.AccountAuthenticator"
-                    android:resource="@xml/authenticator"/>
+            <meta-data android:name="android.accounts.AccountAuthenticator" android:resource="@xml/authenticator"/>
         </service>
         <!--<service android:exported="true" android:name=".sync.SyncService" android:process=":contacts">-->
         <!--<intent-filter>-->
@@ -47,12 +32,7 @@
         <!--<meta-data android:name="android.content.SyncAdapter" android:resource="@xml/sync_all"/>-->
         <!--</service>-->
 
-        <activity
-                android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
-                android:label="@string/app_name"
-                android:launchMode="singleTop"
-                android:name=".activity.InitActivity"
-                android:theme="@style/Theme.MissionHubDark.NoActionBar">
+        <activity android:configChanges="keyboard|keyboardHidden|orientation|screenSize" android:label="@string/app_name" android:launchMode="singleTop" android:name=".activity.InitActivity" android:theme="@style/Theme.MissionHubDark.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -60,42 +40,14 @@
             </intent-filter>
         </activity>
 
-        <activity
-                android:label="@string/app_name"
-                android:launchMode="singleTop"
-                android:name=".activity.MainActivity"
-                android:theme="@style/Theme.MissionHub.MainActivity"/>
-        <activity
-                android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
-                android:excludeFromRecents="true"
-                android:label="@string/auth_activity_title"
-                android:name=".authenticator.AuthenticatorActivity"
-                android:theme="@style/Theme.MissionHubDark"/>
-        <activity
-                android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
-                android:label="@string/about_licenses"
-                android:name=".activity.LicensesActivity"
-                android:theme="@style/Theme.MissionHub"/>
-        <activity
-                android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
-                android:label="@string/about_activity_title"
-                android:name=".activity.AboutActivity"
-                android:theme="@style/Theme.MissionHub"/>
-        <activity
-                android:label="@string/pref_activity_title"
-                android:name=".activity.PreferencesActivity"
-                android:theme="@style/Theme.MissionHub"/>
-        <activity
-                android:label="@string/contact_activity_title"
-                android:name=".activity.ContactActivity"
-                android:theme="@style/Theme.MissionHub"/>
+        <activity android:label="@string/app_name" android:launchMode="singleTop" android:name=".activity.MainActivity" android:theme="@style/Theme.MissionHub.MainActivity"/>
+        <activity android:configChanges="keyboard|keyboardHidden|orientation|screenSize" android:excludeFromRecents="true" android:label="@string/auth_activity_title" android:name=".authenticator.AuthenticatorActivity" android:theme="@style/Theme.MissionHubDark"/>
+        <activity android:configChanges="keyboard|keyboardHidden|orientation|screenSize" android:label="@string/about_licenses" android:name=".activity.LicensesActivity" android:theme="@style/Theme.MissionHub"/>
+        <activity android:configChanges="keyboard|keyboardHidden|orientation|screenSize" android:label="@string/about_activity_title" android:name=".activity.AboutActivity" android:theme="@style/Theme.MissionHub"/>
+        <activity android:label="@string/pref_activity_title" android:name=".activity.PreferencesActivity" android:theme="@style/Theme.MissionHub"/>
+        <activity android:label="@string/contact_activity_title" android:name=".activity.ContactActivity" android:theme="@style/Theme.MissionHub"/>
 
-        <activity
-                android:excludeFromRecents="true"
-                android:finishOnTaskLaunch="true"
-                android:launchMode="singleInstance"
-                android:name="org.acra.CrashReportDialog"
-                android:theme="@android:style/Theme.Dialog"/>
+        <activity android:excludeFromRecents="true" android:finishOnTaskLaunch="true" android:launchMode="singleInstance" android:name="org.acra.CrashReportDialog" android:theme="@android:style/Theme.Dialog"/>
     </application>
 
 </manifest>
