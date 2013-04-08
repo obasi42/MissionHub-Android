@@ -1,4 +1,4 @@
-<com.github.croemmich.drilldown.LockableViewPager
+<com.missionhub.ui.widget.LockableViewPager
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/pager"
         android:layout_width="fill_parent"
@@ -13,4 +13,4 @@
             android:paddingBottom="4.0dip"
             android:paddingTop="4.0dip"
             android:textColor="#fff"/>
-</com.github.croemmich.drilldown.LockableViewPager>
+</com.missionhub.ui.widget.LockableViewPager>

@@ -12,6 +12,7 @@ import com.missionhub.application.Session.SessionInvalidatedEvent;
 import com.missionhub.fragment.MainFragment;
 import com.missionhub.fragment.MainMenuFragment;
 import com.missionhub.fragment.MyContactsFragment;
+import com.missionhub.fragment.dialog.SelectOrganizationDialogFragment;
 import com.missionhub.util.IntentHelper;
 import org.holoeverywhere.addon.AddonSlider;
 import org.holoeverywhere.slider.SliderView;
@@ -121,6 +122,10 @@ public class MainActivity extends BaseAuthenticatedActivity {
     public void openPreferences() {
         final Intent intent = new Intent(this, PreferencesActivity.class);
         startActivity(intent);
+    }
+
+    public void openOrganization() {
+        SelectOrganizationDialogFragment.showForResult(getSupportFragmentManager(), null);
     }
 
     /**

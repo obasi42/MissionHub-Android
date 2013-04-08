@@ -61,7 +61,7 @@ public class MainMenuFragment extends BaseFragment implements OnItemClickListene
             mAdapter.add(new MainMenuItem(R.id.menu_item_surveys, R.string.menu_surveys, R.drawable.ic_main_survey));
 
             mAdapter.add(new MainMenuDivider(R.string.menu_div_account));
-            mAdapter.add(new MainMenuItem(R.id.menu_item_preferences, R.string.menu_preferences));
+            mAdapter.add(new MainMenuItem(R.id.menu_item_organization, R.string.menu_organization));
             mAdapter.add(new MainMenuItem(R.id.menu_item_logout, R.string.menu_logout));
 
             mAdapter.add(new MainMenuDivider(R.string.menu_div_missionhub));
@@ -236,8 +236,8 @@ public class MainMenuFragment extends BaseFragment implements OnItemClickListene
             case R.id.menu_item_logout:
                 Session.getInstance().logout();
                 break;
-            case R.id.menu_item_preferences:
-                getMainActivity().openPreferences();
+            case R.id.menu_item_organization:
+                getMainActivity().openOrganization();
                 break;
             case R.id.menu_item_about:
                 getMainActivity().openAbout();

@@ -99,6 +99,7 @@ public class SelectableListView extends ListView {
 
     @Override
     public boolean performItemClick(final View view, final int position, final long id) {
+
         final OnItemClickListener mOnItemClickListener = getOnItemClickListener();
         if (mOnItemClickListener != null) {
             playSoundEffect(SoundEffectConstants.CLICK);
@@ -257,75 +258,5 @@ public class SelectableListView extends ListView {
      */
     public void setOnItemCheckedListener(final OnItemCheckedListener onItemCheckedListener) {
         mOnItemCheckedListener = onItemCheckedListener;
-    }
-
-    /**
-     * Sets a list item as activated
-     *
-     * @param position the item position or -1 to clear the activated item
-     */
-    public void setItemActivated(int position) {
-        if (getAdapter() == null) {
-            return;
-        }
-
-        if (position < 0 || position >= getAdapter().getCount()) {
-            position = -1;
-        }
-        mActivatedItem = position;
-        invalidateViews();
-
-    }
-
-    /**
-     * Returns true if the list item at the given position is activated
-     *
-     * @param position
-     * @return
-     */
-    public boolean isItemActivated(final int position) {
-        return mActivatedItem == position;
-    }
-
-    /**
-     * Returns the currently activated list item
-     *
-     * @return the current activated item or -1 if none activated
-     */
-    public int getItemActivated() {
-        return mActivatedItem;
-    }
-
-    /**
-     * Interface for view to implement to support being activated
-     */
-    public interface SupportActivatable {
-        /**
-         * @return true if the view is activated
-         */
-        public boolean isSupportActivated();
-
-        /**
-         * Sets the view's activation status
-         *
-         * @param activated true if the view is activated
-         */
-        public void setSupportActivated(boolean activated);
-    }
-
-    /**
-     * Scrolls the list to the activated item
-     */
-    public void scrollToItemActivated() {
-        setSelection(mActivatedItem);
-    }
-
-    /**
-     * Sets the selection mode
-     *
-     * @param mode
-     */
-    public void setMode(final int mode) {
-        mMode = mode;
     }
 }
