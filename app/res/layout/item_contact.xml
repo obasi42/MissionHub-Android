@@ -1,4 +1,4 @@
-<com.missionhub.contactlist.ContactItemView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.missionhub.ui.widget.CheckableRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                                             android:layout_width="fill_parent"
                                             android:layout_height="wrap_content"
                                             android:background="@drawable/list_item_background"
@@ -44,4 +44,4 @@
             android:layout_below="@id/name"
             android:text="TextView"/>
 
-</com.missionhub.contactlist.ContactItemView>
+</com.missionhub.ui.widget.CheckableRelativeLayout>

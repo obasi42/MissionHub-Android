@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
+import android.view.KeyEvent;
 import com.missionhub.application.Application;
 import com.missionhub.application.Session;
 import com.missionhub.exception.ExceptionHelper;
@@ -15,14 +16,13 @@ import com.missionhub.util.SafeAsyncTask;
 import com.missionhub.util.TreeDataStructure;
 import org.holoeverywhere.app.AlertDialog;
 
-public class SelectOrganizationDialogFragment extends RefreshableDialogFragment {
+public class SelectOrganizationDialogFragment extends RefreshableDialogFragment implements DialogInterface.OnKeyListener {
 
     private DrillDownView mView;
     private DrillDownAdapter mAdapter;
 
     private SafeAsyncTask<Void> mTask;
     private OrganizationDrillDownItem mCurrentItem;
-    private OrganizationDrillDownItem mPrimaryItem;
 
     public SelectOrganizationDialogFragment() {}
 
@@ -33,7 +33,6 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         onRefresh();
     }
 
@@ -71,6 +70,8 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
             }
         });
         builder.setView(mView);
+        builder.setCancelable(false);
+        builder.setOnKeyListener(this);
 
         return builder;
     }
@@ -80,7 +81,6 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
         mAdapter.clear();
 
         mCurrentItem = null;
-        mPrimaryItem = null;
 
         try {
             rebuildAdapterR(Session.getInstance().getPerson().getOrganizationHierarchy(), null);
@@ -88,14 +88,7 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
             /** shouldn't be possible to get here */
         }
 
-        if (mCurrentItem == null && mPrimaryItem != null) {
-            mCurrentItem = mPrimaryItem;
-        }
-        if (mCurrentItem != null) {
-            // move one up so we can see the selected item
-            mCurrentItem.getParent();
-        }
-        mAdapter.setCurrentItem(mCurrentItem.getParent());
+        mAdapter.setCurrentItem(mCurrentItem);
     }
 
     private synchronized void rebuildAdapterR(final TreeDataStructure<Long> tree, final OrganizationDrillDownItem parent) throws Session.NoPersonException {
@@ -107,9 +100,6 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
                 if (parent == null) {
                     mAdapter.addRootItem(item);
                 }
-                if (org.getId() == Session.getInstance().getOrganizationId()) {
-                    mPrimaryItem = item;
-                }
                 if (mAdapter.getCurrentItem() != null && mAdapter.getCurrentItem().getId() == item.getId()) {
                     mCurrentItem = item;
                 }
@@ -118,6 +108,19 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
                 rebuildAdapterR(subTree, parent);
             }
         }
+    }
+
+    @Override
+    public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+        if (mAdapter != null && keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
+            if (mAdapter.getCurrentItem() != null) {
+                mAdapter.pageBackward(true);
+            } else {
+                cancel();
+            }
+            return true;
+        }
+        return getSupportActivity().dispatchKeyEvent(event);
     }
 
     public static class OrganizationDrillDownAdapter extends DrillDownAdapter {

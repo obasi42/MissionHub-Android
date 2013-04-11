@@ -3,6 +3,7 @@ package com.missionhub.ui.drilldown;
 import android.content.Context;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,8 +23,8 @@ public class DrillDownAdapter extends PagerAdapter implements ViewPager.OnPageCh
     private List<DrillDownItem> mRootItems = new ArrayList<DrillDownItem>();
 
     private List<View> mViews = new ArrayList<View>();
-    private WeakReference<View> mCachedRootView;
     private WeakHashMap<DrillDownItem, WeakReference<View>> mCachedViews = new WeakHashMap<DrillDownItem, WeakReference<View>>();
+    private WeakHashMap<DrillDownItem, DrillDownListAdapter> mCachedListAdapters = new WeakHashMap<DrillDownItem, DrillDownListAdapter>();
 
     private boolean mNotify = true;
     private final Object mLock = new Object();
@@ -45,7 +46,6 @@ public class DrillDownAdapter extends PagerAdapter implements ViewPager.OnPageCh
         if (context != mContext) {
             mContext = context;
             synchronized (mLock) {
-                mCachedRootView = null;
                 mCachedViews.clear();
             }
             rebuildAdapter();
@@ -77,6 +77,10 @@ public class DrillDownAdapter extends PagerAdapter implements ViewPager.OnPageCh
             }
             Collections.reverse(mReverseViews);
             mViews.addAll(mReverseViews);
+
+            if (getDrillDownView() != null) {
+                getDrillDownView().setCurrentItem(mPageSelected, false);
+            }
         }
     }
 
@@ -85,6 +89,9 @@ public class DrillDownAdapter extends PagerAdapter implements ViewPager.OnPageCh
         ListView list = getListView(page);
         DrillDownListAdapter adapter = getListAdapter(list);
 
+        if (adapter == null) {
+            adapter = mCachedListAdapters.get(item);
+        }
         if (adapter == null) {
             if (item == null) {
                 adapter = createListAdapter(mRootItems);
@@ -99,8 +106,8 @@ public class DrillDownAdapter extends PagerAdapter implements ViewPager.OnPageCh
             } else {
                 adapter.addItems(item.getChildren());
             }
-            adapter.notifyDataSetChanged();
         }
+        mCachedListAdapters.put(item, adapter);
 
         list.setAdapter(adapter);
 
@@ -112,7 +119,7 @@ public class DrillDownAdapter extends PagerAdapter implements ViewPager.OnPageCh
 
         synchronized (mLock) {
             mCurrentItem = item;
-            rebuildAdapter();
+            maybeNotify();
 
             if (getDrillDownView() != null) {
                 if (item == null) {
@@ -153,26 +160,15 @@ public class DrillDownAdapter extends PagerAdapter implements ViewPager.OnPageCh
     private View getPageView(DrillDownItem item) {
         View view = null;
         synchronized (mLock) {
-            if (item == null) {
-                if (mCachedRootView != null) {
-                    view = mCachedRootView.get();
-                }
-                if (view == null) {
-                    view = createPageView(null);
-                    setupPageView(view);
-                    mCachedRootView = new WeakReference<View>(view);
-                }
-            } else {
-                WeakReference<View> weakView = mCachedViews.get(item);
-                if (weakView != null) {
-                    view = weakView.get();
-                }
-                if (view == null) {
-                    view = createPageView(item);
-                    setupPageView(view);
-                    mCachedViews.put(item, new WeakReference<View>(view));
-                }
+            WeakReference<View> weakView = mCachedViews.get(item);
+            if (weakView != null) {
+                view = weakView.get();
             }
+            if (view == null) {
+                view = createPageView(item);
+            }
+            setupPageView(view);
+            mCachedViews.put(item, new WeakReference<View>(view));
         }
         return view;
     }
@@ -201,7 +197,6 @@ public class DrillDownAdapter extends PagerAdapter implements ViewPager.OnPageCh
 
     public void setupPageView(View view) {
         final ListView list = getListView(view);
-        list.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -296,12 +291,6 @@ public class DrillDownAdapter extends PagerAdapter implements ViewPager.OnPageCh
             mPageChanged = false;
             super.notifyDataSetChanged();
         }
-    }
-
-    public void setItemChecked(DrillDownItem item, boolean checked) {
-        item.setChecked(checked);
-
-
     }
 
     public void clear() {

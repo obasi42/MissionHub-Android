@@ -16,7 +16,6 @@ public class DrillDownItem {
     private CharSequence mText1;
     private boolean mEnabled = true;
     private int mDepth = 0;
-    private boolean mChecked = false;
 
     /**
      * Creates a new item with the given parent
@@ -191,6 +190,22 @@ public class DrillDownItem {
     }
 
     /**
+     * Returns all of the parents of the item
+     * @return
+     */
+    public List<DrillDownItem> getParents() {
+        List<DrillDownItem> parents = new ArrayList<DrillDownItem>();
+
+        DrillDownItem current = getParent();
+        while (current != null) {
+            parents.add(current);
+            current = current.getParent();
+        }
+
+        return parents;
+    }
+
+    /**
      * Returns the direct children of the item
      *
      * @return
@@ -270,18 +285,5 @@ public class DrillDownItem {
      */
     public int getDepth() {
         return mDepth;
-    }
-
-    public void setChecked(boolean checked) {
-        if (checked == mChecked) return;
-
-        mChecked = checked;
-        if (mAdapter != null) {
-            mAdapter.setItemChecked(this, checked);
-        }
-    }
-
-    public boolean isChecked() {
-        return mChecked;
     }
 }

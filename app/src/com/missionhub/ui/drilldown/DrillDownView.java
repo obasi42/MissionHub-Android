@@ -20,7 +20,6 @@ public class DrillDownView extends LockableViewPager {
 
     public DrillDownView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        setPagingLocked(LOCK_FORWARD);
     }
 
     @Override
@@ -30,8 +29,13 @@ public class DrillDownView extends LockableViewPager {
         }
         ((DrillDownAdapter) adapter).setDrillDownView(this);
         adapter.notifyDataSetChanged();
-        setOnPageChangeListener((OnPageChangeListener) adapter);
+        super.setOnPageChangeListener((OnPageChangeListener) adapter);
         super.setAdapter(adapter);
+    }
+
+    @Override
+    public void setOnPageChangeListener(OnPageChangeListener listener) {
+        throw new RuntimeException("Cannot set onPageChangeListener for DrillDownViews");
     }
 
     @Override

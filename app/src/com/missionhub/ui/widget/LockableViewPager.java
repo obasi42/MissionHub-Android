@@ -116,8 +116,8 @@ public class LockableViewPager extends ViewPager {
     public boolean pageForward(boolean smoothScroll) {
         if (mLock == LOCK_BOTH || mLock == LOCK_FORWARD) return false;
 
-        if (getCurrentItem() > 0) {
-            setCurrentItem(getCurrentItem() - 1, smoothScroll);
+        if (getAdapter() != null && getCurrentItem() < (getAdapter().getCount() - 1)) {
+            setCurrentItem(getCurrentItem() + 1, smoothScroll);
             return true;
         }
         return false;
@@ -126,8 +126,8 @@ public class LockableViewPager extends ViewPager {
     public boolean pageBackward(boolean smoothScroll) {
         if (mLock == LOCK_BOTH || mLock == LOCK_BACKWARD) return false;
 
-        if (getAdapter() != null && getCurrentItem() < (getAdapter().getCount() - 1)) {
-            setCurrentItem(getCurrentItem() + 1, smoothScroll);
+        if (getCurrentItem() > 0) {
+            setCurrentItem(getCurrentItem() - 1, smoothScroll);
             return true;
         }
         return false;

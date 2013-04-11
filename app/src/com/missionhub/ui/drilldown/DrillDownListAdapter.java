@@ -115,6 +115,12 @@ public class DrillDownListAdapter extends BaseAdapter {
         }
     }
 
+    public int indexOf(DrillDownItem item) {
+        synchronized (mLock) {
+            return mItems.indexOf(item);
+        }
+    }
+
     @Override
     public int getItemViewType(final int position) {
         final Object object = getItem(position);
