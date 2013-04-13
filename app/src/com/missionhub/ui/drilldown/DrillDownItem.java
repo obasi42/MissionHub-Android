@@ -1,5 +1,8 @@
 package com.missionhub.ui.drilldown;
 
+import android.view.View;
+
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -15,7 +18,6 @@ public class DrillDownItem {
     private int mId = 0;
     private CharSequence mText1;
     private boolean mEnabled = true;
-    private int mDepth = 0;
 
     /**
      * Creates a new item with the given parent
@@ -130,7 +132,6 @@ public class DrillDownItem {
     private void setupItem(DrillDownItem item) {
         item.mParent = this;
         item.mAdapter = mAdapter;
-        item.mDepth = getDepth() + 1;
     }
 
     /**
@@ -167,7 +168,6 @@ public class DrillDownItem {
         }
         item.mParent = null;
         item.mAdapter = null;
-        item.mDepth = 0;
     }
 
     /**
@@ -276,14 +276,5 @@ public class DrillDownItem {
      */
     public void setNotifyOnChange(final boolean notify) {
         mNotify = notify;
-    }
-
-    /**
-     * The depth of the menu item. depth=0 for top level elements or orphans
-     *
-     * @return
-     */
-    public int getDepth() {
-        return mDepth;
     }
 }

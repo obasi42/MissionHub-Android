@@ -133,6 +133,26 @@ public class LockableViewPager extends ViewPager {
         return false;
     }
 
+    public boolean pageToFirst(boolean smoothScroll) {
+        if (mLock == LOCK_BOTH || mLock == LOCK_BACKWARD) return false;
+
+        if (getCurrentItem() > 0) {
+            setCurrentItem(0, smoothScroll);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean pageToLast(boolean smoothScroll) {
+        if (mLock == LOCK_BOTH || mLock == LOCK_FORWARD || getAdapter() == null) return false;
+
+        if (getCurrentItem() != getAdapter().getCount() -1) {
+            setCurrentItem(getAdapter().getCount() - 1, smoothScroll);
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public Parcelable onSaveInstanceState() {
         final Bundle bundle = new Bundle();

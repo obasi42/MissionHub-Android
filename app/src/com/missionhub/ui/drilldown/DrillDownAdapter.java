@@ -7,8 +7,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.*;
 import com.missionhub.R;
+import com.missionhub.application.Application;
 import org.holoeverywhere.widget.ListAdapterWrapper;
 
 import java.lang.ref.WeakReference;
@@ -21,10 +23,11 @@ public class DrillDownAdapter extends PagerAdapter implements ViewPager.OnPageCh
     private Context mContext;
     private WeakReference<DrillDownView> mDrillDownView;
     private List<DrillDownItem> mRootItems = new ArrayList<DrillDownItem>();
-
     private List<View> mViews = new ArrayList<View>();
-    private WeakHashMap<DrillDownItem, WeakReference<View>> mCachedViews = new WeakHashMap<DrillDownItem, WeakReference<View>>();
-    private WeakHashMap<DrillDownItem, DrillDownListAdapter> mCachedListAdapters = new WeakHashMap<DrillDownItem, DrillDownListAdapter>();
+
+    private boolean mEnablePools = true;
+    private List<View> mViewPool = new ArrayList<View>();
+    private List<DrillDownListAdapter> mAdapterPool = new ArrayList<DrillDownListAdapter>();
 
     private boolean mNotify = true;
     private final Object mLock = new Object();
@@ -46,7 +49,8 @@ public class DrillDownAdapter extends PagerAdapter implements ViewPager.OnPageCh
         if (context != mContext) {
             mContext = context;
             synchronized (mLock) {
-                mCachedViews.clear();
+                mViews.clear();
+                mViewPool.clear();
             }
             rebuildAdapter();
         }
@@ -54,6 +58,10 @@ public class DrillDownAdapter extends PagerAdapter implements ViewPager.OnPageCh
 
     protected void setDrillDownView(DrillDownView view) {
         mDrillDownView = new WeakReference<DrillDownView>(view);
+    }
+
+    protected void onDrillDownViewCreated(DrillDownView view) {
+        view.setCurrentItem(mPageSelected, false);
     }
 
     protected DrillDownView getDrillDownView() {
@@ -66,49 +74,35 @@ public class DrillDownAdapter extends PagerAdapter implements ViewPager.OnPageCh
             mViews.clear();
 
             // set up the root view
-            mViews.add(setupPageForItem(null));
+            mViews.add(setupPage(0, null));
 
-            // determine the current views
-            List<View> mReverseViews = new ArrayList<View>();
+            // determine the current items
+            List<DrillDownItem> reverseItems = new ArrayList<DrillDownItem>();
             DrillDownItem current = mCurrentItem;
             while (current != null) {
-                mReverseViews.add(setupPageForItem(current));
+                reverseItems.add(current);
                 current = current.getParent();
             }
-            Collections.reverse(mReverseViews);
-            mViews.addAll(mReverseViews);
+            Collections.reverse(reverseItems);
 
-            if (getDrillDownView() != null) {
-                getDrillDownView().setCurrentItem(mPageSelected, false);
+            for(int i=0; i < reverseItems.size(); i++) {
+                mViews.add(setupPage(i + 1, reverseItems.get(i)));
             }
         }
     }
 
-    private View setupPageForItem(DrillDownItem item) {
-        View page = getPageView(item);
+    private View setupPage(int depth, DrillDownItem item) {
+        View page = getOrCreatePageView(depth, item);
         ListView list = getListView(page);
-        DrillDownListAdapter adapter = getListAdapter(list);
+        DrillDownListAdapter adapter = getOrCreateListAdapter(depth);
 
-        if (adapter == null) {
-            adapter = mCachedListAdapters.get(item);
-        }
-        if (adapter == null) {
-            if (item == null) {
-                adapter = createListAdapter(mRootItems);
-            } else {
-                adapter = createListAdapter(item.getChildren());
-            }
+        adapter.setNotifyOnChange(false);
+        adapter.clear();
+        if (item == null) {
+            adapter.addItems(mRootItems);
         } else {
-            adapter.setNotifyOnChange(false);
-            adapter.clear();
-            if (item == null) {
-                adapter.addItems(mRootItems);
-            } else {
-                adapter.addItems(item.getChildren());
-            }
+            adapter.addItems(item.getChildren());
         }
-        mCachedListAdapters.put(item, adapter);
-
         list.setAdapter(adapter);
 
         return page;
@@ -120,32 +114,16 @@ public class DrillDownAdapter extends PagerAdapter implements ViewPager.OnPageCh
         synchronized (mLock) {
             mCurrentItem = item;
             maybeNotify();
-
-            if (getDrillDownView() != null) {
-                if (item == null) {
-                    getDrillDownView().setCurrentItem(0);
-                } else {
-                    WeakReference<View> view = mCachedViews.get(item);
-                    if (view != null && view.get() != null) {
-                        int index = mViews.indexOf(view.get());
-                        if (index >= 0) {
-                            getDrillDownView().setCurrentItem(index);
-                        } else {
-                            getDrillDownView().setCurrentItem(0);
-                        }
-                    }
-                }
-            }
         }
     }
 
-    public void onItemClicked(DrillDownItem item) {
+    private void onItemClicked(DrillDownItem item) {
         if (mDrillDownView != null && mDrillDownView.get() != null) {
             mDrillDownView.get().onItemClicked(this, item);
         }
     }
 
-    public void onNextClicked(DrillDownItem item) {
+    private void onNextClicked(DrillDownItem item) {
         if (mDrillDownView != null && mDrillDownView.get() != null) {
             mDrillDownView.get().onNextClicked(this, item);
         }
@@ -157,42 +135,8 @@ public class DrillDownAdapter extends PagerAdapter implements ViewPager.OnPageCh
         }
     }
 
-    private View getPageView(DrillDownItem item) {
-        View view = null;
-        synchronized (mLock) {
-            WeakReference<View> weakView = mCachedViews.get(item);
-            if (weakView != null) {
-                view = weakView.get();
-            }
-            if (view == null) {
-                view = createPageView(item);
-            }
-            setupPageView(view);
-            mCachedViews.put(item, new WeakReference<View>(view));
-        }
-        return view;
-    }
-
-    public ListView getListView(View view) {
-        ListView list = (ListView) view.findViewById(android.R.id.list);
-
-        if (list == null) {
-            throw new RuntimeException(TAG + ": page view must contain a ListView with the id android:id/list");
-        }
-
-        return list;
-    }
-
-    public DrillDownListAdapter getListAdapter(ListView list) {
-        final ListAdapter adapter = list.getAdapter();
-        if (adapter instanceof ListAdapterWrapper) {
-            return (DrillDownListAdapter) ((ListAdapterWrapper) adapter).getWrappedAdapter();
-        }
-        return (DrillDownListAdapter) adapter;
-    }
-
-    public View createPageView(DrillDownItem item) {
-        return getLayoutInflater().inflate(R.layout.widget_drill_down, null);
+    public View createPageView(int depth, DrillDownItem item, LayoutInflater inflater) {
+        return inflater.inflate(R.layout.widget_drill_down, null);
     }
 
     public void setupPageView(View view) {
@@ -204,6 +148,56 @@ public class DrillDownAdapter extends PagerAdapter implements ViewPager.OnPageCh
             }
         });
     }
+
+    public ListView getListView(View view) {
+        ListView list = (ListView) view.findViewById(android.R.id.list);
+        if (list == null) {
+            throw new RuntimeException(TAG + ": page view must contain a ListView with the id android:id/list");
+        }
+        return list;
+    }
+
+    private View getOrCreatePageView(int depth, DrillDownItem item) {
+        View view = null;
+        synchronized (mLock) {
+            if (mEnablePools && mViewPool.size() > depth) {
+                view = mViewPool.get(depth);
+            }
+            if (view == null) {
+                view = createPageView(depth, item, getLayoutInflater());
+                setupPageView(view);
+                if (mEnablePools) {
+                    if (mViewPool.size() <= depth) {
+                        mViewPool.add(view);
+                    } else {
+                        mViewPool.set(depth, view);
+                    }
+                }
+            }
+        }
+        return view;
+    }
+
+    private DrillDownListAdapter getOrCreateListAdapter(int depth) {
+        DrillDownListAdapter adapter = null;
+        synchronized (mLock) {
+            if (mEnablePools && mAdapterPool.size() > depth) {
+                adapter = mAdapterPool.get(depth);
+            }
+            if (adapter == null) {
+                adapter = createListAdapter();
+                if (mEnablePools) {
+                    if (mAdapterPool.size() <= depth) {
+                        mAdapterPool.add(adapter);
+                    } else {
+                        mAdapterPool.set(depth, adapter);
+                    }
+                }
+            }
+        }
+        return adapter;
+    }
+
 
     public View createItemView(final DrillDownItem item, View convertView) {
         View view = convertView;
@@ -252,44 +246,30 @@ public class DrillDownAdapter extends PagerAdapter implements ViewPager.OnPageCh
         public View mNext;
     }
 
-    public DrillDownListAdapter createListAdapter(Collection<DrillDownItem> initialItems) {
-        return new DrillDownListAdapter(this, initialItems);
+    public DrillDownListAdapter createListAdapter() {
+        return new DrillDownListAdapter(this);
     }
 
     public LayoutInflater getLayoutInflater() {
         return (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
-    @Override
-    public void onPageScrolled(int i, float v, int i2) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
 
-    @Override
-    public void onPageSelected(int page) {
-        synchronized (mLock) {
-            if (mPageSelected != page) {
-                if (page == 0) {
-                    mCurrentItem = null;
-                }
-                mPageSelected = page;
-                mPageChanged = true;
-            }
+    public void setEnablePools(boolean enabled) {
+        mEnablePools = enabled;
+        if (!enabled) {
+            clearPools();
         }
     }
 
-    @Override
-    public void onPageScrollStateChanged(int state) {
-        if (mPageChanged && state == ViewPager.SCROLL_STATE_IDLE) {
-            synchronized (mLock) {
-                int i = getCount() - 1;
-                while (i > mPageSelected) {
-                    mViews.remove(i);
-                    i--;
-                }
-            }
-            mPageChanged = false;
-            super.notifyDataSetChanged();
+    public boolean isPoolsEnabled() {
+        return mEnablePools;
+    }
+
+    public void clearPools() {
+        synchronized (mLock) {
+            mViewPool.clear();
+            mAdapterPool.clear();
         }
     }
 
@@ -371,6 +351,9 @@ public class DrillDownAdapter extends PagerAdapter implements ViewPager.OnPageCh
         mNotify = true;
         rebuildAdapter();
         super.notifyDataSetChanged();
+        if (getDrillDownView() != null) {
+            getDrillDownView().pageToLast(true);
+        }
     }
 
     @Override
@@ -384,6 +367,10 @@ public class DrillDownAdapter extends PagerAdapter implements ViewPager.OnPageCh
     public Object instantiateItem(ViewGroup container, int position) {
         synchronized (mLock) {
             final View view = mViews.get(position);
+            ViewParent parent = view.getParent();
+            if (parent != null && parent instanceof ViewGroup) {
+                ((ViewGroup) parent).removeView(view);
+            }
             container.addView(view, 0);
             return view;
         }
@@ -411,7 +398,41 @@ public class DrillDownAdapter extends PagerAdapter implements ViewPager.OnPageCh
         }
     }
 
-    public boolean pageBackward(boolean smoothScroll) {
-        return getDrillDownView() != null && getDrillDownView().pageBackward(smoothScroll);
+    @Override
+    public void onPageScrolled(int i, float v, int i2) {
+        //To change body of implemented methods use File | Settings | File Templates.
     }
+
+    @Override
+    public void onPageSelected(int page) {
+        synchronized (mLock) {
+            if (mPageSelected != page) {
+                if (page == 0) {
+                    mCurrentItem = null;
+                }
+                mPageSelected = page;
+                mPageChanged = true;
+            }
+        }
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+        synchronized (mLock) {
+            if (mPageChanged && state == ViewPager.SCROLL_STATE_IDLE) {
+                int i = getCount() - 1;
+                while (i > mPageSelected) {
+                    mViews.remove(i);
+                    i--;
+                }
+            }
+            mPageChanged = false;
+            super.notifyDataSetChanged();
+        }
+    }
+
+    public int getPageSelected() {
+        return mPageSelected;
+    }
+
 }

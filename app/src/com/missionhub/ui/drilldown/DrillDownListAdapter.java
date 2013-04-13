@@ -27,13 +27,14 @@ public class DrillDownListAdapter extends BaseAdapter {
     }
 
     public DrillDownListAdapter(DrillDownAdapter adapter, Collection<DrillDownItem> items) {
-        for (DrillDownItem item : items) {
-            item.setListAdapter(this);
-            addType(item.getClass(), false);
+        if (items != null) {
+            for (DrillDownItem item : items) {
+                item.setListAdapter(this);
+                addType(item.getClass(), false);
+            }
+            mItems.addAll(items);
         }
-        mItems.addAll(items);
         setAdapter(adapter);
-
         if (mTypes.size() > 3) {
             mMaxViewTypes = mTypes.size();
         } else {

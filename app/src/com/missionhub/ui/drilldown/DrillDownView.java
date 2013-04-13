@@ -31,6 +31,7 @@ public class DrillDownView extends LockableViewPager {
         adapter.notifyDataSetChanged();
         super.setOnPageChangeListener((OnPageChangeListener) adapter);
         super.setAdapter(adapter);
+        ((DrillDownAdapter) adapter).onDrillDownViewCreated(this);
     }
 
     @Override
