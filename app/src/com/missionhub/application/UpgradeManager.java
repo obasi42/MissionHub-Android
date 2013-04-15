@@ -23,8 +23,6 @@ public class UpgradeManager {
         return true;
     }
 
-
-
     /*========================*/
     /* UpgradeManager Methods */
     /*========================*/

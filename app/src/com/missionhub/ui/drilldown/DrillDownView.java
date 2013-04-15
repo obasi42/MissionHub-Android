@@ -13,6 +13,7 @@ public class DrillDownView extends LockableViewPager {
 
     private OnDrillDownItemClickListener mClickListener;
     private OnDrillDownItemClickListener mNextListener;
+    private OnDrillDownItemLongClickListener mLongClickListener;
 
     public DrillDownView(Context context) {
         this(context, null);
@@ -60,6 +61,13 @@ public class DrillDownView extends LockableViewPager {
         }
     }
 
+    public boolean onItemLongClicked(DrillDownAdapter adapter, DrillDownItem item) {
+        if (mLongClickListener != null) {
+            return mLongClickListener.onItemLongClicked(adapter, item);
+        }
+        return false;
+    }
+
     public void setOnDrillDownItemClickListener(OnDrillDownItemClickListener clickListener) {
         mClickListener = clickListener;
     }
@@ -68,9 +76,19 @@ public class DrillDownView extends LockableViewPager {
         mNextListener = nextListener;
     }
 
+    public void setOnDrillDownItemLongClickListener(OnDrillDownItemLongClickListener longClickListener) {
+        mLongClickListener = longClickListener;
+    }
+
     public static interface OnDrillDownItemClickListener {
 
         public void onItemClicked(DrillDownAdapter adapter, DrillDownItem item);
+
+    }
+
+    public static interface OnDrillDownItemLongClickListener {
+
+        public boolean onItemLongClicked(DrillDownAdapter adapter, DrillDownItem item);
 
     }
 }

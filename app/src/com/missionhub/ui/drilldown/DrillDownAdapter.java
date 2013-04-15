@@ -129,6 +129,13 @@ public class DrillDownAdapter extends PagerAdapter implements ViewPager.OnPageCh
         }
     }
 
+    private boolean onItemLongClicked(DrillDownItem item) {
+        if (mDrillDownView != null && mDrillDownView.get() != null) {
+            return mDrillDownView.get().onItemLongClicked(this, item);
+        }
+        return false;
+    }
+
     public DrillDownItem getCurrentItem() {
         synchronized (mLock) {
             return mCurrentItem;
@@ -143,8 +150,14 @@ public class DrillDownAdapter extends PagerAdapter implements ViewPager.OnPageCh
         final ListView list = getListView(view);
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                onItemClicked((DrillDownItem) adapterView.getItemAtPosition(i));
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                onItemClicked((DrillDownItem) parent.getItemAtPosition(position));
+            }
+        });
+        list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                return onItemLongClicked((DrillDownItem) parent.getItemAtPosition(position));
             }
         });
     }

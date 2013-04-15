@@ -200,7 +200,7 @@ public class Session implements OnAccountsUpdateListener {
             @Override
             public Void call() throws Exception {
                 final long organizationId = getOrganizationId();
-                final long lastUpdated = Long.parseLong(SettingsManager.getInstance().getUserSetting(getPersonId(), "organization_" + organizationId + "_updated", "0"));
+                final long lastUpdated = SettingsManager.getInstance().getUserSetting(getPersonId(), "organization_" + organizationId + "_updated", 0l);
                 final long currentTime = System.currentTimeMillis() - 1000;
 
                 if (lastUpdated < System.currentTimeMillis() - mOneWeekMillis || force) {

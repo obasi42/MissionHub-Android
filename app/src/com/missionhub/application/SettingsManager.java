@@ -1,26 +1,24 @@
 package com.missionhub.application;
 
+import android.util.Log;
+import com.google.gson.Gson;
 import com.missionhub.model.Setting;
 import com.missionhub.model.SettingDao;
 import com.missionhub.model.UserSetting;
 import com.missionhub.model.UserSettingDao;
+import org.apache.commons.lang3.ClassUtils;
 
 /**
  * Manages the user's settings
  */
 public class SettingsManager {
 
-    /**
-     * the singleton instance
-     */
     private static SettingsManager sSettingsManager;
+    private static Gson sGson;
 
     private SettingsManager() {
     }
 
-    /**
-     * creates and returns the SettingsManager
-     */
     public synchronized static SettingsManager getInstance() {
         if (sSettingsManager == null) {
             sSettingsManager = new SettingsManager();
@@ -28,26 +26,17 @@ public class SettingsManager {
         return sSettingsManager;
     }
 
-    /**
-     * Parse object as string
-     *
-     * @param o
-     * @return
-     */
-    private static String s(final Object o) {
-        return String.valueOf(o);
+    public synchronized static Gson getGsonInstance() {
+        if (sGson == null) {
+            sGson = new Gson();
+        }
+        return sGson;
     }
 
     // |**********************************|//
     // |******** SETTINGS METHODS ********|//
     // |**********************************|//
 
-    /**
-     * Finds a setting by the key
-     *
-     * @param key
-     * @return the setting
-     */
     public Setting findSettingByKey(final String key) {
         Setting setting = Application.getDb().getSettingDao().queryBuilder().where(SettingDao.Properties.Key.eq(key)).unique();
         if (setting == null) {
@@ -57,49 +46,39 @@ public class SettingsManager {
         return setting;
     }
 
-    /**
-     * Gets the value of a setting
-     *
-     * @param key
-     * @return the value or null
-     */
-    public String getSetting(final String key) {
+    public <T> T getSetting(final String key) {
         return getSetting(key, null);
     }
 
-    /**
-     * Gets the value of a setting or the default value
-     *
-     * @param key
-     * @param def
-     * @return the value or def
-     */
-    public String getSetting(final String key, final String def) {
-        final Setting setting = findSettingByKey(key);
-        if (setting.getValue() != null) {
-            return setting.getValue();
-        } else {
-            return def;
-        }
+    public <T> T getSetting(final String key, final T def) {
+        return getSetting(key, def, null);
     }
 
-    /**
-     * Sets the value of a setting
-     *
-     * @param key
-     * @param value
-     */
-    public void setSetting(final String key, final String value) {
+    public <T> T getSetting(final String key, final T def, Class<T> type) {
         final Setting setting = findSettingByKey(key);
-        setting.setValue(String.valueOf(value));
+        if (setting.getValue() != null) {
+            try {
+                if (type == null) {
+                    if (def == null) {
+                        return def;
+                    }
+                    type = (Class<T>) def.getClass();
+                }
+                return getGsonInstance().fromJson(setting.getValue(), type);
+            } catch (Exception e) {
+                Log.e("SettingManager", e.getMessage(), e);
+            /* ignore */
+            }
+        }
+        return def;
+    }
+
+    public void setSetting(final String key, final Object value) {
+        final Setting setting = findSettingByKey(key);
+        setting.setValue(getGsonInstance().toJson(value));
         Application.getDb().getSettingDao().insertOrReplace(setting);
     }
 
-    /**
-     * Deletes a setting
-     *
-     * @param key
-     */
     public void deleteSetting(final String key) {
         final Setting setting = findSettingByKey(key);
         if (setting != null) Application.getDb().getSettingDao().delete(setting);
@@ -109,12 +88,6 @@ public class SettingsManager {
     // |***** USER SETTINGS METHODS ******|//
     // |**********************************|//
 
-    /**
-     * Finds a user setting by the key
-     *
-     * @param key
-     * @return
-     */
     public UserSetting findUserSettingByKey(final long personId, final String key) {
         UserSetting setting = Application.getDb().getUserSettingDao().queryBuilder().where(UserSettingDao.Properties.Key.eq(key), UserSettingDao.Properties.Person_id.eq(personId)).unique();
         if (setting == null) {
@@ -125,53 +98,39 @@ public class SettingsManager {
         return setting;
     }
 
-    /**
-     * Gets a setting for a user
-     *
-     * @param personId
-     * @param key
-     * @return the value or null
-     */
-    public String getUserSetting(final long personId, final String key) {
+    public <T> T getUserSetting(final long personId, final String key) {
         return getUserSetting(personId, key, null);
     }
 
-    /**
-     * Gets a setting for a user
-     *
-     * @param personId
-     * @param key
-     * @param def
-     * @return the value or def
-     */
-    public String getUserSetting(final long personId, final String key, final String def) {
-        final UserSetting setting = findUserSettingByKey(personId, key);
-        if (setting.getValue() != null) {
-            return setting.getValue();
-        } else {
-            return def;
-        }
+    public <T> T getUserSetting(final long personId, final String key, final T def) {
+        return getUserSetting(personId, key, def, null);
     }
 
-    /**
-     * Sets a user setting
-     *
-     * @param personId
-     * @param key
-     * @param value
-     */
-    public void setUserSetting(final long personId, final String key, final Object value) {
+    public <T> T getUserSetting(final long personId, final String key, final T def, Class<T> type) {
         final UserSetting setting = findUserSettingByKey(personId, key);
-        setting.setValue(String.valueOf(value));
+        if (setting.getValue() != null) {
+            try {
+                if (type == null) {
+                    if (def == null) {
+                        return def;
+                    }
+                    type = (Class<T>) def.getClass();
+                }
+                return getGsonInstance().fromJson(setting.getValue(), type);
+            } catch (Exception e) {
+                Log.e("SettingManager", e.getMessage(), e);
+                /* ignore */
+            }
+        }
+        return def;
+    }
+
+    public <T> void setUserSetting(final long personId, final String key, final T value) {
+        final UserSetting setting = findUserSettingByKey(personId, key);
+        setting.setValue(getGsonInstance().toJson(value));
         Application.getDb().getUserSettingDao().insertOrReplace(setting);
     }
 
-    /**
-     * Deletes a user setting
-     *
-     * @param personId
-     * @param key
-     */
     public void deleteUserSetting(final long personId, final String key) {
         final UserSetting setting = findUserSettingByKey(personId, key);
         if (setting != null) Application.getDb().getUserSettingDao().delete(setting);
@@ -182,26 +141,26 @@ public class SettingsManager {
     // |**********************************|//
 
     public static long getSessionLastUserId() {
-        return Long.parseLong(SettingsManager.getInstance().getSetting("sessionLastUserId", "-1"));
+        return SettingsManager.getInstance().getSetting("sessionLastUserId", -1l, long.class);
     }
 
     public static void setSessionLastUserId(final long lastUserId) {
-        SettingsManager.getInstance().setSetting("sessionLastUserId", s(lastUserId));
+        SettingsManager.getInstance().setSetting("sessionLastUserId", lastUserId);
     }
 
     public static int getApplicationLastVersionId() {
-        return Integer.parseInt(SettingsManager.getInstance().getSetting("applicationLastVersionId", "-1"));
+        return SettingsManager.getInstance().getSetting("applicationLastVersionId", -1, int.class);
     }
 
     public static void setApplicationLastVersionId(final int lastVersionId) {
-        SettingsManager.getInstance().setSetting("applicationLastVersionId", s(lastVersionId));
+        SettingsManager.getInstance().setSetting("applicationLastVersionId", lastVersionId);
     }
 
     public static long getSessionOrganizationId(final long personId) {
-        return Long.parseLong(SettingsManager.getInstance().getUserSetting(personId, "sessionOrganizationId", "-1"));
+        return SettingsManager.getInstance().getUserSetting(personId, "sessionOrganizationId", -1l, long.class);
     }
 
     public static void setSessionOrganizationId(final long personId, final long organizationId) {
-        SettingsManager.getInstance().setUserSetting(personId, "sessionOrganizationId", s(organizationId));
+        SettingsManager.getInstance().setUserSetting(personId, "sessionOrganizationId", organizationId);
     }
 }

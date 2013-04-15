@@ -195,6 +195,14 @@
     <string name="assignment_failed">Failed to assign contact(s)</string>
     <string name="assignment_progress">Please wait. Performing assignment…</string>
 
+    <!-- Select Organization Dialog -->
+    <string name="select_organization_favorites">Favorites</string>
+    <string name="select_organization_all_organizations">All Organizations</string>
+    <string name="select_organization_removed">Removed from Favorites</string>
+    <string name="select_organization_added">Added to Favorites</string>
+    <string name="select_organization_title">Select Organization</string>
+    <string name="select_organization_update_failed">Updating Organizations Failed</string>
+
     <!-- Time Ago -->
     <string name="time_ago_hour">about an hour</string>
     <string name="time_ago_hours">{0} hours</string>
