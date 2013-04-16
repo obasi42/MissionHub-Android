@@ -20,7 +20,7 @@ public class ExceptionHelper {
     /**
      * the context in which to display the error
      */
-    private final Context mContext;
+    private Context mContext;
 
     /**
      * the throwable that contains the error data
@@ -88,7 +88,13 @@ public class ExceptionHelper {
     public AlertDialog show() {
         final AlertDialog dialog = getDialog();
 
-        if (dialog != null && !dialog.isShowing()) dialog.show();
+        try {
+            if (dialog != null && !dialog.isShowing())
+                dialog.show();
+        } catch (Exception e) {
+            mContext = Application.getContext();
+            makeToast();
+        }
 
         return dialog;
     }
@@ -97,7 +103,14 @@ public class ExceptionHelper {
      * Builds and returns the dialog for more modification before showing
      */
     public AlertDialog getDialog() {
-        if (mDialog == null && mContext != null) {
+        if (mDialog != null && (mDialog.isShowing() || mDialog.getContext() != mContext)) {
+            try {
+                mDialog.dismiss();
+            } catch (Exception e) { /* ignore */ }
+            mDialog = null;
+        }
+
+        if (mContext != null && mDialog == null) {
             final AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 
             builder.setTitle(mTitle);
