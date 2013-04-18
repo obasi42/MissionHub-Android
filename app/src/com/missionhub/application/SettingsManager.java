@@ -54,6 +54,7 @@ public class SettingsManager {
         return getSetting(key, def, null);
     }
 
+    @SuppressWarnings("unchecked")
     public <T> T getSetting(final String key, final T def, Class<T> type) {
         final Setting setting = findSettingByKey(key);
         if (setting.getValue() != null) {

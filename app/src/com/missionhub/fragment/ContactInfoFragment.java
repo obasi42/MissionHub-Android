@@ -11,6 +11,8 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ImageView;
 import android.widget.ListView;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.Phonenumber;
 import com.missionhub.R;
 import com.missionhub.api.Api;
 import com.missionhub.api.Api.Include;
@@ -37,6 +39,7 @@ import com.missionhub.util.U.Gender;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.PauseOnScrollListener;
+import org.apache.commons.lang3.StringUtils;
 import org.holoeverywhere.LayoutInflater;
 import org.holoeverywhere.app.AlertDialog;
 import org.holoeverywhere.widget.*;
@@ -467,40 +470,41 @@ public class ContactInfoFragment extends BaseFragment {
         }
 
         // calling/messaging
-        final PhoneNumber phoneNumber = mPerson.getPrimaryPhoneNumber();
+        mHeaderActionCall.setVisibility(View.GONE);
+        mHeaderActionMessage.setVisibility(View.GONE);
+        mHeaderContainerPhone.setVisibility(View.GONE);
+        final Phonenumber.PhoneNumber phoneNumber = U.parsePhoneNumber(mPerson.getPrimaryPhoneNumber());
         if (phoneNumber != null) {
-            final String prettyNumber = U.formatPhoneNumber(phoneNumber.getNumber());
-            mHeaderPhone.setText(prettyNumber);
-            mHeaderContainerPhone.setVisibility(View.VISIBLE);
-            if (U.hasPhoneAbility(getSupportActivity())) {
-                mHeaderActionCall.setVisibility(View.VISIBLE);
-                mHeaderActionCall.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(final View v) {
-                        IntentHelper.dialNumber(prettyNumber);
-                    }
-                });
-                mHeaderActionMessage.setVisibility(View.VISIBLE);
-                mHeaderActionMessage.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(final View v) {
-                        IntentHelper.sendSms(prettyNumber);
-                    }
-                });
-                mHeaderPhone.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(final View v) {
-                        IntentHelper.viewNumber(prettyNumber);
-                    }
-                });
+            if (PhoneNumberUtil.getInstance().isPossibleNumber(phoneNumber)) {
+                mHeaderPhone.setText(PhoneNumberUtil.getInstance().format(phoneNumber, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL));
+                if (IntentHelper.canDialNumber() && U.hasPhoneAbility(Application.getContext())) {
+                    mHeaderPhone.setOnClickListener(new OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            IntentHelper.dialNumber(phoneNumber);
+                        }
+                    });
+                    mHeaderActionCall.setOnClickListener(new OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            IntentHelper.dialNumber(phoneNumber);
+                        }
+                    });
+                    mHeaderActionCall.setVisibility(View.VISIBLE);
+                }
+                if (IntentHelper.canSendSms()) {
+                    mHeaderActionMessage.setVisibility(View.VISIBLE);
+                    mHeaderActionMessage.setOnClickListener(new OnClickListener() {
+                        @Override
+                        public void onClick(final View v) {
+                            IntentHelper.sendSms(phoneNumber);
+                        }
+                    });
+                }
             } else {
-                mHeaderActionCall.setVisibility(View.GONE);
-                mHeaderActionMessage.setVisibility(View.GONE);
+                mHeaderPhone.setText(phoneNumber.getRawInput());
             }
-        } else {
-            mHeaderContainerPhone.setVisibility(View.GONE);
-            mHeaderActionCall.setVisibility(View.GONE);
-            mHeaderActionMessage.setVisibility(View.GONE);
+            mHeaderContainerPhone.setVisibility(View.VISIBLE);
         }
 
         // emailing
@@ -508,15 +512,18 @@ public class ContactInfoFragment extends BaseFragment {
         if (emailAddress != null) {
             mHeaderEmail.setText(emailAddress.getEmail());
             mHeaderContainerEmail.setVisibility(View.VISIBLE);
-            mHeaderActionEmail.setVisibility(View.VISIBLE);
-            final OnClickListener listener = new OnClickListener() {
-                @Override
-                public void onClick(final View v) {
-                    IntentHelper.sendEmail(emailAddress.getEmail());
-                }
-            };
-            mHeaderEmail.setOnClickListener(listener);
-            mHeaderActionEmail.setOnClickListener(listener);
+
+            if (IntentHelper.canSendEmail()) {
+                mHeaderActionEmail.setVisibility(View.VISIBLE);
+                final OnClickListener listener = new OnClickListener() {
+                    @Override
+                    public void onClick(final View v) {
+                        IntentHelper.sendEmail(emailAddress.getEmail(), null, null);
+                    }
+                };
+                mHeaderEmail.setOnClickListener(listener);
+                mHeaderActionEmail.setOnClickListener(listener);
+            }
         } else {
             mHeaderActionEmail.setVisibility(View.GONE);
             mHeaderContainerEmail.setVisibility(View.GONE);

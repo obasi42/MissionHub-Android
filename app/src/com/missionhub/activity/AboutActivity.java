@@ -42,7 +42,7 @@ public class AboutActivity extends BaseActivity {
     }
 
     public void clickFeedback(final View view) {
-        IntentHelper.sendEmail(getString(R.string.about_feedback_email));
+        IntentHelper.sendEmail(getString(R.string.about_feedback_email), null, null);
     }
 
     public void clickLicenses(final View view) {

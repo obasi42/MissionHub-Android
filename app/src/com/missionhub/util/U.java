@@ -2,14 +2,19 @@ package com.missionhub.util;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;
+import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
 import android.util.TypedValue;
 import com.actionbarsherlock.app.ActionBar;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.TreeMultimap;
+import com.google.i18n.phonenumbers.NumberParseException;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.Phonenumber;
 import com.missionhub.R;
 import com.missionhub.application.Application;
 import com.missionhub.model.Person;
+import com.missionhub.model.PhoneNumber;
 import com.missionhub.model.gson.GRejoicable;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import org.holoeverywhere.app.Activity;
@@ -370,33 +375,25 @@ public class U {
         return Application.getContext().getString(resource);
     }
 
-    public static String formatPhoneNumber(String phoneNumber) {
-        String fNum;
-        phoneNumber = phoneNumber.replaceAll("[^0-9]", "");
-
-        if (11 == phoneNumber.length()) {
-            fNum = "+" + phoneNumber.substring(0, 1);
-            fNum += " (" + phoneNumber.substring(1, 4) + ")";
-            fNum += " " + phoneNumber.substring(4, 7);
-            fNum += "-" + phoneNumber.substring(7, 11);
-        } else if (10 == phoneNumber.length()) {
-            fNum = "(" + phoneNumber.substring(0, 3) + ")";
-            fNum += " " + phoneNumber.substring(3, 6);
-            fNum += "-" + phoneNumber.substring(6, 10);
-        } else if (7 == phoneNumber.length()) {
-            fNum = phoneNumber.substring(0, 3);
-            fNum += "-" + phoneNumber.substring(4, 7);
-        } else {
-            return getString(R.string.u_invalid_phone);
+    public static Phonenumber.PhoneNumber parsePhoneNumber(final String phoneNumber) {
+        try {
+            return PhoneNumberUtil.getInstance().parseAndKeepRawInput(phoneNumber, "US");
+        } catch (NumberParseException e) {
+            /* ignore */
         }
+        return null;
+    }
 
-        return fNum;
+    public static Phonenumber.PhoneNumber parsePhoneNumber(final PhoneNumber number) {
+        if (number != null) {
+            return parsePhoneNumber(number.getNumber());
+        }
+        return null;
     }
 
     public static boolean hasPhoneAbility(final Context ctx) {
         final TelephonyManager telephonyManager = (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
         return telephonyManager.getPhoneType() != TelephonyManager.PHONE_TYPE_NONE;
-
     }
 
     public static boolean superGetRetainInstance(final Fragment fragment) {
