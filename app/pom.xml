@@ -34,7 +34,7 @@
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.2.2</version>
+            <version>2.2.3</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -80,7 +80,7 @@
         <dependency>
             <groupId>com.nostra13.universalimageloader</groupId>
             <artifactId>universal-image-loader</artifactId>
-            <version>1.8.3</version>
+            <version>1.8.4</version>
         </dependency>
         <dependency>
             <groupId>com.actionbarsherlock</groupId>
@@ -103,7 +103,7 @@
         <dependency>
             <groupId>de.greenrobot</groupId>
             <artifactId>eventbus</artifactId>
-            <version>2.0.1</version>
+            <version>2.0.2</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.google.android</groupId>
@@ -159,7 +159,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.0</version>
+                <version>3.1</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
