@@ -34,6 +34,8 @@
     <string name="menu_div_missionhub">MissionHub</string>
     <string name="menu_about">About</string>
     <string name="menu_help_center">Help Center</string>
+    <string name="menu_open">Open menu drawer</string>
+    <string name="menu_close">Close menu drawer</string>
 
     <!-- My Contacts Fragment -->
     <string name="my_contacts_title">My Contacts</string>

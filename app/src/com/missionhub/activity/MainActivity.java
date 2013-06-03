@@ -1,12 +1,16 @@
 package com.missionhub.activity;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
-import android.view.KeyEvent;
+import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.widget.DrawerLayout;
+import android.view.Gravity;
+import android.view.View;
+
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.Window;
 import com.missionhub.R;
-import com.missionhub.application.Application;
 import com.missionhub.application.Session.SessionInvalidTokenEvent;
 import com.missionhub.application.Session.SessionInvalidatedEvent;
 import com.missionhub.fragment.MainFragment;
@@ -14,14 +18,22 @@ import com.missionhub.fragment.MainMenuFragment;
 import com.missionhub.fragment.MyContactsFragment;
 import com.missionhub.fragment.dialog.SelectOrganizationDialogFragment;
 import com.missionhub.util.IntentHelper;
-import org.holoeverywhere.addon.AddonSlider;
-import org.holoeverywhere.slider.SliderView;
 import org.holoeverywhere.widget.Toast;
 
 /**
  * The main activity controls the attachment of the main fragments such as My Contacts, All Contacts, Surveys, etc.
  */
 public class MainActivity extends BaseAuthenticatedActivity {
+
+    /**
+     * The main drawer layout
+     */
+    private DrawerLayout mDrawerLayout;
+
+    /**
+     * The drawer toggle state
+     */
+    private ActionBarDrawerToggle mDrawerToggle;
 
     /**
      * the main content fragment
@@ -34,30 +46,31 @@ public class MainActivity extends BaseAuthenticatedActivity {
     private MainMenuFragment mMenuFragment;
 
     @Override
-    protected void onPreInit(Holo config, Bundle savedInstanceState) {
-        super.onPreInit(config, savedInstanceState);
-        config.requireSlider = true;
-    }
-
-    @Override
     public void onCreate(final Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
-        // setup the slider addon
-        final AddonSlider.AddonSliderA slider = getAddonSlider();
-        slider.setDragWithActionBar(true);
-        slider.disableShadow();
-        slider.setTranslateFactor(0f);
-        slider.setTouchMode(SliderView.TouchMode.Left);
-        slider.setLeftViewWidth((int) getResources().getDimension(R.dimen.main_menu_width));
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.drawable.ic_drawer,
+                R.string.menu_open, R.string.menu_close) {
+
+            public void onDrawerClosed(View view) {
+                //getActionBar().setTitle(mTitle);
+            }
+
+            public void onDrawerOpened(View drawerView) {
+                //getActionBar().setTitle(mDrawerTitle);
+            }
+        };
+        // Set the drawer toggle as the DrawerListener
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
 
         // setup the fragments
         if (savedInstanceState != null) {
-            mFragment = (MainFragment) getSupportFragmentManager().findFragmentById(R.id.contentView);
-            mMenuFragment = (MainMenuFragment) getSupportFragmentManager().findFragmentById(R.id.leftView);
+            mFragment = (MainFragment) getSupportFragmentManager().findFragmentById(R.id.content_frame);
+            mMenuFragment = (MainMenuFragment) getSupportFragmentManager().findFragmentById(R.id.left_drawer);
         } else {
             mFragment = new MyContactsFragment();
             mMenuFragment = new MainMenuFragment();
@@ -69,15 +82,11 @@ public class MainActivity extends BaseAuthenticatedActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
-    public AddonSlider.AddonSliderA getAddonSlider() {
-        return addon(AddonSlider.class);
-    }
-
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                getAddonSlider().toggle();
+                toggleDrawer(Gravity.LEFT);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -110,12 +119,12 @@ public class MainActivity extends BaseAuthenticatedActivity {
     }
 
     private void setFragment(final MainFragment fragment) {
-        getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out).replace(R.id.contentView, fragment).commit();
+        getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out).replace(R.id.content_frame, fragment).commit();
         mFragment = fragment;
     }
 
     private void setMenuFragment(final MainMenuFragment fragment) {
-        getSupportFragmentManager().beginTransaction().replace(R.id.leftView, fragment).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.left_drawer, fragment).commit();
         mMenuFragment = fragment;
     }
 
@@ -172,13 +181,27 @@ public class MainActivity extends BaseAuthenticatedActivity {
         finish();
     }
 
-    @Override
-    public boolean onKeyUp(int keyCode, KeyEvent event) {
-        if (!getAddonSlider().isContentShowed()) {
-            getAddonSlider().showContentDelayed();
-            return true;
-        }
-        return super.onKeyUp(keyCode, event);
+    public DrawerLayout getDrawerLayout() {
+        return mDrawerLayout;
     }
 
+    public void toggleDrawer(int gravity) {
+        if (mDrawerLayout.isDrawerOpen(gravity)){
+            mDrawerLayout.closeDrawer(gravity);
+        } else {
+            mDrawerLayout.openDrawer(gravity);
+        }
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        mDrawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        mDrawerToggle.onConfigurationChanged(newConfig);
+    }
 }

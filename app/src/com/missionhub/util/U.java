@@ -2,7 +2,6 @@ package com.missionhub.util;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;
-import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
 import android.util.TypedValue;
 import com.actionbarsherlock.app.ActionBar;
@@ -23,6 +22,9 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+/**
+ * Set of utility methods
+ */
 public class U {
 
     /**
@@ -154,7 +156,14 @@ public class U {
         return false;
     }
 
-    public static String concatinate(final CharSequence delemiter, final boolean ignoreEmpty, final CharSequence... items) {
+    /**
+     * Concatenates a collections of strings with a delimiter.
+     * @param delemiter
+     * @param ignoreEmpty
+     * @param items
+     * @return
+     */
+    public static String concatinate(final CharSequence delimiter, final boolean ignoreEmpty, final CharSequence... items) {
         final StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < items.length; i++) {
@@ -165,8 +174,8 @@ public class U {
 
             sb.append(string);
 
-            if (delemiter != null && i + 1 < items.length) {
-                sb.append(delemiter);
+            if (delimiter != null && i + 1 < items.length) {
+                sb.append(delimiter);
             }
         }
 
@@ -193,7 +202,7 @@ public class U {
     }
 
     /**
-     * converts dip to px
+     * Converts density independent pixels to pixels.
      *
      * @param dip
      * @return
@@ -202,6 +211,11 @@ public class U {
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dip, Application.getContext().getResources().getDisplayMetrics());
     }
 
+    /**
+     * Converts pixels to density independent pixels.
+     * @param px
+     * @return
+     */
     public static float pixelToDp(final float px) {
         return px / (Application.getContext().getResources().getDisplayMetrics().densityDpi / 160f);
     }

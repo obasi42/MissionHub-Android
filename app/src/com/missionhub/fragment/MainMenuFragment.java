@@ -2,6 +2,7 @@ package com.missionhub.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -246,6 +247,6 @@ public class MainMenuFragment extends BaseFragment implements OnItemClickListene
                 getMainActivity().openHelp();
                 break;
         }
-        getMainActivity().getAddonSlider().showContentDelayed();
+        getMainActivity().getDrawerLayout().closeDrawer(Gravity.LEFT);
     }
 }

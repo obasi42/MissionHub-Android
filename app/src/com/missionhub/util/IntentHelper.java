@@ -14,8 +14,16 @@ import com.missionhub.model.Address;
 import org.apache.commons.lang3.StringUtils;
 import org.holoeverywhere.widget.Toast;
 
+/**
+ * A set of methods for creating and starting intents.
+ */
 public class IntentHelper {
 
+    /**
+     * Checks if a device is capable of sending an email through an intent
+     *
+     * @return
+     */
     public static boolean canSendEmail() {
         final Intent intent = new Intent(android.content.Intent.ACTION_SEND);
         addTaskFlags(intent);
@@ -26,6 +34,13 @@ public class IntentHelper {
         return hasIntentHandler(intent);
     }
 
+    /**
+     * Creates and starts an intent chooser for sending an email
+     *
+     * @param address
+     * @param subject
+     * @param body
+     */
     public static void sendEmail(final String address, final String subject, final String body) {
         try {
             final Intent intent = new Intent(android.content.Intent.ACTION_SEND);
@@ -47,6 +62,11 @@ public class IntentHelper {
         }
     }
 
+    /**
+     * Checks if the devices is capable of opening a Facebook profile in either the app or browser as a fallback.
+     *
+     * @return
+     */
     public static boolean canOpenFacebookProfile() {
         try {
             Application.getContext().getPackageManager().getPackageInfo("com.facebook.katana", 0);
@@ -58,6 +78,12 @@ public class IntentHelper {
         return hasIntentHandler(intent);
     }
 
+    /**
+     * Creates and starts an intent that opens a person's Facebook profile in the Facebook app. As a fallback,
+     * the user's profile will be opened in a web browser.
+     *
+     * @param fbId
+     */
     public static void openFacebookProfile(final long fbId) {
         try {
             Application.getContext().getPackageManager().getPackageInfo("com.facebook.katana", 0);
@@ -69,12 +95,22 @@ public class IntentHelper {
         }
     }
 
+    /**
+     * Checks if the device is capable of opening a Google map.
+     *
+     * @return
+     */
     public static boolean canOpenMap() {
         final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://maps.google.com/maps?q=" + "1600 Pennsylvania Avenue NW, Washington, D.C."));
         addTaskFlags(intent);
         return hasIntentHandler(intent);
     }
 
+    /**
+     * Creates and starts an intent for opening a Google map.
+     *
+     * @param address
+     */
     public static void openMap(final Address address) {
         final String query = U.concatinate(", ", true, address.getAddress1(), address.getAddress2(), address.getCity(), address.getState(), address.getZip(), address.getCountry());
 
@@ -87,6 +123,11 @@ public class IntentHelper {
         }
     }
 
+    /**
+     * Checks if the device is capable of dialing a number.
+     *
+     * @return
+     */
     public static boolean canDialNumber() {
         final Intent intent = new Intent(Intent.ACTION_DIAL);
         addTaskFlags(intent);
@@ -94,6 +135,11 @@ public class IntentHelper {
         return hasIntentHandler(intent);
     }
 
+    /**
+     * Creates and starts an intent to dial a phone number.
+     *
+     * @param number
+     */
     public static void dialNumber(final Phonenumber.PhoneNumber number) {
         try {
             final Intent intent = new Intent(Intent.ACTION_DIAL);
@@ -106,6 +152,11 @@ public class IntentHelper {
         }
     }
 
+    /**
+     * Checks if the device is cable of sending SMS messages.
+     *
+     * @return
+     */
     public static boolean canSendSms() {
         final Intent intent = new Intent(Intent.ACTION_SENDTO);
         addTaskFlags(intent);
@@ -114,6 +165,11 @@ public class IntentHelper {
         return hasIntentHandler(intent);
     }
 
+    /**
+     * Creates and starts an intent to send an SMS.
+     *
+     * @param number
+     */
     public static void sendSms(final Phonenumber.PhoneNumber number) {
         try {
             final Intent intent = new Intent(Intent.ACTION_SENDTO);
@@ -127,12 +183,22 @@ public class IntentHelper {
         }
     }
 
+    /**
+     * Checks if the device is capable of opening a url in a web browser.
+     *
+     * @return
+     */
     public static boolean canOpenUrl() {
         final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.example.com"));
         addTaskFlags(intent);
         return hasIntentHandler(intent);
     }
 
+    /**
+     * Creates and starts an intent to open a url in a web browser.
+     *
+     * @param url
+     */
     public static void openUrl(final String url) {
         try {
             final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
@@ -143,20 +209,44 @@ public class IntentHelper {
         }
     }
 
+    /**
+     * Adds the FLAG_ACTIVITY_NEW_TASK and FLAG_ACTIVITY_MULTIPLE_TASK flags to an intent.
+     *
+     * @param intent
+     */
     private static void addTaskFlags(final Intent intent) {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
     }
 
+    /**
+     * Creates and starts an intent chooser from an intent.
+     *
+     * @param intent
+     * @param title
+     * @throws ActivityNotFoundException
+     */
     private static void startChooser(Intent intent, int title) throws ActivityNotFoundException {
         final Intent chooser = Intent.createChooser(intent, getString(title));
         addTaskFlags(chooser);
         Application.getContext().startActivity(chooser);
     }
 
+    /**
+     * Convenience method for retrieving a translated string
+     *
+     * @param resId
+     * @return
+     */
     private static String getString(final int resId) {
         return Application.getContext().getString(resId);
     }
 
+    /**
+     * Checks if the device has an intent handler for the given intent
+     *
+     * @param intent
+     * @return
+     */
     private static boolean hasIntentHandler(Intent intent) {
         ResolveInfo info = Application.getContext().getPackageManager().resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY);
         if (info != null) {
@@ -165,6 +255,4 @@ public class IntentHelper {
             return false;
         }
     }
-
-
 }
