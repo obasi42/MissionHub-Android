@@ -5,7 +5,7 @@
               android:layout_height="wrap_content">
 
     <LinearLayout
-            style="@style/MissionHub.ContactInfoContent"
+            style="@style/Missionhub.ContactInfoContent"
             android:orientation="horizontal">
 
         <ImageView
@@ -19,12 +19,12 @@
 
         <TextView
                 android:id="@android:id/text1"
-                style="@style/MissionHub.ContactInfoItem"
+                style="@style/Missionhub.ContactInfoItem"
                 android:layout_gravity="center_vertical"/>
     </LinearLayout>
 
     <View
             android:id="@+id/divider"
-            style="@style/MissionHub.Divider"/>
+            style="@style/Missionhub.Divider"/>
 
 </LinearLayout>

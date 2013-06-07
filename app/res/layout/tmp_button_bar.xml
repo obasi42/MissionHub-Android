@@ -1,0 +1,127 @@
+<LinearLayout
+
+        xmlns:android="http://schemas.android.com/apk/res/android"
+
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:background="#FFFFFF"
+        android:orientation="vertical"
+        >
+
+    <View
+            android:layout_width="match_parent"
+            android:layout_height="9dip"
+            android:background="@drawable/contact_header_divider"
+            />
+
+    <LinearLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="60dip"
+            android:background="@drawable/tab_bar_background">
+
+        <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:id="@+id/relativeLayout3"
+                android:layout_weight="1">
+
+            <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:text="Info"
+                    android:gravity="center"
+                    android:textStyle="bold"
+                    />
+
+            <View
+                    android:layout_width="25dip"
+                    android:layout_height="12dip"
+                    android:background="@drawable/tab_caret"
+                    android:id="@+id/caret"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:visibility="invisible"/>
+        </RelativeLayout>
+
+        <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+
+            <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:text="Interactions"
+                    android:gravity="center"
+                    android:textStyle="bold"
+                    />
+
+            <View
+                    android:layout_width="25dip"
+                    android:layout_height="12dip"
+                    android:background="@drawable/tab_caret"
+                    android:id="@+id/caret"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"/>
+        </RelativeLayout>
+
+        <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:id="@+id/relativeLayout"
+                android:layout_weight="1">
+
+            <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:text="Surveys"
+                    android:gravity="center"
+                    android:textStyle="bold"
+                    />
+
+            <View
+                    android:layout_width="25dip"
+                    android:layout_height="12dip"
+                    android:background="@drawable/tab_caret"
+                    android:id="@+id/caret"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:visibility="invisible"/>
+        </RelativeLayout>
+
+        <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:id="@+id/relativeLayout2"
+                android:layout_weight="1">
+
+            <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:text="All"
+                    android:gravity="center"
+                    android:textStyle="bold"
+                    />
+
+            <View
+                    android:layout_width="25dip"
+                    android:layout_height="12dip"
+                    android:background="@drawable/tab_caret"
+                    android:id="@+id/caret"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:visibility="invisible"/>
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <ListView
+
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+
+            tools:listitem="@layout/item_interaction"/>
+
+</LinearLayout>

@@ -3,7 +3,11 @@ package com.missionhub.util;
 import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.telephony.TelephonyManager;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
+import android.view.Display;
+
 import com.actionbarsherlock.app.ActionBar;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.TreeMultimap;
@@ -16,11 +20,17 @@ import com.missionhub.model.Person;
 import com.missionhub.model.PhoneNumber;
 import com.missionhub.model.gson.GRejoicable;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
+
 import org.holoeverywhere.app.Activity;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.Locale;
 
 /**
  * Set of utility methods
@@ -158,6 +168,7 @@ public class U {
 
     /**
      * Concatenates a collections of strings with a delimiter.
+     *
      * @param delemiter
      * @param ignoreEmpty
      * @param items
@@ -213,6 +224,7 @@ public class U {
 
     /**
      * Converts pixels to density independent pixels.
+     *
      * @param px
      * @return
      */
@@ -442,7 +454,8 @@ public class U {
 
         if (url == null || url.contains("facebook.com") || url.contains("fbcdn.net")) {
             if (!U.isNullEmpty(person.getFb_uid())) {
-                return "http://graph.facebook.com/" + person.getFb_uid() + "/picture?width=" + width + "&height=" + height;
+                url = "http://graph.facebook.com/" + person.getFb_uid() + "/picture?width=" + width + "&height=" + height;
+                Log.e("URL", url);
             }
         }
 
@@ -457,5 +470,22 @@ public class U {
                 .showImageOnFail(R.drawable.default_contact)
                 .showStubImage(R.drawable.default_contact)
                 .build();
+    }
+
+    public static DisplayMetrics getRealDisplayMetrics(Activity activity) {
+        final DisplayMetrics metrics = new DisplayMetrics();
+        Display display = activity.getWindowManager().getDefaultDisplay();
+        try {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                display.getRealMetrics(metrics);
+            } else {
+                display.getMetrics(metrics);
+                metrics.widthPixels = (Integer) Display.class.getMethod("getRawWidth").invoke(display);
+                metrics.heightPixels = (Integer) Display.class.getMethod("getRawHeight").invoke(display);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return metrics;
     }
 }

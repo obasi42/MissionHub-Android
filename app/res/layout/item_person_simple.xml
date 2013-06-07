@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="64dip"
+              android:orientation="horizontal"
+              android:gravity="center_vertical"
+              android:padding="8dip">
+
+    <ImageView
+            android:layout_width="50dip"
+            android:layout_height="50dip"
+            android:layout_marginRight="8dip"
+            android:id="@+id/avatar"
+            android:scaleType="centerCrop"
+            android:src="@drawable/default_contact"/>
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Large Text"
+            android:id="@+id/name"/>
+
+</LinearLayout>

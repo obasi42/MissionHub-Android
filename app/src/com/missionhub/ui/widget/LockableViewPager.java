@@ -39,12 +39,12 @@ public class LockableViewPager extends ViewPager {
 
     public LockableViewPager(Context context) {
         super(context);
+        setOnPageChangeListener(null);
     }
 
     public LockableViewPager(Context context, AttributeSet attrs) {
         super(context, attrs);
-
-        this.onFinishInflate();
+        setOnPageChangeListener(null);
     }
 
     @Override
@@ -146,7 +146,7 @@ public class LockableViewPager extends ViewPager {
     public boolean pageToLast(boolean smoothScroll) {
         if (mLock == LOCK_BOTH || mLock == LOCK_FORWARD || getAdapter() == null) return false;
 
-        if (getCurrentItem() != getAdapter().getCount() -1) {
+        if (getCurrentItem() != getAdapter().getCount() - 1) {
             setCurrentItem(getAdapter().getCount() - 1, smoothScroll);
             return true;
         }
@@ -171,5 +171,4 @@ public class LockableViewPager extends ViewPager {
         }
         super.onRestoreInstanceState(state);
     }
-
 }

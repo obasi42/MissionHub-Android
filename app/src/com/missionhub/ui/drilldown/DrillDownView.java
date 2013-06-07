@@ -3,9 +3,8 @@ package com.missionhub.ui.drilldown;
 import android.content.Context;
 import android.support.v4.view.PagerAdapter;
 import android.util.AttributeSet;
-import com.missionhub.application.Application;
+
 import com.missionhub.ui.widget.LockableViewPager;
-import org.holoeverywhere.widget.Toast;
 
 public class DrillDownView extends LockableViewPager {
 

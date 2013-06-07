@@ -16,7 +16,9 @@
     <string name="action_demote">Demote to Contact</string>
     <string name="action_assign">Assign</string>
     <string name="action_delete">Delete</string>
-    <string name="action_no_permissions">You do not have the required permissions to perform this action.</string>
+    <string name="action_no_permissions">You do not have the required permissions to perform this
+        action.
+    </string>
     <string name="action_add_contact">Add Contact</string>
     <string name="action_save">Save</string>
     <string name="action_label">Label</string>
@@ -53,7 +55,9 @@
     <string name="contact_comment_actions">Comment Actions</string>
     <string name="contact_comment_deleted">Comment deleted</string>
     <string name="contact_cannot_delete_comment">Could not delete comment.</string>
-    <string name="contact_cannot_comment">Please set a comment, status, or rejoicable before saving.</string>
+    <string name="contact_cannot_comment">Please set a comment, status, or rejoicable before
+        saving.
+    </string>
     <string name="contact_comment_saved">Comment saved</string>
     <string name="contact_comment_failed_to_save">Failed to save comment</string>
     <string name="contact_comment_loading">Loading Comments…</string>
@@ -70,11 +74,14 @@
     <string name="contact_surveys_no_key">Unknown Keyword</string>
     <string name="contact_surveys_no_q">Unknown Question</string>
     <string name="contact_surveys_no_a">Not answered</string>
-    <string name="contact_surveys_updating_org">Updating organization keywords and questions</string>
+    <string name="contact_surveys_updating_org">Updating organization keywords and questions
+    </string>
 
     <!-- About Activity -->
     <string name="about_activity_title">About MissionHub</string>
-    <string name="about_tag">We\'re here to make it easier for you to care for the people who need you most.</string>
+    <string name="about_tag">We\'re here to make it easier for you to care for the people who need
+        you most.
+    </string>
     <string name="about_licenses">Open source licenses</string>
     <string name="about_privacy">Privacy Policy</string>
     <string name="about_terms">Terms and Conditions</string>
@@ -88,7 +95,9 @@
     <!-- Main Activity -->
     <string name="main_help_url">http://blog.missionhub.com</string>
     <string name="main_logged_out">You have been logged out of MissionHub.</string>
-    <string name="main_invalid_token">Your MissionHub authentication token is invaild. Please login again.</string>
+    <string name="main_invalid_token">Your MissionHub authentication token is invaild. Please login
+        again.
+    </string>
 
     <!-- Init Activity -->
     <string name="init_resuming">Resuming session…</string>
@@ -99,7 +108,8 @@
     <string name="init_updating_current_organization">Loading your current organization…</string>
 
     <!-- Session -->
-    <string name="session_no_longer_admin">You are no longer an admin or leader in your preferred organization.
+    <string name="session_no_longer_admin">You are no longer an admin or leader in your preferred
+        organization.
         Selecting your primary.
     </string>
     <string name="session_not_admin">You are not an admin or leader in this organization.</string>
@@ -115,18 +125,22 @@
 
     <!-- Exceptions -->
     <string name="exception_helper_error">Error</string>
-    <string name="exception_helper_support">Email support@missionhub.com if the problem persists.</string>
+    <string name="exception_helper_support">Email support@missionhub.com if the problem persists.
+    </string>
     <string name="exception_helper_network_error">Network Error</string>
-    <string name="exception_helper_mh_down">The MissionHub server is currently down. Please try again in a few
+    <string name="exception_helper_mh_down">The MissionHub server is currently down. Please try
+        again in a few
         minutes.
     </string>
-    <string name="exception_helper_mh_not_responding">Either your internet connection is very slow or the MissionHub
+    <string name="exception_helper_mh_not_responding">Either your internet connection is very slow
+        or the MissionHub
         servers are not currently responding. Please try again in a few minutes.
     </string>
     <string name="no_person_exception">No person in SQLite DB</string>
     <string name="no_account_exception">No MissionHub Account Found</string>
     <string name="unexpected_data">The MissionHub server returned unexpected data.</string>
-    <string name="network_unavailable_exception">MissionHub is currently working offline. Check your internet connection
+    <string name="network_unavailable_exception">MissionHub is currently working offline. Check your
+        internet connection
         and retry.
     </string>
     <string name="network_unavailable_exception_title">Offline Error</string>
@@ -222,6 +236,9 @@
     <string name="time_ago_ago">ago</string>
     <string name="time_ago_from_now">from now</string>
 
+    <!-- Dynamic Lists -->
+    <string name="list_loading">Loading More…</string>
+
     <!-- Helper/Utility -->
     <string name="u_invalid_phone">Invalid Phone Number</string>
 
@@ -230,10 +247,12 @@
 
     <!-- Crash Reporting -->
     <string name="crash_dialog_title">MissionHub Has Crashed</string>
-    <string name="crash_dialog_text">An unexpected error occurred forcing the application to stop. Please help us fix
+    <string name="crash_dialog_text">An unexpected error occurred forcing the application to stop.
+        Please help us fix
         this by sending us error data, all you have to do is click OK.
     </string>
-    <string name="crash_dialog_comment_prompt">You can add comments about the problem below. If you include your email
+    <string name="crash_dialog_comment_prompt">You can add comments about the problem below. If you
+        include your email
         address we will followup with you when the issue has been resolved.
     </string>
     <string name="crash_dialog_ok_toast">Thank you!</string>

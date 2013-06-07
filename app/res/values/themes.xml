@@ -1,31 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:android="http://schemas.android.com/apk/res/android">
+<resources>
 
-    <style name="Theme.MissionHub" parent="Holo.Theme.Light.DarkActionBar">
-        <item name="android:listSelector">@drawable/abs__list_selector_holo_light</item>
-        <item name="android:listDivider">@drawable/abs__list_divider_holo_light</item>
-        <item name="android:windowBackground">@color/background</item>
-        <item name="android:colorBackground">@color/background</item>
+    <style name="Theme.Missionhub" parent="@style/Holo.Theme.Light">
+        <item name="actionBarItemBackground">@drawable/selectable_background_missionhub</item>
+        <item name="popupMenuStyle">@style/PopupMenu.Missionhub</item>
+        <item name="dropDownListViewStyle">@style/DropDownListView.Missionhub</item>
+        <item name="actionBarTabStyle">@style/ActionBarTabStyle.Missionhub</item>
+        <item name="actionDropDownStyle">@style/DropDownNav.Missionhub</item>
+        <item name="actionBarStyle">@style/ActionBar.Solid.Missionhub</item>
+        <item name="actionModeBackground">@drawable/cab_background_top_missionhub</item>
+        <item name="actionModeSplitBackground">@drawable/cab_background_bottom_missionhub</item>
+        <item name="actionModeCloseButtonStyle">@style/ActionButton.CloseMode.Missionhub</item>
+        <item name="android:windowBackground">@color/white</item>
     </style>
 
-    <style name="Theme.MissionHub.NoActionBar" parent="Theme.MissionHub">
+    <style name="Theme.Missionhub.NoActionBar" parent="Theme.Missionhub">
         <item name="windowNoTitle">true</item>
         <item name="android:windowNoTitle">true</item>
     </style>
 
-    <style name="Theme.MissionHubDark" parent="Holo.Theme">
-        <item name="android:listSelector">@drawable/abs__list_selector_holo_light</item>
-        <item name="android:listDivider">@drawable/abs__list_divider_holo_light</item>
-    </style>
-
-    <style name="Theme.MissionHubDark.NoActionBar" parent="Theme.MissionHubDark">
+    <style name="Theme.Missionhub.Init" parent="@style/Holo.Theme">
         <item name="windowNoTitle">true</item>
         <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@drawable/background</item>
     </style>
 
-    <style name="Theme.MissionHub.MainActivity" parent="Theme.MissionHub">
-        <item name="homeAsUpIndicator">@drawable/menu_up_indicator</item>
-        <item name="android:homeAsUpIndicator">@drawable/menu_up_indicator</item>
+    <style name="ActionBar.Solid.Missionhub" parent="@style/Widget.Sherlock.Light.ActionBar.Solid">
+        <item name="background">@drawable/ab_solid_missionhub</item>
+        <item name="backgroundStacked">@drawable/ab_stacked_solid_missionhub</item>
+        <item name="backgroundSplit">@drawable/ab_bottom_solid_missionhub</item>
+        <item name="progressBarStyle">@style/ProgressBar.Missionhub</item>
+    </style>
+
+    <style name="ActionBar.Transparent.Missionhub" parent="@style/Widget.Sherlock.Light.ActionBar">
+        <item name="background">@drawable/ab_transparent_missionhub</item>
+        <item name="progressBarStyle">@style/ProgressBar.Missionhub</item>
+    </style>
+
+    <style name="PopupMenu.Missionhub" parent="@style/Widget.Sherlock.Light.ListPopupWindow">
+        <item name="android:popupBackground">@drawable/menu_dropdown_panel_missionhub</item>
+    </style>
+
+    <style name="DropDownListView.Missionhub" parent="@style/Widget.Sherlock.Light.ListView.DropDown">
+        <item name="android:listSelector">@drawable/selectable_background_missionhub</item>
+    </style>
+
+    <style name="ActionBarTabStyle.Missionhub" parent="@style/Widget.Sherlock.Light.ActionBar.TabView">
+        <item name="android:background">@drawable/tab_indicator_ab_missionhub</item>
+    </style>
+
+    <style name="DropDownNav.Missionhub" parent="@style/Widget.Sherlock.Light.Spinner.DropDown.ActionBar">
+        <item name="android:background">@drawable/spinner_background_ab_missionhub</item>
+        <item name="android:popupBackground">@drawable/menu_dropdown_panel_missionhub</item>
+        <item name="android:dropDownSelector">@drawable/selectable_background_missionhub</item>
+    </style>
+
+    <style name="ProgressBar.Missionhub" parent="@style/Widget.Sherlock.Light.ProgressBar.Horizontal">
+        <item name="android:progressDrawable">@drawable/progress_horizontal_missionhub</item>
+    </style>
+
+    <style name="ActionButton.CloseMode.Missionhub" parent="@style/Widget.Sherlock.Light.ActionButton.CloseMode">
+        <item name="android:background">@drawable/btn_cab_done_missionhub</item>
+    </style>
+
+    <!-- this style is only referenced in a Light.DarkActionBar based theme -->
+    <style name="Theme.Missionhub.Widget" parent="@style/Holo.Theme">
+        <item name="popupMenuStyle">@style/PopupMenu.Missionhub</item>
+        <item name="dropDownListViewStyle">@style/DropDownListView.Missionhub</item>
     </style>
 
 </resources>

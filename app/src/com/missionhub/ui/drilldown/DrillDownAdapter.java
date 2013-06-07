@@ -9,8 +9,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.*;
+
 import com.missionhub.R;
 import com.missionhub.application.Application;
+
 import org.holoeverywhere.widget.ListAdapterWrapper;
 
 import java.lang.ref.WeakReference;
@@ -85,7 +87,7 @@ public class DrillDownAdapter extends PagerAdapter implements ViewPager.OnPageCh
             }
             Collections.reverse(reverseItems);
 
-            for(int i=0; i < reverseItems.size(); i++) {
+            for (int i = 0; i < reverseItems.size(); i++) {
                 mViews.add(setupPage(i + 1, reverseItems.get(i)));
             }
         }
@@ -264,9 +266,8 @@ public class DrillDownAdapter extends PagerAdapter implements ViewPager.OnPageCh
     }
 
     public LayoutInflater getLayoutInflater() {
-        return (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        return LayoutInflater.from(getContext());
     }
-
 
     public void setEnablePools(boolean enabled) {
         mEnablePools = enabled;

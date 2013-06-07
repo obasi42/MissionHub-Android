@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
+
 import com.missionhub.R;
 import com.missionhub.application.Application;
 import com.missionhub.application.Session;
@@ -18,6 +19,7 @@ import com.missionhub.exception.ExceptionHelper.DialogButton;
 import com.missionhub.ui.widget.PickAccountDialog;
 import com.missionhub.ui.widget.PickAccountDialog.AccountPickedEvent;
 import com.missionhub.util.U;
+
 import org.holoeverywhere.widget.Button;
 import org.holoeverywhere.widget.ProgressBar;
 import org.holoeverywhere.widget.TextView;
@@ -124,7 +126,7 @@ public class InitActivity extends BaseActivity {
     }
 
     public void onEventMainThread(final SessionResumeSuccessEvent event) {
-        final Intent intent = new Intent(this, MainActivity.class);
+        final Intent intent = new Intent(this, HostActivity.class);
         startActivity(intent);
         finish();
     }

@@ -6,7 +6,7 @@
         android:orientation="vertical">
 
     <TextView
-            style="@style/MissionHub.ContactInfoSectionLabel"
+            style="@style/Missionhub.ContactInfoSectionLabel"
             android:id="@android:id/text1"
             android:text="@string/contact_label_labels"/>
 
