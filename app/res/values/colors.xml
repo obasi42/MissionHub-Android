@@ -1,14 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="background">#FFEEEEEE</color>
     <color name="well">#FFF5F5F5</color>
     <color name="well_border">#FFCCCCCC</color>
-    <color name="main_menu_background">#ffEAF1F6</color>
-    <color name="main_menu_divider">#ff0379AE</color>
-    <color name="main_menu_title">#000</color>
-    <color name="main_menu_divider_title">#ff0379AE</color>
-    <color name="red_error">#ff0000</color>
     <color name="white">#FFF</color>
     <color name="black">#000</color>
     <color name="transparent">#00000000</color>
@@ -22,4 +16,5 @@
     <color name="green">#C6DA74</color>
     <color name="orange">#E3A45A</color>
 
+    <color name="pressed_missionhub">#CC33B5E5</color>
 </resources>

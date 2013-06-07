@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.util.Log;
+
 import com.google.analytics.tracking.android.GoogleAnalytics;
 import com.google.analytics.tracking.android.Tracker;
 import com.missionhub.R;
@@ -20,7 +21,9 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.nostra13.universalimageloader.utils.StorageUtils;
+
 import de.greenrobot.event.EventBus;
+
 import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
 import org.acra.ACRAConfigurationException;
@@ -236,6 +239,7 @@ public class Application extends org.holoeverywhere.app.Application {
         try {
             return Application.getContext().getPackageManager().getPackageInfo(Application.getContext().getPackageName(), 0).versionCode;
         } catch (final Exception e) {
+            /* ignore */
         }
         return -1;
     }
@@ -249,6 +253,7 @@ public class Application extends org.holoeverywhere.app.Application {
         try {
             return Application.getContext().getPackageManager().getPackageInfo(Application.getContext().getPackageName(), 0).versionName;
         } catch (final Exception e) {
+            /* ignore */
         }
         return null;
     }

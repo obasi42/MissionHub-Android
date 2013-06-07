@@ -11,7 +11,8 @@ public class UpgradeManager {
     public static final String TAG = UpgradeManager.class.getSimpleName();
     private static UpgradeManager sUpgradeManager;
 
-    private UpgradeManager() {}
+    private UpgradeManager() {
+    }
 
     /*=========================*/
     /* Dynamic Upgrade Methods */
@@ -38,15 +39,15 @@ public class UpgradeManager {
         int from = SettingsManager.getApplicationLastVersionId();
         int to = Application.getVersionCode();
 
-        while(from < to) {
+        while (from < to) {
             try {
-                Method method = getInstance().getClass().getMethod("toV"+(from+1), new Class[0]);
-                if (!(Boolean) method.invoke(getInstance(), new Object[0])) {
-                    Log.i(TAG, "failed upgrade " + "toV"+(from+1));
+                Method method = getInstance().getClass().getMethod("toV" + (from + 1), new Class[0]);
+                if (!(Boolean) method.invoke(getInstance())) {
+                    Log.i(TAG, "failed upgrade " + "toV" + (from + 1));
                     getInstance().onFailure(to);
                     break;
                 } else {
-                    Log.i(TAG, "completed upgrade " + "toV"+(from+1));
+                    Log.i(TAG, "completed upgrade " + "toV" + (from + 1));
                 }
             } catch (InvocationTargetException e) {
                 getInstance().onFailure(to, e);
@@ -96,8 +97,8 @@ public class UpgradeManager {
     private static boolean deleteDir(File dir) {
         if (dir != null && dir.isDirectory()) {
             String[] children = dir.list();
-            for (int i = 0; i < children.length; i++) {
-                boolean success = deleteDir(new File(dir, children[i]));
+            for (String child : children) {
+                boolean success = deleteDir(new File(dir, child));
                 if (!success) {
                     return false;
                 }

@@ -1,6 +1,7 @@
 package com.missionhub.application;
 
 import android.accounts.*;
+
 import com.missionhub.R;
 import com.missionhub.api.Api;
 import com.missionhub.api.Api.Include;
@@ -11,6 +12,7 @@ import com.missionhub.exception.MissionHubException;
 import com.missionhub.model.Person;
 import com.missionhub.util.SafeAsyncTask;
 import com.missionhub.util.U;
+
 import org.acra.ACRA;
 import org.holoeverywhere.widget.Toast;
 
@@ -403,6 +405,7 @@ public class Session implements OnAccountsUpdateListener {
                 SettingsManager.setSessionLastUserId(-1);
                 resetSession();
             } catch (final Exception e) {
+                /* ignore */
             }
         }
     }
@@ -414,10 +417,7 @@ public class Session implements OnAccountsUpdateListener {
      */
     public boolean canPickAccount() {
         final Account[] accounts = mAccountManager.getAccountsByType(Authenticator.ACCOUNT_TYPE);
-        if (accounts.length > 0) {
-            return true;
-        }
-        return false;
+        return accounts.length > 0;
     }
 
     /**
@@ -526,7 +526,7 @@ public class Session implements OnAccountsUpdateListener {
     }
 
 	/*--------------------*\
-	 * Exceptions
+     * Exceptions
 	\*--------------------*/
 
     /**

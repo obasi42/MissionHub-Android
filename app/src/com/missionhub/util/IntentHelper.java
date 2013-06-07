@@ -6,11 +6,13 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.text.Html;
+
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
 import com.missionhub.R;
 import com.missionhub.application.Application;
 import com.missionhub.model.Address;
+
 import org.apache.commons.lang3.StringUtils;
 import org.holoeverywhere.widget.Toast;
 
@@ -249,10 +251,6 @@ public class IntentHelper {
      */
     private static boolean hasIntentHandler(Intent intent) {
         ResolveInfo info = Application.getContext().getPackageManager().resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY);
-        if (info != null) {
-            return true;
-        } else {
-            return false;
-        }
+        return info != null;
     }
 }

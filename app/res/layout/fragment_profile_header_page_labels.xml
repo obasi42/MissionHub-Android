@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:background="@color/opaque_background"
+        >
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center"
+            >
+
+        <TextView
+                android:id="@+id/labels"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="LABELS:"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                />
+
+
+        <TextView
+                android:id="@+id/labels_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="No Labels"
+                android:gravity="center"
+                android:textStyle="bold"
+                android:layout_marginTop="8dip"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                />
+
+    </LinearLayout>
+
+</FrameLayout>

@@ -10,7 +10,9 @@ import android.view.SoundEffectConstants;
 import android.view.View;
 import android.view.accessibility.AccessibilityEvent;
 import android.widget.AdapterView;
+
 import com.missionhub.util.U;
+
 import org.holoeverywhere.widget.ListView;
 
 public class SelectableListView extends ListView {
@@ -35,7 +37,7 @@ public class SelectableListView extends ListView {
     /**
      * the current selection side
      */
-    private int mSelectionSide = SIDE_RIGHT;
+    private int mSelectionSide = SIDE_LEFT;
 
     /**
      * the current selection width
@@ -118,7 +120,8 @@ public class SelectableListView extends ListView {
     @Override
     public boolean onTouchEvent(final MotionEvent ev) {
         // if the choice mode is none, just pass the touch event
-        if (getChoiceMode() == CHOICE_MODE_NONE || mMode == MODE_CLICK_ONLY) return super.onTouchEvent(ev);
+        if (getChoiceMode() == CHOICE_MODE_NONE || mMode == MODE_CLICK_ONLY)
+            return super.onTouchEvent(ev);
 
         final int action = ev.getAction();
         final int x = (int) ev.getX();

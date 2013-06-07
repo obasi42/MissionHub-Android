@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+
 import com.missionhub.R;
 import com.missionhub.application.Application;
 import com.missionhub.application.Session;
@@ -19,6 +20,7 @@ import com.missionhub.util.U;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
+
 import org.holoeverywhere.LayoutInflater;
 import org.holoeverywhere.widget.AdapterView;
 import org.holoeverywhere.widget.Spinner;
@@ -137,7 +139,7 @@ public class PreferencesFragment extends BaseFragment {
         }
 
         public String appendDepth(final String text, final int depth) {
-            final StringBuffer sb = new StringBuffer();
+            final StringBuilder sb = new StringBuilder();
             for (int i = 0; i < depth; i++) {
                 sb.append("—");
             }

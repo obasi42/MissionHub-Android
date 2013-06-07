@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.missionhub.ui.widget.CheckableRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                                  android:layout_width="match_parent"
+                                                  android:layout_height="64dip"
+                                                  android:gravity="center_vertical"
+                                                  android:paddingLeft="14dip"
+                                                  android:background="@drawable/list_item_background">
+
+    <ImageView
+            android:layout_width="24dip"
+            android:layout_height="24dip"
+            android:id="@+id/checkmark"
+            android:src="@drawable/checkmark"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginRight="14dip"
+            android:layout_marginBottom="8dip"
+            android:duplicateParentState="true"/>
+
+    <ImageView
+            android:layout_width="50dip"
+            android:layout_height="50dip"
+            android:id="@+id/avatar"
+            android:scaleType="centerCrop"
+            android:src="@drawable/default_contact"
+            android:layout_marginRight="14dip"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/checkmark"
+            android:duplicateParentState="true"
+            />
+
+    <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/avatar"
+            android:duplicateParentState="true"
+            >
+
+        <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="0dip"
+                android:text="Ann Anderson"
+                android:background="@drawable/person_item_name_background_state"
+                android:id="@+id/name"
+                android:maxLines="1"
+                android:textSize="18sp"
+                android:textColor="#808286"
+                android:paddingTop="6dip"
+                android:paddingBottom="6dip"
+                android:paddingLeft="10dip"
+                android:paddingRight="14dip"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:layout_weight="1"
+                android:textStyle="bold"
+                android:duplicateParentState="true"
+                />
+
+        <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Female"
+                android:id="@+id/value1"
+                android:textColor="#808286"
+                android:gravity="center_vertical"
+                android:paddingLeft="18dip"
+                android:layout_marginRight="14dip"
+                android:textSize="18sp"
+                android:layout_marginBottom="7dip"
+                android:duplicateParentState="true"/>
+    </LinearLayout>
+</com.missionhub.ui.widget.CheckableRelativeLayout>

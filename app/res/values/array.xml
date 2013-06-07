@@ -1,5 +1,21 @@
 <resources>
 
+    <string-array name="person_info_display">
+        <item>Status</item>
+        <item>Gender</item>
+        <item>Email</item>
+        <item>Phone</item>
+        <item>Permission</item>
+        <item>Date Created</item>
+        <item>Last Survey</item>
+        <item>Last Interaction</item>
+    </string-array>
+    <string-array name="person_info_display_order">
+        <item>Name ASC</item>
+        <item>Name DESC</item>
+        <item>Option ASC</item>
+        <item>Option DESC</item>
+    </string-array>
     <string-array name="phone_location_ids">
         <item>mobile</item>
         <item>home</item>
@@ -11,7 +27,7 @@
         <item>Work</item>
     </string-array>
     <string-array name="state_ids">
-        <item></item>
+        <item/>
         <item>AL</item>
         <item>AK</item>
         <item>AZ</item>
@@ -141,7 +157,7 @@
         <item>Armed Forces Pacific</item>
     </string-array>
     <string-array name="country_ids">
-        <item></item>
+        <item/>
         <item>US</item>
         <item>CA</item>
         <item>AF</item>

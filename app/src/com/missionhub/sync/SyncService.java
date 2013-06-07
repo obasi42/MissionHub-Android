@@ -31,6 +31,7 @@ public class SyncService extends Service {
             try {
                 SyncService.performSync(mContext, account, extras, authority, provider, syncResult);
             } catch (final OperationCanceledException e) {
+                /* ignore */
             }
         }
     }

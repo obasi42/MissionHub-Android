@@ -68,17 +68,15 @@ public class ListOptions {
      * returns a copy of the list filters
      */
     public Multimap<String, String> getFilters() {
-        return HashMultimap.<String, String>create(mFilters);
+        return HashMultimap.create(mFilters);
     }
 
     /**
      * adds the filters to the http params
      */
     protected void toParams(final Map<String, String> params) {
-        final Iterator<String> itr = mFilters.keySet().iterator();
-        while (itr.hasNext()) {
-            final String filter = itr.next();
-            final StringBuffer value = new StringBuffer();
+        for (String filter : mFilters.keySet()) {
+            final StringBuilder value = new StringBuilder();
             final Iterator<String> itr2 = mFilters.get(filter).iterator();
             while (itr2.hasNext()) {
                 final String val = itr2.next();
@@ -90,7 +88,7 @@ public class ListOptions {
             params.put("filters[" + stripUnsafeChars(filter) + "]", value.toString());
         }
 
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         final Iterator<Entry<String, Direction>> itr2 = mOrderBy.entrySet().iterator();
         while (itr2.hasNext()) {
             final Entry<String, Direction> entry = itr2.next();
@@ -183,9 +181,8 @@ public class ListOptions {
     }
 
     public String getFilterValue(final String filter) {
-        final Iterator<String> itr = mFilters.get(filter).iterator();
-        while (itr.hasNext()) {
-            return itr.next();
+        for (String s : mFilters.get(filter)) {
+            return s;
         }
         return null;
     }
