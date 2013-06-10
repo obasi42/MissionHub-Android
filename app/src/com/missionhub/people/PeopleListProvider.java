@@ -25,6 +25,7 @@ public abstract class PeopleListProvider extends ObjectArrayAdapter {
      * The {@link PeopleListView} this provider is attached to
      */
     private WeakReference<PeopleListView> mPeopleListView;
+
     /**
      * The {@link com.missionhub.ui.AdapterViewProvider} that provides views for provider items.
      */
@@ -96,6 +97,26 @@ public abstract class PeopleListProvider extends ObjectArrayAdapter {
             mAdapterViewProvider = new PersonAdapterViewProvider();
         }
         return mAdapterViewProvider;
+    }
+
+
+    /**
+     * Returns the current adapter view provider
+     *
+     * @return the view provider
+     */
+    public AdapterViewProvider getAdapterViewProvider() {
+        return mAdapterViewProvider;
+    }
+
+    /**
+     * Sets the adapter view provider
+     *
+     * @param adapterViewProvider The view provider
+     */
+    public void setAdapterViewProvider(AdapterViewProvider adapterViewProvider) {
+        mAdapterViewProvider = adapterViewProvider;
+        notifyDataSetChanged();
     }
 
     /**

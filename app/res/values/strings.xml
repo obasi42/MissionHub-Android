@@ -38,6 +38,21 @@
     <string name="my_contacts_in_progress">In-Progress</string>
     <string name="my_contacts_completed">Completed</string>
 
+    <!-- Person List Fragment -->
+    <string name="display_status">Status</string>
+    <string name="display_gender">Gender</string>
+    <string name="display_permission">Permission</string>
+    <string name="display_phone">Phone</string>
+    <string name="display_email">Email</string>
+    <string name="display_date_created">Date Created</string>
+
+    <string name="sort_off"><b>Sort:</b>Off
+    </string>
+    <string name="sort_asc"><b>Sort:</b>Asc
+    </string>
+    <string name="sort_desc"><b>Sort:</b>Desc
+    </string>
+
     <!-- Contact -->
     <string name="contact_activity_title">Contact</string>
     <string name="contact_nav_info">Information</string>

@@ -43,7 +43,7 @@
                 android:layout_height="0dip"
                 android:text="Ann Anderson"
                 android:background="@drawable/person_item_name_background_state"
-                android:id="@+id/name"
+                android:id="@android:id/text1"
                 android:maxLines="1"
                 android:textSize="18sp"
                 android:textColor="#808286"
@@ -59,10 +59,10 @@
                 />
 
         <TextView
-                android:layout_width="fill_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Female"
-                android:id="@+id/value1"
+                android:id="@android:id/text2"
                 android:textColor="#808286"
                 android:gravity="center_vertical"
                 android:paddingLeft="18dip"

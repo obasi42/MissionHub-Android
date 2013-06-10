@@ -196,6 +196,11 @@ public abstract class DynamicPeopleListProvider extends PeopleListProvider {
         return mStarted;
     }
 
+    /**
+     * Sets the started state value. If the adapter is not started, begins loading data.
+     *
+     * @param started
+     */
     public void setStarted(boolean started) {
         if (started && !mStarted) {
             mStarted = started;

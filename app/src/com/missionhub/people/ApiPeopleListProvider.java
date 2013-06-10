@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.missionhub.api.Api;
+import com.missionhub.api.ApiOptions;
 import com.missionhub.api.PeopleListOptions;
 import com.missionhub.model.Person;
 import com.missionhub.util.SafeAsyncTask;
@@ -113,7 +114,13 @@ public class ApiPeopleListProvider extends DynamicPeopleListProvider {
         mTask = new SafeAsyncTask<List<Person>>() {
             @Override
             public List<Person> call() throws Exception {
-                return Api.listPeople(mOptions).get();
+                return Api.listPeople(mOptions, ApiOptions.builder()
+                        .include(Api.Include.assigned_tos)
+                        .include(Api.Include.current_address)
+                        .include(Api.Include.email_addresses)
+                        .include(Api.Include.organizational_roles)
+                        .include(Api.Include.phone_numbers)
+                        .build()).get();
             }
 
             @Override

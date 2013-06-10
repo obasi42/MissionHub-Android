@@ -26,13 +26,13 @@ public class PeopleListOptions extends ListOptions {
             return this;
         }
 
-        public Builder role(final long roleId) {
-            filters.addFilter("roles", roleId);
+        public Builder permission(final long roleId) {
+            filters.addFilter("permissions", roleId);
             return this;
         }
 
-        public Builder role(final Collection<Long> roleIds) {
-            filters.addFilter("roles", roleIds);
+        public Builder permissions(final Collection<Long> roleIds) {
+            filters.addFilter("permissions", roleIds);
             return this;
         }
 
@@ -99,7 +99,7 @@ public class PeopleListOptions extends ListOptions {
 
     @Override
     public Object clone() {
-        return new PeopleListOptions((ListOptions) clone());
+        return new PeopleListOptions((ListOptions) super.clone());
     }
 
 }
