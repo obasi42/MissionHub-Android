@@ -4,10 +4,8 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.ImageView;
 
 import com.missionhub.R;
@@ -28,7 +26,7 @@ import org.holoeverywhere.app.Activity;
 import org.holoeverywhere.widget.ListView;
 import org.holoeverywhere.widget.TextView;
 
-public class ProfileFragment extends BaseFragment {
+public class HostedProfileFragment extends HostedFragment {
 
     private long mPersonId;
 
@@ -43,18 +41,18 @@ public class ProfileFragment extends BaseFragment {
 
     private AnimateOnceImageLoadingListener mLoadingListener = new AnimateOnceImageLoadingListener(250);
 
-    public ProfileFragment() {
+    public HostedProfileFragment() {
     }
 
-    public static ProfileFragment instantiate(final Person person) {
+    public static HostedProfileFragment instantiate(final Person person) {
         return instantiate(person.getId());
     }
 
-    public static ProfileFragment instantiate(final long personId) {
+    public static HostedProfileFragment instantiate(final long personId) {
         final Bundle bundle = new Bundle();
         bundle.putLong("personId", personId);
 
-        final ProfileFragment fragment = new ProfileFragment();
+        final HostedProfileFragment fragment = new HostedProfileFragment();
         fragment.setArguments(bundle);
 
         return fragment;

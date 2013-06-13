@@ -11,6 +11,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.missionhub.R;
+import com.missionhub.application.Application;
+import com.missionhub.event.ChangeHostFragmentEvent;
+import com.missionhub.model.Person;
 import com.missionhub.people.ApiPeopleListProvider;
 import com.missionhub.people.PeopleListView;
 import com.missionhub.people.PersonAdapterViewProvider;
@@ -21,11 +24,11 @@ import org.holoeverywhere.widget.AdapterView;
 import org.holoeverywhere.widget.Spinner;
 import org.holoeverywhere.widget.TextView;
 
-public class HostedPeopleListFragment extends HostedFragment implements AdapterView.OnItemSelectedListener {
+public class HostedPeopleListFragment extends HostedFragment implements AdapterView.OnItemSelectedListener, PeopleListView.OnPersonClickListener {
 
     public static final String TAG = HostedPeopleListFragment.class.getSimpleName();
 
-    private PeopleListView mView;
+    private PeopleListView mList;
     private SelectableApiPeopleListController mProvider;
 
     private ImageView mCheckmark;
@@ -46,13 +49,14 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
         View view = inflater.inflate(R.layout.fragment_people_list, parent, false);
 
         // set up the person list and adapter
-        mView = (PeopleListView) view.findViewById(android.R.id.list);
+        mList = (PeopleListView) view.findViewById(android.R.id.list);
         if (mProvider == null) {
             mProvider = new SelectableApiPeopleListController(inflater.getContext());
         } else {
             mProvider.setContext(inflater.getContext());
         }
-        mView.setProvider(mProvider);
+        mList.setProvider(mProvider);
+        mList.setOnPersonClickListener(this);
 
         // set up the list controller
         mCheckmark = (ImageView) view.findViewById(R.id.checkmark);
@@ -100,6 +104,20 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
 
+    }
+
+    @Override
+    public void onPersonClick(PeopleListView list, Person person, int position, long id) {
+        ChangeHostFragmentEvent event = new ChangeHostFragmentEvent(HostedProfileFragment.class);
+        event.setAddToBackstack(true);
+        event.setInAnimation(R.anim.slide_in_right, R.anim.slide_in_left);
+        event.setOutAnimation(R.anim.slide_out_left, R.anim.slide_out_right);
+
+        Bundle bundle = new Bundle();
+        bundle.putLong("personId", person.getId());
+        event.setNewInstance(true, bundle);
+
+        Application.postEvent(event);
     }
 
     public static class StringRunnableItem {

@@ -8,13 +8,13 @@ import android.util.Log;
 
 import com.actionbarsherlock.view.MenuItem;
 import com.missionhub.R;
-import com.missionhub.fragment.ProfileFragment;
+import com.missionhub.fragment.HostedProfileFragment;
 import com.missionhub.model.Person;
 
 public class ProfileActivity extends BaseAuthenticatedActivity {
 
     private long mPersonId;
-    private ProfileFragment mFragment;
+    private HostedProfileFragment mFragment;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -30,11 +30,11 @@ public class ProfileActivity extends BaseAuthenticatedActivity {
         }
 
         final FragmentManager fm = getSupportFragmentManager();
-        mFragment = (ProfileFragment) fm.findFragmentById(R.id.content_frame);
+        mFragment = (HostedProfileFragment) fm.findFragmentById(R.id.content_frame);
 
         if (mFragment == null) {
             Log.e("FRAGMENT NULL", "FRAGMENT NULL");
-            mFragment = ProfileFragment.instantiate(mPersonId);
+            mFragment = HostedProfileFragment.instantiate(mPersonId);
             fm.beginTransaction().add(R.id.content_frame, mFragment).commit();
         }
     }

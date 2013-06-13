@@ -1,8 +1,8 @@
 package com.missionhub.model;
 
-import java.util.*;
+import android.view.View;
 
-import com.missionhub.model.DaoSession;
+import java.util.*;
 
 import de.greenrobot.dao.DaoException;
 
@@ -18,6 +18,7 @@ import com.missionhub.application.Session;
 import com.missionhub.model.gson.GEmailAddress;
 import com.missionhub.model.gson.GPerson;
 import com.missionhub.model.gson.GPhoneNumber;
+import com.missionhub.util.IntentHelper;
 import com.missionhub.util.TreeDataStructure;
 import com.missionhub.util.U;
 import com.missionhub.util.U.FollowupStatus;
@@ -25,6 +26,9 @@ import com.missionhub.util.U.Gender;
 
 import de.greenrobot.dao.AbstractDao;
 import de.greenrobot.dao.query.WhereCondition;
+
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.Phonenumber;
 // KEEP INCLUDES END
 
 /**
@@ -81,6 +85,7 @@ public class Person {
     private EmailAddress mPrimaryEmailAddress;
     private PhoneNumber mPrimaryPhoneNumber;
     private Map<Long, ContactAssignment> mContactAssignments;
+    private PersonViewCache mPersonViewCache;
     // KEEP FIELDS END
 
     public Person() {
@@ -967,6 +972,62 @@ public class Person {
         resetPrimaryEmailAddress();
         resetPrimaryPhoneNumber();
         resetContactAssignments();
+        invalidateViewCache();
+    }
+
+    public PersonViewCache getViewCache() {
+        if (mPersonViewCache == null) {
+            mPersonViewCache = new PersonViewCache();
+            mPersonViewCache.name = getName();
+            if (getGenderEnum() != null) {
+                mPersonViewCache.gender = getGenderEnum().toString();
+            }
+            if (getStatus() != null) {
+                mPersonViewCache.status = getStatus().toString();
+            }
+            if (getPrimaryEmailAddress() != null) {
+                mPersonViewCache.email = getPrimaryEmailAddress().getEmail();
+                mPersonViewCache.emailClickListener = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        IntentHelper.sendEmail(getPrimaryEmailAddress().getEmail(), null, null);
+                    }
+                };
+            }
+            final Phonenumber.PhoneNumber number = U.parsePhoneNumber(getPrimaryPhoneNumber());
+            if (number != null) {
+                if (PhoneNumberUtil.getInstance().isPossibleNumber(number)) {
+                    mPersonViewCache.phone = PhoneNumberUtil.getInstance().format(number, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL);
+                    mPersonViewCache.phoneClickListener = new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            IntentHelper.dialNumber(number);
+                        }
+                    };
+                }
+            }
+            if (getCreated_at() != null) {
+                mPersonViewCache.dateCreated = getCreated_at().toString();
+            }
+        }
+
+        return mPersonViewCache;
+    }
+
+    public void invalidateViewCache() {
+        mPersonViewCache = null;
+    }
+
+    public static class PersonViewCache {
+        public String name;
+        public String gender;
+        public String status;
+        public String email;
+        public View.OnClickListener emailClickListener;
+        public String phone;
+        public View.OnClickListener phoneClickListener;
+        public String permission; // TODO: implement permissions
+        public String dateCreated;
     }
     // KEEP METHODS END
 

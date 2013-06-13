@@ -166,6 +166,9 @@ public class HostActivity extends BaseAuthenticatedActivity implements FragmentM
             if (fragment == null || event.isNewInstance()) {
                 try {
                     fragment = event.getFragmentClass().newInstance();
+                    if (event.getArguments() != null) {
+                        fragment.setArguments(event.getArguments());
+                    }
                 } catch (Exception e) {
                     Log.e("ERROR", e.getMessage(), e);
                     throw new RuntimeException(e);

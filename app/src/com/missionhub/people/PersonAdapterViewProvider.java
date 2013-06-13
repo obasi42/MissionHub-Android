@@ -4,15 +4,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.google.i18n.phonenumbers.PhoneNumberUtil;
-import com.google.i18n.phonenumbers.Phonenumber;
 import com.missionhub.R;
 import com.missionhub.model.Person;
 import com.missionhub.people.DynamicPeopleListProvider.LoadingItem;
 import com.missionhub.ui.AdapterViewProvider;
 import com.missionhub.ui.AnimateOnceImageLoadingListener;
 import com.missionhub.ui.ObjectArrayAdapter;
-import com.missionhub.util.IntentHelper;
 import com.missionhub.util.U;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -45,14 +42,9 @@ public class PersonAdapterViewProvider implements AdapterViewProvider {
     }
 
     /**
-     * The current line 1 display option
-     */
-    private Display mLine1 = Display.NAME;
-
-    /**
      * The current line 2 display option
      */
-    private Display mLine2 = Display.STATUS;
+    private Display mLine2 = Display.GENDER;
 
     /**
      * {@inheritDoc}
@@ -98,75 +90,34 @@ public class PersonAdapterViewProvider implements AdapterViewProvider {
             ImageLoader.getInstance().displayImage(url, holder.avatar, mImageLoaderOptions, mImageLoaderListener);
         }
 
+        safeSet(holder.text1, person.getName());
 
-        for (TextView textView : new TextView[]{holder.text1, holder.text2}) {
-            Display display;
-            if (textView == holder.text1) {
-                display = mLine1;
-            } else {
-                display = mLine2;
-                textView.setOnClickListener(null);
-            }
+        holder.text2.setOnClickListener(null);
+        Person.PersonViewCache mCache = person.getViewCache();
 
-            switch (display) {
-                case STATUS:
-                    if (person.getStatus() != null) {
-                        safeSet(textView, person.getStatus().toString());
-                    } else {
-                        safeSet(textView, null);
-                    }
-                    break;
-                case GENDER:
-                    if (person.getGenderEnum() != null) {
-                        safeSet(textView, person.getGenderEnum().toString());
-                    } else {
-                        safeSet(textView, null);
-                    }
-                    break;
-                case EMAIL:
-                    if (person.getPrimaryEmailAddress() != null) {
-                        safeSet(textView, person.getPrimaryEmailAddress().getEmail());
-                        textView.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                IntentHelper.sendEmail(person.getPrimaryEmailAddress().getEmail(), null, null);
-                            }
-                        });
-                    } else {
-                        safeSet(textView, null);
-                    }
-                    break;
-                case PHONE:
-                    final Phonenumber.PhoneNumber number = U.parsePhoneNumber(person.getPrimaryPhoneNumber());
-                    if (number != null) {
-                        if (PhoneNumberUtil.getInstance().isPossibleNumber(number)) {
-                            safeSet(textView, PhoneNumberUtil.getInstance().format(number, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL));
-                            textView.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    IntentHelper.dialNumber(number);
-                                }
-                            });
-                        } else {
-                            safeSet(textView, number.getRawInput());
-                        }
-                    } else {
-                        safeSet(textView, null);
-                    }
-                    break;
-                case PERMISSION:
-                    safeSet(textView, null);
-                    break; // TODO: implement permissions
-                case DATE_CREATED:
-                    if (person.getCreated_at() != null) {
-                        safeSet(textView, person.getCreated_at().toString());
-                    } else {
-                        safeSet(textView, null);
-                    }
-                    break;
-                default:
-                    safeSet(textView, person.getName());
-            }
+        switch (mLine2) {
+            case STATUS:
+                safeSet(holder.text2, mCache.status);
+                break;
+            case GENDER:
+                safeSet(holder.text2, mCache.gender);
+                break;
+            case EMAIL:
+                safeSet(holder.text2, mCache.email);
+                holder.text2.setOnClickListener(mCache.emailClickListener);
+                break;
+            case PHONE:
+                safeSet(holder.text2, mCache.phone);
+                holder.text2.setOnClickListener(mCache.phoneClickListener);
+                break;
+            case PERMISSION:
+                safeSet(holder.text2, mCache.permission);
+                break;
+            case DATE_CREATED:
+                safeSet(holder.text2, mCache.dateCreated);
+                break;
+            default:
+                safeSet(holder.text2, null);
         }
 
         return view;
@@ -204,22 +155,6 @@ public class PersonAdapterViewProvider implements AdapterViewProvider {
         ImageView avatar;
         TextView text1;
         TextView text2;
-    }
-
-    /**
-     * @return Returns the line 1 display parameter
-     */
-    public Display getLine1() {
-        return mLine1;
-    }
-
-    /**
-     * Sets the line 1 display parameter
-     *
-     * @param line1
-     */
-    public void setLine1(Display line1) {
-        mLine1 = line1;
     }
 
     /**

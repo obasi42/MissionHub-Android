@@ -114,13 +114,21 @@ public class ApiPeopleListProvider extends DynamicPeopleListProvider {
         mTask = new SafeAsyncTask<List<Person>>() {
             @Override
             public List<Person> call() throws Exception {
-                return Api.listPeople(mOptions, ApiOptions.builder()
+                List<Person> people = Api.listPeople(mOptions, ApiOptions.builder()
                         .include(Api.Include.assigned_tos)
                         .include(Api.Include.current_address)
                         .include(Api.Include.email_addresses)
                         .include(Api.Include.organizational_roles)
                         .include(Api.Include.phone_numbers)
                         .build()).get();
+
+                // init the view cache
+                if (people != null) {
+                    for (Person p : people) {
+                        p.getViewCache();
+                    }
+                }
+                return people;
             }
 
             @Override

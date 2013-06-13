@@ -23,14 +23,27 @@ public class ParallaxListView extends ListView implements OnScrollListener {
 
     public ParallaxListView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        init();
     }
 
     public ParallaxListView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        init();
     }
 
     public ParallaxListView(Context context) {
         super(context);
+        init();
+    }
+
+    // set the view bounds once the view is drawn
+    public void init() {
+        this.post(new Runnable() {
+            @Override
+            public void run() {
+                setViewsBounds();
+            }
+        });
     }
 
     @Override
@@ -167,11 +180,5 @@ public class ParallaxListView extends ListView implements OnScrollListener {
         public void initialize(int width, int height, int parentWidth, int parentHeight) {
             super.initialize(width, height, parentWidth, parentHeight);
         }
-    }
-
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-        setViewsBounds();
     }
 }
