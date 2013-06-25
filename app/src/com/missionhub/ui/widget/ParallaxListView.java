@@ -8,7 +8,8 @@ import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
-import android.widget.ListView;
+
+import org.holoeverywhere.widget.ListView;
 
 /**
  * Adapted from https://github.com/Gnod/ParallaxListView/blob/master/src/com/gnod/parallaxlistview/ParallaxScollListView.java
@@ -21,24 +22,19 @@ public class ParallaxListView extends ListView implements OnScrollListener {
 
     private float xDistance, yDistance, lastX, lastY;
 
-    public ParallaxListView(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
-        init();
+    public ParallaxListView(Context context) {
+        this(context, null);
     }
 
     public ParallaxListView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        init();
+        this(context, attrs, android.R.attr.listViewStyle);
     }
 
-    public ParallaxListView(Context context) {
-        super(context);
-        init();
-    }
+    public ParallaxListView(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
 
-    // set the view bounds once the view is drawn
-    public void init() {
-        this.post(new Runnable() {
+        // set the view bounds after the view has been drawn
+        post(new Runnable() {
             @Override
             public void run() {
                 setViewsBounds();

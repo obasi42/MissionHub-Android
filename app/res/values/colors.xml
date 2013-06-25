@@ -1,20 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="well">#FFF5F5F5</color>
-    <color name="well_border">#FFCCCCCC</color>
-    <color name="white">#FFF</color>
+    <color name="well">#fff5f5f5</color>
+    <color name="well_border">#ffcccccc</color>
+    <color name="white">#fff</color>
     <color name="black">#000</color>
     <color name="transparent">#00000000</color>
     <color name="opaque_background">#99000000</color>
-    <color name="blue">#0078AE</color>
-    <color name="light_blue">#1AB4FA</color>
+    <color name="blue">#0078ae</color>
+    <color name="light_blue">#1ab4fa</color>
     <color name="dark_blue">#004361</color>
-    <color name="light_gray">#E6EAED</color>
+    <color name="light_gray">#e6eaed</color>
     <color name="gray">#838383</color>
     <color name="dark_gray">#535455</color>
-    <color name="green">#C6DA74</color>
-    <color name="orange">#E3A45A</color>
+    <color name="green">#c6da74</color>
+    <color name="orange">#e3a45a</color>
 
-    <color name="pressed_missionhub">#CC33B5E5</color>
+    <color name="pressed_missionhub">#cc33b5e5</color>
+
+    <color name="sidebar_background">#333333</color>
+    <color name="sidebar_divider">#58595a</color>
+    <color name="sidebar_header_background">#808284</color>
+    <color name="sidebar_header_text">#050505</color>
+    <color name="sidebar_item_text">#d1d1d1</color>
 </resources>

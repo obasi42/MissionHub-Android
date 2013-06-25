@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/sidebar_background"/>
+        </shape>
+    </item>
+    <item
+            android:top="0dp"
+            android:right="1px"
+            android:bottom="0dp"
+            android:left="0dp">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/sidebar_divider"/>
+        </shape>
+    </item>
+</layer-list>

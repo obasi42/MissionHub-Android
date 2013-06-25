@@ -13,6 +13,11 @@
             android:orientation="horizontal">
 
         <FrameLayout
+                android:id="@+id/content_frame_left_drawer"
+                android:layout_width="@dimen/sidebar_width"
+                android:layout_height="match_parent"/>
+
+        <FrameLayout
                 android:id="@+id/content_frame_main"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"

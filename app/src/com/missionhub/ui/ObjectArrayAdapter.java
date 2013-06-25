@@ -484,4 +484,24 @@ public abstract class ObjectArrayAdapter<T> extends BaseAdapter {
             return false;
         }
     }
+
+    /**
+     * Returns the lock object for external entities to synchronize on
+     *
+     * @return
+     */
+    public Object getLock() {
+        return mLock;
+    }
+
+    /**
+     * Returns all of the objects in the adapter
+     *
+     * @return
+     */
+    public List<T> getObjects() {
+        synchronized (mLock) {
+            return new ArrayList<T>(mObjects);
+        }
+    }
 }

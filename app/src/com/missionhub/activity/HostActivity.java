@@ -20,7 +20,9 @@ import com.missionhub.event.DrawerOpenedEvent;
 import com.missionhub.event.OnHostFragmentChangedEvent;
 import com.missionhub.fragment.HostedFragment;
 import com.missionhub.fragment.HostedPeopleListFragment;
-import com.missionhub.fragment.SideMenuFragment;
+import com.missionhub.fragment.SidebarFragment;
+
+import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
 
 public class HostActivity extends BaseAuthenticatedActivity implements FragmentManager.OnBackStackChangedListener {
 
@@ -28,7 +30,11 @@ public class HostActivity extends BaseAuthenticatedActivity implements FragmentM
     private ActionBarDrawerToggle mDrawerToggle;
 
     private HostedFragment mCurrentFragment;
-    private SideMenuFragment mSideMenuFragment;
+    private SidebarFragment mSidebarFragment;
+    private PullToRefreshAttacher mPullToRefreshHelper;
+
+    private int mLeftDrawerId = R.id.left_drawer;
+    private boolean mTabletSidebarStatic = true;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -36,6 +42,11 @@ public class HostActivity extends BaseAuthenticatedActivity implements FragmentM
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_host);
+
+        // restore state
+        if (savedInstanceState != null) {
+            mTabletSidebarStatic = savedInstanceState.getBoolean("mTabletSidebarStatic", true);
+        }
 
         // set up the navigation drawer
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -56,15 +67,53 @@ public class HostActivity extends BaseAuthenticatedActivity implements FragmentM
 
         // setup the initial fragments
         if (savedInstanceState != null) {
-            mCurrentFragment = (HostedFragment) getSupportFragmentManager().findFragmentById(R.id.content_frame);
-            mSideMenuFragment = (SideMenuFragment) getSupportFragmentManager().findFragmentById(R.id.left_drawer);
+            mCurrentFragment = (HostedFragment) getSupportFragmentManager().findFragmentById(R.id.content_frame_main);
+            attachSidebar(true);
         } else {
-            mSideMenuFragment = new SideMenuFragment();
             onEventMainThread(new ChangeHostFragmentEvent(HostedPeopleListFragment.class));
-            getSupportFragmentManager().beginTransaction().replace(R.id.left_drawer, mSideMenuFragment).commit();
+            attachSidebar(false);
         }
 
+        // create the global pull to refresh helper
+        mPullToRefreshHelper = new PullToRefreshAttacher(this);
+
         Application.registerEventSubscriber(this, ChangeHostFragmentEvent.class);
+    }
+
+    public void attachSidebar(boolean created) {
+        View leftFrame = findViewById(R.id.content_frame_left_drawer);
+        if (leftFrame == null || !mTabletSidebarStatic) {
+            mLeftDrawerId = R.id.left_drawer;
+        } else {
+            mLeftDrawerId = R.id.content_frame_left_drawer;
+        }
+        if (created) {
+            if (mSidebarFragment == null) {
+                mSidebarFragment = (SidebarFragment) getSupportFragmentManager().findFragmentById(R.id.left_drawer);
+            }
+            if (mSidebarFragment == null) {
+                mSidebarFragment = (SidebarFragment) getSupportFragmentManager().findFragmentById(R.id.content_frame_left_drawer);
+            }
+            // check if the fragment container has changed, fragments can't be moved :(
+            if (mSidebarFragment.getContainerId() != mLeftDrawerId) {
+                SidebarFragment oldFragment = mSidebarFragment;
+                mSidebarFragment = new SidebarFragment();
+                mSidebarFragment.clone(oldFragment);
+                getSupportFragmentManager().beginTransaction().remove(oldFragment).commit();
+                getSupportFragmentManager().executePendingTransactions();
+            }
+        } else {
+            mSidebarFragment = new SidebarFragment();
+        }
+        if (mSidebarFragment.getContainerId() == 0) {
+            getSupportFragmentManager().beginTransaction().replace(mLeftDrawerId, mSidebarFragment).commit();
+        }
+
+        if (leftFrame != null && mLeftDrawerId == R.id.left_drawer) {
+            leftFrame.setVisibility(View.GONE);
+        } else if (leftFrame != null) {
+            leftFrame.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -79,15 +128,21 @@ public class HostActivity extends BaseAuthenticatedActivity implements FragmentM
 
     @Override
     public void onBackStackChanged() {
-        if (isAtRoot()) {
+        if (isAtRoot() && (!mTabletSidebarStatic || mLeftDrawerId == R.id.left_drawer)) {
             mDrawerToggle.setDrawerIndicatorEnabled(true);
             mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
         } else {
             mDrawerToggle.setDrawerIndicatorEnabled(false);
             mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         }
-        getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        if (isAtRoot() && mTabletSidebarStatic && mLeftDrawerId != R.id.left_drawer) {
+            getSupportActionBar().setHomeButtonEnabled(false);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        } else {
+            getSupportActionBar().setHomeButtonEnabled(true);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
     }
 
     @Override
@@ -149,8 +204,8 @@ public class HostActivity extends BaseAuthenticatedActivity implements FragmentM
         return mCurrentFragment;
     }
 
-    public SideMenuFragment getSideMenuFragment() {
-        return mSideMenuFragment;
+    public SidebarFragment getSidebarFragment() {
+        return mSidebarFragment;
     }
 
     public void onEventMainThread(ChangeHostFragmentEvent event) {
@@ -178,7 +233,7 @@ public class HostActivity extends BaseAuthenticatedActivity implements FragmentM
             FragmentManager fm = getSupportFragmentManager();
             FragmentTransaction ft = fm.beginTransaction();
             ft.setCustomAnimations(event.getInAnimation(), event.getOutAnimation(), event.getPopInAnimation(), event.getPopOutAnimation());
-            ft.replace(R.id.content_frame, fragment, event.getFragmentTag());
+            ft.replace(R.id.content_frame_main, fragment, event.getFragmentTag());
             if (event.isAddToBackstack()) {
                 ft.addToBackStack(event.getFragmentTag());
             }
@@ -190,5 +245,29 @@ public class HostActivity extends BaseAuthenticatedActivity implements FragmentM
 
         mCurrentFragment = fragment;
         Application.postEvent(new OnHostFragmentChangedEvent(fragment));
+    }
+
+    public PullToRefreshAttacher getPullToRefreshAttacher() {
+        return mPullToRefreshHelper;
+    }
+
+    public void setTabletSidebarStatic(boolean tabletSidebarStatic) {
+        if (mTabletSidebarStatic == tabletSidebarStatic) return;
+
+        attachSidebar(true);
+
+        onBackStackChanged();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putBoolean("mTabletSidebarStatic", mTabletSidebarStatic);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        mTabletSidebarStatic = savedInstanceState.getBoolean("mTabletSidebarStatic");
+        super.onRestoreInstanceState(savedInstanceState);
     }
 }
