@@ -15,12 +15,14 @@ import com.missionhub.model.Address;
 import com.missionhub.model.EmailAddress;
 import com.missionhub.model.PhoneNumber;
 import com.missionhub.model.Organization;
-import com.missionhub.model.Role;
-import com.missionhub.model.OrganizationalRole;
+import com.missionhub.model.Label;
+import com.missionhub.model.Permission;
+import com.missionhub.model.OrganizationalLabel;
+import com.missionhub.model.OrganizationalPermission;
 import com.missionhub.model.ContactAssignment;
-import com.missionhub.model.Group;
-import com.missionhub.model.FollowupComment;
-import com.missionhub.model.Rejoicable;
+import com.missionhub.model.Interaction;
+import com.missionhub.model.InteractionInitiator;
+import com.missionhub.model.InteractionType;
 import com.missionhub.model.Question;
 import com.missionhub.model.Survey;
 import com.missionhub.model.SmsKeyword;
@@ -35,12 +37,14 @@ import com.missionhub.model.AddressDao;
 import com.missionhub.model.EmailAddressDao;
 import com.missionhub.model.PhoneNumberDao;
 import com.missionhub.model.OrganizationDao;
-import com.missionhub.model.RoleDao;
-import com.missionhub.model.OrganizationalRoleDao;
+import com.missionhub.model.LabelDao;
+import com.missionhub.model.PermissionDao;
+import com.missionhub.model.OrganizationalLabelDao;
+import com.missionhub.model.OrganizationalPermissionDao;
 import com.missionhub.model.ContactAssignmentDao;
-import com.missionhub.model.GroupDao;
-import com.missionhub.model.FollowupCommentDao;
-import com.missionhub.model.RejoicableDao;
+import com.missionhub.model.InteractionDao;
+import com.missionhub.model.InteractionInitiatorDao;
+import com.missionhub.model.InteractionTypeDao;
 import com.missionhub.model.QuestionDao;
 import com.missionhub.model.SurveyDao;
 import com.missionhub.model.SmsKeywordDao;
@@ -53,7 +57,7 @@ import com.missionhub.model.UserSettingDao;
 
 /**
  * {@inheritDoc}
- * 
+ *
  * @see de.greenrobot.dao.AbstractDaoSession
  */
 public class DaoSession extends AbstractDaoSession {
@@ -64,12 +68,14 @@ public class DaoSession extends AbstractDaoSession {
     private final DaoConfig emailAddressDaoConfig;
     private final DaoConfig phoneNumberDaoConfig;
     private final DaoConfig organizationDaoConfig;
-    private final DaoConfig roleDaoConfig;
-    private final DaoConfig organizationalRoleDaoConfig;
+    private final DaoConfig labelDaoConfig;
+    private final DaoConfig permissionDaoConfig;
+    private final DaoConfig organizationalLabelDaoConfig;
+    private final DaoConfig organizationalPermissionDaoConfig;
     private final DaoConfig contactAssignmentDaoConfig;
-    private final DaoConfig groupDaoConfig;
-    private final DaoConfig followupCommentDaoConfig;
-    private final DaoConfig rejoicableDaoConfig;
+    private final DaoConfig interactionDaoConfig;
+    private final DaoConfig interactionInitiatorDaoConfig;
+    private final DaoConfig interactionTypeDaoConfig;
     private final DaoConfig questionDaoConfig;
     private final DaoConfig surveyDaoConfig;
     private final DaoConfig smsKeywordDaoConfig;
@@ -84,12 +90,14 @@ public class DaoSession extends AbstractDaoSession {
     private final EmailAddressDao emailAddressDao;
     private final PhoneNumberDao phoneNumberDao;
     private final OrganizationDao organizationDao;
-    private final RoleDao roleDao;
-    private final OrganizationalRoleDao organizationalRoleDao;
+    private final LabelDao labelDao;
+    private final PermissionDao permissionDao;
+    private final OrganizationalLabelDao organizationalLabelDao;
+    private final OrganizationalPermissionDao organizationalPermissionDao;
     private final ContactAssignmentDao contactAssignmentDao;
-    private final GroupDao groupDao;
-    private final FollowupCommentDao followupCommentDao;
-    private final RejoicableDao rejoicableDao;
+    private final InteractionDao interactionDao;
+    private final InteractionInitiatorDao interactionInitiatorDao;
+    private final InteractionTypeDao interactionTypeDao;
     private final QuestionDao questionDao;
     private final SurveyDao surveyDao;
     private final SmsKeywordDao smsKeywordDao;
@@ -120,23 +128,29 @@ public class DaoSession extends AbstractDaoSession {
         organizationDaoConfig = daoConfigMap.get(OrganizationDao.class).clone();
         organizationDaoConfig.initIdentityScope(type);
 
-        roleDaoConfig = daoConfigMap.get(RoleDao.class).clone();
-        roleDaoConfig.initIdentityScope(type);
+        labelDaoConfig = daoConfigMap.get(LabelDao.class).clone();
+        labelDaoConfig.initIdentityScope(type);
 
-        organizationalRoleDaoConfig = daoConfigMap.get(OrganizationalRoleDao.class).clone();
-        organizationalRoleDaoConfig.initIdentityScope(type);
+        permissionDaoConfig = daoConfigMap.get(PermissionDao.class).clone();
+        permissionDaoConfig.initIdentityScope(type);
+
+        organizationalLabelDaoConfig = daoConfigMap.get(OrganizationalLabelDao.class).clone();
+        organizationalLabelDaoConfig.initIdentityScope(type);
+
+        organizationalPermissionDaoConfig = daoConfigMap.get(OrganizationalPermissionDao.class).clone();
+        organizationalPermissionDaoConfig.initIdentityScope(type);
 
         contactAssignmentDaoConfig = daoConfigMap.get(ContactAssignmentDao.class).clone();
         contactAssignmentDaoConfig.initIdentityScope(type);
 
-        groupDaoConfig = daoConfigMap.get(GroupDao.class).clone();
-        groupDaoConfig.initIdentityScope(type);
+        interactionDaoConfig = daoConfigMap.get(InteractionDao.class).clone();
+        interactionDaoConfig.initIdentityScope(type);
 
-        followupCommentDaoConfig = daoConfigMap.get(FollowupCommentDao.class).clone();
-        followupCommentDaoConfig.initIdentityScope(type);
+        interactionInitiatorDaoConfig = daoConfigMap.get(InteractionInitiatorDao.class).clone();
+        interactionInitiatorDaoConfig.initIdentityScope(type);
 
-        rejoicableDaoConfig = daoConfigMap.get(RejoicableDao.class).clone();
-        rejoicableDaoConfig.initIdentityScope(type);
+        interactionTypeDaoConfig = daoConfigMap.get(InteractionTypeDao.class).clone();
+        interactionTypeDaoConfig.initIdentityScope(type);
 
         questionDaoConfig = daoConfigMap.get(QuestionDao.class).clone();
         questionDaoConfig.initIdentityScope(type);
@@ -165,12 +179,14 @@ public class DaoSession extends AbstractDaoSession {
         emailAddressDao = new EmailAddressDao(emailAddressDaoConfig, this);
         phoneNumberDao = new PhoneNumberDao(phoneNumberDaoConfig, this);
         organizationDao = new OrganizationDao(organizationDaoConfig, this);
-        roleDao = new RoleDao(roleDaoConfig, this);
-        organizationalRoleDao = new OrganizationalRoleDao(organizationalRoleDaoConfig, this);
+        labelDao = new LabelDao(labelDaoConfig, this);
+        permissionDao = new PermissionDao(permissionDaoConfig, this);
+        organizationalLabelDao = new OrganizationalLabelDao(organizationalLabelDaoConfig, this);
+        organizationalPermissionDao = new OrganizationalPermissionDao(organizationalPermissionDaoConfig, this);
         contactAssignmentDao = new ContactAssignmentDao(contactAssignmentDaoConfig, this);
-        groupDao = new GroupDao(groupDaoConfig, this);
-        followupCommentDao = new FollowupCommentDao(followupCommentDaoConfig, this);
-        rejoicableDao = new RejoicableDao(rejoicableDaoConfig, this);
+        interactionDao = new InteractionDao(interactionDaoConfig, this);
+        interactionInitiatorDao = new InteractionInitiatorDao(interactionInitiatorDaoConfig, this);
+        interactionTypeDao = new InteractionTypeDao(interactionTypeDaoConfig, this);
         questionDao = new QuestionDao(questionDaoConfig, this);
         surveyDao = new SurveyDao(surveyDaoConfig, this);
         smsKeywordDao = new SmsKeywordDao(smsKeywordDaoConfig, this);
@@ -185,12 +201,14 @@ public class DaoSession extends AbstractDaoSession {
         registerDao(EmailAddress.class, emailAddressDao);
         registerDao(PhoneNumber.class, phoneNumberDao);
         registerDao(Organization.class, organizationDao);
-        registerDao(Role.class, roleDao);
-        registerDao(OrganizationalRole.class, organizationalRoleDao);
+        registerDao(Label.class, labelDao);
+        registerDao(Permission.class, permissionDao);
+        registerDao(OrganizationalLabel.class, organizationalLabelDao);
+        registerDao(OrganizationalPermission.class, organizationalPermissionDao);
         registerDao(ContactAssignment.class, contactAssignmentDao);
-        registerDao(Group.class, groupDao);
-        registerDao(FollowupComment.class, followupCommentDao);
-        registerDao(Rejoicable.class, rejoicableDao);
+        registerDao(Interaction.class, interactionDao);
+        registerDao(InteractionInitiator.class, interactionInitiatorDao);
+        registerDao(InteractionType.class, interactionTypeDao);
         registerDao(Question.class, questionDao);
         registerDao(Survey.class, surveyDao);
         registerDao(SmsKeyword.class, smsKeywordDao);
@@ -199,7 +217,7 @@ public class DaoSession extends AbstractDaoSession {
         registerDao(Setting.class, settingDao);
         registerDao(UserSetting.class, userSettingDao);
     }
-    
+
     public void clear() {
         userDaoConfig.getIdentityScope().clear();
         personDaoConfig.getIdentityScope().clear();
@@ -207,12 +225,14 @@ public class DaoSession extends AbstractDaoSession {
         emailAddressDaoConfig.getIdentityScope().clear();
         phoneNumberDaoConfig.getIdentityScope().clear();
         organizationDaoConfig.getIdentityScope().clear();
-        roleDaoConfig.getIdentityScope().clear();
-        organizationalRoleDaoConfig.getIdentityScope().clear();
+        labelDaoConfig.getIdentityScope().clear();
+        permissionDaoConfig.getIdentityScope().clear();
+        organizationalLabelDaoConfig.getIdentityScope().clear();
+        organizationalPermissionDaoConfig.getIdentityScope().clear();
         contactAssignmentDaoConfig.getIdentityScope().clear();
-        groupDaoConfig.getIdentityScope().clear();
-        followupCommentDaoConfig.getIdentityScope().clear();
-        rejoicableDaoConfig.getIdentityScope().clear();
+        interactionDaoConfig.getIdentityScope().clear();
+        interactionInitiatorDaoConfig.getIdentityScope().clear();
+        interactionTypeDaoConfig.getIdentityScope().clear();
         questionDaoConfig.getIdentityScope().clear();
         surveyDaoConfig.getIdentityScope().clear();
         smsKeywordDaoConfig.getIdentityScope().clear();
@@ -246,28 +266,36 @@ public class DaoSession extends AbstractDaoSession {
         return organizationDao;
     }
 
-    public RoleDao getRoleDao() {
-        return roleDao;
+    public LabelDao getLabelDao() {
+        return labelDao;
     }
 
-    public OrganizationalRoleDao getOrganizationalRoleDao() {
-        return organizationalRoleDao;
+    public PermissionDao getPermissionDao() {
+        return permissionDao;
+    }
+
+    public OrganizationalLabelDao getOrganizationalLabelDao() {
+        return organizationalLabelDao;
+    }
+
+    public OrganizationalPermissionDao getOrganizationalPermissionDao() {
+        return organizationalPermissionDao;
     }
 
     public ContactAssignmentDao getContactAssignmentDao() {
         return contactAssignmentDao;
     }
 
-    public GroupDao getGroupDao() {
-        return groupDao;
+    public InteractionDao getInteractionDao() {
+        return interactionDao;
     }
 
-    public FollowupCommentDao getFollowupCommentDao() {
-        return followupCommentDao;
+    public InteractionInitiatorDao getInteractionInitiatorDao() {
+        return interactionInitiatorDao;
     }
 
-    public RejoicableDao getRejoicableDao() {
-        return rejoicableDao;
+    public InteractionTypeDao getInteractionTypeDao() {
+        return interactionTypeDao;
     }
 
     public QuestionDao getQuestionDao() {

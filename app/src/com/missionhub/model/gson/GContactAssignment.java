@@ -3,7 +3,6 @@ package com.missionhub.model.gson;
 import com.missionhub.application.Application;
 import com.missionhub.model.ContactAssignment;
 import com.missionhub.model.ContactAssignmentDao;
-import com.missionhub.util.U;
 
 import java.util.concurrent.Callable;
 
@@ -21,7 +20,6 @@ public class GContactAssignment {
     public GPerson person;
 
     public static final Object lock = new Object();
-    public static final Object allLock = new Object();
 
     /**
      * Saves the contact assignment to the SQLite database.
@@ -47,8 +45,8 @@ public class GContactAssignment {
                     assignment.setPerson_id(person_id);
                     assignment.setAssigned_to_id(assigned_to_id);
                     assignment.setOrganization_id(organization_id);
-                    assignment.setCreated_at(U.parseISO8601(created_at));
-                    assignment.setUpdated_at(U.parseISO8601(updated_at));
+                    assignment.setCreated_at(created_at);
+                    assignment.setUpdated_at(updated_at);
                     dao.insertOrReplace(assignment);
 
                     if (assigned_to != null) {

@@ -176,14 +176,16 @@ public abstract class SafeAsyncTask<ResultT> implements Callable<ResultT> {
                 try {
                     doException(e);
                 } catch (Exception f) {
-                    Log.e("roboguice", f.getMessage(), f);
+                    // logged but ignored
+                    Log.e(SafeAsyncTask.class.getSimpleName(), f.getMessage(), f);
                 }
 
             } catch (final Throwable t) {
                 try {
                     doThrowable(t);
                 } catch (Exception f) {
-                    Log.e("roboguice", f.getMessage(), f);
+                    // logged but ignored
+                    Log.e(SafeAsyncTask.class.getSimpleName(), f.getMessage(), f);
                 }
             } finally {
                 doFinally();

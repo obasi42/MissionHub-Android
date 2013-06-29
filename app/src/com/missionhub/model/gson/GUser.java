@@ -3,7 +3,6 @@ package com.missionhub.model.gson;
 import com.missionhub.application.Application;
 import com.missionhub.model.User;
 import com.missionhub.model.UserDao;
-import com.missionhub.util.U;
 
 import java.util.concurrent.Callable;
 
@@ -40,8 +39,8 @@ public class GUser {
                     user.setId(id);
                     user.setPerson_id(personId);
                     user.setPrimary_organization_id(primary_organization_id);
-                    user.setCreated_at(U.parseISO8601(created_at));
-                    user.setUpdated_at(U.parseISO8601(updated_at));
+                    user.setCreated_at(created_at);
+                    user.setUpdated_at(updated_at);
 
                     if (insert) {
                         dao.insert(user);

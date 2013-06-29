@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+
 import com.missionhub.R;
 import com.missionhub.application.Application;
 import com.missionhub.application.SettingsManager;
@@ -17,7 +18,8 @@ import com.missionhub.fragment.dialog.BaseDialogFragment;
 import com.missionhub.model.Organization;
 import com.missionhub.model.Person;
 import com.missionhub.ui.ObjectArrayAdapter;
-import com.missionhub.util.U;
+import com.missionhub.util.ObjectUtils;
+
 import org.holoeverywhere.LayoutInflater;
 import org.holoeverywhere.app.AlertDialog;
 import org.holoeverywhere.app.Dialog;
@@ -128,7 +130,7 @@ public class PickAccountDialog extends BaseDialogFragment implements OnItemClick
         for (final Account account : accounts) {
             final Long personId = Long.parseLong(mAccountManager.getUserData(account, Authenticator.KEY_PERSON_ID));
             final Person person = Application.getDb().getPersonDao().load(personId);
-            if (!U.isNull(account, person)) {
+            if (ObjectUtils.isNotNull(account, person)) {
                 mAdapter.add(new AccountItem(person));
             }
         }

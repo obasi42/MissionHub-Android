@@ -3,7 +3,6 @@ package com.missionhub.model.gson;
 import com.missionhub.application.Application;
 import com.missionhub.model.EmailAddress;
 import com.missionhub.model.EmailAddressDao;
-import com.missionhub.util.U;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +18,6 @@ public class GEmailAddress {
     public String updated_at;
 
     public static final Object lock = new Object();
-    public static final Object allLock = new Object();
 
     /**
      * Saves the email address to the SQLite database.
@@ -40,8 +38,8 @@ public class GEmailAddress {
                     address.setEmail(email);
                     address.setPerson_id(person_id);
                     address.setPrimary(primary);
-                    address.setCreated_at(U.parseISO8601(created_at));
-                    address.setUpdated_at(U.parseISO8601(updated_at));
+                    address.setCreated_at(created_at);
+                    address.setUpdated_at(updated_at);
                     dao.insertOrReplace(address);
 
                     return address;
@@ -68,7 +66,7 @@ public class GEmailAddress {
         final Callable<List<EmailAddress>> callable = new Callable<List<EmailAddress>>() {
             @Override
             public List<EmailAddress> call() throws Exception {
-                synchronized (allLock) {
+                synchronized (lock) {
                     final EmailAddressDao dao = Application.getDb().getEmailAddressDao();
 
                     // delete current address
@@ -102,6 +100,7 @@ public class GEmailAddress {
         email.id = address.getId();
         email.email = address.getEmail();
         email.primary = address.getPrimary();
+        email.person_id = address.getPerson_id();
 
         return email;
     }

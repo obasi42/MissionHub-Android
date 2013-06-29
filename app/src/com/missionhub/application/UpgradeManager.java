@@ -18,7 +18,7 @@ public class UpgradeManager {
     /* Dynamic Upgrade Methods */
     /*=========================*/
 
-    public boolean toV45() {
+    public boolean toV83() {
         // wipe everything from MH v1
         clearApplicationData();
         return true;

@@ -1,7 +1,7 @@
 # the production mode. values development|test|production
 ENVIRONMENT=development
 
-# access token of the user to login as, requires development environment
+# facebook token of the user to login as, requires development environment
 LOGIN_AS=
 
 # the market the application is deployed to. values: play|amazon|nook
@@ -13,12 +13,6 @@ API_VERSION=v3
 
 # missionhub surveys
 SURVEY_URL=http://mhub.cc/surveys
-
-# missionhub oauth
-OAUTH_URL=https://www.missionhub.com/oauth
-OAUTH_CLIENT_ID=
-OAUTH_CLIENT_SECRET=
-OAUTH_SCOPE=userinfo,contacts,contact_assignment,followup_comments,roles,organization_info,groups,communication
 
 # caching
 CACHE_FILE_ENABLED=true
@@ -35,3 +29,6 @@ ANAYLTICS_ANONYMIZE_IP=false
 # android crash reporter
 ACRA_ENABLED=false
 ACRA_FORM_KEY=
+
+# facebook app id
+FACEBOOK_APP_ID=

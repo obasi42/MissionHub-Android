@@ -164,23 +164,35 @@
     <string name="intent_helper_dial_number">Dial Number</string>
     <string name="intent_helper_send_sms">Send SMS</string>
 
-    <!-- Status Labels -->
-    <string name="rejoice_spiritual_conversation">Spiritual Conversation</string>
-    <string name="rejoice_prayed_to_receive">Prayed To Receive Christ</string>
-    <string name="rejoice_gospel_presentation">Gospel Presentation</string>
+    <!-- Statuses -->
     <string name="status_uncontacted">Uncontacted</string>
     <string name="status_attempted_contact">Attempted Contact</string>
     <string name="status_contacted">Contacted</string>
     <string name="status_completed">Completed</string>
     <string name="status_do_not_contact">Do Not Contact</string>
 
-    <!-- Roles (Labels) -->
-    <string name="role_admin">Admin</string>
-    <string name="role_contact">Contact</string>
-    <string name="role_involved">Involved</string>
-    <string name="role_leader">Leader</string>
-    <string name="role_alumni">Alumni</string>
-    <string name="role_sent">100\% Sent</string>
+    <!-- Permissions -->
+    <string name="permission_admin">Admin</string>
+    <string name="permission_no_permissions">No Permissions</string>
+    <string name="permission_user">User</string>
+
+    <!-- Labels -->
+    <string name="label_sent">100% Sent</string>
+    <string name="label_leader">Leader</string>
+    <string name="label_involved">Involved</string>
+    <string name="label_engaged_disciple">Engaged Disciple</string>
+    <string name="label_alumni">Alumni</string>
+
+    <!-- Interaction Types -->
+    <string name="interaction_type_comment">Comment Only</string>
+    <string name="interaction_type_spiritual_conversation">Spiritual Conversation</string>
+    <string name="interaction_type_gospel_presentation">Personal Evangelism</string>
+    <string name="interaction_type_prayed_to_receive_christ">Personal Evangelism Decision for
+        Christ
+    </string>
+    <string name="interaction_type_holy_spirit_presentation">Holy Spirit Presentation</string>
+    <string name="interaction_type_graduating_on_mission">Graduating on Mission</string>
+    <string name="interaction_type_faculty_on_mission">Faculty on Mission</string>
 
     <!-- Genders -->
     <string name="gender_male">Male</string>

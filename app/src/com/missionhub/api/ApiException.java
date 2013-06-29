@@ -2,7 +2,6 @@ package com.missionhub.api;
 
 import com.missionhub.exception.ExceptionHelper;
 import com.missionhub.exception.MissionHubException;
-import com.missionhub.model.gson.GErrorsDepreciated;
 
 /**
  * All API errors extend or directly use this exception type.
@@ -22,22 +21,13 @@ public class ApiException extends MissionHubException implements ExceptionHelper
         super(message);
     }
 
-    public ApiException(final String message, final Throwable cause) {
-        super(message, cause);
+    public ApiException(final String message, final String code) {
+        super(message);
+        mCode = code;
     }
 
     public ApiException(final Throwable cause) {
         super(cause);
-    }
-
-    public ApiException(final GErrorsDepreciated error) {
-        this(error.error.title, error.error.message, error.error.code);
-    }
-
-    public ApiException(final String title, final String message, final String code) {
-        super(message);
-        mTitle = title;
-        mCode = code;
     }
 
     public String getTitle() {

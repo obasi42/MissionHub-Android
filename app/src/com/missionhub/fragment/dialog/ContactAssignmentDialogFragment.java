@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageView;
+
 import com.missionhub.R;
 import com.missionhub.api.Api;
 import com.missionhub.api.Api.Include;
@@ -27,11 +28,12 @@ import com.missionhub.model.gson.GContactAssignment;
 import com.missionhub.ui.AnimateOnceImageLoadingListener;
 import com.missionhub.ui.ObjectArrayAdapter;
 import com.missionhub.ui.widget.LockableViewPager;
+import com.missionhub.util.DisplayUtils;
 import com.missionhub.util.SafeAsyncTask;
-import com.missionhub.util.U;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.PauseOnScrollListener;
+
 import org.holoeverywhere.LayoutInflater;
 import org.holoeverywhere.app.Fragment;
 import org.holoeverywhere.widget.ListView;
@@ -259,13 +261,6 @@ public class ContactAssignmentDialogFragment extends RefreshableDialogFragment i
         }
     }
 
-    public static class GroupItem {
-        public Group group;
-
-        public GroupItem(final Group group) {
-            this.group = group;
-        }
-    }
 
     public static class SelectionItem {
         public int id;
@@ -279,14 +274,14 @@ public class ContactAssignmentDialogFragment extends RefreshableDialogFragment i
 
     public static class ContactAssignmentAdapter extends ObjectArrayAdapter {
 
-        final int mPicturePx = Math.round(U.dpToPixel(50));
+        final int mPicturePx = Math.round(DisplayUtils.dpToPixel(50));
         final DisplayImageOptions mImageLoaderOptions;
         final AnimateOnceImageLoadingListener mImageLoadingListener;
 
         public ContactAssignmentAdapter(final Context context) {
             super(context);
 
-            mImageLoaderOptions = U.getContactImageDisplayOptions();
+            mImageLoaderOptions = DisplayUtils.getContactImageDisplayOptions();
             mImageLoadingListener = new AnimateOnceImageLoadingListener(250);
         }
 
@@ -299,8 +294,6 @@ public class ContactAssignmentDialogFragment extends RefreshableDialogFragment i
                 holder = new ViewHolder();
                 if (object instanceof LeaderItem) {
                     view = getLayoutInflater().inflate(R.layout.item_assignment_leader, null);
-                } else if (object instanceof GroupItem) {
-                    view = getLayoutInflater().inflate(R.layout.item_assignment_group, null);
                 } else if (object instanceof SelectionItem) {
                     view = getLayoutInflater().inflate(R.layout.item_assignment_selection, null);
                 } else if (object instanceof AssignMeItem) {
@@ -318,12 +311,7 @@ public class ContactAssignmentDialogFragment extends RefreshableDialogFragment i
             if (object instanceof LeaderItem) {
                 final LeaderItem item = (LeaderItem) object;
                 holder.text1.setText(item.leader.getName());
-
-                String url = U.getProfilePicture(item.leader, mPicturePx, mPicturePx);
-                ImageLoader.getInstance().displayImage(url, holder.icon, mImageLoaderOptions, mImageLoadingListener);
-            } else if (object instanceof GroupItem) {
-                final GroupItem item = (GroupItem) object;
-                holder.text1.setText(item.group.getName());
+                ImageLoader.getInstance().displayImage(item.leader.getPictureUrl(mPicturePx, mPicturePx), holder.icon, mImageLoaderOptions, mImageLoadingListener);
             } else if (object instanceof SelectionItem) {
                 final SelectionItem item = (SelectionItem) object;
                 holder.text1.setText(item.text);
@@ -337,9 +325,7 @@ public class ContactAssignmentDialogFragment extends RefreshableDialogFragment i
             } else if (object instanceof AssignMeItem) {
                 final AssignMeItem item = (AssignMeItem) object;
                 holder.text1.setText("Me");
-
-                String url = U.getProfilePicture(item.me, mPicturePx, mPicturePx);
-                ImageLoader.getInstance().displayImage(url, holder.icon, mImageLoaderOptions, mImageLoadingListener);
+                ImageLoader.getInstance().displayImage(item.me.getPictureUrl(mPicturePx, mPicturePx), holder.icon, mImageLoaderOptions, mImageLoadingListener);
             }
 
             return view;
@@ -559,7 +545,8 @@ public class ContactAssignmentDialogFragment extends RefreshableDialogFragment i
         }
 
         private void buildLeaderAdapter() {
-            if (mLeaderAdapter == null || getDialog() == null || getDialog().getPeople() == null) return;
+            if (mLeaderAdapter == null || getDialog() == null || getDialog().getPeople() == null)
+                return;
 
             mLeaderAdapter.setNotifyOnChange(false);
             mLeaderAdapter.clear();
@@ -598,10 +585,6 @@ public class ContactAssignmentDialogFragment extends RefreshableDialogFragment i
             return true;
         }
         return getSupportActivity().onKeyDown(keyCode, event);
-    }
-
-    private void doGroupAssignment(final Group group) {
-
     }
 
     private void doLeaderAssignment(final Person leader) {
@@ -699,8 +682,6 @@ public class ContactAssignmentDialogFragment extends RefreshableDialogFragment i
             } else if (((SelectionItem) item).id == IndexFragment.GROUPS) {
                 showGroups(true);
             }
-        } else if (item instanceof GroupItem) {
-            doGroupAssignment(((GroupItem) item).group);
         } else if (item instanceof LeaderItem) {
             doLeaderAssignment(((LeaderItem) item).leader);
         }

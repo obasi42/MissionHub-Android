@@ -3,7 +3,6 @@ package com.missionhub.model.gson;
 import com.missionhub.application.Application;
 import com.missionhub.model.Organization;
 import com.missionhub.model.OrganizationDao;
-import com.missionhub.util.U;
 
 import java.util.concurrent.Callable;
 
@@ -23,8 +22,8 @@ public class GOrganization {
     public GPerson[] leaders;
     public GPerson[] people;
     public GSurvey[] surveys;
-    public GGroup[] groups;
     public GSmsKeyword[] keywords;
+    public GLabel[] labels;
 
     public static final Object lock = new Object();
 
@@ -49,8 +48,8 @@ public class GOrganization {
                     org.setAncestry(ancestry);
                     org.setShow_sub_orgs(show_sub_orgs);
                     org.setStatus(status);
-                    org.setCreated_at(U.parseISO8601(created_at));
-                    org.setUpdated_at(U.parseISO8601(updated_at));
+                    org.setCreated_at(created_at);
+                    org.setUpdated_at(updated_at);
                     dao.insertOrReplace(org);
 
                     if (contacts != null) {
@@ -78,21 +77,15 @@ public class GOrganization {
                     }
 
                     if (surveys != null) {
-                        for (final GSurvey survey : surveys) {
-                            survey.save(true);
-                        }
-                    }
-
-                    if (groups != null) {
-                        for (final GGroup group : groups) {
-                            group.save(true);
-                        }
+                        GSurvey.replaceAll(surveys, id, true);
                     }
 
                     if (keywords != null) {
-                        for (final GSmsKeyword keyword : keywords) {
-                            keyword.save(true);
-                        }
+                        GSmsKeyword.replaceAll(keywords, id, true);
+                    }
+
+                    if (labels != null) {
+                        GLabel.replaceAll(labels, id, true);
                     }
 
                     return org;

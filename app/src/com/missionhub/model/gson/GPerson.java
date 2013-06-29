@@ -3,8 +3,16 @@ package com.missionhub.model.gson;
 import com.google.common.collect.HashMultimap;
 import com.missionhub.application.Application;
 import com.missionhub.application.Session;
-import com.missionhub.model.*;
-import com.missionhub.util.U;
+import com.missionhub.model.AnswerSheet;
+import com.missionhub.model.AnswerSheetDao;
+import com.missionhub.model.ContactAssignmentDao;
+import com.missionhub.model.DaoSession;
+import com.missionhub.model.OrganizationalPermissionDao;
+import com.missionhub.model.Person;
+import com.missionhub.model.PersonDao;
+import com.missionhub.util.ObjectUtils;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -30,19 +38,19 @@ public class GPerson {
     public String created_at;
     public String updated_at;
 
-    public GUser user;
     public GPhoneNumber[] phone_numbers;
     public GEmailAddress[] email_addresses;
     public GContactAssignment[] contact_assignments;
     public GContactAssignment[] assigned_tos;
-    public GFollowupComment[] followup_comments;
-    public GFollowupComment[] comments_on_me;
-    public GRejoicable[] rejoicables;
-    public GOrganizationalRole[] organizational_roles;
-    public GOrganizationalRole[] all_organizational_roles;
-    public GOrganization[] all_organization_and_children;
-    public GAddress current_address;
     public GAnswerSheet[] answer_sheets;
+    public GOrganizationalPermission[] all_organizational_permissions;
+    public GOrganization[] all_organization_and_children;
+    public GInteraction[] interactions;
+    public GOrganizationalLabel[] organizational_labels;
+    public GAddress[] addresses;
+
+    public GUser user;
+    public GOrganizationalPermission organizational_permission;
 
     public HashMultimap<Long, String> _answers; // used by AddContactDialog
 
@@ -73,47 +81,50 @@ public class GPerson {
                     }
                     person.setId(id);
 
-                    if (!U.isNullEmpty(first_name)) {
+                    if (first_name != null) {
                         person.setFirst_name(first_name);
                     }
-                    if (!U.isNullEmpty(last_name)) {
+                    if (last_name != null) {
                         person.setLast_name(last_name);
                     }
-                    if (!U.isNullEmpty(gender)) {
+                    if (gender != null) {
                         person.setGender(gender);
                     }
-                    if (!U.isNullEmpty(campus)) {
+                    if (campus != null) {
                         person.setCampus(campus);
                     }
-                    if (!U.isNullEmpty(major)) {
+                    if (year_in_school != null) {
+                        person.setYear_in_school(year_in_school);
+                    }
+                    if (major != null) {
                         person.setMajor(major);
                     }
-                    if (!U.isNullEmpty(minor)) {
+                    if (minor != null) {
                         person.setMinor(minor);
                     }
-                    if (!U.isNullEmpty(birth_date)) {
-                        person.setBirth_date(U.parseYMD(birth_date));
+                    if (birth_date != null) {
+                        person.setBirth_date(birth_date);
                     }
-                    if (!U.isNullEmpty(date_became_christian)) {
-                        person.setDate_became_christian(U.parseYMD(date_became_christian));
+                    if (date_became_christian != null) {
+                        person.setDate_became_christian(date_became_christian);
                     }
-                    if (!U.isNullEmpty(graduation_date)) {
-                        person.setGraduation_date(U.parseYMD(graduation_date));
+                    if (graduation_date != null) {
+                        person.setGraduation_date(graduation_date);
                     }
-                    if (!U.isNullEmpty(picture)) {
+                    if (picture != null) {
                         person.setPicture(picture);
                     }
-                    if (!U.isNullEmpty(user_id)) {
+                    if (user_id != null) {
                         person.setUser_id(user_id);
                     }
-                    if (!U.isNullEmpty(fb_uid)) {
+                    if (fb_uid != null) {
                         person.setFb_uid(fb_uid);
                     }
-                    if (!U.isNullEmpty(created_at)) {
-                        person.setCreated_at(U.parseISO8601(created_at));
+                    if (created_at != null) {
+                        person.setCreated_at(created_at);
                     }
-                    if (!U.isNullEmpty(updated_at)) {
-                        person.setUpdated_at(U.parseISO8601(updated_at));
+                    if (updated_at != null) {
+                        person.setUpdated_at(updated_at);
                     }
 
                     if (insert) {
@@ -122,9 +133,6 @@ public class GPerson {
                         dao.update(person);
                     }
 
-                    if (user != null) {
-                        user.save(id, true);
-                    }
 
                     if (phone_numbers != null) {
                         GPhoneNumber.replaceAll(phone_numbers, id, true);
@@ -164,76 +172,6 @@ public class GPerson {
                         }
                     }
 
-                    if (followup_comments != null) {
-                        if (followup_comments.length > 0) {
-                            orgId = followup_comments[0].organization_id;
-                        }
-
-                        List<Long> keys = session.getFollowupCommentDao().queryBuilder().where(FollowupCommentDao.Properties.Commenter_id.eq(id), FollowupCommentDao.Properties.Organization_id.eq(orgId)).listKeys();
-                        for (Long key : keys) {
-                            session.getFollowupCommentDao().deleteByKey(key);
-                        }
-
-                        for (final GFollowupComment comment : followup_comments) {
-                            comment.save(true);
-                        }
-                    }
-
-                    if (comments_on_me != null) {
-                        if (comments_on_me.length > 0) {
-                            orgId = comments_on_me[0].organization_id;
-                        }
-
-                        List<Long> keys = session.getFollowupCommentDao().queryBuilder().where(FollowupCommentDao.Properties.Contact_id.eq(id), FollowupCommentDao.Properties.Organization_id.eq(orgId)).listKeys();
-                        for (Long key : keys) {
-                            session.getFollowupCommentDao().deleteByKey(key);
-                        }
-
-                        for (final GFollowupComment comment : comments_on_me) {
-                            comment.save(true);
-                        }
-                    }
-
-                    if (rejoicables != null) {
-                        for (final GRejoicable rejoicable : rejoicables) {
-                            rejoicable.save(true);
-                        }
-                    }
-
-                    if (organizational_roles != null) {
-                        if (organizational_roles.length > 0) {
-                            orgId = organizational_roles[0].organization_id;
-                        }
-
-                        List<Long> keys = session.getOrganizationalRoleDao().queryBuilder().where(OrganizationalRoleDao.Properties.Person_id.eq(id), OrganizationalRoleDao.Properties.Organization_id.eq(orgId)).listKeys();
-                        for (Long key : keys) {
-                            session.getOrganizationalRoleDao().deleteByKey(key);
-                        }
-
-                        for (final GOrganizationalRole role : organizational_roles) {
-                            role.save(true);
-                        }
-                        person.resetLabels();
-                    }
-
-                    if (all_organizational_roles != null) {
-                        List<Long> keys = session.getOrganizationalRoleDao().queryBuilder().where(OrganizationalRoleDao.Properties.Person_id.eq(id)).listKeys();
-                        for (Long key : keys) {
-                            session.getOrganizationalRoleDao().deleteByKey(key);
-                        }
-
-                        for (final GOrganizationalRole role : all_organizational_roles) {
-                            role.save(true);
-                        }
-                        person.resetLabels();
-                    }
-
-                    if (all_organization_and_children != null) {
-                        for (GOrganization organization : all_organization_and_children) {
-                            organization.save(true);
-                        }
-                    }
-
                     if (answer_sheets != null) {
                         final List<AnswerSheet> oldSheets = Application.getDb().getAnswerSheetDao().queryBuilder().where(AnswerSheetDao.Properties.Person_id.eq(id)).list();
                         for (final AnswerSheet oldSheet : oldSheets) {
@@ -244,8 +182,46 @@ public class GPerson {
                         }
                     }
 
-                    if (current_address != null) {
-                        current_address.save(id, true);
+                    if (all_organizational_permissions != null) {
+                        final List<Long> oldKeys = Application.getDb().getOrganizationalPermissionDao().queryBuilder().where(OrganizationalPermissionDao.Properties.Person_id.eq(id)).listKeys();
+                        for (long key : oldKeys) {
+                            Application.getDb().getOrganizationalPermissionDao().deleteByKey(key);
+                        }
+                        for (GOrganizationalPermission perm : all_organizational_permissions) {
+                            perm.save(true);
+                        }
+                    }
+
+                    if (all_organization_and_children != null) {
+                        for (GOrganization organization : all_organization_and_children) {
+                            organization.save(true);
+                        }
+                    }
+
+                    if (interactions != null) {
+                        if (interactions.length > 0) {
+                            orgId = interactions[0].organization_id;
+                        }
+                        GInteraction.replaceAll(interactions, id, orgId, true);
+                    }
+
+                    if (organizational_labels != null) {
+                        if (organizational_labels.length > 0) {
+                            orgId = organizational_labels[0].organization_id;
+                        }
+                        GOrganizationalLabel.replaceAll(organizational_labels, id, orgId, true);
+                    }
+
+                    if (addresses != null) {
+                        GAddress.replaceAll(addresses, id, true);
+                    }
+
+                    if (user != null) {
+                        user.save(id, true);
+                    }
+
+                    if (organizational_permission != null) {
+                        GOrganizationalPermission.replace(organizational_permission, true);
                     }
 
                     return person;
@@ -265,13 +241,13 @@ public class GPerson {
      * @param params
      */
     public void toParams(final Map<String, String> params) {
-        if (!U.isNullEmpty(first_name)) {
+        if (ObjectUtils.isNotEmpty(first_name)) {
             params.put("person[first_name]", first_name);
         }
-        if (!U.isNullEmpty(last_name)) {
+        if (ObjectUtils.isNotEmpty(last_name)) {
             params.put("person[last_name]", last_name);
         }
-        if (!U.isNullEmpty(gender)) {
+        if (ObjectUtils.isNotEmpty(gender)) {
             params.put("person[gender]", gender);
         }
 
@@ -281,13 +257,13 @@ public class GPerson {
                 if (number.id > 0) {
                     params.put("person[phone_numbers_attributes][" + i + "][id]", String.valueOf(number.id));
                 }
-                if (!U.isNullEmpty(number.number)) {
+                if (ObjectUtils.isNotEmpty(number.number)) {
                     params.put("person[phone_numbers_attributes][" + i + "][number]", number.number);
                 }
-                if (!U.isNullEmpty(number.location)) {
+                if (ObjectUtils.isNotEmpty(number.location)) {
                     params.put("person[phone_numbers_attributes][" + i + "][location]", number.location);
                 }
-                if (!U.isNullEmpty(number.primary)) {
+                if (ObjectUtils.isNotEmpty(number.primary)) {
                     params.put("person[phone_numbers_attributes][" + i + "][primary]", String.valueOf(number.primary));
                 }
             }
@@ -299,37 +275,50 @@ public class GPerson {
                 if (address.id > 0) {
                     params.put("person[email_addresses_attributes][" + i + "][id]", String.valueOf(address.id));
                 }
-                if (address.id > 0 && U.isNullEmpty(address.email)) {
+                if (address.id > 0 && StringUtils.isEmpty(address.email)) {
                     params.put("person[email_addresses_attributes][" + i + "][_destroy]", String.valueOf(true));
                 } else {
-                    if (!U.isNullEmpty(address.email)) {
+                    if (ObjectUtils.isNotEmpty(address.email)) {
                         params.put("person[email_addresses_attributes][" + i + "][email]", address.email);
                     }
-                    if (!U.isNullEmpty(address.primary)) {
+                    if (ObjectUtils.isNotEmpty(address.primary)) {
                         params.put("person[email_addresses_attributes][" + i + "][primary]", String.valueOf(address.primary));
                     }
                 }
             }
         }
 
-        if (current_address != null) {
-            if (!U.isNullEmpty(current_address.address1)) {
-                params.put("person[current_address_attributes][address1]", current_address.address1);
-            }
-            if (!U.isNullEmpty(current_address.address2)) {
-                params.put("person[current_address_attributes][address2]", current_address.address2);
-            }
-            if (!U.isNullEmpty(current_address.city)) {
-                params.put("person[current_address_attributes][city]", current_address.city);
-            }
-            if (!U.isNullEmpty(current_address.country)) {
-                params.put("person[current_address_attributes][country]", current_address.country);
-            }
-            if (!U.isNullEmpty(current_address.state)) {
-                params.put("person[current_address_attributes][state]", current_address.state);
-            }
-            if (!U.isNullEmpty(current_address.zip)) {
-                params.put("person[current_address_attributes][zip]", current_address.zip);
+        if (addresses != null) {
+            for (int i = 0; i < addresses.length; i++) {
+                final GAddress address = addresses[i];
+                if (address.id > 0) {
+                    params.put("person[addresses_attributes][" + i + "][id]", String.valueOf(address.id));
+                }
+                if (address.id > 0 && StringUtils.isEmpty(address.address1)) {
+                    params.put("person[addresses_attributes][" + i + "][_destroy]", String.valueOf(true));
+                } else {
+                    if (ObjectUtils.isNotEmpty(address.address1)) {
+                        params.put("person[address_attributes][" + i + "][address1]", address.address1);
+                    }
+                    if (ObjectUtils.isNotEmpty(address.address2)) {
+                        params.put("person[address_attributes][" + i + "][address2]", address.address2);
+                    }
+                    if (ObjectUtils.isNotEmpty(address.city)) {
+                        params.put("person[address_attributes][" + i + "][city]", address.city);
+                    }
+                    if (ObjectUtils.isNotEmpty(address.country)) {
+                        params.put("person[address_attributes][" + i + "][country]", address.country);
+                    }
+                    if (ObjectUtils.isNotEmpty(address.state)) {
+                        params.put("person[address_attributes][" + i + "][state]", address.state);
+                    }
+                    if (ObjectUtils.isNotEmpty(address.zip)) {
+                        params.put("person[address_attributes][" + i + "][zip]", address.zip);
+                    }
+                    if (ObjectUtils.isNotEmpty(address.address_type)) {
+                        params.put("person[address_attributes][" + i + "][address_type]", address.address_type);
+                    }
+                }
             }
         }
 
@@ -375,7 +364,7 @@ public class GPerson {
     }
 
     public boolean isValid() {
-        return !U.isNullEmpty(first_name);
+        return ObjectUtils.isNotEmpty(first_name);
     }
 
 }

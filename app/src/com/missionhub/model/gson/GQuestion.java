@@ -3,7 +3,6 @@ package com.missionhub.model.gson;
 import com.missionhub.application.Application;
 import com.missionhub.model.Question;
 import com.missionhub.model.QuestionDao;
-import com.missionhub.util.U;
 
 import java.util.concurrent.Callable;
 
@@ -51,8 +50,8 @@ public class GQuestion {
                     question.setTrigger_words(trigger_words);
                     question.setNotify_via(notify_via);
                     question.setHidden(hidden);
-                    question.setCreated_at(U.parseISO8601(created_at));
-                    question.setUpdated_at(U.parseISO8601(updated_at));
+                    question.setCreated_at(created_at);
+                    question.setUpdated_at(updated_at);
                     dao.insertOrReplace(question);
 
                     return question;

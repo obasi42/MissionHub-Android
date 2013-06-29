@@ -8,7 +8,9 @@ import de.greenrobot.dao.DaoException;
 
 // KEEP INCLUDES - put your custom includes here
 import com.missionhub.model.gson.GAddress;
-import com.missionhub.util.U;
+import com.missionhub.util.ArrayUtils;
+
+import org.apache.commons.lang3.StringUtils;
 // KEEP INCLUDES END
 
 /**
@@ -24,6 +26,7 @@ public class Address {
     private String state;
     private String country;
     private String zip;
+    private String address_type;
 
     /**
      * Used to resolve relations
@@ -49,7 +52,7 @@ public class Address {
         this.id = id;
     }
 
-    public Address(Long id, Long person_id, String address1, String address2, String city, String state, String country, String zip) {
+    public Address(Long id, Long person_id, String address1, String address2, String city, String state, String country, String zip, String address_type) {
         this.id = id;
         this.person_id = person_id;
         this.address1 = address1;
@@ -58,6 +61,7 @@ public class Address {
         this.state = state;
         this.country = country;
         this.zip = zip;
+        this.address_type = address_type;
     }
 
     /**
@@ -132,6 +136,14 @@ public class Address {
         this.zip = zip;
     }
 
+    public String getAddress_type() {
+        return address_type;
+    }
+
+    public void setAddress_type(String address_type) {
+        this.address_type = address_type;
+    }
+
     /**
      * To-one relationship, resolved on first access.
      */
@@ -199,12 +211,13 @@ public class Address {
         a.country = getCountry();
         a.state = getState();
         a.zip = getZip();
+        a.address_type = getAddress_type();
         return a;
     }
 
-
-    public boolean isComplete() {
-        return !U.isNullEmpty(getAddress1()) || !U.isNullEmpty(getAddress2()) || (!U.isNullEmpty(getCity()) && !U.isNullEmpty(getState()));
+    @Override
+    public String toString() {
+        return StringUtils.join(ArrayUtils.clean(new String[]{getAddress1(), getAddress2(), getCity(), getState(), getZip(), getCountry()}), ", ");
     }
     // KEEP METHODS END
 

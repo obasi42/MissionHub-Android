@@ -3,8 +3,9 @@ package com.missionhub.model.gson;
 import com.missionhub.application.Application;
 import com.missionhub.model.Survey;
 import com.missionhub.model.SurveyDao;
-import com.missionhub.util.U;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 public class GSurvey {
@@ -47,8 +48,8 @@ public class GSurvey {
                     survey.setTerminology(terminology);
                     survey.setLogin_paragraph(login_paragraph);
                     survey.setIs_frozen(is_frozen);
-                    survey.setCreated_at(U.parseISO8601(created_at));
-                    survey.setUpdated_at(U.parseISO8601(updated_at));
+                    survey.setCreated_at(created_at);
+                    survey.setUpdated_at(updated_at);
                     dao.insertOrReplace(survey);
 
                     if (questions != null) {
@@ -68,6 +69,36 @@ public class GSurvey {
                     }
 
                     return survey;
+                }
+            }
+        };
+        if (inTx) {
+            return callable.call();
+        } else {
+            return Application.getDb().callInTx(callable);
+        }
+    }
+
+    public static List<Survey> replaceAll(final GSurvey[] surveys, final long organization_id, final boolean inTx) throws Exception {
+        final Callable<List<Survey>> callable = new Callable<List<Survey>>() {
+            @Override
+            public List<Survey> call() throws Exception {
+                synchronized (lock) {
+                    final SurveyDao dao = Application.getDb().getSurveyDao();
+
+                    List<Long> oldIds = dao.queryBuilder().where(SurveyDao.Properties.Organization_id.eq(organization_id)).listKeys();
+                    for (Long id : oldIds) {
+                        dao.deleteByKey(id);
+                    }
+
+                    final List<Survey> surveys1 = new ArrayList<Survey>();
+                    for (final GSurvey gsurvey : surveys) {
+                        final Survey survey = gsurvey.save(true);
+                        if (survey != null) {
+                            surveys1.add(survey);
+                        }
+                    }
+                    return surveys1;
                 }
             }
         };

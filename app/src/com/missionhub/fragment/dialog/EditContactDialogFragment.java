@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.view.View;
 import android.widget.RadioGroup;
+
 import com.missionhub.R;
 import com.missionhub.api.Api;
 import com.missionhub.api.Api.Include;
@@ -16,8 +17,10 @@ import com.missionhub.model.gson.GAddress;
 import com.missionhub.model.gson.GEmailAddress;
 import com.missionhub.model.gson.GPerson;
 import com.missionhub.model.gson.GPhoneNumber;
+import com.missionhub.util.ObjectUtils;
 import com.missionhub.util.SafeAsyncTask;
-import com.missionhub.util.U;
+
+import org.apache.commons.lang3.StringUtils;
 import org.holoeverywhere.app.AlertDialog;
 import org.holoeverywhere.app.Dialog;
 import org.holoeverywhere.widget.ArrayAdapter;
@@ -160,7 +163,7 @@ public class EditContactDialogFragment extends BaseDialogFragment {
         if (mPerson != null) {
             mPerson = person;
             mName.setText(mPerson.getName());
-            if (!U.isNullEmpty(mPerson.gender)) {
+            if (StringUtils.isNotEmpty(mPerson.gender)) {
                 if (mPerson.gender.equals("male")) {
                     mGender.check(R.id.male);
                 } else if (mPerson.gender.equals("female")) {
@@ -185,32 +188,32 @@ public class EditContactDialogFragment extends BaseDialogFragment {
             }
             if (mPerson.current_address != null) {
                 final GAddress address = mPerson.current_address;
-                if (!U.isNullEmpty(address.address1)) {
+                if (StringUtils.isNotEmpty(address.address1)) {
                     mAddressLine1.setText(address.address1);
                 } else {
                     mAddressLine1.setText("");
                 }
-                if (!U.isNullEmpty(address.address2)) {
+                if (StringUtils.isNotEmpty(address.address2)) {
                     mAddressLine2.setText(address.address2);
                 } else {
                     mAddressLine2.setText("");
                 }
-                if (!U.isNullEmpty(address.city)) {
+                if (StringUtils.isNotEmpty(address.city)) {
                     mAddressCity.setText(address.city);
                 } else {
                     mAddressCity.setText("");
                 }
-                if (!U.isNullEmpty(address.state)) {
+                if (StringUtils.isNotEmpty(address.state)) {
                     mAddressState.setSelection(getIndexOfId(address.state, R.array.state_ids));
                 } else {
                     mAddressState.setSelection(0);
                 }
-                if (!U.isNull(address.country)) {
+                if (address.country != null) {
                     mAddressCountry.setSelection(getIndexOfId(address.country, R.array.country_ids));
                 } else {
                     mAddressCountry.setSelection(0);
                 }
-                if (!U.isNullEmpty(address.zip)) {
+                if (StringUtils.isNotEmpty(address.zip)) {
                     mAddressZip.setText(address.zip);
                 } else {
                     mAddressZip.setText("");
@@ -314,7 +317,7 @@ public class EditContactDialogFragment extends BaseDialogFragment {
     }
 
     public void showProgress() {
-        if (U.isNull(mForm, mProgress)) return;
+        if (ObjectUtils.isNull(mForm, mProgress)) return;
         mForm.setVisibility(View.GONE);
         mProgress.setVisibility(View.VISIBLE);
 
@@ -324,7 +327,7 @@ public class EditContactDialogFragment extends BaseDialogFragment {
     }
 
     public void hideProgress() {
-        if (U.isNull(mForm, mProgress)) return;
+        if (ObjectUtils.isNull(mForm, mProgress)) return;
         mProgress.setVisibility(View.GONE);
         mForm.setVisibility(View.VISIBLE);
 

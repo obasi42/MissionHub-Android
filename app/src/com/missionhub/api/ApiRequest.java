@@ -4,8 +4,8 @@ import com.github.kevinsawicki.http.HttpRequest;
 import com.missionhub.api.Api.ApiResponseParser;
 import com.missionhub.application.Session;
 import com.missionhub.model.gson.GErrors;
-import com.missionhub.model.gson.GErrorsDepreciated;
-import com.missionhub.util.U;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.net.HttpURLConnection;
 import java.util.HashMap;
@@ -111,28 +111,15 @@ public class ApiRequest<T> {
             throw new AccessTokenException();
         }
 
-        if (!U.isNullEmpty(getBody())) {
+        if (StringUtils.isNotEmpty(getBody())) {
             ApiException exception = null;
             try {
                 final GErrors errors = Api.sGson.fromJson(getBody(), GErrors.class);
-                if (errors.errors == null) throw new ApiException("The API returned an error with out a message");
+                if (errors.errors == null)
+                    throw new ApiException("The API returned an error with out a message");
                 exception = errors.getException();
             } catch (final Exception e) {
                 /* ignore */
-            }
-
-            if (exception == null) {
-                try {
-                    final GErrorsDepreciated error = Api.sGson.fromJson(getBody(), GErrorsDepreciated.class);
-                    if (error.error != null && error.error.code.equalsIgnoreCase("56")) {
-                        Session.getInstance().reportInvalidAccessToken();
-                        exception = new AccessTokenException(error);
-                    } else {
-                        exception = error.getException();
-                    }
-                } catch (final Exception e) {
-                    /* ignore */
-                }
             }
             if (exception != null) {
                 throw ApiException.wrap(exception);
@@ -169,7 +156,7 @@ public class ApiRequest<T> {
             mOptions.params = new HashMap<String, String>();
         }
         if (mOptions.includes != null) {
-            mOptions.params.put("include", U.toCSV(mOptions.includes));
+            mOptions.params.put("include", StringUtils.join(mOptions.includes, ','));
         }
         if (mOptions.since != null) {
             mOptions.params.put("since", String.valueOf(mOptions.since));

@@ -9,8 +9,11 @@ import com.missionhub.application.Configuration;
 import com.missionhub.application.Session;
 import com.missionhub.model.*;
 import com.missionhub.model.gson.*;
-import com.missionhub.util.U;
+import com.missionhub.util.ObjectUtils;
 
+import org.apache.commons.lang3.StringUtils;
+
+import java.lang.reflect.Type;
 import java.util.*;
 
 public class Api {
@@ -56,10 +59,14 @@ public class Api {
         return getPersonMe((ApiOptions) null);
     }
 
-    public static ApiRequest<Person> getPersonMe(final String accessToken) {
+    public static ApiRequest<Person> getPersonMe(final String facebookToken) {
+        return getPersonMe(facebookToken, null);
+    }
+
+    public static ApiRequest<Person> getPersonMe(final String facebookToken, final ApiOptions options) {
         HashMap<String, String> headers = new HashMap<String, String>();
-        headers.put(HttpRequest.HEADER_AUTHORIZATION, "Bearer " + accessToken);
-        return getPersonMe(ApiOptions.builder().authenticated(false).headers(headers).build());
+        headers.put(HttpRequest.HEADER_AUTHORIZATION, "Facebook " + facebookToken);
+        return getPersonMe(ApiOptions.builder().authenticated(false).headers(headers).merge(options).build());
     }
 
     public static ApiRequest<Person> getPersonMe(final ApiOptions options) {
@@ -113,77 +120,111 @@ public class Api {
         return new ApiRequest<List<Person>>(ApiOptions.builder().method(HttpRequest.METHOD_GET).url(buildUrl("people")).responseParser(peopleParser).params(params).merge(options).build());
     }
 
-    /* Roles (Labels) */
-    public static ApiRequest<Role> getRole(final long roleId) {
-        return getRole(roleId, null);
+    /* Permissions */
+
+    public static ApiRequest<Permission> getPermission(final long permissionId) {
+        return getPermission(permissionId, null);
     }
 
-    public static ApiRequest<Role> getRole(final long roleId, final ApiOptions options) {
-        return new ApiRequest<Role>(ApiOptions.builder().method(HttpRequest.METHOD_GET).url(buildUrl("roles", roleId)).responseParser(roleParser).merge(options).build());
+    public static ApiRequest<Permission> getPermission(final long permissionId, final ApiOptions options) {
+        return new ApiRequest<Permission>(ApiOptions.builder().method(HttpRequest.METHOD_GET).url(buildUrl("permissions", permissionId)).responseParser(permissionParser).merge(options).build());
     }
 
-    public static ApiRequest<Role> createRole(final GRole person) {
-        return createRole(person, null);
+    public static ApiRequest<List<Permission>> listPermissions() {
+        return listPermissions(null, null);
     }
 
-    public static ApiRequest<Role> createRole(final GRole role, final ApiOptions options) {
+    public static ApiRequest<List<Permission>> listPermissions(final ApiOptions options, final ListOptions listOptions) {
         final Map<String, String> params = new HashMap<String, String>();
-        role.toParams(params);
-        return new ApiRequest<Role>(ApiOptions.builder().method(HttpRequest.METHOD_POST).url(buildUrl("roles")).responseParser(roleParser).params(params).merge(options).build());
+        if (listOptions != null) {
+            listOptions.toParams(params);
+        }
+        return new ApiRequest<List<Permission>>(ApiOptions.builder().method(HttpRequest.METHOD_GET).url(buildUrl("permissions")).responseParser(permissionsParser).params(params).merge(options).build());
     }
 
-    public static ApiRequest<Role> updateRole(final GRole role) {
-        return updateRole(role, null);
-    }
-
-    public static ApiRequest<Role> updateRole(final GRole role, final ApiOptions options) {
+    public static ApiRequest<List<Person>> bulkUpdatePermissions(final Collection<Long> personIds, final Long addPermission, final Long removePermission, final ApiOptions options) {
         final Map<String, String> params = new HashMap<String, String>();
-        role.toParams(params);
-        return new ApiRequest<Role>(ApiOptions.builder().method(HttpRequest.METHOD_PUT).url(buildUrl("roles", role.id)).responseParser(roleParser).params(params).merge(options).build());
+        params.put("include_archived", "true");
+        params.put("filters[ids]", StringUtils.join(personIds, ","));
+        if (addPermission != null) {
+            params.put("add_permission", String.valueOf(addPermission));
+        }
+        if (removePermission != null) {
+            params.put("remove_permission", String.valueOf(removePermission));
+        }
+        return new ApiRequest<List<Person>>(ApiOptions.builder().method(HttpRequest.METHOD_POST).url(buildUrl("organizational_permissions", "bulk")).responseParser(organizationalPermissionsParser).params(params).merge(options).build());
     }
 
-    public static ApiRequest<Void> deleteRole(final long roleId) {
-        return deleteRole(roleId, null);
+    /* Labels */
+
+    public static ApiRequest<Label> getLabel(final long labelId) {
+        return getLabel(labelId, null);
     }
 
-    public static ApiRequest<Void> deleteRole(final long roleId, final ApiOptions options) {
-        return new ApiRequest<Void>(ApiOptions.builder().method(HttpRequest.METHOD_DELETE).url(buildUrl("roles", roleId)).responseParser(new ApiResponseParser<Void>() {
+    public static ApiRequest<Label> getLabel(final long labelId, final ApiOptions options) {
+        return new ApiRequest<Label>(ApiOptions.builder().method(HttpRequest.METHOD_GET).url(buildUrl("labels", labelId)).responseParser(labelParser).merge(options).build());
+    }
+
+    public static ApiRequest<Label> createLabel(final GLabel label) {
+        return createLabel(label, null);
+    }
+
+    public static ApiRequest<Label> createLabel(final GLabel label, final ApiOptions options) {
+        final Map<String, String> params = new HashMap<String, String>();
+        label.toParams(params);
+        return new ApiRequest<Label>(ApiOptions.builder().method(HttpRequest.METHOD_POST).url(buildUrl("labels")).responseParser(labelParser).params(params).merge(options).build());
+    }
+
+    public static ApiRequest<Label> updateLabel(final GLabel label) {
+        return updateLabel(label, null);
+    }
+
+    public static ApiRequest<Label> updateLabel(final GLabel label, final ApiOptions options) {
+        final Map<String, String> params = new HashMap<String, String>();
+        label.toParams(params);
+        return new ApiRequest<Label>(ApiOptions.builder().method(HttpRequest.METHOD_PUT).url(buildUrl("labels", label.id)).responseParser(labelParser).params(params).merge(options).build());
+    }
+
+    public static ApiRequest<Void> deleteLabel(final long labelId) {
+        return deleteLabel(labelId, null);
+    }
+
+    public static ApiRequest<Void> deleteLabel(final long labelId, final ApiOptions options) {
+        return new ApiRequest<Void>(ApiOptions.builder().method(HttpRequest.METHOD_DELETE).url(buildUrl("labels", labelId)).responseParser(new ApiResponseParser<Void>() {
             @Override
             public Void parseResponse(final ApiRequest response) throws Exception {
-                final Role role = Application.getDb().getRoleDao().load(roleId);
-                if (role != null) {
-                    role.deleteWithRelations();
+                final Label label = Application.getDb().getLabelDao().load(labelId);
+                if (label != null) {
+                    label.deleteWithRelations();
                 }
                 return null;
             }
         }).merge(options).build());
     }
 
-    public static ApiRequest<List<Role>> listRoles() {
-        return listRoles(null, null);
+    public static ApiRequest<List<Label>> listLabels() {
+        return listLabels(null, null);
     }
 
-    public static ApiRequest<List<Role>> listRoles(final ApiOptions options, final ListOptions listOptions) {
+    public static ApiRequest<List<Label>> listLabels(final ApiOptions options, final ListOptions listOptions) {
         final Map<String, String> params = new HashMap<String, String>();
         if (listOptions != null) {
             listOptions.toParams(params);
         }
-        return new ApiRequest<List<Role>>(ApiOptions.builder().method(HttpRequest.METHOD_GET).url(buildUrl("roles")).responseParser(rolesParser).params(params).merge(options).build());
+        return new ApiRequest<List<Label>>(ApiOptions.builder().method(HttpRequest.METHOD_GET).url(buildUrl("labels")).responseParser(labelsParser).params(params).merge(options).build());
     }
 
-    /* Organizational Roles (Labels) */
-
-    public static ApiRequest<List<Person>> bulkUpdateRoles(final Collection<Long> personIds, final Collection<Long> addRoles, final Collection<Long> removeRoles, final ApiOptions options) {
+    public static ApiRequest<List<Person>> bulkUpdateLabels(final Collection<Long> personIds, final Collection<Long> addLabels, final Collection<Long> removeLabels, final ApiOptions options) {
         final Map<String, String> params = new HashMap<String, String>();
         params.put("include_archived", "true");
-        params.put("filters[ids]", U.toCSV(personIds));
-        if (!U.isNullEmpty(addRoles)) {
-            params.put("add_roles", U.toCSV(addRoles));
+        params.put("filters[ids]", StringUtils.join(personIds, ","));
+        if (ObjectUtils.isNotEmpty(addLabels)) {
+            params.put("add_labels", StringUtils.join(addLabels, ","));
         }
-        if (!U.isNullEmpty(removeRoles)) {
-            params.put("remove_roles", U.toCSV(removeRoles));
+        if (ObjectUtils.isNotEmpty(removeLabels)) {
+            params.put("remove_labels", StringUtils.join(removeLabels, ","));
         }
-        return new ApiRequest<List<Person>>(ApiOptions.builder().method(HttpRequest.METHOD_POST).url(buildUrl("organizational_roles", "bulk")).responseParser(organizationalRolesParser).params(params).merge(options).build());
+        return new ApiRequest<List<Person>>(ApiOptions.builder().method(HttpRequest.METHOD_POST).url(buildUrl("organizational_labels", "bulk")).responseParser(organizationalLabelsParser).params(params).merge(options).build());
     }
 
 	/* Contact Assignments */
@@ -205,7 +246,7 @@ public class Api {
 
     public static ApiRequest<Void> bulkDeleteContactAssignments(final Collection<Long> personIds, final ApiOptions options) {
         final Map<String, String> params = new HashMap<String, String>();
-        params.put("filters[person_id]", U.toCSV(personIds));
+        params.put("filters[person_id]", StringUtils.join(personIds, ","));
         return new ApiRequest<Void>(ApiOptions.builder().method(HttpRequest.METHOD_DELETE).url(buildUrl("contact_assignments", "bulk_destroy")).responseParser(new ApiResponseParser<Void>() {
             @Override
             public Void parseResponse(final ApiRequest response) throws Exception {
@@ -252,48 +293,47 @@ public class Api {
         }
     }
 
-    /* Followup Comments */
-    public static ApiRequest<FollowupComment> getFollowupComment(final long commentId) {
-        return getFollowupComment(commentId, null);
+    /* Interactions */
+    public static ApiRequest<Interaction> getInteraction(final long interactionId) {
+        return getInteraction(interactionId, null);
     }
 
-    public static ApiRequest<FollowupComment> getFollowupComment(final long commentId, final ApiOptions options) {
-        return new ApiRequest<FollowupComment>(ApiOptions.builder().method(HttpRequest.METHOD_GET).url(buildUrl("followup_comments", commentId)).responseParser(commentParser).merge(options).build());
+    public static ApiRequest<Interaction> getInteraction(final long interactionId, final ApiOptions options) {
+        return new ApiRequest<Interaction>(ApiOptions.builder().method(HttpRequest.METHOD_GET).url(buildUrl("interactions", interactionId)).responseParser(interactionParser).merge(options).build());
     }
 
-    public static ApiRequest<FollowupComment> createFollowupComment(final GFollowupComment comment) {
-        return createFollowupComment(comment, null);
+    public static ApiRequest<Interaction> createInteraction(final GInteraction interaction) {
+        return createInteraction(interaction, null);
     }
 
-    public static ApiRequest<FollowupComment> createFollowupComment(final GFollowupComment comment, final ApiOptions options) {
+    public static ApiRequest<Interaction> createInteraction(final GInteraction interaction, final ApiOptions options) {
         final Map<String, String> params = new HashMap<String, String>();
-        comment.toParams(params);
-        return new ApiRequest<FollowupComment>(ApiOptions.builder().method(HttpRequest.METHOD_POST).url(buildUrl("followup_comments")).responseParser(commentParser).params(params).merge(options).build());
+        interaction.toParams(params);
+        return new ApiRequest<Interaction>(ApiOptions.builder().method(HttpRequest.METHOD_POST).url(buildUrl("interactions")).responseParser(interactionParser).params(params).merge(options).build());
     }
 
-    public static ApiRequest<FollowupComment> updateFollowupComment(final GFollowupComment comment) {
-        return updateFollowupComment(comment, null);
+    public static ApiRequest<Interaction> updateInteraction(final GInteraction interaction) {
+        return updateInteraction(interaction, null);
     }
 
-    public static ApiRequest<FollowupComment> updateFollowupComment(final GFollowupComment comment, final ApiOptions options) {
+    public static ApiRequest<Interaction> updateInteraction(final GInteraction interaction, final ApiOptions options) {
         final Map<String, String> params = new HashMap<String, String>();
-        comment.toParams(params);
-        return new ApiRequest<FollowupComment>(ApiOptions.builder().method(HttpRequest.METHOD_PUT).url(buildUrl("followup_comments", comment.id)).responseParser(commentParser).params(params).merge(options)
+        interaction.toParams(params);
+        return new ApiRequest<Interaction>(ApiOptions.builder().method(HttpRequest.METHOD_PUT).url(buildUrl("interactions", interaction.id)).responseParser(interactionParser).params(params).merge(options)
                 .build());
     }
 
-    public static ApiRequest<Void> deleteFollowupComment(final long commentId) {
-        return deleteFollowupComment(commentId, null);
+    public static ApiRequest<Void> deleteInteraction(final long interactionId) {
+        return deleteInteraction(interactionId, null);
     }
 
-    public static ApiRequest<Void> deleteFollowupComment(final long commentId, final ApiOptions options) {
-        return new ApiRequest<Void>(ApiOptions.builder().method(HttpRequest.METHOD_DELETE).url(buildUrl("followup_comments", commentId)).responseParser(new ApiResponseParser<Void>() {
+    public static ApiRequest<Void> deleteInteraction(final long interactionId, final ApiOptions options) {
+        return new ApiRequest<Void>(ApiOptions.builder().method(HttpRequest.METHOD_DELETE).url(buildUrl("interactions", interactionId)).responseParser(new ApiResponseParser<Void>() {
             @Override
             public Void parseResponse(final ApiRequest response) throws Exception {
-                final FollowupComment comment = Application.getDb().getFollowupCommentDao().load(commentId);
-                if (comment != null) {
-
-                    comment.deleteWithRelations();
+                final Interaction interaction = Application.getDb().getInteractionDao().load(interactionId);
+                if (interaction != null) {
+                    interaction.deleteWithRelations();
                 }
                 return null;
             }
@@ -365,32 +405,6 @@ public class Api {
         }
     }
 
-	/* OAuth */
-
-    /**
-     * Returns the access token from a grant code
-     *
-     * @param code
-     * @return
-     */
-    public static ApiRequest<GAccessToken> getAccessToken(final String code) {
-        final Map<String, String> params = new HashMap<String, String>();
-        params.put("client_id", Configuration.getOauthClientId());
-        params.put("client_secret", Configuration.getOauthClientSecret());
-        params.put("code", code);
-        params.put("grant_type", "authorization_code");
-        params.put("scope", Configuration.getOauthScope());
-        params.put("redirect_uri", Configuration.getOauthUrl() + "/done.json");
-
-        return new ApiRequest<GAccessToken>(ApiOptions.builder().method(HttpRequest.METHOD_POST).url(Configuration.getOauthUrl() + "/access_token").params(params).authenticated(false)
-                .responseParser(new ApiResponseParser<GAccessToken>() {
-                    @Override
-                    public GAccessToken parseResponse(final ApiRequest response) throws Exception {
-                        return sGson.fromJson(response.getBody(), GAccessToken.class);
-                    }
-                }).build());
-    }
-
     /* Generic Response Parsers */
     private static final ApiResponseParser<Person> personParser = new ApiResponseParser<Person>() {
         @Override
@@ -408,23 +422,47 @@ public class Api {
         }
     };
 
-    private static final ApiResponseParser<Role> roleParser = new ApiResponseParser<Role>() {
+    private static final ApiResponseParser<Permission> permissionParser = new ApiResponseParser<Permission>() {
         @Override
-        public Role parseResponse(final ApiRequest response) throws Exception {
-            final GRole role = sGson.fromJson(response.getBody(), GRole.class);
-            return role.save(false);
+        public Permission parseResponse(final ApiRequest response) throws Exception {
+            final GPermission permission = sGson.fromJson(response.getBody(), GPermission.class);
+            return permission.save(false);
         }
     };
 
-    private static final ApiResponseParser<List<Role>> rolesParser = new ApiResponseParser<List<Role>>() {
+    private static final ApiResponseParser<List<Permission>> permissionsParser = new ApiResponseParser<List<Permission>>() {
         @Override
-        public List<Role> parseResponse(final ApiRequest response) throws Exception {
-            final GRoles roles = sGson.fromJson(response.getBody(), GRoles.class);
-            return roles.save(false);
+        public List<Permission> parseResponse(final ApiRequest response) throws Exception {
+            final GPermissions permissions = sGson.fromJson(response.getBody(), GPermissions.class);
+            return permissions.save(false);
         }
     };
 
-    public static final ApiResponseParser<List<Person>> organizationalRolesParser = new ApiResponseParser<List<Person>>() {
+    private static final ApiResponseParser<Label> labelParser = new ApiResponseParser<Label>() {
+        @Override
+        public Label parseResponse(final ApiRequest response) throws Exception {
+            final GLabel label = sGson.fromJson(response.getBody(), GLabel.class);
+            return label.save(false);
+        }
+    };
+
+    private static final ApiResponseParser<List<Label>> labelsParser = new ApiResponseParser<List<Label>>() {
+        @Override
+        public List<Label> parseResponse(final ApiRequest response) throws Exception {
+            final GLabels labels = sGson.fromJson(response.getBody(), GLabels.class);
+            return labels.save(false);
+        }
+    };
+
+    public static final ApiResponseParser<List<Person>> organizationalPermissionsParser = new ApiResponseParser<List<Person>>() {
+        @Override
+        public List<Person> parseResponse(final ApiRequest response) throws Exception {
+            final GPeople people = sGson.fromJson(response.getBody(), GPeople.class);
+            return people.save(false);
+        }
+    };
+
+    public static final ApiResponseParser<List<Person>> organizationalLabelsParser = new ApiResponseParser<List<Person>>() {
         @Override
         public List<Person> parseResponse(final ApiRequest response) throws Exception {
             final GPeople people = sGson.fromJson(response.getBody(), GPeople.class);
@@ -440,11 +478,11 @@ public class Api {
         }
     };
 
-    private static final ApiResponseParser<FollowupComment> commentParser = new ApiResponseParser<FollowupComment>() {
+    private static final ApiResponseParser<Interaction> interactionParser = new ApiResponseParser<Interaction>() {
         @Override
-        public FollowupComment parseResponse(final ApiRequest response) throws Exception {
-            final GFollowupComment comment = sGson.fromJson(response.getBody(), GFollowupComment.class);
-            return comment.save(false);
+        public Interaction parseResponse(final ApiRequest response) throws Exception {
+            final GInteraction interaction = sGson.fromJson(response.getBody(), GInteraction.class);
+            return interaction.save(false);
         }
     };
 
@@ -482,8 +520,8 @@ public class Api {
         for (int i = 0; i < parts.length; i++) {
             final Object part = parts[i];
             if (part != null) {
-                if (part instanceof List) {
-                    sb.append(U.toCSV((List<?>) part));
+                if (part instanceof Iterable) {
+                    sb.append(StringUtils.join((Iterable<?>) part, ","));
                 } else {
                     sb.append(part);
                 }
@@ -586,6 +624,24 @@ public class Api {
      * Enum of all available includes
      */
     public enum Include {
-        answers, surveys, answer_sheets, all_organizational_roles, all_organization_and_children, organizational_roles, followup_comments, contact_assignments, assigned_tos, current_address, user, phone_numbers, person_transfers, email_addresses, all_questions, elements, keyword, contacts, admins, leaders, people, groups, keywords, assigned_to, person, comments_on_me, rejoicables
+        answers(GAnswerSheet.class), survey(GAnswerSheet.class),
+        assigned_to(GContactAssignment.class), person(GContactAssignment.class),
+        initiators(GInteraction.class), interaction_type(GInteraction.class), receiver(GInteraction.class), creator(GInteraction.class), last_updater(GInteraction.class), // interactions
+        contacts(GOrganization.class), admins(GOrganization.class), leaders(GOrganization.class), people(GOrganization.class), surveys(GOrganization.class), groups(GOrganization.class), keywords(GOrganization.class), labels(GOrganization.class), // organizations
+        label(GLabel.class), // organizational label
+        permission(GPermission.class), // organizational permission
+        phone_numbers(GPerson.class), email_addresses(GPerson.class), person_transfers(GPerson.class), contact_assignments(GPerson.class), assigned_tos(GPerson.class), // people
+        answer_sheets(GPerson.class), all_organizational_permissions(GPerson.class), all_organization_and_children(GPerson.class),
+        interactions(GPerson.class), organizational_labels(GPerson.class), addresses(GPerson.class), user(GPerson.class), current_address(GPerson.class), organizational_permission(GPerson.class);
+
+        private final Type mValid;
+
+        Include(Type valid) {
+            mValid = valid;
+        }
+
+        public boolean isValidOn(Type type) {
+            return type == mValid;
+        }
     }
 }

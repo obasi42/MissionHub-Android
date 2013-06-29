@@ -24,7 +24,7 @@ public class GContactAssignments {
         final Callable<List<ContactAssignment>> callable = new Callable<List<ContactAssignment>>() {
             @Override
             public List<ContactAssignment> call() throws Exception {
-                synchronized (GContactAssignment.allLock) {
+                synchronized (GContactAssignment.lock) {
                     final List<ContactAssignment> assignments = new ArrayList<ContactAssignment>();
                     if (contact_assignments != null) {
                         for (final GContactAssignment assignment : contact_assignments) {
@@ -65,7 +65,7 @@ public class GContactAssignments {
         final Callable<List<ContactAssignment>> callable = new Callable<List<ContactAssignment>>() {
             @Override
             public List<ContactAssignment> call() throws Exception {
-                synchronized (GContactAssignment.allLock) {
+                synchronized (GContactAssignment.lock) {
                     final ContactAssignmentDao dao = Application.getDb().getContactAssignmentDao();
 
                     // delete current assignments

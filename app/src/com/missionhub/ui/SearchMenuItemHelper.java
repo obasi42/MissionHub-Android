@@ -3,13 +3,15 @@ package com.missionhub.ui;
 import android.os.Handler;
 import android.view.View;
 import android.view.View.OnFocusChangeListener;
+
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.widget.SearchView;
 import com.actionbarsherlock.widget.SearchView.OnQueryTextListener;
 import com.missionhub.R;
-import com.missionhub.util.U;
+
+import org.apache.commons.lang3.StringUtils;
 import org.holoeverywhere.app.Fragment;
 
 public class SearchMenuItemHelper implements OnQueryTextListener, OnFocusChangeListener {
@@ -91,7 +93,7 @@ public class SearchMenuItemHelper implements OnQueryTextListener, OnFocusChangeL
 
     @Override
     public void onFocusChange(final View v, final boolean hasFocus) {
-        if (!hasFocus && mSearchItem != null && U.isNullEmpty(mQuery)) {
+        if (!hasFocus && mSearchItem != null && StringUtils.isNotEmpty(mQuery)) {
             mSearchItem.collapseActionView();
         }
     }

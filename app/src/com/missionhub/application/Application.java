@@ -8,6 +8,7 @@ import android.util.Log;
 import com.google.analytics.tracking.android.GoogleAnalytics;
 import com.google.analytics.tracking.android.Tracker;
 import com.missionhub.R;
+import com.missionhub.event.ToastEvent;
 import com.missionhub.model.DaoMaster;
 import com.missionhub.model.DaoMaster.OpenHelper;
 import com.missionhub.model.DaoSession;
@@ -303,20 +304,6 @@ public class Application extends org.holoeverywhere.app.Application {
 
     public void onEventMainThread(final ToastEvent event) {
         Toast.makeText(getContext(), event.message, event.duration).show();
-    }
-
-    public static class ToastEvent {
-        public String message;
-        public int duration = Toast.LENGTH_SHORT;
-
-        public ToastEvent(final String message) {
-            this.message = message;
-        }
-
-        public ToastEvent(final String message, final int duration) {
-            this.message = message;
-            this.duration = duration;
-        }
     }
 
     public static Tracker getTracker() {

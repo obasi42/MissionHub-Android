@@ -1,7 +1,7 @@
 package com.missionhub.api;
 
-import com.missionhub.util.U;
-import com.missionhub.util.U.FollowupStatus;
+import com.missionhub.model.generic.FollowupStatus;
+import com.missionhub.model.generic.Gender;
 
 import java.util.Collection;
 import java.util.Set;
@@ -61,7 +61,7 @@ public class PeopleListOptions extends ListOptions {
             return this;
         }
 
-        public Builder gender(final U.Gender gender) {
+        public Builder gender(final Gender gender) {
             filters.addFilter("gender", gender.toFilter());
             return this;
         }

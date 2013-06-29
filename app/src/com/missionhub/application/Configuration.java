@@ -63,6 +63,10 @@ public class Configuration {
         return Configuration.getInstance().sProperties.getProperty("ACRA_FORM_KEY", "");
     }
 
+    public static String getFacebookAppId() {
+        return Configuration.getInstance().sProperties.getProperty("FACEBOOK_APP_ID", "");
+    }
+
     public static enum Environment {
         DEVELOPMENT, TEST, PRODUCTION
     }

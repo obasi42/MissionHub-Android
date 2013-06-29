@@ -3,7 +3,6 @@ package com.missionhub.model.gson;
 import com.missionhub.application.Application;
 import com.missionhub.model.PhoneNumber;
 import com.missionhub.model.PhoneNumberDao;
-import com.missionhub.util.U;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +21,6 @@ public class GPhoneNumber {
     public String updated_at;
 
     public static final Object lock = new Object();
-    public static final Object allLock = new Object();
 
     /**
      * Saves the phone number to the SQLite database.
@@ -45,9 +43,9 @@ public class GPhoneNumber {
                     num.setLocation(location);
                     num.setPrimary(primary);
                     num.setTxt_to_email(txt_to_email);
-                    num.setEmail_updated_at(U.parseISO8601(email_updated_at));
-                    num.setCreated_at(U.parseISO8601(created_at));
-                    num.setUpdated_at(U.parseISO8601(updated_at));
+                    num.setEmail_updated_at(email_updated_at);
+                    num.setCreated_at(created_at);
+                    num.setUpdated_at(updated_at);
                     dao.insertOrReplace(num);
 
                     return num;
@@ -74,7 +72,7 @@ public class GPhoneNumber {
         final Callable<List<PhoneNumber>> callable = new Callable<List<PhoneNumber>>() {
             @Override
             public List<PhoneNumber> call() throws Exception {
-                synchronized (allLock) {
+                synchronized (lock) {
                     final PhoneNumberDao dao = Application.getDb().getPhoneNumberDao();
 
                     // delete current number

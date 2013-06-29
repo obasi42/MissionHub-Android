@@ -5,10 +5,7 @@ import android.os.Bundle;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
 import com.missionhub.activity.HostActivity;
-import com.missionhub.util.U;
-
-import org.holoeverywhere.app.Activity;
-import org.holoeverywhere.app.Fragment;
+import com.missionhub.util.FragmentUtils;
 
 public abstract class HostedFragment extends BaseFragment {
 
@@ -18,9 +15,7 @@ public abstract class HostedFragment extends BaseFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (!U.superGetRetainInstance(this)) {
-            setRetainInstance(true);
-        }
+        FragmentUtils.retainInstance(this);
         setHasOptionsMenu(true);
     }
 

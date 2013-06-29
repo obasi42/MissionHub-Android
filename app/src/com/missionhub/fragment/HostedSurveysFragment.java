@@ -18,7 +18,6 @@ import com.actionbarsherlock.view.MenuItem;
 import com.missionhub.R;
 import com.missionhub.api.Api;
 import com.missionhub.application.Application;
-import com.missionhub.application.Session.SessionOrganizationIdChanged;
 import com.missionhub.exception.ExceptionHelper;
 import com.missionhub.exception.ExceptionHelper.DialogButton;
 import com.missionhub.exception.WebViewException;
@@ -102,7 +101,7 @@ public class HostedSurveysFragment extends HostedFragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        Application.registerEventSubscriber(this, SessionOrganizationIdChanged.class);
+        //TODO: Application.registerEventSubscriber(this, SessionOrganizationIdChanged.class);
     }
 
     @Override
@@ -229,8 +228,9 @@ public class HostedSurveysFragment extends HostedFragment {
         super.onDestroy();
     }
 
-    public void onEventMainThread(final SessionOrganizationIdChanged event) {
-        goInitialUrl();
-    }
+// TODO: uncomment
+//    public void onEventMainThread(final SessionOrganizationIdChanged event) {
+//        goInitialUrl();
+//    }
 
 }

@@ -10,10 +10,11 @@ import com.missionhub.people.DynamicPeopleListProvider.LoadingItem;
 import com.missionhub.ui.AdapterViewProvider;
 import com.missionhub.ui.AnimateOnceImageLoadingListener;
 import com.missionhub.ui.ObjectArrayAdapter;
-import com.missionhub.util.U;
+import com.missionhub.util.DisplayUtils;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
+import org.apache.commons.lang3.StringUtils;
 import org.holoeverywhere.widget.TextView;
 
 /**
@@ -24,7 +25,7 @@ public class PersonAdapterViewProvider implements AdapterViewProvider {
     /**
      * The size in pixels of the avatar
      */
-    private final int mAvatarSizePx = Math.round(U.dpToPixel(50));
+    private final int mAvatarSizePx = Math.round(DisplayUtils.dpToPixel(50));
     /**
      * The {@link ImageLoader} display options for avatars
      */
@@ -81,13 +82,12 @@ public class PersonAdapterViewProvider implements AdapterViewProvider {
 
         if (holder.avatar != null) {
             if (mImageLoaderOptions == null) {
-                mImageLoaderOptions = U.getContactImageDisplayOptions();
+                mImageLoaderOptions = DisplayUtils.getContactImageDisplayOptions();
             }
             if (mImageLoaderListener == null) {
                 mImageLoaderListener = new AnimateOnceImageLoadingListener(250);
             }
-            String url = U.getProfilePicture(person, mAvatarSizePx, mAvatarSizePx);
-            ImageLoader.getInstance().displayImage(url, holder.avatar, mImageLoaderOptions, mImageLoaderListener);
+            ImageLoader.getInstance().displayImage(person.getPictureUrl(mAvatarSizePx, mAvatarSizePx), holder.avatar, mImageLoaderOptions, mImageLoaderListener);
         }
 
         safeSet(holder.text1, person.getName());
@@ -125,11 +125,12 @@ public class PersonAdapterViewProvider implements AdapterViewProvider {
 
     /**
      * Sets the text of a text field or sets it empty
+     *
      * @param view
      * @param text
      */
     private void safeSet(TextView view, CharSequence text) {
-        if (!U.isNullEmpty(text)) {
+        if (StringUtils.isNotEmpty(text)) {
             view.setText(text);
         } else {
             view.setText("");
@@ -166,6 +167,7 @@ public class PersonAdapterViewProvider implements AdapterViewProvider {
 
     /**
      * Sets the line 2 display parameter
+     *
      * @param line2
      */
     public void setLine2(Display line2) {

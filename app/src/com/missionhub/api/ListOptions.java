@@ -5,7 +5,8 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.missionhub.api.ListOptions.ListFilterOrderJson.Filter;
 import com.missionhub.api.ListOptions.ListFilterOrderJson.Order;
-import com.missionhub.util.U;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -113,7 +114,7 @@ public class ListOptions {
     }
 
     protected void setOrRemoveFilter(final String filter, final Collection<Object> values) {
-        if (U.isNullEmpty(values)) {
+        if (values == null || values.isEmpty()) {
             removeFilter(filter);
         } else {
             setFilter(filter, values);
@@ -121,7 +122,7 @@ public class ListOptions {
     }
 
     protected void setOrRemoveFilter(final String filter, final Object value) {
-        if (U.isNullEmpty(String.valueOf(value))) {
+        if (StringUtils.isEmpty(String.valueOf(value))) {
             removeFilter(filter);
         } else {
             setFilter(filter, objectToString(value));

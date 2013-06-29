@@ -1,47 +1,33 @@
 package com.missionhub.authenticator;
 
 import android.accounts.Account;
+import android.accounts.AccountAuthenticatorResponse;
 import android.accounts.AccountManager;
-import android.annotation.SuppressLint;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
-import android.webkit.*;
+
 import com.actionbarsherlock.view.Window;
-import com.github.kevinsawicki.http.HttpRequest;
-import com.google.gson.Gson;
+import com.facebook.widget.LoginButton;
 import com.missionhub.R;
-import com.missionhub.api.Api;
+import com.missionhub.activity.BaseActivity;
 import com.missionhub.application.Application;
 import com.missionhub.application.Configuration;
+import com.missionhub.application.Session;
 import com.missionhub.application.SettingsManager;
-import com.missionhub.exception.ExceptionHelper;
-import com.missionhub.exception.ExceptionHelper.DialogButton;
-import com.missionhub.exception.WebViewException;
+import com.missionhub.event.SessionEvent;
 import com.missionhub.model.Person;
-import com.missionhub.model.gson.GAccessToken;
-import com.missionhub.model.gson.GErrorsDepreciated;
-import com.missionhub.util.SafeAsyncTask;
-import com.missionhub.util.U;
-import org.holoeverywhere.app.Activity;
+
+import org.apache.commons.lang3.StringUtils;
+import org.holoeverywhere.widget.Button;
 import org.holoeverywhere.widget.ProgressBar;
 import org.holoeverywhere.widget.TextView;
 import org.holoeverywhere.widget.Toast;
 
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URLDecoder;
-import java.util.HashMap;
-import java.util.concurrent.FutureTask;
-
 /**
- * Activity which displays login screen to the user.
+ * Activity that manages the login process
  */
-@SuppressLint("SetJavaScriptEnabled")
-public class AuthenticatorActivity extends AccountAuthenticatorActivity {
+public class AuthenticatorActivity extends BaseActivity {
 
     /**
      * the logging tag
@@ -49,14 +35,14 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
     public static final String TAG = AuthenticatorActivity.class.getSimpleName();
 
     /**
-     * the activity result when a duplicate account exists
+     * The id of the person requesting authentication
      */
-    public static final int RESULT_DUPLICATE = 1;
+    private long mRequestPersonId = -1;
 
     /**
-     * the web view used for authentication
+     * The account authenticator response when used as an account authenticator
      */
-    private WebView mWebView;
+    private AccountAuthenticatorResponse mAccountAuthenticatorResponse = null;
 
     /**
      * the progress bar
@@ -69,184 +55,96 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
     private TextView mProgressText;
 
     /**
-     * holds the task that fetches the access token and adds the system account
+     * the facebook login button
      */
-    private FutureTask<GAccessToken> mAuthTask;
+    private Button mLoginButton;
+
+    /**
+     * the missionhub version number
+     */
+    private TextView mVersion;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-
         setContentView(R.layout.activity_authenticator);
 
-        mWebView = (WebView) findViewById(R.id.webview);
+        // set up the authenticator response when used as an authenticator
+        mRequestPersonId = getIntent().getLongExtra(Authenticator.KEY_PERSON_ID, -1);
+        mAccountAuthenticatorResponse = getIntent().getParcelableExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE);
+        if (mAccountAuthenticatorResponse != null) {
+            mAccountAuthenticatorResponse.onRequestContinued();
+        }
+
+        // set up the progress bar and text
         mProgress = (ProgressBar) findViewById(android.R.id.progress);
         mProgressText = (TextView) findViewById(R.id.progress_text);
 
-        // web view settings
-        mWebView.getSettings().setAppCacheEnabled(true);
-        mWebView.getSettings().setAllowFileAccess(false);
-        mWebView.getSettings().setBuiltInZoomControls(false);
-        mWebView.getSettings().setJavaScriptEnabled(true);
-        mWebView.getSettings().setLoadsImagesAutomatically(true);
-        mWebView.getSettings().setSaveFormData(false);
-        mWebView.getSettings().setSavePassword(false);
-        mWebView.getSettings().setSupportMultipleWindows(false);
-        mWebView.getSettings().setSupportZoom(false);
-
-        // web view display settings
-        mWebView.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_OVERLAY);
-        mWebView.setScrollbarFadingEnabled(true);
-
-        // the web view client
-        mWebView.setWebViewClient(new AuthenticatorWebViewClient());
-
-        // begin authentication
-        resetAuthentication();
-    }
-
-    /**
-     * resets the state of the auth activity
-     */
-    private void resetAuthentication() {
-        // cancel the current auth task
-        if (mAuthTask != null) {
-            mAuthTask.cancel(true);
-            mAuthTask = null;
-        }
-
-        // clear the web view cookies
-        clearCookies();
-
-        // show the webview and go to the initial auth page
-        mWebView.setVisibility(View.VISIBLE);
-        try {
-            mWebView.loadUrl(getAuthenticationUrl());
-        } catch (final Exception e) {
-            displayError(e);
-        }
-    }
-
-    /**
-     * web view client to manage the authentication process
-     */
-    private class AuthenticatorWebViewClient extends WebViewClient {
-
-        @Override
-        public boolean shouldOverrideUrlLoading(final WebView view, final String url) {
-            return false; // make sure this web view handles all other urls
-        }
-
-        @Override
-        public void onPageStarted(final WebView view, final String url, final Bitmap favicon) {
-            AuthenticatorActivity.this.setSupportProgressBarIndeterminateVisibility(Boolean.TRUE);
-
-            // parse the url to a uri for easier checking
-            final Uri uri = Uri.parse(url);
-
-            // parse the oauth url to a uri for comparisons to the uri
-            final Uri oauthUri = Uri.parse(Configuration.getOauthUrl());
-
-            // make sure we are only working with requests from the oauth server
-            if (uri.getHost() != null && uri.getHost().equalsIgnoreCase(oauthUri.getHost())) {
-
-                // prevent the mission hub server from being dumb
-                if (!uri.getPath().contains("/users") && !uri.getPath().contains(oauthUri.getPath())) {
-                    onError(new Exception(getString(R.string.unexpected_data)));
-                    return;
-                }
-
-                // check for an api error
-                if (!U.isNullEmpty(uri.getQueryParameter("error"))) {
-                    try {
-                        final Gson gson = new Gson();
-                        final GErrorsDepreciated error = gson.fromJson(URLDecoder.decode(uri.getQueryParameter("error_description"), "UTF-8"), GErrorsDepreciated.class);
-                        onError(error.getException());
-                    } catch (final Exception e) {
-                        onError(new Exception(uri.getQueryParameter("error")));
-                    }
-                    return;
-                }
-
-                // Check for the authorization parameter. If it exists, automatically grant app access.
-                final String authorization = uri.getQueryParameter("authorization");
-                if (!U.isNullEmpty(authorization) && uri.getPath().contains("/authorize")) {
-                    // check for a mh cookie to ensure the user is logged in
-                    CookieSyncManager.createInstance(AuthenticatorActivity.this);
-                    final CookieManager mgr = CookieManager.getInstance();
-                    final String cookieString = mgr.getCookie(oauthUri.getHost());
-                    if (cookieString != null && (cookieString.contains("_mh_session="))) {
-                        mWebView.stopLoading();
-                        mWebView.loadUrl(Configuration.getOauthUrl() + "/grant.json?authorization=" + authorization);
-                        return;
-                    }
-                }
-
-                // Check for the authentication code. If exists, use it to obtain the user's access token
-                final String code = uri.getQueryParameter("code");
-                if (!U.isNullEmpty(code) && uri.getPath().contains("/done")) {
-                    mWebView.stopLoading();
-                    mWebView.loadData("", "text/plain; charset=UTF-8", null);
-                    mWebView.setVisibility(View.GONE);
-
-                    // fetch the access token and add an account
-                    addAccountFromCode(code);
-                }
+        // set up the login button
+        mLoginButton = (Button) findViewById(R.id.login_button);
+        mLoginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onClickLogin();
             }
-        }
+        });
 
-        @Override
-        public void onPageFinished(final WebView view, final String url) {
-            AuthenticatorActivity.this.setSupportProgressBarIndeterminateVisibility(Boolean.FALSE);
-        }
+        // set the version number
+        mVersion = (TextView) findViewById(R.id.version);
+        mVersion.setText(Application.getVersionName());
 
-        @Override
-        public void onReceivedError(final WebView view, final int errorCode, final String description, final String failingUrl) {
-            onError(new WebViewException(errorCode, description, failingUrl));
-        }
+        // receive session events
+        Application.registerEventSubscriber(this, SessionEvent.class);
 
-        public void onError(final Exception e) {
-            mWebView.stopLoading();
-            mWebView.loadData("", "text/plain; charset=UTF-8", null);
-            mWebView.setVisibility(View.GONE);
-
-            displayError(e);
-        }
+        // open a missionhub session
+        Session.getInstance().open();
     }
 
+
     /**
-     * Builds and returns the url used for authentication
+     * Called by session open
      *
-     * @return the url used for authentication
-     * @throws URISyntaxException
-     * @throws MalformedURLException
+     * @param event
      */
-    private String getAuthenticationUrl() throws URISyntaxException, MalformedURLException {
-        HashMap<String, String> params = new HashMap<String, String>();
-        params.put("android", "true");
-        params.put("display", "touch");
-        params.put("simple", "true");
-        params.put("response_type", "code");
-        params.put("redirect_uri", Configuration.getOauthUrl() + "/done.json");
-        params.put("client_id", Configuration.getOauthClientId());
-        params.put("scope", Configuration.getOauthScope());
+    @SuppressWarnings("unused")
+    public void onEventMainThread(final SessionEvent event) {
 
-        return HttpRequest.append(Configuration.getOauthUrl() + "/authorize", params);
+    }
+
+    @Override
+    public void onDestroy() {
+        Application.unregisterEventSubscriber(this);
+        super.onDestroy();
     }
 
     /**
-     * shows the progress indicator with text
+     * Passes activity result information to the facebook api client
+     *
+     * @param requestCode The request code
+     * @param resultCode  The activity result
+     * @param data        Misc data
+     */
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        com.facebook.Session.getActiveSession().onActivityResult(this, requestCode, resultCode, data);
+    }
+
+    public void onClickLogin() {
+
+    }
+
+    /**
+     * shows the progress indicator
      */
     private void showProgress(final String action) {
-        AuthenticatorActivity.this.setSupportProgressBarIndeterminateVisibility(Boolean.TRUE);
         mProgress.setVisibility(View.VISIBLE);
-
-        if (!U.isNullEmpty(action)) {
+        if (StringUtils.isNotEmpty(action)) {
             mProgressText.setText(action);
             mProgressText.setVisibility(View.VISIBLE);
         } else {
+            mProgress.setVisibility(View.INVISIBLE);
             mProgressText.setVisibility(View.INVISIBLE);
         }
     }
@@ -260,145 +158,65 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         mProgressText.setVisibility(View.INVISIBLE);
     }
 
-    /**
-     * Fetches an access token and adds a system account from the oauth code
-     *
-     * @param code
-     */
-    private void addAccountFromCode(final String code) {
-        if (mAuthTask != null) return;
+    @Override
+    public void finish() {
+        // TODO: finish this
 
-        showProgress(getString(R.string.auth_fetching_account_info));
+//        final Intent intent = new Intent();
+//        intent.putExtra(AccountManager.KEY_ACCOUNT_NAME, account.name);
+//        intent.putExtra(AccountManager.KEY_ACCOUNT_TYPE, account.type);
+//        intent.putExtra(Authenticator.KEY_PERSON_ID, personId);
+//        setResult(result, intent);
+//        finish();
 
-        final SafeAsyncTask<GAccessToken> task = new SafeAsyncTask<GAccessToken>() {
-            @Override
-            public GAccessToken call() throws Exception {
-                // request the access token from the code
-                final GAccessToken done = Api.getAccessToken(code).get();
-
-                // save the person stub to the local database for access later.
-                done.person.save();
-
-                // return the done object
-                return done;
-            }
-
-            @Override
-            protected void onSuccess(final GAccessToken done) {
-                final Person person = Application.getDb().getPersonDao().load(done.person.id);
-                final String token = done.access_token;
-
-                Account account = addAccountForPerson(person, token, AuthenticatorActivity.this);
-
-                finishActivity(Activity.RESULT_OK, account, done.person.id);
-            }
-
-            @Override
-            protected void onException(final Exception e) {
-                displayError(e);
-            }
-
-            @Override
-            protected void onFinally() {
-                mAuthTask = null;
-                hideProgress();
-            }
-        };
-        Application.getExecutor().execute(task.future());
+//
+//        if (mAccountAuthenticatorResponse != null) {
+//            // send the result bundle back if set, otherwise send an error.
+//            if (mResultBundle != null) {
+//                mAccountAuthenticatorResponse.onResult(mResultBundle);
+//            } else {
+//                mAccountAuthenticatorResponse.onError(AccountManager.ERROR_CODE_CANCELED, "canceled");
+//            }
+//            mAccountAuthenticatorResponse = null;
+//        }
+        super.finish();
     }
 
-    private void finishActivity(final int result, final Account account, final long personId) {
-        final Intent intent = new Intent();
-        intent.putExtra(AccountManager.KEY_ACCOUNT_NAME, account.name);
-        intent.putExtra(AccountManager.KEY_ACCOUNT_TYPE, account.type);
-        intent.putExtra(Authenticator.KEY_PERSON_ID, personId);
-        setAccountAuthenticatorResult(intent.getExtras());
-        setResult(result, intent);
-        finish();
-    }
 
-    public static Account addAccountForPerson(Person person, String accessToken, AuthenticatorActivity activity) {
-        final AccountManager accountManager = AccountManager.get(Application.getContext());
-        final String accountId = String.valueOf(person.getName());
-
-        // check for duplicate account
-        final Account[] accounts = accountManager.getAccountsByType(Authenticator.ACCOUNT_TYPE);
-        for (final Account account : accounts) {
-            final long personId = Long.parseLong(accountManager.getUserData(account, Authenticator.KEY_PERSON_ID));
-            if (personId == person.getId()) {
-                // account already exists
-                if (activity != null) {
-                    Toast.makeText(activity, String.format(activity.getString(R.string.auth_duplicate_account), person.getName()), Toast.LENGTH_LONG).show();
-                    activity.finishActivity(RESULT_DUPLICATE, account, personId);
-                }
-                return account;
-            }
-        }
-
-        // if there are no other accounts, set this as the last used so it is resumed on next launch
-        // if there are are other accounts, clear the session id to allow the user to pick an account on next
-        // launch
-        if (accounts.length == 0) {
-            SettingsManager.setSessionLastUserId(person.getId());
-        } else {
-            SettingsManager.setSessionLastUserId(-1);
-        }
-
-        // add the new account, for now we will use the access token as the password
-        final Account account = new Account(accountId, Authenticator.ACCOUNT_TYPE);
-        final Bundle userdata = new Bundle();
-        userdata.putString(Authenticator.KEY_PERSON_ID, String.valueOf(person.getId()));
-        accountManager.addAccountExplicitly(account, accessToken, userdata);
-        accountManager.setPassword(account, accessToken);
-
-        return account;
-    }
-
-    /**
-     * Clears all of the web view cookies to make sure we get a fresh login
-     */
-    private void clearCookies() {
-        final WebViewDatabase db = WebViewDatabase.getInstance(this);
-        db.clearFormData();
-        db.clearHttpAuthUsernamePassword();
-        db.clearUsernamePassword();
-        final CookieSyncManager csm = CookieSyncManager.createInstance(this);
-        final CookieManager mgr = CookieManager.getInstance();
-        mgr.removeAllCookie();
-        csm.sync();
-        csm.startSync();
-    }
-
-    /**
-     * displays an error dialog
-     */
-    private void displayError(final Exception e) {
-        final ExceptionHelper eh = new ExceptionHelper(this, e);
-        eh.setPositiveButton(new DialogButton() {
-            @Override
-            public String getTitle() {
-                return getString(R.string.action_retry);
-            }
-
-            @Override
-            public void onClick(final DialogInterface dialog, final int whichButton) {
-                resetAuthentication();
-            }
-        });
-        eh.setNegativeButton(new DialogButton() {
-            @Override
-            public String getTitle() {
-                return getString(R.string.action_cancel);
-            }
-
-            @Override
-            public void onClick(final DialogInterface dialog, final int whichButton) {
-                dialog.dismiss();
-                setResult(Activity.RESULT_CANCELED);
-                finish();
-            }
-        });
-        eh.show();
-    }
-
+//    public static Account addAccountForPerson(Person person, String accessToken, AuthenticatorActivity activity) {
+//        final AccountManager accountManager = AccountManager.get(Application.getContext());
+//        final String accountId = String.valueOf(person.getName());
+//
+//        // check for duplicate account
+//        final Account[] accounts = accountManager.getAccountsByType(Authenticator.ACCOUNT_TYPE);
+//        for (final Account account : accounts) {
+//            final long personId = Long.parseLong(accountManager.getUserData(account, Authenticator.KEY_PERSON_ID));
+//            if (personId == person.getId()) {
+//                // account already exists
+//                if (activity != null) {
+//                    Toast.makeText(activity, String.format(activity.getString(R.string.auth_duplicate_account), person.getName()), Toast.LENGTH_LONG).show();
+//                    activity.finishActivity(RESULT_DUPLICATE, account, personId);
+//                }
+//                return account;
+//            }
+//        }
+//
+//        // if there are no other accounts, set this as the last used so it is resumed on next launch
+//        // if there are are other accounts, clear the session id to allow the user to pick an account on next
+//        // launch
+//        if (accounts.length == 0) {
+//            SettingsManager.setSessionLastUserId(person.getId());
+//        } else {
+//            SettingsManager.setSessionLastUserId(-1);
+//        }
+//
+//        // add the new account, for now we will use the access token as the password
+//        final Account account = new Account(accountId, Authenticator.ACCOUNT_TYPE);
+//        final Bundle userdata = new Bundle();
+//        userdata.putString(Authenticator.KEY_PERSON_ID, String.valueOf(person.getId()));
+//        accountManager.addAccountExplicitly(account, accessToken, userdata);
+//        accountManager.setPassword(account, accessToken);
+//
+//        return account;
+//    }
 }

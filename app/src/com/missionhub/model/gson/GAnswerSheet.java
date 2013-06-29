@@ -3,7 +3,6 @@ package com.missionhub.model.gson;
 import com.missionhub.application.Application;
 import com.missionhub.model.AnswerSheet;
 import com.missionhub.model.AnswerSheetDao;
-import com.missionhub.util.U;
 
 import java.util.concurrent.Callable;
 
@@ -38,9 +37,9 @@ public class GAnswerSheet {
                     sheet.setId(id);
                     sheet.setPerson_id(personId);
                     sheet.setSurvey_id(survey_id);
-                    sheet.setCreated_at(U.parseISO8601(created_at));
-                    sheet.setUpdated_at(U.parseISO8601(updated_at));
-                    sheet.setCompleted_at(U.parseISO8601(completed_at));
+                    sheet.setCreated_at(created_at);
+                    sheet.setUpdated_at(updated_at);
+                    sheet.setCompleted_at(completed_at);
                     dao.insertOrReplace(sheet);
 
                     if (answers != null) {

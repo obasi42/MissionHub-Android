@@ -1,13 +1,22 @@
 package com.missionhub.application;
 
-import android.accounts.*;
+import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.accounts.AuthenticatorException;
+import android.accounts.OnAccountsUpdateListener;
+import android.accounts.OperationCanceledException;
+import android.os.Bundle;
+import android.util.Log;
 
+import com.facebook.Session.StatusCallback;
 import com.missionhub.R;
 import com.missionhub.api.Api;
 import com.missionhub.api.Api.Include;
+import com.missionhub.api.ApiException;
 import com.missionhub.api.ApiOptions;
 import com.missionhub.authenticator.Authenticator;
 import com.missionhub.authenticator.AuthenticatorActivity;
+import com.missionhub.event.SessionEvent;
 import com.missionhub.exception.MissionHubException;
 import com.missionhub.model.Person;
 import com.missionhub.util.SafeAsyncTask;
@@ -27,63 +36,51 @@ public class Session implements OnAccountsUpdateListener {
      * the logging tag
      */
     public static final String TAG = Session.class.getSimpleName();
-
     /**
      * the singleton instance of the session
      */
     private static Session sSession;
-
-    /**
-     * the person object
-     */
-    private Person mPerson;
-
-    /**
-     * the person id
-     */
-    private long mPersonId = -1;
-
-    /**
-     * the organization id
-     */
-    private long mOrganizationId = -1;
-
-    /**
-     * the android account manager
-     */
-    private final AccountManager mAccountManager;
-
-    /**
-     * the account being used
-     */
-    private Account mAccount;
-
     /**
      * true while resuming the user's session
      */
     private final AtomicBoolean mResuming = new AtomicBoolean();
-
+    /**
+     * the person id
+     */
+    private long mPersonId = -1;
+    /**
+     * the organization id
+     */
+    private long mOrganizationId = -1;
+    /**
+     * the android account manager
+     */
+    private AccountManager mAccountManager;
+    /**
+     * the account being used
+     */
+    private Account mAccount;
     /**
      * task used to update the current person data
      */
     private FutureTask<Person> mUpdatePersonTask;
-
     /**
      * task used to update organizations
      */
     private FutureTask<Void> mUpdateOrganizationsTask;
-
     /**
      * task used to update current organization
      */
     private SafeAsyncTask<Void> mUpdateOrganizationTask;
+    private StatusCallback mFacebookStatusCallback;
+    private SafeAsyncTask<Void> mOpenTask;
+    private SafeAsyncTask<Void> mCloseTask;
+    private SessionState mState = SessionState.CLOSED;
 
     /**
      * Creates a new session object and sets up the account manager
      */
     private Session() {
-        mAccountManager = AccountManager.get(Application.getContext());
-        mAccountManager.addOnAccountsUpdatedListener(this, null, false);
     }
 
     /**
@@ -94,6 +91,210 @@ public class Session implements OnAccountsUpdateListener {
             sSession = new Session();
         }
         return sSession;
+    }
+
+    /**
+     * @return the system account manager
+     */
+    public AccountManager getAccountManager() {
+        if (mAccountManager == null) {
+            mAccountManager = AccountManager.get(Application.getContext());
+            mAccountManager.addOnAccountsUpdatedListener(this, null, false);
+        }
+        return mAccountManager;
+    }
+
+    /**
+     * @return the system account of the current person
+     */
+    public Account getAccount() {
+        if (mAccount == null) {
+            mAccount = getAccount(getPersonId());
+        }
+        return mAccount;
+    }
+
+    /**
+     * @param personId
+     * @return the system account of the given person
+     */
+    public Account getAccount(long personId) {
+        final Account[] accounts = getAllAccounts();
+        for (final Account account : accounts) {
+            if (getAccountManager().getUserData(account, Authenticator.KEY_PERSON_ID).equalsIgnoreCase(String.valueOf(personId))) {
+                return account;
+            }
+        }
+        return null;
+    }
+
+    public Account[] getAllAccounts() {
+        return getAccountManager().getAccountsByType(Authenticator.ACCOUNT_TYPE);
+    }
+
+    /**
+     * Opens the session
+     */
+    public synchronized void open() {
+        if (mOpenTask != null) return;
+
+        mOpenTask = new SafeAsyncTask<Void>() {
+            @Override
+            public Void call() throws Exception {
+                setAndPostState(SessionState.OPENING);
+
+                // allow logging in with a hardcoded token
+                if (Configuration.getEnvironment() == Configuration.Environment.DEVELOPMENT && !U.isNullEmpty(Configuration.getLoginAs())) {
+                    try {
+                        Person person = Api.getPersonMe(Configuration.getLoginAs()).get();
+                        addSystemAccount(person, Configuration.getLoginAs());
+                        SettingsManager.setSessionLastUserId(person.getUser_id());
+                    } catch (ApiException exception) {
+                        Application.showToast(exception.getMessage(), Toast.LENGTH_LONG);
+                    }
+                }
+
+                // setup data of last logged in person
+                long lastPersonId = SettingsManager.getSessionLastUserId();
+                if (lastPersonId > 0) {
+                    Account account = getAccount(lastPersonId);
+                    if (account != null) {
+                        mAccount = account;
+                        mPersonId = lastPersonId;
+                        mOrganizationId = SettingsManager.getSessionOrganizationId(mPersonId);
+                    } else {
+                        mPersonId = -1;
+                    }
+                }
+
+                // send choose or no account message if there is no initialized person
+                if (mPersonId <= 0) {
+                    if (getAllAccounts().length > 0) {
+                        setAndPostState(SessionState.CHOOSE_ACCOUNT);
+                    } else {
+                        setAndPostState(SessionState.NO_ACCOUNT);
+                    }
+                    return null;
+                }
+
+                // setup ACRA data
+                if (Configuration.isACRAEnabled()) {
+                    try {
+                        ACRA.getErrorReporter().putCustomData("mPersonId", String.valueOf(mPersonId));
+                        ACRA.getErrorReporter().putCustomData("mOrganizationId", String.valueOf(mOrganizationId));
+                    } catch (Exception e) {
+                            /* ignore */
+                    }
+                }
+
+                Application.trackNewSession();
+
+                // update the person
+                Application.postEvent(new SessionEvent(mState, Application.getContext().getString(R.string.init_updating_person)));
+                try {
+                    updatePerson().get();
+                } catch (Exception e) {
+
+                }
+
+                // update the current organization
+                Application.postEvent(new SessionEvent(mState, Application.getContext().getString(R.string.init_updating_current_organization)));
+                updateCurrentOrganization(false);
+
+                setAndPostState(SessionState.OPEN);
+                return null;
+            }
+
+            @Override
+            public void onSuccess(Void _) {
+
+            }
+
+            @Override
+            public void onException(Exception e) {
+                Log.e(TAG, e.getMessage(), e);
+            }
+
+            @Override
+            public void onInterrupted(Exception e) {
+            }
+
+            @Override
+            public void onFinally() {
+                mOpenTask = null;
+            }
+        };
+        mOpenTask.execute();
+    }
+
+    private Account addSystemAccount(Person person, String facebookToken) {
+        final String accountId = String.valueOf(person.getName());
+
+        // check for duplicate account
+        final Account[] accounts = getAllAccounts();
+        for (final Account account : accounts) {
+            final long personId = Long.parseLong(getAccountManager().getUserData(account, Authenticator.KEY_PERSON_ID));
+            if (personId == person.getId()) {
+                getAccountManager().setAuthToken(account, Authenticator.ACCOUNT_TYPE, facebookToken);
+                return account;
+            }
+        }
+
+        // add the new account, for now we will use the access token as the password
+        final Account account = new Account(accountId, Authenticator.ACCOUNT_TYPE);
+        final Bundle userdata = new Bundle();
+        userdata.putString(Authenticator.KEY_PERSON_ID, String.valueOf(person.getId()));
+        getAccountManager().addAccountExplicitly(account, facebookToken, userdata);
+        getAccountManager().setAuthToken(account, Authenticator.ACCOUNT_TYPE, facebookToken);
+
+        return account;
+    }
+
+    private void setAndPostState(SessionState state) {
+        mState = state;
+        Application.postEvent(new SessionEvent(mState));
+    }
+
+    /**
+     * Closes the session
+     */
+    public synchronized void close() {
+        if (mCloseTask != null) return;
+
+        mCloseTask = new SafeAsyncTask<Void>() {
+            @Override
+            public Void call() throws Exception {
+                return null;
+            }
+
+            @Override
+            public void onFinally() {
+                mCloseTask = null;
+            }
+        };
+        mCloseTask.execute();
+    }
+
+    /**
+     * Closes and destroys the session
+     */
+    public void destroy() {
+
+    }
+
+    /**
+     * @return the facebook status callback that controls the MissionHub session
+     */
+    public StatusCallback getFacebookStatusCallback() {
+        if (mFacebookStatusCallback == null) {
+            mFacebookStatusCallback = new StatusCallback() {
+                @Override
+                public void call(com.facebook.Session session, com.facebook.SessionState state, Exception exception) {
+
+                }
+            };
+        }
+        return mFacebookStatusCallback;
     }
 
     /**
@@ -115,6 +316,26 @@ public class Session implements OnAccountsUpdateListener {
             return getPrimaryOrganizationId();
         }
         return mOrganizationId;
+    }
+
+    /**
+     * Sets the user's organization id
+     *
+     * @param organizationId
+     * @throws NoPersonException
+     */
+    public synchronized void setOrganizationId(final long organizationId) throws NoPersonException {
+        if (getPerson().isAdminOrLeader(organizationId)) {
+            if (organizationId != getOrganizationId()) {
+                mOrganizationId = organizationId;
+                SettingsManager.setSessionOrganizationId(getPersonId(), mOrganizationId);
+                //Application.postEvent(new SessionOrganizationIdChanged(organizationId));
+
+                updateCurrentOrganization(true);
+            }
+        } else {
+            Application.showToast(R.string.session_not_admin, Toast.LENGTH_LONG);
+        }
     }
 
     /**
@@ -245,86 +466,85 @@ public class Session implements OnAccountsUpdateListener {
         return future;
     }
 
-    /**
-     * Attempts to resume the previous user's session
-     */
-    public synchronized void resumeSession() {
-        if (mResuming.get()) return;
-        mResuming.set(true);
-
-        // update from the mh server
-        final Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Application.postEvent(new SessionResumeStatusEvent(Application.getContext().getString(R.string.init_resuming)));
-
-                    if (Configuration.getEnvironment() == Configuration.Environment.DEVELOPMENT && !U.isNullEmpty(Configuration.getLoginAs())) {
-                        final String accessToken = Configuration.getLoginAs();
-                        Person person = Api.getPersonMe(accessToken).get();
-                        AuthenticatorActivity.addAccountForPerson(person, accessToken, null);
-                        SettingsManager.setSessionLastUserId(person.getId());
-                    }
-
-                    long personId = SettingsManager.getSessionLastUserId();
-                    if (personId >= 0) {
-                        final Account account = findAccount(personId);
-                        if (account != null) {
-                            mAccount = account;
-                            mPersonId = personId;
-                            mOrganizationId = SettingsManager.getSessionOrganizationId(mPersonId);
-                        } else {
-                            mPersonId = -1;
-                        }
-                    }
-
-                    if (Configuration.isACRAEnabled()) {
-                        try {
-                            ACRA.getErrorReporter().putCustomData("mPersonId", String.valueOf(mPersonId));
-                            ACRA.getErrorReporter().putCustomData("mOrganizationId", String.valueOf(mOrganizationId));
-                        } catch (Exception e) {
-                            /* ignore */
-                        }
-                    }
-
-                    if (mPersonId < 0) {
-                        if (canPickAccount()) {
-                            Application.postEvent(new SessionPickAccountEvent());
-                        } else {
-                            Application.postEvent(new SessionResumeErrorEvent(new NoAccountException()));
-                        }
-                        mResuming.set(false);
-                        return;
-                    }
-
-                    Application.trackNewSession();
-
-                    // resume the session
-                    // update the person
-                    Application.postEvent(new SessionResumeStatusEvent(Application.getContext().getString(R.string.init_updating_person)));
-                    updatePerson().get();
-
-                    // update the current organization
-                    Application.postEvent(new SessionResumeStatusEvent(Application.getContext().getString(R.string.init_updating_current_organization)));
-                    updateCurrentOrganization(false).get();
-
-                    Application.postEvent(new SessionResumeSuccessEvent());
-                } catch (final Exception e) {
-                    Application.postEvent(new SessionResumeErrorEvent(e));
-                }
-
-                mResuming.set(false);
-            }
-        };
-
-        Application.getExecutor().submit(runnable);
-    }
+//    /**
+//     * Attempts to resume the previous user's session
+//     */
+//    public synchronized void resumeSession() {
+//        if (mResuming.get()) return;
+//        mResuming.set(true);
+//
+//        // update from the mh server
+//        final Runnable runnable = new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    //Application.postEvent(new SessionResumeStatusEvent(Application.getContext().getString(R.string.init_resuming)));
+//
+//                    if (Configuration.getEnvironment() == Configuration.Environment.DEVELOPMENT && !U.isNullEmpty(Configuration.getLoginAs())) {
+//                        final String facebookToken = Configuration.getLoginAs();
+//                        Person person = Api.getPersonMe(facebookToken).get();
+//                        addSystemAccount(person, facebookToken);
+//                        SettingsManager.setSessionLastUserId(person.getId());
+//                    }
+//
+//                    long personId = SettingsManager.getSessionLastUserId();
+//                    if (personId >= 0) {
+//                        final Account account = findAccount(personId);
+//                        if (account != null) {
+//                            mAccount = account;
+//                            mPersonId = personId;
+//                            mOrganizationId = SettingsManager.getSessionOrganizationId(mPersonId);
+//                        } else {
+//                            mPersonId = -1;
+//                        }
+//                    }
+//
+//                    if (Configuration.isACRAEnabled()) {
+//                        try {
+//                            ACRA.getErrorReporter().putCustomData("mPersonId", String.valueOf(mPersonId));
+//                            ACRA.getErrorReporter().putCustomData("mOrganizationId", String.valueOf(mOrganizationId));
+//                        } catch (Exception e) {
+//                            /* ignore */
+//                        }
+//                    }
+//
+//                    if (mPersonId < 0) {
+//                        if (canPickAccount()) {
+//                            Application.postEvent(new SessionPickAccountEvent());
+//                        } else {
+//                            Application.postEvent(new SessionResumeErrorEvent(new NoAccountException()));
+//                        }
+//                        mResuming.set(false);
+//                        return;
+//                    }
+//
+//                    Application.trackNewSession();
+//
+//                    // resume the session
+//                    // update the person
+//                    Application.postEvent(new SessionResumeStatusEvent(Application.getContext().getString(R.string.init_updating_person)));
+//                    updatePerson().get();
+//
+//                    // update the current organization
+//                    Application.postEvent(new SessionResumeStatusEvent(Application.getContext().getString(R.string.init_updating_current_organization)));
+//                    updateCurrentOrganization(false).get();
+//
+//                    Application.postEvent(new SessionResumeSuccessEvent());
+//                } catch (final Exception e) {
+//                    Application.postEvent(new SessionResumeErrorEvent(e));
+//                }
+//
+//                mResuming.set(false);
+//            }
+//        };
+//
+//        Application.getExecutor().submit(runnable);
+//    }
 
     /**
      * Resets the session data
      */
     private synchronized void resetSession() {
-        mPerson = null;
         mPersonId = -1;
         mOrganizationId = -1;
         mAccount = null;
@@ -357,7 +577,7 @@ public class Session implements OnAccountsUpdateListener {
         // clear database cache
         Application.getDb().clear();
 
-        Application.postEvent(new SessionInvalidatedEvent());
+        //Application.postEvent(new SessionInvalidatedEvent());
     }
 
     /**
@@ -365,11 +585,7 @@ public class Session implements OnAccountsUpdateListener {
      * @throws NoPersonException
      */
     public Person getPerson() throws NoPersonException {
-        mPerson = Application.getDb().getPersonDao().load(getPersonId());
-        if (mPerson == null) {
-            throw new NoPersonException(Application.getContext().getString(R.string.no_person_exception));
-        }
-        return mPerson;
+        return Application.getDb().getPersonDao().load(getPersonId());
     }
 
     @Override
@@ -433,7 +649,7 @@ public class Session implements OnAccountsUpdateListener {
      */
     public void reportInvalidAccessToken() {
         deleteAccount();
-        Application.postEvent(new SessionInvalidTokenEvent());
+        //Application.postEvent(new SessionInvalidTokenEvent());
     }
 
     /**
@@ -450,106 +666,64 @@ public class Session implements OnAccountsUpdateListener {
         }
     }
 
-    /**
-     * Sets the user's organization id
-     *
-     * @param organizationId
-     * @throws NoPersonException
-     */
-    public synchronized void setOrganizationId(final long organizationId) throws NoPersonException {
-        if (getPerson().isAdminOrLeader(organizationId)) {
-            if (organizationId != getOrganizationId()) {
-                mOrganizationId = organizationId;
-                SettingsManager.setSessionOrganizationId(getPersonId(), mOrganizationId);
-                Application.postEvent(new SessionOrganizationIdChanged(organizationId));
-
-                updateCurrentOrganization(true);
-            }
-        } else {
-            Application.showToast(R.string.session_not_admin, Toast.LENGTH_LONG);
-        }
-    }
-
 	/*--------------------*\
      * Event Types
 	\*--------------------*/
 
-    /**
-     * base type for all events relating to the user session
-     */
-    public static class SessionEvent {
-    }
-
-    /* events posted from resumeSession() */
-    public static class SessionResumeEvent extends SessionEvent {
-    }
-
-    public static class SessionResumeSuccessEvent extends SessionResumeEvent {
-    }
-
-    public static class SessionResumeErrorEvent extends SessionResumeEvent {
-        public Exception exception;
-
-        public SessionResumeErrorEvent(final Exception exception) {
-            this.exception = exception;
-        }
-    }
-
-    public static class SessionResumeStatusEvent extends SessionResumeEvent {
-        public String status;
-
-        public SessionResumeStatusEvent(final String status) {
-            this.status = status;
-        }
-    }
-
-    /* events posted from setOrganizationId() */
-    public static class SessionOrganizationIdChanged extends SessionEvent {
-        public long organizationId;
-
-        public SessionOrganizationIdChanged(final long organizationId) {
-            this.organizationId = organizationId;
-        }
-    }
-
-	/* account picker events */
-
-    public static class SessionPickAccountEvent extends SessionEvent {
-    }
-
-	/* general events */
-
-    public static class SessionInvalidTokenEvent extends SessionEvent {
-    }
-
-    public static class SessionInvalidatedEvent extends SessionEvent {
-    }
+//    /**
+//     * base type for all events relating to the user session
+//     */
+//    public static class SessionEvent {
+//    }
+//
+//    /* events posted from resumeSession() */
+//    public static class SessionResumeEvent extends SessionEvent {
+//    }
+//
+//    public static class SessionResumeSuccessEvent extends SessionResumeEvent {
+//    }
+//
+//    public static class SessionResumeErrorEvent extends SessionResumeEvent {
+//        public Exception exception;
+//
+//        public SessionResumeErrorEvent(final Exception exception) {
+//            this.exception = exception;
+//        }
+//    }
+//
+//    public static class SessionResumeStatusEvent extends SessionResumeEvent {
+//        public String status;
+//
+//        public SessionResumeStatusEvent(final String status) {
+//            this.status = status;
+//        }
+//    }
+//
+//    /* events posted from setOrganizationId() */
+//    public static class SessionOrganizationIdChanged extends SessionEvent {
+//        public long organizationId;
+//
+//        public SessionOrganizationIdChanged(final long organizationId) {
+//            this.organizationId = organizationId;
+//        }
+//    }
+//
+//	/* account picker events */
+//
+//    public static class SessionPickAccountEvent extends SessionEvent {
+//    }
+//
+//	/* general events */
+//
+//    public static class SessionInvalidTokenEvent extends SessionEvent {
+//    }
+//
+//    public static class SessionInvalidatedEvent extends SessionEvent {
+//    }
 
 	/*--------------------*\
      * Exceptions
 	\*--------------------*/
-
-    /**
-     * Exception to be thrown when no MissionHub account exists in the system accounts
-     */
-    public static class NoAccountException extends MissionHubException {
-        private static final long serialVersionUID = 1L;
-
-        public NoAccountException() {
-            super(Application.getContext().getString(R.string.no_account_exception));
-        }
-    }
-
-    /**
-     * Exception to be thrown when no person is referenced by the session
-     */
-    public static class NoPersonException extends MissionHubException {
-        private static final long serialVersionUID = 1L;
-
-        public NoPersonException(final String message) {
-            super(message);
-        }
-    }
 
     /**
      * Returns true of the current person is an admin in the current organization
@@ -585,6 +759,32 @@ public class Session implements OnAccountsUpdateListener {
             return getPerson().isAdminOrLeader(getOrganizationId());
         } catch (final NoPersonException e) {
             return false;
+        }
+    }
+
+    public void startFacebookSession() {
+
+    }
+
+    /**
+     * Exception to be thrown when no MissionHub account exists in the system accounts
+     */
+    public static class NoAccountException extends MissionHubException {
+        private static final long serialVersionUID = 1L;
+
+        public NoAccountException() {
+            super(Application.getContext().getString(R.string.no_account_exception));
+        }
+    }
+
+    /**
+     * Exception to be thrown when no person is referenced by the session
+     */
+    public static class NoPersonException extends MissionHubException {
+        private static final long serialVersionUID = 1L;
+
+        public NoPersonException(final String message) {
+            super(message);
         }
     }
 }

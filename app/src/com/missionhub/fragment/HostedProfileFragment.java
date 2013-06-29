@@ -16,7 +16,8 @@ import com.missionhub.ui.AnimateOnceImageLoadingListener;
 import com.missionhub.ui.ViewArrayPagerAdapter;
 import com.missionhub.ui.ObjectArrayAdapter;
 import com.missionhub.ui.widget.ParallaxListView;
-import com.missionhub.util.U;
+import com.missionhub.util.DisplayUtils;
+import com.missionhub.util.FragmentUtils;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.viewpagerindicator.CirclePageIndicator;
@@ -61,9 +62,7 @@ public class HostedProfileFragment extends HostedFragment {
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (!U.superGetRetainInstance(this)) {
-            setRetainInstance(true);
-        }
+        FragmentUtils.retainInstance(this);
         setHasOptionsMenu(true);
     }
 
@@ -165,8 +164,8 @@ public class HostedProfileFragment extends HostedFragment {
         mPagerAdapter.notifyPersonChanged();
 
         // The avatar
-        DisplayMetrics metrics = U.getRealDisplayMetrics(getSupportActivity());
-        String picture = U.getProfilePicture(person, metrics.widthPixels, metrics.heightPixels);
+        DisplayMetrics metrics = DisplayUtils.getRealDisplayMetrics(getSupportActivity());
+        String picture = person.getPictureUrl(metrics.widthPixels, metrics.heightPixels);
         DisplayImageOptions options = new DisplayImageOptions.Builder()
                 .cacheInMemory()
                 .cacheOnDisc()

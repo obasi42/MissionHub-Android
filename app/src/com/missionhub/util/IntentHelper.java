@@ -13,6 +13,7 @@ import com.missionhub.R;
 import com.missionhub.application.Application;
 import com.missionhub.model.Address;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.holoeverywhere.widget.Toast;
 
@@ -114,10 +115,8 @@ public class IntentHelper {
      * @param address
      */
     public static void openMap(final Address address) {
-        final String query = U.concatinate(", ", true, address.getAddress1(), address.getAddress2(), address.getCity(), address.getState(), address.getZip(), address.getCountry());
-
         try {
-            final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://maps.google.com/maps?q=" + query));
+            final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://maps.google.com/maps?q=" + address.toString()));
             addTaskFlags(intent);
             Application.getContext().startActivity(intent);
         } catch (final Exception e) {

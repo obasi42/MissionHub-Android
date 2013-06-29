@@ -4,7 +4,9 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import com.missionhub.util.U;
+
+import com.missionhub.util.FragmentUtils;
+
 import org.holoeverywhere.app.Activity;
 import org.holoeverywhere.app.DialogFragment;
 
@@ -21,9 +23,7 @@ public class BaseDialogFragment extends DialogFragment implements FragmentResult
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (!U.superGetRetainInstance(this)) {
-            setRetainInstance(true);
-        }
+        FragmentUtils.retainInstance(this);
 
         if (getArguments() != null) {
             mRequestCode = getArguments().getInt("requestCode", Integer.MIN_VALUE);
@@ -57,7 +57,7 @@ public class BaseDialogFragment extends DialogFragment implements FragmentResult
      */
     @Override
     public void onDestroyView() {
-        if (getDialog() != null && U.superGetRetainInstance(this)) getDialog().setDismissMessage(null);
+        if (getDialog() != null) getDialog().setDismissMessage(null);
         super.onDestroyView();
     }
 

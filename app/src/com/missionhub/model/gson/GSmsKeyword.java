@@ -3,8 +3,9 @@ package com.missionhub.model.gson;
 import com.missionhub.application.Application;
 import com.missionhub.model.SmsKeyword;
 import com.missionhub.model.SmsKeywordDao;
-import com.missionhub.util.U;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 public class GSmsKeyword {
@@ -45,11 +46,41 @@ public class GSmsKeyword {
                     key.setState(state);
                     key.setInitial_response(initial_response);
                     key.setSurvey_id(survey_id);
-                    key.setCreated_at(U.parseISO8601(created_at));
-                    key.setUpdated_at(U.parseISO8601(updated_at));
+                    key.setCreated_at(created_at);
+                    key.setUpdated_at(updated_at);
                     dao.insertOrReplace(key);
 
                     return key;
+                }
+            }
+        };
+        if (inTx) {
+            return callable.call();
+        } else {
+            return Application.getDb().callInTx(callable);
+        }
+    }
+
+    public static List<SmsKeyword> replaceAll(final GSmsKeyword[] keywords, final long organization_id, final boolean inTx) throws Exception {
+        final Callable<List<SmsKeyword>> callable = new Callable<List<SmsKeyword>>() {
+            @Override
+            public List<SmsKeyword> call() throws Exception {
+                synchronized (lock) {
+                    final SmsKeywordDao dao = Application.getDb().getSmsKeywordDao();
+
+                    List<Long> oldIds = dao.queryBuilder().where(SmsKeywordDao.Properties.Organization_id.eq(organization_id)).listKeys();
+                    for (Long id : oldIds) {
+                        dao.deleteByKey(id);
+                    }
+
+                    final List<SmsKeyword> keywds = new ArrayList<SmsKeyword>();
+                    for (final GSmsKeyword gkeyword : keywords) {
+                        final SmsKeyword keyword = gkeyword.save(true);
+                        if (keyword != null) {
+                            keywds.add(keyword);
+                        }
+                    }
+                    return keywds;
                 }
             }
         };

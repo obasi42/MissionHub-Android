@@ -2,7 +2,6 @@ package com.missionhub.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -11,12 +10,10 @@ import com.missionhub.R;
 import com.missionhub.application.Application;
 import com.missionhub.application.Session;
 import com.missionhub.application.Session.NoPersonException;
-import com.missionhub.application.Session.SessionOrganizationIdChanged;
 import com.missionhub.model.Organization;
 import com.missionhub.model.Person;
 import com.missionhub.ui.ObjectArrayAdapter;
 import com.missionhub.util.TreeDataStructure;
-import com.missionhub.util.U;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
@@ -56,7 +53,8 @@ public class PreferencesFragment extends BaseFragment {
     @Override
     public void onActivityCreated(final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Application.registerEventSubscriber(this, SessionOrganizationIdChanged.class);
+
+        // TODO: Application.registerEventSubscriber(this, SessionOrganizationIdChanged.class);
     }
 
     @Override
@@ -72,12 +70,13 @@ public class PreferencesFragment extends BaseFragment {
         super.onDetach();
     }
 
-    public void onEventMainThread(final SessionOrganizationIdChanged event) {
-        Log.e("EVENT", event.organizationId + "");
-
-
-        rebuildOrganizationList();
-    }
+    // TODO: uncomment
+//    public void onEventMainThread(final SessionOrganizationIdChanged event) {
+//        Log.e("EVENT", event.organizationId + "");
+//
+//
+//        rebuildOrganizationList();
+//    }
 
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
@@ -99,11 +98,8 @@ public class PreferencesFragment extends BaseFragment {
 
         try {
             final Person person = Session.getInstance().getPerson();
-
-            mName.setText(Session.getInstance().getPerson().getName());
-
-            String picture = U.getProfilePicture(person, 100, 100);
-            ImageLoader.getInstance().displayImage(picture, mPicture, mImageLoaderOptions);
+            mName.setText(person.getName());
+            ImageLoader.getInstance().displayImage(person.getPictureUrl(100, 100), mPicture, mImageLoaderOptions);
         } catch (final NoPersonException e) { /* this should be impossible */}
     }
 

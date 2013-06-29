@@ -13,8 +13,8 @@ import com.missionhub.activity.HostActivity;
 import com.missionhub.application.Application;
 import com.missionhub.event.OnHostFragmentChangedEvent;
 import com.missionhub.ui.ObjectArrayAdapter;
+import com.missionhub.util.FragmentUtils;
 import com.missionhub.util.SafeAsyncTask;
-import com.missionhub.util.U;
 
 import org.holoeverywhere.LayoutInflater;
 import org.holoeverywhere.app.Fragment;
@@ -40,9 +40,7 @@ public class SidebarFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (!U.superGetRetainInstance(this)) {
-            setRetainInstance(true);
-        }
+        FragmentUtils.retainInstance(this);
         Application.registerEventSubscriber(this, OnHostFragmentChangedEvent.class);
     }
 

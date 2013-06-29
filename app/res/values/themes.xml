@@ -14,6 +14,18 @@
         <item name="android:windowBackground">@color/white</item>
     </style>
 
+    <style name="Theme.Missionhub.Translucent" parent="Theme.Missionhub">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation</item>
+    </style>
+
+    <style name="Theme.Missionhub.Translucent.NoActionBar" parent="Theme.Missionhub.Translucent">
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
+
     <style name="Theme.Missionhub.NoActionBar" parent="Theme.Missionhub">
         <item name="windowNoTitle">true</item>
         <item name="android:windowNoTitle">true</item>

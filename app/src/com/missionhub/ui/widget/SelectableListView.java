@@ -11,7 +11,7 @@ import android.view.View;
 import android.view.accessibility.AccessibilityEvent;
 import android.widget.AdapterView;
 
-import com.missionhub.util.U;
+import com.missionhub.util.DisplayUtils;
 
 import org.holoeverywhere.widget.ListView;
 
@@ -42,7 +42,7 @@ public class SelectableListView extends ListView {
     /**
      * the current selection width
      */
-    private int mSelectionWidth = (int) U.dpToPixel(56);
+    private int mSelectionWidth = (int) DisplayUtils.dpToPixel(56);
 
     /**
      * state variable for determining if a press is in selection mode
@@ -233,7 +233,7 @@ public class SelectableListView extends ListView {
      * @param widthDip
      */
     public void setSelectionWidth(final int widthDip) {
-        mSelectionWidth = (int) U.dpToPixel(widthDip);
+        mSelectionWidth = (int) DisplayUtils.dpToPixel(widthDip);
     }
 
     /**

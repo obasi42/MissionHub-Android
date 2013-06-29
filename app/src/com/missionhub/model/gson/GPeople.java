@@ -13,6 +13,8 @@ public class GPeople {
     public GPerson person;
 
     public GPerson[] organizational_roles; // returned by organizational_roles/bulk.. yes it's people
+    public GPerson[] organizational_labels;
+    public GPerson[] organizational_permissions;
 
     /**
      * Saves the people to the SQLite database.
@@ -39,6 +41,18 @@ public class GPeople {
 
                 if (organizational_roles != null) {
                     for (final GPerson person : organizational_roles) {
+                        ps.add(person.save(true));
+                    }
+                }
+
+                if (organizational_labels != null) {
+                    for (final GPerson person : organizational_labels) {
+                        ps.add(person.save(true));
+                    }
+                }
+
+                if (organizational_permissions != null) {
+                    for (final GPerson person : organizational_permissions) {
                         ps.add(person.save(true));
                     }
                 }

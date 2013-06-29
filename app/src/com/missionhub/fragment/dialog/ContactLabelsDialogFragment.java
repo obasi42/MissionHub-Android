@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageView;
+
 import com.missionhub.R;
 import com.missionhub.api.Api;
 import com.missionhub.api.ApiOptions;
@@ -18,11 +19,10 @@ import com.missionhub.application.Application;
 import com.missionhub.application.Session;
 import com.missionhub.exception.ExceptionHelper;
 import com.missionhub.model.Person;
-import com.missionhub.model.Role;
-import com.missionhub.model.RoleDao;
 import com.missionhub.ui.ObjectArrayAdapter;
 import com.missionhub.ui.widget.SelectableListView;
 import com.missionhub.util.SafeAsyncTask;
+
 import org.holoeverywhere.app.AlertDialog;
 import org.holoeverywhere.widget.ListView;
 import org.holoeverywhere.widget.TextView;
