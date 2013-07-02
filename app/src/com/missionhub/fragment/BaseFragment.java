@@ -1,7 +1,9 @@
 package com.missionhub.fragment;
 
 import android.os.Bundle;
+
 import com.missionhub.fragment.dialog.FragmentResult;
+
 import org.holoeverywhere.app.Fragment;
 
 public abstract class BaseFragment extends Fragment implements FragmentResult {

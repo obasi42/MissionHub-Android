@@ -3,10 +3,12 @@ package com.missionhub.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+
 import com.actionbarsherlock.view.MenuItem;
 import com.missionhub.R;
 import com.missionhub.application.Application;
 import com.missionhub.util.IntentHelper;
+
 import org.holoeverywhere.widget.TextView;
 
 public class AboutActivity extends BaseActivity {

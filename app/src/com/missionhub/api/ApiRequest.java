@@ -106,24 +106,23 @@ public class ApiRequest<T> {
     }
 
     private void checkResponse() throws ApiException {
-        if (isAuthenticated() && getCode() == HttpURLConnection.HTTP_UNAUTHORIZED) {
-            Session.getInstance().reportInvalidAccessToken();
-            throw new AccessTokenException();
-        }
-
         if (StringUtils.isNotEmpty(getBody())) {
             ApiException exception = null;
             try {
                 final GErrors errors = Api.sGson.fromJson(getBody(), GErrors.class);
-                if (errors.errors == null)
-                    throw new ApiException("The API returned an error with out a message");
                 exception = errors.getException();
             } catch (final Exception e) {
-                /* ignore */
+                /* probably not an api error ignore */
+            }
+            if (exception instanceof InvalidFacebookTokenException) {
+                Session.getInstance().invalidateAuthToken();
             }
             if (exception != null) {
-                throw ApiException.wrap(exception);
+                throw exception;
             }
+        }
+        if (getCode() >= 400) {
+            throw new ApiHttpException(getCode(), getMessage());
         }
     }
 

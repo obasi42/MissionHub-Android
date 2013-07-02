@@ -3,6 +3,7 @@ package com.missionhub.ui.widget;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.Checkable;
+
 import org.holoeverywhere.widget.LinearLayout;
 
 public class CheckableLinearLayout extends LinearLayout implements Checkable {

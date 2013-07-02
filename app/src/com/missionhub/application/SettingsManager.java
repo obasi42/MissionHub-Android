@@ -1,11 +1,13 @@
 package com.missionhub.application;
 
 import android.util.Log;
+
 import com.google.gson.Gson;
 import com.missionhub.model.Setting;
 import com.missionhub.model.SettingDao;
 import com.missionhub.model.UserSetting;
 import com.missionhub.model.UserSettingDao;
+
 import org.apache.commons.lang3.ClassUtils;
 
 /**
@@ -141,12 +143,12 @@ public class SettingsManager {
     // |****** CONVENIENCE METHODS *******|//
     // |**********************************|//
 
-    public static long getSessionLastUserId() {
-        return SettingsManager.getInstance().getSetting("sessionLastUserId", -1l, long.class);
+    public static long getSessionLastPersonId() {
+        return SettingsManager.getInstance().getSetting("sessionLastPersonId", -1l, long.class);
     }
 
-    public static void setSessionLastUserId(final long lastUserId) {
-        SettingsManager.getInstance().setSetting("sessionLastUserId", lastUserId);
+    public static void setSessionLastPersonId(final long lastPersonId) {
+        SettingsManager.getInstance().setSetting("sessionLastPersonId", lastPersonId);
     }
 
     public static int getApplicationLastVersionId() {

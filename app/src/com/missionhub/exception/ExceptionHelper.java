@@ -6,8 +6,10 @@ import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.webkit.WebViewClient;
+
 import com.missionhub.R;
 import com.missionhub.application.Application;
+
 import org.holoeverywhere.widget.Toast;
 
 import java.net.UnknownHostException;
@@ -338,7 +340,8 @@ public class ExceptionHelper {
      * Shows a toast with the data from the exception
      */
     public void makeToast() {
-        if (mContext != null) Toast.makeText(mContext, getTitle() + "\n\n" + getMessage(), Toast.LENGTH_LONG).show();
+        if (mContext != null)
+            Toast.makeText(mContext, getTitle() + "\n\n" + getMessage(), Toast.LENGTH_LONG).show();
     }
 
     /**

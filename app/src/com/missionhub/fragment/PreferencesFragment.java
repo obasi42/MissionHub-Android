@@ -9,7 +9,6 @@ import android.widget.ImageView;
 import com.missionhub.R;
 import com.missionhub.application.Application;
 import com.missionhub.application.Session;
-import com.missionhub.application.Session.NoPersonException;
 import com.missionhub.model.Organization;
 import com.missionhub.model.Person;
 import com.missionhub.ui.ObjectArrayAdapter;
@@ -96,11 +95,10 @@ public class PreferencesFragment extends BaseFragment {
         rebuildOrganizationList();
         mOrganizations.setOnItemSelectedListener(new OrganizationSelectedListener());
 
-        try {
-            final Person person = Session.getInstance().getPerson();
-            mName.setText(person.getName());
-            ImageLoader.getInstance().displayImage(person.getPictureUrl(100, 100), mPicture, mImageLoaderOptions);
-        } catch (final NoPersonException e) { /* this should be impossible */}
+        final Person person = Session.getInstance().getPerson();
+        mName.setText(person.getName());
+        ImageLoader.getInstance().displayImage(person.getPictureUrl(100, 100), mPicture, mImageLoaderOptions);
+
     }
 
     @Override
@@ -163,11 +161,7 @@ public class PreferencesFragment extends BaseFragment {
         @Override
         public void onItemSelected(final AdapterView<?> spinner, final View view, final int position, final long id) {
             final OrganizationItem item = (OrganizationItem) spinner.getItemAtPosition(position);
-            try {
-                Session.getInstance().setOrganizationId(item.organization.getId());
-            } catch (final NoPersonException e) {
-                /** ignore, shouldn't be possible to get here */
-            }
+            Session.getInstance().setOrganizationId(item.organization.getId());
         }
 
         @Override
@@ -189,17 +183,13 @@ public class PreferencesFragment extends BaseFragment {
         mOrganizationsAdapter.setNotifyOnChange(false);
         mOrganizationsAdapter.clear();
 
-        try {
-            rebuildOrganizationListR(Session.getInstance().getPerson().getOrganizationHierarchy(), 0);
-        } catch (final NoPersonException e) {
-            /** shouldn't be possible to get here */
-        }
+        rebuildOrganizationListR(Session.getInstance().getPerson().getOrganizationHierarchy(), 0);
 
         mOrganizationsAdapter.notifyDataSetChanged();
         mOrganizations.setSelection(mDefaultSpinnerIndex);
     }
 
-    private synchronized void rebuildOrganizationListR(final TreeDataStructure<Long> tree, final int depth) throws NoPersonException {
+    private synchronized void rebuildOrganizationListR(final TreeDataStructure<Long> tree, final int depth) {
         for (final TreeDataStructure<Long> subTree : tree.getSubTrees()) {
             final long organizationId = subTree.getHead();
             final Organization org = Application.getDb().getOrganizationDao().load(organizationId);

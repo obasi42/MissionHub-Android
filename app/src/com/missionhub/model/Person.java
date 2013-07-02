@@ -18,6 +18,7 @@ import com.missionhub.application.Application;
 import com.missionhub.application.Session;
 import com.missionhub.model.generic.FollowupStatus;
 import com.missionhub.model.generic.Gender;
+import com.missionhub.model.gson.GAddress;
 import com.missionhub.model.gson.GEmailAddress;
 import com.missionhub.model.gson.GPerson;
 import com.missionhub.model.gson.GPhoneNumber;
@@ -926,10 +927,12 @@ public class Person {
         }
         p.phone_numbers = numbers.toArray(new GPhoneNumber[numbers.size()]);
 
-        final Address address = getCurrentAddress();
-        if (address != null) {
-            p.current_address = address.getGModel();
+        final List<GAddress> gAddrs = new ArrayList<GAddress>();
+        final List<Address> addrs = getAddressList();
+        for (final Address address : addrs) {
+            gAddrs.add(GAddress.createFromAddress(address));
         }
+        p.addresses = gAddrs.toArray(new GAddress[gAddrs.size()]);
 
         return p;
     }

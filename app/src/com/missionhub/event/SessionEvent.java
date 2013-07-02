@@ -5,15 +5,15 @@ import com.missionhub.application.SessionState;
 public class SessionEvent {
 
     private SessionState mState;
-    private Throwable mThrowable;
+    private Exception mException;
     private CharSequence mMessage;
 
     public SessionEvent(SessionState state) {
         this(state, null);
     }
 
-    public SessionEvent(Throwable throwable) {
-        mThrowable = throwable;
+    public SessionEvent(Exception exception) {
+        mException = exception;
         mState = SessionState.CLOSED_ERROR;
     }
 
@@ -26,23 +26,11 @@ public class SessionEvent {
         return mState;
     }
 
-    public void setState(SessionState state) {
-        mState = state;
-    }
-
-    public Throwable getThrowable() {
-        return mThrowable;
-    }
-
-    public void setThrowable(Throwable throwable) {
-        mThrowable = throwable;
+    public Exception getException() {
+        return mException;
     }
 
     public CharSequence getMessage() {
         return mMessage;
-    }
-
-    public void setMessage(CharSequence message) {
-        mMessage = message;
     }
 }

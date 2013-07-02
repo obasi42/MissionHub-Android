@@ -20,7 +20,6 @@ import com.missionhub.api.ApiOptions;
 import com.missionhub.application.Application;
 import com.missionhub.application.DrawableCache;
 import com.missionhub.application.Session;
-import com.missionhub.application.Session.NoPersonException;
 import com.missionhub.exception.ExceptionHelper;
 import com.missionhub.fragment.BaseFragment;
 import com.missionhub.model.*;
@@ -422,11 +421,7 @@ public class ContactAssignmentDialogFragment extends RefreshableDialogFragment i
             }
 
             if (showMe) {
-                try {
-                    mAdapter.add(new AssignMeItem(Session.getInstance().getPerson()));
-                } catch (final NoPersonException e) {
-                    /** should be impossible to get here */
-                }
+                mAdapter.add(new AssignMeItem(Session.getInstance().getPerson()));
             }
 
             if (showNone) {
@@ -550,22 +545,22 @@ public class ContactAssignmentDialogFragment extends RefreshableDialogFragment i
 
             mLeaderAdapter.setNotifyOnChange(false);
             mLeaderAdapter.clear();
-
-            final List<OrganizationalRole> roles = Application
-                    .getDb()
-                    .getOrganizationalRoleDao()
-                    .queryBuilder()
-                    .where(OrganizationalRoleDao.Properties.Organization_id.eq(Session.getInstance().getOrganizationId()),
-                            OrganizationalRoleDao.Properties.Role_id.in(U.Role.admin.id(), U.Role.leader.id())).list();
-
-            final Set<Person> leaders = new HashSet<Person>();
-            for (final OrganizationalRole role : roles) {
-                leaders.add(Application.getDb().getPersonDao().load(role.getPerson_id()));
-            }
-
-            for (final Person leader : U.sortPeople(leaders, true)) {
-                mLeaderAdapter.add(new LeaderItem(leader));
-            }
+//          TODO: implement
+//            final List<OrganizationalPermission> roles = Application
+//                    .getDb()
+//                    .getOrganizationalPermissionDao()
+//                    .queryBuilder()
+//                    .where(OrganizationalRoleDao.Properties.Organization_id.eq(Session.getInstance().getOrganizationId()),
+//                            OrganizationalRoleDao.Properties.Role_id.in(U.Role.admin.id(), U.Role.leader.id())).list();
+//
+//            final Set<Person> leaders = new HashSet<Person>();
+//            for (final OrganizationalRole role : roles) {
+//                leaders.add(Application.getDb().getPersonDao().load(role.getPerson_id()));
+//            }
+//
+//            for (final Person leader : U.sortPeople(leaders, true)) {
+//                mLeaderAdapter.add(new LeaderItem(leader));
+//            }
 
             mLeaderAdapter.notifyDataSetChanged();
         }
@@ -671,11 +666,7 @@ public class ContactAssignmentDialogFragment extends RefreshableDialogFragment i
         if (item instanceof AssignNoneItem) {
             doLeaderAssignment(null);
         } else if (item instanceof AssignMeItem) {
-            try {
-                doLeaderAssignment(Session.getInstance().getPerson());
-            } catch (final NoPersonException e) {
-                /** should be impossible to get here */
-            }
+            doLeaderAssignment(Session.getInstance().getPerson());
         } else if (item instanceof SelectionItem) {
             if (((SelectionItem) item).id == IndexFragment.LEADERS) {
                 showLeaders(true);
@@ -700,7 +691,7 @@ public class ContactAssignmentDialogFragment extends RefreshableDialogFragment i
                 public Void call() throws Exception {
                     Api.getOrganization(Session.getInstance().getOrganizationId(), ApiOptions.builder()//
                             .include(Include.leaders) //
-                            .include(Include.organizational_roles) //
+                            .include(Include.organizational_permission) //
                             .build()).get();
                     return null;
                 }

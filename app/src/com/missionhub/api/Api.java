@@ -2,6 +2,7 @@ package com.missionhub.api;
 
 import android.os.Build;
 import android.util.Log;
+
 import com.github.kevinsawicki.http.HttpRequest;
 import com.google.gson.Gson;
 import com.missionhub.application.Application;
@@ -632,7 +633,8 @@ public class Api {
         permission(GPermission.class), // organizational permission
         phone_numbers(GPerson.class), email_addresses(GPerson.class), person_transfers(GPerson.class), contact_assignments(GPerson.class), assigned_tos(GPerson.class), // people
         answer_sheets(GPerson.class), all_organizational_permissions(GPerson.class), all_organization_and_children(GPerson.class),
-        interactions(GPerson.class), organizational_labels(GPerson.class), addresses(GPerson.class), user(GPerson.class), current_address(GPerson.class), organizational_permission(GPerson.class);
+        interactions(GPerson.class), organizational_labels(GPerson.class), addresses(GPerson.class), user(GPerson.class), current_address(GPerson.class), organizational_permission(GPerson.class),
+        questions(GSurvey.class), all_questions(GSurvey.class), archived_questions(GSurvey.class), keyword(GSurvey.class); // surveys
 
         private final Type mValid;
 

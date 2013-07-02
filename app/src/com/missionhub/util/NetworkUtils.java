@@ -5,6 +5,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
+
 import com.missionhub.application.Configuration;
 
 import java.io.File;
@@ -24,8 +25,10 @@ public class NetworkUtils {
         final ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         final NetworkInfo[] netInfo = cm.getAllNetworkInfo();
         for (final NetworkInfo ni : netInfo) {
-            if (ni.getTypeName().equalsIgnoreCase("WIFI")) if (ni.isConnected()) haveConnectedWifi = true;
-            if (ni.getTypeName().equalsIgnoreCase("MOBILE")) if (ni.isConnected()) haveConnectedMobile = true;
+            if (ni.getTypeName().equalsIgnoreCase("WIFI"))
+                if (ni.isConnected()) haveConnectedWifi = true;
+            if (ni.getTypeName().equalsIgnoreCase("MOBILE"))
+                if (ni.isConnected()) haveConnectedMobile = true;
         }
         return haveConnectedWifi || haveConnectedMobile;
     }

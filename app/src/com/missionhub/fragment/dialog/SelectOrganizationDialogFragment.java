@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+
 import com.missionhub.R;
 import com.missionhub.application.Application;
 import com.missionhub.application.Session;
@@ -19,6 +20,7 @@ import com.missionhub.ui.drilldown.DrillDownItem;
 import com.missionhub.ui.drilldown.DrillDownView;
 import com.missionhub.util.SafeAsyncTask;
 import com.missionhub.util.TreeDataStructure;
+
 import org.apache.commons.lang3.StringUtils;
 import org.holoeverywhere.app.AlertDialog;
 import org.apache.commons.lang3.ArrayUtils;
@@ -35,7 +37,8 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
     private SafeAsyncTask<Void> mTask;
     private OrganizationDrillDownItem mCurrentItem;
 
-    public SelectOrganizationDialogFragment() {}
+    public SelectOrganizationDialogFragment() {
+    }
 
     public static SelectOrganizationDialogFragment showForResult(FragmentManager fm, Integer requestCode) {
         return SelectOrganizationDialogFragment.show(SelectOrganizationDialogFragment.class, fm, null, requestCode);
@@ -72,11 +75,7 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
         mView.setOnDrillDownItemClickListener(new DrillDownView.OnDrillDownItemClickListener() {
             @Override
             public void onItemClicked(DrillDownAdapter adapter, DrillDownItem item) {
-                try {
-                    Session.getInstance().setOrganizationId(item.getId());
-                } catch (Session.NoPersonException e) {
-                    /* ignore */
-                }
+                Session.getInstance().setOrganizationId(item.getId());
                 dismiss();
             }
         });
@@ -124,11 +123,7 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
 
         mCurrentItem = null;
 
-        try {
-            rebuildAdapterR(Session.getInstance().getPerson().getOrganizationHierarchy(), null);
-        } catch (final Session.NoPersonException e) {
-            /** shouldn't be possible to get here */
-        }
+        rebuildAdapterR(Session.getInstance().getPerson().getOrganizationHierarchy(), null);
 
         mAdapter.setCurrentItem(mCurrentItem);
     }
@@ -140,7 +135,7 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
         try {
             Person currentPerson = Session.getInstance().getPerson();
             for (Long favorite : favorites) {
-                if (currentPerson.isAdminOrLeader(favorite)) {
+                if (currentPerson.isAdminOrUser(favorite)) {
                     privilegedFavorites.add(favorite);
                 }
             }
@@ -151,7 +146,7 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
     }
 
     private long[] getFavorites() {
-        return SettingsManager.getInstance().getUserSetting(Session.getInstance().getPersonId(), "favorite_organizations", new long[] {Session.getInstance().getPrimaryOrganizationId()});
+        return SettingsManager.getInstance().getUserSetting(Session.getInstance().getPersonId(), "favorite_organizations", new long[]{Session.getInstance().getPrimaryOrganizationId()});
     }
 
     private void addFavoriteOrganization(long organizationId) {
@@ -170,7 +165,7 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
         }
     }
 
-    private synchronized void rebuildAdapterR(final TreeDataStructure<Long> tree, final OrganizationDrillDownItem parent) throws Session.NoPersonException {
+    private synchronized void rebuildAdapterR(final TreeDataStructure<Long> tree, final OrganizationDrillDownItem parent) {
         for (final TreeDataStructure<Long> subTree : tree.getSubTrees()) {
             final long organizationId = subTree.getHead();
             final Organization org = Application.getDb().getOrganizationDao().load(organizationId);
@@ -215,7 +210,7 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
                     view = getLayoutInflater().inflate(R.layout.item_list_divider, null);
                     holder.text1 = (TextView) view.findViewById(android.R.id.text1);
                     view.setTag(holder);
-                }  else {
+                } else {
                     holder = (HeaderViewHolder) view.getTag();
                 }
                 if (StringUtils.isNotEmpty(item.getText())) {
@@ -296,7 +291,8 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
             }
 
             @Override
-            public void onInterrupted(final Exception e) {}
+            public void onInterrupted(final Exception e) {
+            }
         };
 
         Application.getExecutor().execute(mTask.future());

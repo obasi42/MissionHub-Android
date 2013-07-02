@@ -35,6 +35,11 @@ public class Authenticator extends AbstractAccountAuthenticator {
     public static final String KEY_PERSON_ID = "com.missionhub.authenticator.key_person_id";
 
     /**
+     * the facebook user id of the person
+     */
+    public static final String KEY_FACEBOOK_ID = "com.missionhub.authenticator.key_facebook_id";
+
+    /**
      * Creates a new Authenticator object
      *
      * @param context
@@ -71,7 +76,8 @@ public class Authenticator extends AbstractAccountAuthenticator {
         // an intent to display our AuthenticatorActivity panel.
         final Intent intent = new Intent(mContext, AuthenticatorActivity.class);
         intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
-        intent.putExtra(Authenticator.KEY_PERSON_ID, Long.parseLong(accountManager.getUserData(account, KEY_PERSON_ID)));
+        intent.putExtra(Authenticator.KEY_PERSON_ID, accountManager.getUserData(account, KEY_PERSON_ID));
+        intent.putExtra(Authenticator.KEY_FACEBOOK_ID, accountManager.getUserData(account, KEY_FACEBOOK_ID));
         final Bundle bundle = new Bundle();
         bundle.putParcelable(AccountManager.KEY_INTENT, intent);
         return bundle;

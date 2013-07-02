@@ -276,5 +276,9 @@
         address we will followup with you when the issue has been resolved.
     </string>
     <string name="crash_dialog_ok_toast">Thank you!</string>
+    <string name="exception_user_not_found">Before using MissionHub, you must first log in to web
+        interface using a web browser at www.missionhub.com.
+    </string>
+    <string name="exception_user_not_found_title">MissionHub user not found</string>
 
 </resources>

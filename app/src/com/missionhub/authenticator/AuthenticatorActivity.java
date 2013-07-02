@@ -3,26 +3,31 @@ package com.missionhub.authenticator;
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorResponse;
 import android.accounts.AccountManager;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
-import com.actionbarsherlock.view.Window;
-import com.facebook.widget.LoginButton;
+import com.facebook.model.GraphUser;
 import com.missionhub.R;
 import com.missionhub.activity.BaseActivity;
+import com.missionhub.api.ApiException;
 import com.missionhub.application.Application;
-import com.missionhub.application.Configuration;
 import com.missionhub.application.Session;
+import com.missionhub.application.SessionState;
 import com.missionhub.application.SettingsManager;
+import com.missionhub.event.FacebookEvent;
 import com.missionhub.event.SessionEvent;
-import com.missionhub.model.Person;
+import com.missionhub.exception.ExceptionHelper;
+import com.missionhub.ui.widget.PickAccountDialog;
 
 import org.apache.commons.lang3.StringUtils;
+import org.holoeverywhere.app.Activity;
 import org.holoeverywhere.widget.Button;
 import org.holoeverywhere.widget.ProgressBar;
 import org.holoeverywhere.widget.TextView;
-import org.holoeverywhere.widget.Toast;
+
+import java.util.logging.Handler;
 
 /**
  * Activity that manages the login process
@@ -35,9 +40,14 @@ public class AuthenticatorActivity extends BaseActivity {
     public static final String TAG = AuthenticatorActivity.class.getSimpleName();
 
     /**
-     * The id of the person requesting authentication
+     * The id of the person requesting re-authenticating
      */
-    private long mRequestPersonId = -1;
+    private long mReauthPersonId = -1;
+
+    /**
+     * The facebook id of the person re-authenticating
+     */
+    private long mReauthFacebookId = -1;
 
     /**
      * The account authenticator response when used as an account authenticator
@@ -64,14 +74,24 @@ public class AuthenticatorActivity extends BaseActivity {
      */
     private TextView mVersion;
 
+    /**
+     * the account picker dialog if used
+     */
+    private PickAccountDialog mAccountDialog;
+
+    /**
+     * Holds the authenticator response
+     */
+    private Intent mResponseIntent;
+
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.activity_authenticator);
 
         // set up the authenticator response when used as an authenticator
-        mRequestPersonId = getIntent().getLongExtra(Authenticator.KEY_PERSON_ID, -1);
+        mReauthPersonId = getIntent().getLongExtra(Authenticator.KEY_PERSON_ID, -1);
+        mReauthFacebookId = getIntent().getLongExtra(Authenticator.KEY_FACEBOOK_ID, -1);
         mAccountAuthenticatorResponse = getIntent().getParcelableExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE);
         if (mAccountAuthenticatorResponse != null) {
             mAccountAuthenticatorResponse.onRequestContinued();
@@ -95,27 +115,125 @@ public class AuthenticatorActivity extends BaseActivity {
         mVersion.setText(Application.getVersionName());
 
         // receive session events
-        Application.registerEventSubscriber(this, SessionEvent.class);
+        Application.registerEventSubscriber(this, SessionEvent.class, FacebookEvent.class);
 
-        // open a missionhub session
         Session.getInstance().open();
     }
 
-
     /**
-     * Called by session open
+     * Callback method that listens for SessionEvents
      *
      * @param event
      */
     @SuppressWarnings("unused")
     public void onEventMainThread(final SessionEvent event) {
+        switch (event.getState()) {
+            case OPENING:
+                if (event.getMessage() != null) {
+                    showProgress(event.getMessage());
+                } else {
+                    showProgress(getString(R.string.init_resuming));
+                }
+                break;
+            case OPEN:
+                mResponseIntent = new Intent();
+                Account account = Session.getInstance().getAccount();
+                final Intent intent = new Intent();
+                intent.putExtra(AccountManager.KEY_ACCOUNT_NAME, account.name);
+                intent.putExtra(AccountManager.KEY_ACCOUNT_TYPE, account.type);
+                intent.putExtra(Authenticator.KEY_PERSON_ID, Session.getInstance().getAccountPersonId(account));
+                intent.putExtra(Authenticator.KEY_FACEBOOK_ID, Session.getInstance().getAccountFacebookId(account));
+                finish();
+                break;
+            case CLOSED_ERROR:
+                showLoginButton();
+                showException(event.getException());
+                break;
+            case CHOOSE_ACCOUNT:
+                showLoginButton();
+                showAccountPicker();
+                break;
+            case NO_ACCOUNT:
+                showLoginButton();
+                break;
+        }
+    }
 
+    /**
+     * Callback method that listens for FacebookEvents
+     *
+     * @param event
+     */
+    @SuppressWarnings("unused")
+    public void onEventMainThread(final FacebookEvent event) {
+        switch (event.getState()) {
+            case OPENED:
+                GraphUser user = Session.getInstance().blockingGetFacebookGraphUser();
+                if (user != null) {
+                    Session.getInstance().open(Session.getInstance().addSystemAccount(user, event.getSession().getAccessToken()));
+                    break;
+                } else {
+                    showException(new ApiException("Could not login with Facebook"));
+                }
+                break;
+            case CLOSED_LOGIN_FAILED:
+                showException(event.getException());
+                break;
+        }
+        findViewById(R.id.test).invalidate();
     }
 
     @Override
     public void onDestroy() {
         Application.unregisterEventSubscriber(this);
         super.onDestroy();
+    }
+
+    public void onClickLogin() {
+        if (Session.getInstance().getState() == SessionState.NO_ACCOUNT) {
+            openFacebookSession();
+        } else {
+            Session.getInstance().open();
+        }
+    }
+
+    private void showProgress(final CharSequence action) {
+        hideLoginButton();
+        mProgress.setVisibility(View.VISIBLE);
+        if (StringUtils.isNotEmpty(action)) {
+            mProgressText.setText(action);
+            mProgressText.setVisibility(View.VISIBLE);
+        } else {
+            mProgress.setVisibility(View.GONE);
+            mProgressText.setVisibility(View.GONE);
+        }
+    }
+
+    private void hideProgress() {
+        mProgress.setVisibility(View.GONE);
+        mProgressText.setVisibility(View.GONE);
+    }
+
+    private void showLoginButton() {
+        hideProgress();
+        mLoginButton.setVisibility(View.VISIBLE);
+    }
+
+    private void hideLoginButton() {
+        mLoginButton.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void finish() {
+        if (mAccountAuthenticatorResponse != null) {
+            if (mResponseIntent != null) {
+                setResult(Activity.RESULT_OK, mResponseIntent);
+                mAccountAuthenticatorResponse.onResult(mResponseIntent.getExtras());
+            } else {
+                mAccountAuthenticatorResponse.onError(AccountManager.ERROR_CODE_CANCELED, "canceled");
+            }
+        }
+        super.finish();
     }
 
     /**
@@ -128,95 +246,57 @@ public class AuthenticatorActivity extends BaseActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        com.facebook.Session.getActiveSession().onActivityResult(this, requestCode, resultCode, data);
-    }
-
-    public void onClickLogin() {
-
-    }
-
-    /**
-     * shows the progress indicator
-     */
-    private void showProgress(final String action) {
-        mProgress.setVisibility(View.VISIBLE);
-        if (StringUtils.isNotEmpty(action)) {
-            mProgressText.setText(action);
-            mProgressText.setVisibility(View.VISIBLE);
-        } else {
-            mProgress.setVisibility(View.INVISIBLE);
-            mProgressText.setVisibility(View.INVISIBLE);
+        com.facebook.Session session = com.facebook.Session.getActiveSession();
+        if (session != null) {
+            session.onActivityResult(this, requestCode, resultCode, data);
         }
     }
 
-    /**
-     * hides the progress indicator
-     */
-    private void hideProgress() {
-        AuthenticatorActivity.this.setSupportProgressBarIndeterminateVisibility(Boolean.FALSE);
-        mProgress.setVisibility(View.INVISIBLE);
-        mProgressText.setVisibility(View.INVISIBLE);
+    private void showAccountPicker() {
+        hideProgress();
+        if (mAccountDialog == null) {
+            mAccountDialog = new PickAccountDialog();
+            mAccountDialog.setCancelable(false);
+        }
+        mAccountDialog.show(getSupportFragmentManager());
     }
 
-    @Override
-    public void finish() {
-        // TODO: finish this
-
-//        final Intent intent = new Intent();
-//        intent.putExtra(AccountManager.KEY_ACCOUNT_NAME, account.name);
-//        intent.putExtra(AccountManager.KEY_ACCOUNT_TYPE, account.type);
-//        intent.putExtra(Authenticator.KEY_PERSON_ID, personId);
-//        setResult(result, intent);
-//        finish();
-
-//
-//        if (mAccountAuthenticatorResponse != null) {
-//            // send the result bundle back if set, otherwise send an error.
-//            if (mResultBundle != null) {
-//                mAccountAuthenticatorResponse.onResult(mResultBundle);
-//            } else {
-//                mAccountAuthenticatorResponse.onError(AccountManager.ERROR_CODE_CANCELED, "canceled");
-//            }
-//            mAccountAuthenticatorResponse = null;
-//        }
-        super.finish();
+    @SuppressWarnings("unused")
+    public void onEventMainThread(final PickAccountDialog.AccountPickedEvent event) {
+        if (event.personId > 0) {
+            SettingsManager.setSessionLastPersonId(event.personId);
+            Session.getInstance().open();
+        } else {
+            openFacebookSession();
+        }
     }
 
+    private void openFacebookSession() {
+        hideLoginButton();
+        if (mAccountAuthenticatorResponse == null) {
+            Session.getInstance().openFacebookSession(this, true);
+        } else {
+            if (Session.getInstance().getAllAccounts().length > 0) {
+                Session.getInstance().openFacebookSession(this, false);
+            } else {
+                Session.getInstance().openFacebookSession(this, true);
+            }
+        }
+    }
 
-//    public static Account addAccountForPerson(Person person, String accessToken, AuthenticatorActivity activity) {
-//        final AccountManager accountManager = AccountManager.get(Application.getContext());
-//        final String accountId = String.valueOf(person.getName());
-//
-//        // check for duplicate account
-//        final Account[] accounts = accountManager.getAccountsByType(Authenticator.ACCOUNT_TYPE);
-//        for (final Account account : accounts) {
-//            final long personId = Long.parseLong(accountManager.getUserData(account, Authenticator.KEY_PERSON_ID));
-//            if (personId == person.getId()) {
-//                // account already exists
-//                if (activity != null) {
-//                    Toast.makeText(activity, String.format(activity.getString(R.string.auth_duplicate_account), person.getName()), Toast.LENGTH_LONG).show();
-//                    activity.finishActivity(RESULT_DUPLICATE, account, personId);
-//                }
-//                return account;
-//            }
-//        }
-//
-//        // if there are no other accounts, set this as the last used so it is resumed on next launch
-//        // if there are are other accounts, clear the session id to allow the user to pick an account on next
-//        // launch
-//        if (accounts.length == 0) {
-//            SettingsManager.setSessionLastUserId(person.getId());
-//        } else {
-//            SettingsManager.setSessionLastUserId(-1);
-//        }
-//
-//        // add the new account, for now we will use the access token as the password
-//        final Account account = new Account(accountId, Authenticator.ACCOUNT_TYPE);
-//        final Bundle userdata = new Bundle();
-//        userdata.putString(Authenticator.KEY_PERSON_ID, String.valueOf(person.getId()));
-//        accountManager.addAccountExplicitly(account, accessToken, userdata);
-//        accountManager.setPassword(account, accessToken);
-//
-//        return account;
-//    }
+    private void showException(Exception e) {
+        final ExceptionHelper eh = new ExceptionHelper(this, e);
+        eh.setPositiveButton(new ExceptionHelper.DialogButton() {
+            @Override
+            public String getTitle() {
+                return getString(R.string.action_close);
+            }
+
+            @Override
+            public void onClick(final DialogInterface dialog, final int whichButton) {
+                dialog.dismiss();
+            }
+        });
+        eh.show();
+    }
 }

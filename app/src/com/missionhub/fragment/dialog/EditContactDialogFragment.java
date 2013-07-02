@@ -186,39 +186,40 @@ public class EditContactDialogFragment extends BaseDialogFragment {
             } else {
                 mEmail.setText("");
             }
-            if (mPerson.current_address != null) {
-                final GAddress address = mPerson.current_address;
-                if (StringUtils.isNotEmpty(address.address1)) {
-                    mAddressLine1.setText(address.address1);
-                } else {
-                    mAddressLine1.setText("");
-                }
-                if (StringUtils.isNotEmpty(address.address2)) {
-                    mAddressLine2.setText(address.address2);
-                } else {
-                    mAddressLine2.setText("");
-                }
-                if (StringUtils.isNotEmpty(address.city)) {
-                    mAddressCity.setText(address.city);
-                } else {
-                    mAddressCity.setText("");
-                }
-                if (StringUtils.isNotEmpty(address.state)) {
-                    mAddressState.setSelection(getIndexOfId(address.state, R.array.state_ids));
-                } else {
-                    mAddressState.setSelection(0);
-                }
-                if (address.country != null) {
-                    mAddressCountry.setSelection(getIndexOfId(address.country, R.array.country_ids));
-                } else {
-                    mAddressCountry.setSelection(0);
-                }
-                if (StringUtils.isNotEmpty(address.zip)) {
-                    mAddressZip.setText(address.zip);
-                } else {
-                    mAddressZip.setText("");
-                }
-            }
+//            TODO: implement
+// if (mPerson.current_address != null) {
+//                final GAddress address = mPerson.current_address;
+//                if (StringUtils.isNotEmpty(address.address1)) {
+//                    mAddressLine1.setText(address.address1);
+//                } else {
+//                    mAddressLine1.setText("");
+//                }
+//                if (StringUtils.isNotEmpty(address.address2)) {
+//                    mAddressLine2.setText(address.address2);
+//                } else {
+//                    mAddressLine2.setText("");
+//                }
+//                if (StringUtils.isNotEmpty(address.city)) {
+//                    mAddressCity.setText(address.city);
+//                } else {
+//                    mAddressCity.setText("");
+//                }
+//                if (StringUtils.isNotEmpty(address.state)) {
+//                    mAddressState.setSelection(getIndexOfId(address.state, R.array.state_ids));
+//                } else {
+//                    mAddressState.setSelection(0);
+//                }
+//                if (address.country != null) {
+//                    mAddressCountry.setSelection(getIndexOfId(address.country, R.array.country_ids));
+//                } else {
+//                    mAddressCountry.setSelection(0);
+//                }
+//                if (StringUtils.isNotEmpty(address.zip)) {
+//                    mAddressZip.setText(address.zip);
+//                } else {
+//                    mAddressZip.setText("");
+//                }
+//            }
         }
     }
 
@@ -250,7 +251,7 @@ public class EditContactDialogFragment extends BaseDialogFragment {
             address.state = getIdFromTitle(mAddressState.getSelectedItem().toString(), R.array.state_titles, R.array.state_ids);
             address.country = getIdFromTitle(mAddressCountry.getSelectedItem().toString(), R.array.country_titles, R.array.country_ids);
             address.zip = mAddressZip.getText().toString();
-            person.current_address = address;
+            //person.current_address = address;
         }
     }
 
@@ -276,7 +277,8 @@ public class EditContactDialogFragment extends BaseDialogFragment {
                         .include(Include.current_address) //
                         .include(Include.email_addresses) //
                         .include(Include.phone_numbers) //
-                        .include(Include.organizational_roles) //
+                        .include(Include.organizational_permission) //
+                        .include(Include.organizational_labels) //
                         .build()).get();
             }
 

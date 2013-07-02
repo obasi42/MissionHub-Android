@@ -118,7 +118,8 @@ public class ApiPeopleListProvider extends DynamicPeopleListProvider {
                         .include(Api.Include.assigned_tos)
                         .include(Api.Include.current_address)
                         .include(Api.Include.email_addresses)
-                        .include(Api.Include.organizational_roles)
+                        .include(Api.Include.organizational_permission)
+                        .include(Api.Include.organizational_labels)
                         .include(Api.Include.phone_numbers)
                         .build()).get();
 

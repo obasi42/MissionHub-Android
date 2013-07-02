@@ -1,6 +1,7 @@
 package com.missionhub.activity;
 
 import com.missionhub.fragment.dialog.FragmentResult;
+
 import org.holoeverywhere.app.Activity;
 
 /**

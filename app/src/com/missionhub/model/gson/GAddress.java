@@ -3,6 +3,7 @@ package com.missionhub.model.gson;
 import com.missionhub.application.Application;
 import com.missionhub.model.Address;
 import com.missionhub.model.AddressDao;
+import com.missionhub.model.PhoneNumber;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -91,4 +92,16 @@ public class GAddress {
         }
     }
 
+    public static GAddress createFromAddress(Address address) {
+        final GAddress addr = new GAddress();
+        addr.id = address.getId();
+        addr.address1 = address.getAddress1();
+        addr.address2 = address.getAddress2();
+        addr.city = address.getCity();
+        addr.state = address.getState();
+        addr.country = address.getCountry();
+        addr.zip = address.getZip();
+        addr.address_type = address.getAddress_type();
+        return addr;
+    }
 }
