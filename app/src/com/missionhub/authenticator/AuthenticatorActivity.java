@@ -27,8 +27,6 @@ import org.holoeverywhere.widget.Button;
 import org.holoeverywhere.widget.ProgressBar;
 import org.holoeverywhere.widget.TextView;
 
-import java.util.logging.Handler;
-
 /**
  * Activity that manages the login process
  */
@@ -98,7 +96,7 @@ public class AuthenticatorActivity extends BaseActivity {
         }
 
         // set up the progress bar and text
-        mProgress = (ProgressBar) findViewById(android.R.id.progress);
+        mProgress = (ProgressBar) findViewById(R.id.progress);
         mProgressText = (TextView) findViewById(R.id.progress_text);
 
         // set up the login button
@@ -167,6 +165,20 @@ public class AuthenticatorActivity extends BaseActivity {
     @SuppressWarnings("unused")
     public void onEventMainThread(final FacebookEvent event) {
         switch (event.getState()) {
+            case CLOSED_LOGIN_FAILED:
+                showException(event.getException());
+                break;
+        }
+    }
+
+    /**
+     * Callback method that listens for FacebookEvents
+     *
+     * @param event
+     */
+    @SuppressWarnings("unused")
+    public void onEventBackgroundThread(final FacebookEvent event) {
+        switch (event.getState()) {
             case OPENED:
                 GraphUser user = Session.getInstance().blockingGetFacebookGraphUser();
                 if (user != null) {
@@ -176,12 +188,9 @@ public class AuthenticatorActivity extends BaseActivity {
                     showException(new ApiException("Could not login with Facebook"));
                 }
                 break;
-            case CLOSED_LOGIN_FAILED:
-                showException(event.getException());
-                break;
         }
-        findViewById(R.id.test).invalidate();
     }
+
 
     @Override
     public void onDestroy() {
@@ -263,9 +272,8 @@ public class AuthenticatorActivity extends BaseActivity {
 
     @SuppressWarnings("unused")
     public void onEventMainThread(final PickAccountDialog.AccountPickedEvent event) {
-        if (event.personId > 0) {
-            SettingsManager.setSessionLastPersonId(event.personId);
-            Session.getInstance().open();
+        if (event.account != null) {
+            Session.getInstance().open(event.account);
         } else {
             openFacebookSession();
         }

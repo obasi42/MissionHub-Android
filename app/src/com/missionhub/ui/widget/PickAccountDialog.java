@@ -12,6 +12,7 @@ import android.widget.AdapterView.OnItemClickListener;
 
 import com.missionhub.R;
 import com.missionhub.application.Application;
+import com.missionhub.application.Session;
 import com.missionhub.application.SettingsManager;
 import com.missionhub.authenticator.Authenticator;
 import com.missionhub.fragment.dialog.BaseDialogFragment;
@@ -77,10 +78,11 @@ public class PickAccountDialog extends BaseDialogFragment implements OnItemClick
 
             if (item instanceof AccountItem) {
                 final AccountItem aitem = (AccountItem) item;
-                if (aitem.person != null) {
-                    holder.name.setText(aitem.person.getName());
+                if (aitem.account != null) {
+                    holder.name.setText(aitem.account.name);
 
-                    final Organization org = Application.getDb().getOrganizationDao().load(SettingsManager.getSessionOrganizationId(aitem.person.getId()));
+                    long personId = Session.getInstance().getAccountPersonId(aitem.account);
+                    final Organization org = Application.getDb().getOrganizationDao().load(SettingsManager.getSessionOrganizationId(personId));
                     if (org != null) {
                         holder.organization.setText(org.getName());
                         holder.organization.setVisibility(View.VISIBLE);
@@ -128,11 +130,7 @@ public class PickAccountDialog extends BaseDialogFragment implements OnItemClick
 
         final Account[] accounts = mAccountManager.getAccountsByType(Authenticator.ACCOUNT_TYPE);
         for (final Account account : accounts) {
-            final Long personId = Long.parseLong(mAccountManager.getUserData(account, Authenticator.KEY_PERSON_ID));
-            final Person person = Application.getDb().getPersonDao().load(personId);
-            if (ObjectUtils.isNotNull(account, person)) {
-                mAdapter.add(new AccountItem(person));
-            }
+            mAdapter.add(new AccountItem(account));
         }
         mAdapter.add(new NewAccountItem());
 
@@ -148,18 +146,18 @@ public class PickAccountDialog extends BaseDialogFragment implements OnItemClick
     public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id) {
         final Object item = parent.getItemAtPosition(position);
         if (item instanceof AccountItem) {
-            Application.postEvent(new AccountPickedEvent(((AccountItem) item).person.getId()));
+            Application.postEvent(new AccountPickedEvent(((AccountItem) item).account));
         } else if (item instanceof NewAccountItem) {
-            Application.postEvent(new AccountPickedEvent(-1));
+            Application.postEvent(new AccountPickedEvent(null));
         }
         dismiss();
     }
 
     private static class AccountItem {
-        public final Person person;
+        public final Account account;
 
-        public AccountItem(final Person person) {
-            this.person = person;
+        public AccountItem(final Account account) {
+            this.account = account;
         }
     }
 
@@ -167,10 +165,10 @@ public class PickAccountDialog extends BaseDialogFragment implements OnItemClick
     }
 
     public static class AccountPickedEvent {
-        public long personId = -1;
+        public final Account account;
 
-        public AccountPickedEvent(final long personId) {
-            this.personId = personId;
+        public AccountPickedEvent(final Account account) {
+            this.account = account;
         }
     }
 }

@@ -219,6 +219,8 @@ public class Session implements OnAccountsUpdateListener {
                 Application.postEvent(new SessionEvent(mState, Application.getContext().getString(R.string.init_updating_current_organization)));
                 updateCurrentOrganization(false);
 
+                SettingsManager.setSessionLastPersonId(mPersonId);
+
                 setAndPostState(SessionState.OPEN);
                 return null;
             }
@@ -649,11 +651,14 @@ public class Session implements OnAccountsUpdateListener {
     }
 
     public GraphUser blockingGetFacebookGraphUser() {
-        Response response = Request.newMeRequest(com.facebook.Session.getActiveSession(), null).executeAndWait();
-        if (response.getError() != null) {
-            throw new RuntimeException(response.getError().getErrorMessage());
-        }
-        return response.getGraphObjectAs(GraphUser.class);
+        try {
+            Response response = Request.newMeRequest(com.facebook.Session.getActiveSession(), null).executeAndWait();
+            if (response.getError() != null) {
+                throw new RuntimeException(response.getError().getErrorMessage());
+            }
+            return response.getGraphObjectAs(GraphUser.class);
+        } catch (Exception e) { /* ignore */ }
+        return null;
     }
 
 
