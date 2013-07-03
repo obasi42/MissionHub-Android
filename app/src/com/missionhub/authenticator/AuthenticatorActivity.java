@@ -11,6 +11,7 @@ import android.view.View;
 import com.facebook.model.GraphUser;
 import com.missionhub.R;
 import com.missionhub.activity.BaseActivity;
+import com.missionhub.activity.HostActivity;
 import com.missionhub.api.ApiException;
 import com.missionhub.application.Application;
 import com.missionhub.application.Session;
@@ -36,47 +37,38 @@ public class AuthenticatorActivity extends BaseActivity {
      * the logging tag
      */
     public static final String TAG = AuthenticatorActivity.class.getSimpleName();
-
     /**
      * The id of the person requesting re-authenticating
      */
     private long mReauthPersonId = -1;
-
     /**
      * The facebook id of the person re-authenticating
      */
     private long mReauthFacebookId = -1;
-
     /**
      * The account authenticator response when used as an account authenticator
      */
     private AccountAuthenticatorResponse mAccountAuthenticatorResponse = null;
-
     /**
      * the progress bar
      */
     private ProgressBar mProgress;
-
     /**
      * text to display the current progress action
      */
     private TextView mProgressText;
-
     /**
      * the facebook login button
      */
     private Button mLoginButton;
-
     /**
      * the missionhub version number
      */
     private TextView mVersion;
-
     /**
      * the account picker dialog if used
      */
     private PickAccountDialog mAccountDialog;
-
     /**
      * Holds the authenticator response
      */
@@ -113,9 +105,13 @@ public class AuthenticatorActivity extends BaseActivity {
         mVersion.setText(Application.getVersionName());
 
         // receive session events
-        Application.registerEventSubscriber(this, SessionEvent.class, FacebookEvent.class);
+        Application.registerEventSubscriber(this, SessionEvent.class, FacebookEvent.class, PickAccountDialog.AccountPickedEvent.class);
 
-        Session.getInstance().open();
+        if (!isAuthenticator()) {
+            Session.getInstance().open();
+        } else {
+            showLoginButton();
+        }
     }
 
     /**
@@ -134,14 +130,8 @@ public class AuthenticatorActivity extends BaseActivity {
                 }
                 break;
             case OPEN:
-                mResponseIntent = new Intent();
                 Account account = Session.getInstance().getAccount();
-                final Intent intent = new Intent();
-                intent.putExtra(AccountManager.KEY_ACCOUNT_NAME, account.name);
-                intent.putExtra(AccountManager.KEY_ACCOUNT_TYPE, account.type);
-                intent.putExtra(Authenticator.KEY_PERSON_ID, Session.getInstance().getAccountPersonId(account));
-                intent.putExtra(Authenticator.KEY_FACEBOOK_ID, Session.getInstance().getAccountFacebookId(account));
-                finish();
+                finishWithAccount(account);
                 break;
             case CLOSED_ERROR:
                 showLoginButton();
@@ -167,6 +157,7 @@ public class AuthenticatorActivity extends BaseActivity {
         switch (event.getState()) {
             case CLOSED_LOGIN_FAILED:
                 showException(event.getException());
+                showLoginButton();
                 break;
         }
     }
@@ -182,7 +173,14 @@ public class AuthenticatorActivity extends BaseActivity {
             case OPENED:
                 GraphUser user = Session.getInstance().blockingGetFacebookGraphUser();
                 if (user != null) {
-                    Session.getInstance().open(Session.getInstance().addSystemAccount(user, event.getSession().getAccessToken()));
+                    Account account = Session.getInstance().addSystemAccount(user, event.getSession().getAccessToken());
+                    if (isAuthenticator()) {
+                        finishWithAccount(account);
+                        Session.getInstance().close();
+                        SettingsManager.setSessionLastPersonId(-1);
+                    } else {
+                        Session.getInstance().open(account);
+                    }
                     break;
                 } else {
                     showException(new ApiException("Could not login with Facebook"));
@@ -191,15 +189,15 @@ public class AuthenticatorActivity extends BaseActivity {
         }
     }
 
-
     @Override
     public void onDestroy() {
         Application.unregisterEventSubscriber(this);
+        Session.getInstance().closeFacebookSession();
         super.onDestroy();
     }
 
     public void onClickLogin() {
-        if (Session.getInstance().getState() == SessionState.NO_ACCOUNT) {
+        if (isAuthenticator() || Session.getInstance().getState() == SessionState.NO_ACCOUNT) {
             openFacebookSession();
         } else {
             Session.getInstance().open();
@@ -213,7 +211,6 @@ public class AuthenticatorActivity extends BaseActivity {
             mProgressText.setText(action);
             mProgressText.setVisibility(View.VISIBLE);
         } else {
-            mProgress.setVisibility(View.GONE);
             mProgressText.setVisibility(View.GONE);
         }
     }
@@ -234,15 +231,28 @@ public class AuthenticatorActivity extends BaseActivity {
 
     @Override
     public void finish() {
-        if (mAccountAuthenticatorResponse != null) {
+        if (isAuthenticator()) {
             if (mResponseIntent != null) {
                 setResult(Activity.RESULT_OK, mResponseIntent);
                 mAccountAuthenticatorResponse.onResult(mResponseIntent.getExtras());
             } else {
                 mAccountAuthenticatorResponse.onError(AccountManager.ERROR_CODE_CANCELED, "canceled");
             }
+        } else {
+            Intent intent = new Intent(this, HostActivity.class);
+            startActivity(intent);
         }
         super.finish();
+    }
+
+    private void finishWithAccount(Account account) {
+        mResponseIntent = new Intent();
+        final Intent intent = new Intent();
+        intent.putExtra(AccountManager.KEY_ACCOUNT_NAME, account.name);
+        intent.putExtra(AccountManager.KEY_ACCOUNT_TYPE, account.type);
+        intent.putExtra(Authenticator.KEY_PERSON_ID, Session.getInstance().getAccountPersonId(account));
+        intent.putExtra(Authenticator.KEY_FACEBOOK_ID, Session.getInstance().getAccountFacebookId(account));
+        finish();
     }
 
     /**
@@ -281,7 +291,7 @@ public class AuthenticatorActivity extends BaseActivity {
 
     private void openFacebookSession() {
         hideLoginButton();
-        if (mAccountAuthenticatorResponse == null) {
+        if (!isAuthenticator()) {
             Session.getInstance().openFacebookSession(this, true);
         } else {
             if (Session.getInstance().getAllAccounts().length > 0) {
@@ -306,5 +316,9 @@ public class AuthenticatorActivity extends BaseActivity {
             }
         });
         eh.show();
+    }
+
+    private boolean isAuthenticator() {
+        return mAccountAuthenticatorResponse != null;
     }
 }

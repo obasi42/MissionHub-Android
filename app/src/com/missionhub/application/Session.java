@@ -158,7 +158,6 @@ public class Session implements OnAccountsUpdateListener {
                     try {
                         Person person = Api.getPersonMe(Configuration.getLoginAs()).get();
                         addSystemAccount(person, Configuration.getLoginAs());
-                        SettingsManager.setSessionLastPersonId(person.getId());
                     } catch (ApiException exception) {
                         setAndPostException(exception);
                         return null;
@@ -174,7 +173,6 @@ public class Session implements OnAccountsUpdateListener {
                         Person person = Api.getPersonMe(authToken).get();
                         addSystemAccount(person, authToken);
                         personId = person.getId();
-                        SettingsManager.setSessionLastPersonId(personId);
                     } catch (InvalidFacebookTokenException exception) {
                         personId = -1;
                     }
@@ -185,6 +183,12 @@ public class Session implements OnAccountsUpdateListener {
                     mAccount = account;
                     mPersonId = personId;
                     mOrganizationId = SettingsManager.getSessionOrganizationId(personId);
+                    if (mOrganizationId <= 0 && personId > 0) {
+                        Person person = Application.getDb().getPersonDao().load(personId);
+                        if (person != null) {
+                            mOrganizationId = person.getPrimaryOrganizationId();
+                        }
+                    }
                 } else {
                     mAccount = null;
                     mPersonId = -1;
@@ -211,6 +215,8 @@ public class Session implements OnAccountsUpdateListener {
 
                 Application.trackNewSession();
 
+                SettingsManager.setSessionLastPersonId(mPersonId);
+
                 // update the person
                 Application.postEvent(new SessionEvent(mState, Application.getContext().getString(R.string.init_updating_person)));
                 updatePerson().get();
@@ -218,8 +224,6 @@ public class Session implements OnAccountsUpdateListener {
                 // update the current organization
                 Application.postEvent(new SessionEvent(mState, Application.getContext().getString(R.string.init_updating_current_organization)));
                 updateCurrentOrganization(false);
-
-                SettingsManager.setSessionLastPersonId(mPersonId);
 
                 setAndPostState(SessionState.OPEN);
                 return null;
@@ -311,8 +315,8 @@ public class Session implements OnAccountsUpdateListener {
         } else {
             account = new Account(person.getName(), Authenticator.ACCOUNT_TYPE);
             final Bundle userdata = new Bundle();
-            userdata.putLong(Authenticator.KEY_PERSON_ID, person.getId());
-            userdata.putLong(Authenticator.KEY_FACEBOOK_ID, person.getFb_uid());
+            userdata.putString(Authenticator.KEY_PERSON_ID, String.valueOf(person.getId()));
+            userdata.putString(Authenticator.KEY_FACEBOOK_ID, String.valueOf(person.getFb_uid()));
             getAccountManager().addAccountExplicitly(account, facebookToken, userdata);
             getAccountManager().setAuthToken(account, Authenticator.ACCOUNT_TYPE, facebookToken);
         }
@@ -326,7 +330,7 @@ public class Session implements OnAccountsUpdateListener {
         } else {
             account = new Account(user.getName(), Authenticator.ACCOUNT_TYPE);
             final Bundle userdata = new Bundle();
-            userdata.putLong(Authenticator.KEY_FACEBOOK_ID, Long.parseLong(user.getId()));
+            userdata.putString(Authenticator.KEY_FACEBOOK_ID, user.getId());
             getAccountManager().addAccountExplicitly(account, facebookToken, userdata);
             getAccountManager().setAuthToken(account, Authenticator.ACCOUNT_TYPE, facebookToken);
         }
@@ -370,18 +374,14 @@ public class Session implements OnAccountsUpdateListener {
      * @param organizationId
      */
     public synchronized void setOrganizationId(final long organizationId) {
-        try {
-            if (getPerson().isAdminOrUser(organizationId)) {
-                if (organizationId != getOrganizationId()) {
-                    mOrganizationId = organizationId;
-                    SettingsManager.setSessionOrganizationId(getPersonId(), mOrganizationId);
-                    Application.postEvent(new OrganizationChangedEvent(organizationId));
-                    updateCurrentOrganization(true);
-                }
-                return;
+        if (getPerson().isAdminOrUser(organizationId)) {
+            if (organizationId != getOrganizationId()) {
+                mOrganizationId = organizationId;
+                SettingsManager.setSessionOrganizationId(getPersonId(), mOrganizationId);
+                Application.postEvent(new OrganizationChangedEvent(organizationId));
+                updateCurrentOrganization(true);
             }
-        } catch (Exception e) {
-            /* ignore */
+            return;
         }
         Application.showToast(R.string.session_not_admin, Toast.LENGTH_LONG);
     }
@@ -439,7 +439,6 @@ public class Session implements OnAccountsUpdateListener {
                 mAccountManager.setUserData(mAccount, AccountManager.KEY_ACCOUNT_NAME, getPerson().getName());
 
                 getPerson().refreshAll();
-                updateLabels();
 
                 // update the person's organization hierarchy, as it is too expensive to do from the ui thread.
                 getPerson().resetOrganizationHierarchy();
@@ -535,12 +534,15 @@ public class Session implements OnAccountsUpdateListener {
      * @return
      */
     private Account findAccount(final long personId, final long facebookId) {
-        final Account[] accounts = mAccountManager.getAccountsByType(Authenticator.ACCOUNT_TYPE);
+        final Account[] accounts = getAllAccounts();
         for (final Account account : accounts) {
-            if (personId > 0 && mAccountManager.getUserData(account, Authenticator.KEY_PERSON_ID).equalsIgnoreCase(String.valueOf(personId))) {
+            final String strPersonId = getAccountManager().getUserData(account, Authenticator.KEY_PERSON_ID);
+            final String strFacebookId = getAccountManager().getUserData(account, Authenticator.KEY_FACEBOOK_ID);
+
+            if (personId > 0 && strPersonId != null && strPersonId.equalsIgnoreCase(String.valueOf(personId))) {
                 return account;
             }
-            if (facebookId > 0 && mAccountManager.getUserData(account, Authenticator.KEY_FACEBOOK_ID).equalsIgnoreCase(String.valueOf(facebookId))) {
+            if (facebookId > 0 && strFacebookId != null && strFacebookId.equalsIgnoreCase(String.valueOf(facebookId))) {
                 return account;
             }
         }
@@ -568,17 +570,6 @@ public class Session implements OnAccountsUpdateListener {
     public void invalidateAuthToken() {
         getAccountManager().invalidateAuthToken(Authenticator.ACCOUNT_TYPE, null);
         setAndPostState(SessionState.INVALID_TOKEN);
-    }
-
-    /**
-     * Updates the labels multimap from sql
-     */
-    public synchronized void updateLabels() {
-        getPerson().resetLabels();
-        if (!getPerson().isAdminOrUser(getOrganizationId())) {
-            setOrganizationId(getPerson().getPrimaryOrganizationId());
-            Application.showToast(R.string.session_no_longer_admin, Toast.LENGTH_LONG);
-        }
     }
 
     /*--------------------------------*\
@@ -623,6 +614,8 @@ public class Session implements OnAccountsUpdateListener {
     }
 
     public com.facebook.Session openFacebookSession(AuthenticatorActivity activity, boolean sso) {
+        closeFacebookSession();
+
         com.facebook.Session.Builder builder = new com.facebook.Session.Builder(Application.getContext());
         builder.setApplicationId(Configuration.getFacebookAppId());
         com.facebook.Session session = builder.build();
@@ -664,5 +657,12 @@ public class Session implements OnAccountsUpdateListener {
 
     public SessionState getState() {
         return mState;
+    }
+
+    public void closeFacebookSession() {
+        com.facebook.Session session = com.facebook.Session.getActiveSession();
+        if (session != null) {
+            session.closeAndClearTokenInformation();
+        }
     }
 }

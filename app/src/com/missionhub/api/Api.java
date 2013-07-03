@@ -561,7 +561,7 @@ public class Api {
 
         // add oauth token to the request if needed
         if (authenticated) {
-            headers.put(HttpRequest.HEADER_AUTHORIZATION, "Bearer " + Session.getInstance().getAccessToken());
+            headers.put(HttpRequest.HEADER_AUTHORIZATION, "Facebook " + Session.getInstance().getAccessToken());
 
             if (Session.getInstance().getOrganizationId() >= 0) {
                 params.put("organization_id", String.valueOf(Session.getInstance().getOrganizationId()));
