@@ -2,16 +2,12 @@ package com.missionhub.people;
 
 import android.content.Context;
 import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
 
 import com.missionhub.api.Api;
 import com.missionhub.api.ApiOptions;
 import com.missionhub.api.PeopleListOptions;
 import com.missionhub.model.Person;
 import com.missionhub.util.SafeAsyncTask;
-
-import org.holoeverywhere.widget.TextView;
 
 import java.util.Collection;
 import java.util.List;

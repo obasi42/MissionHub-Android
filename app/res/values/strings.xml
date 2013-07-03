@@ -44,7 +44,6 @@
     <string name="display_permission">Permission</string>
     <string name="display_phone">Phone</string>
     <string name="display_email">Email</string>
-    <string name="display_date_created">Date Created</string>
 
     <string name="sort_off"><b>Sort:</b>Off
     </string>
@@ -107,20 +106,18 @@
         again.
     </string>
 
-    <!-- Init Activity -->
-    <string name="init_resuming">Resuming session…</string>
-    <string name="init_updating_person">Loading your account…</string>
-    <string name="init_updating_orgs">Loading your organizations…</string>
-    <string name="init_add_account">Add Account</string>
-    <string name="init_choose_account">Choose account…</string>
-    <string name="init_updating_current_organization">Loading your current organization…</string>
-
     <!-- Session -->
-    <string name="session_no_longer_admin">You are no longer an admin or leader in your preferred
-        organization.
-        Selecting your primary.
+    <string name="session_resuming">Resuming session…</string>
+    <string name="session_add_account">Add Account</string>
+    <string name="session_choose_account">Choose account…</string>
+    <string name="session_no_longer_admin_or_user">You are no longer an admin or user in your
+        preferred
+        organization. Selecting your primary.
     </string>
-    <string name="session_not_admin">You are not an admin or leader in this organization.</string>
+    <string name="session_updating_permissions">Loading Permissions…</string>
+    <string name="session_updating_person">Loading your account…</string>
+    <string name="session_updating_current_organization">Loading your current organization…</string>
+    <string name="session_logging_in_facebook">Logging in with Facebook…</string>
 
     <!-- Preferences Activity -->
     <string name="pref_activity_title">Preferences</string>

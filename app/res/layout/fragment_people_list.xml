@@ -16,7 +16,8 @@
             android:paddingBottom="8dip"
             android:paddingTop="8dip"
             android:background="@color/white"
-            android:textSize="20sp"/>
+            android:textSize="20sp"
+            />
 
     <LinearLayout
             android:id="@+id/person_list_controller"

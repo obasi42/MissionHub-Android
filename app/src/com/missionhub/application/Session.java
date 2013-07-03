@@ -66,13 +66,14 @@ public class Session implements OnAccountsUpdateListener {
      */
     private FutureTask<Person> mUpdatePersonTask;
     /**
-     * task used to update organizations
-     */
-    private FutureTask<Void> mUpdateOrganizationsTask;
-    /**
      * task used to update current organization
      */
     private SafeAsyncTask<Void> mUpdateOrganizationTask;
+    /**
+     * task used to update permissions
+     */
+    private SafeAsyncTask<Void> mUpdatePermissionsTask;
+
     private StatusCallback mFacebookStatusCallback;
     private SafeAsyncTask<Void> mOpenTask;
     private SafeAsyncTask<Void> mCloseTask;
@@ -217,13 +218,17 @@ public class Session implements OnAccountsUpdateListener {
 
                 SettingsManager.setSessionLastPersonId(mPersonId);
 
+                // update the permission
+                Application.postEvent(new SessionEvent(mState, Application.getContext().getString(R.string.session_updating_permissions)));
+                updatePermissions(false).get();
+
                 // update the person
-                Application.postEvent(new SessionEvent(mState, Application.getContext().getString(R.string.init_updating_person)));
-                updatePerson().get();
+                Application.postEvent(new SessionEvent(mState, Application.getContext().getString(R.string.session_updating_person)));
+                updatePerson(false).get();
 
                 // update the current organization
-                Application.postEvent(new SessionEvent(mState, Application.getContext().getString(R.string.init_updating_current_organization)));
-                updateCurrentOrganization(false);
+                Application.postEvent(new SessionEvent(mState, Application.getContext().getString(R.string.session_updating_current_organization)));
+                updateCurrentOrganization(false).get();
 
                 setAndPostState(SessionState.OPEN);
                 return null;
@@ -267,7 +272,7 @@ public class Session implements OnAccountsUpdateListener {
                     mUpdatePersonTask.cancel(true);
                 } catch (Exception e) { /* ignore */ }
                 try {
-                    mUpdateOrganizationsTask.cancel(true);
+                    mUpdatePermissionsTask.cancel(true);
                 } catch (Exception e) { /* ignore */ }
                 try {
                     mUpdateOrganizationTask.cancel(true);
@@ -374,16 +379,17 @@ public class Session implements OnAccountsUpdateListener {
      * @param organizationId
      */
     public synchronized void setOrganizationId(final long organizationId) {
-        if (getPerson().isAdminOrUser(organizationId)) {
-            if (organizationId != getOrganizationId()) {
+        if (organizationId != getOrganizationId()) {
+            if (getPerson().isAdminOrUser(organizationId)) {
                 mOrganizationId = organizationId;
-                SettingsManager.setSessionOrganizationId(getPersonId(), mOrganizationId);
-                Application.postEvent(new OrganizationChangedEvent(organizationId));
-                updateCurrentOrganization(true);
+            } else {
+                Application.showToast(R.string.session_no_longer_admin_or_user, Toast.LENGTH_LONG);
+                mOrganizationId = getPrimaryOrganizationId();
             }
-            return;
+            SettingsManager.setSessionOrganizationId(getPersonId(), mOrganizationId);
+            Application.postEvent(new OrganizationChangedEvent(mOrganizationId));
+            updateCurrentOrganization(true);
         }
-        Application.showToast(R.string.session_not_admin, Toast.LENGTH_LONG);
     }
 
     /**
@@ -413,25 +419,36 @@ public class Session implements OnAccountsUpdateListener {
     /**
      * Updates the person from the MissionHub Server Posts SessionUpdatePersonEvent
      */
-    public FutureTask<Person> updatePerson() {
+    public FutureTask<Person> updatePerson(final boolean force) {
         if (mUpdatePersonTask != null) return mUpdatePersonTask;
 
         final Callable<Person> callable = new Callable<Person>() {
+
+            private final long mOneDayMillis = 60 * 60 * 24 * 1000;
+
             @Override
             public Person call() throws Exception {
-                Api.getPersonMe(ApiOptions.builder() //
-                        .include(Include.all_organization_and_children) //
-                        .include(Include.all_organizational_permissions) //
-                        .include(Include.answer_sheets) //
-                        .include(Include.answers) //
-                        .include(Include.contact_assignments) //
-                        .include(Include.email_addresses) //
-                        .include(Include.phone_numbers) //
-                        .include(Include.current_address) //
-                        .include(Include.interactions) //
-                        .include(Include.user) //
-                        .include(Include.organizational_labels)
-                        .build()).get(); //
+
+                final long lastUpdated = SettingsManager.getInstance().getUserSetting(getPersonId(), "person_" + getPersonId() + "_updated", 0l);
+                final long currentTime = System.currentTimeMillis() - 1000;
+
+                if (lastUpdated < System.currentTimeMillis() - mOneDayMillis || force) {
+                    Api.getPersonMe(ApiOptions.builder() //
+                            .include(Include.all_organization_and_children) //
+                            .include(Include.all_organizational_permissions) //
+                            .include(Include.answer_sheets) //
+                            .include(Include.answers) //
+                            .include(Include.contact_assignments) //
+                            .include(Include.email_addresses) //
+                            .include(Include.phone_numbers) //
+                            .include(Include.current_address) //
+                            .include(Include.interactions) //
+                            .include(Include.user) //
+                            .include(Include.organizational_labels)
+                            .build()).get(); //
+
+                    SettingsManager.getInstance().setUserSetting(getPersonId(), "person_" + getPersonId() + "_updated", currentTime);
+                }
 
                 // update the account with new data to keep it fresh
                 mAccountManager.setUserData(mAccount, Authenticator.KEY_PERSON_ID, String.valueOf(getPerson().getId()));
@@ -481,6 +498,7 @@ public class Session implements OnAccountsUpdateListener {
                             .include(Include.leaders) //
                             .include(Include.labels) //
                             .include(Include.surveys) //
+                            .include(Include.organizational_permission) //
                             .build()).get();
 
                     SettingsManager.getInstance().setUserSetting(getPersonId(), "organization_" + organizationId + "_updated", currentTime);
@@ -511,6 +529,55 @@ public class Session implements OnAccountsUpdateListener {
         Application.getExecutor().submit(future);
         return future;
     }
+
+    private FutureTask<Void> updatePermissions(final boolean force) {
+        try {
+            mUpdatePermissionsTask.cancel(true);
+        } catch (final Exception e) {
+            /* ignore */
+        }
+
+        mUpdatePermissionsTask = new SafeAsyncTask<Void>() {
+
+            private final long mOneWeekMillis = 60 * 60 * 24 * 7 * 1000;
+
+            @Override
+            public Void call() throws Exception {
+                final long lastUpdated = SettingsManager.getInstance().getSetting("permissions_updated", 0l);
+                final long currentTime = System.currentTimeMillis() - 1000;
+
+                if (lastUpdated < System.currentTimeMillis() - mOneWeekMillis || force) {
+
+                    Api.listPermissions().get();
+
+                    SettingsManager.getInstance().setUserSetting(getPersonId(), "permissions_updated", currentTime);
+                }
+
+                return null;
+            }
+
+            @Override
+            public void onSuccess(final Void _) {
+            }
+
+            @Override
+            public void onFinally() {
+                mUpdatePermissionsTask = null;
+            }
+
+            @Override
+            public void onException(final Exception e) {
+            }
+
+            @Override
+            public void onInterrupted(final Exception e) {
+            }
+        };
+        final FutureTask<Void> future = mUpdatePermissionsTask.future();
+        Application.getExecutor().submit(future);
+        return future;
+    }
+
 
     /**
      * @return person object associated with the session

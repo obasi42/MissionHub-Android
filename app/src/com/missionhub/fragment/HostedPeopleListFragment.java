@@ -18,6 +18,8 @@ import com.missionhub.people.ApiPeopleListProvider;
 import com.missionhub.people.PeopleListView;
 import com.missionhub.people.PersonAdapterViewProvider;
 import com.missionhub.ui.ObjectArrayAdapter;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.PauseOnScrollListener;
 
 import org.holoeverywhere.LayoutInflater;
 import org.holoeverywhere.widget.AdapterView;
@@ -57,6 +59,7 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
         }
         mList.setProvider(mProvider);
         mList.setOnPersonClickListener(this);
+        mList.setOnScrollListener(new PauseOnScrollListener(ImageLoader.getInstance(), false, true));
 
         // set up the list controller
         mCheckmark = (ImageView) view.findViewById(R.id.checkmark);
@@ -222,12 +225,6 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
             @Override
             public void run() {
                 mProvider.setDisplay(PersonAdapterViewProvider.Display.EMAIL);
-            }
-        }));
-        adapter.add(new StringRunnableItem(R.string.display_date_created, new Runnable() {
-            @Override
-            public void run() {
-                mProvider.setDisplay(PersonAdapterViewProvider.Display.DATE_CREATED);
             }
         }));
         return adapter;

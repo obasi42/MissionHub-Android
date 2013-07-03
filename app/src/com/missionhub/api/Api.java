@@ -568,7 +568,7 @@ public class Api {
             }
         }
 
-        logRequest(url, method, headers, params, authenticated);
+        logRequest(url, method, headers, params);
 
         appendLoggingParams(params);
 
@@ -589,7 +589,7 @@ public class Api {
         return request;
     }
 
-    private void logRequest(String url, String method, Map<String, String> headers, Map<String, String> params, boolean authenticated) {
+    private void logRequest(String url, String method, Map<String, String> headers, Map<String, String> params) {
         if (Configuration.getEnvironment() == Configuration.Environment.DEVELOPMENT) {
             Log.i(TAG, method + " " + url);
             if (headers != null) {

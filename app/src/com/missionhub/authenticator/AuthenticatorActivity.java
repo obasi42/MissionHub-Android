@@ -126,7 +126,7 @@ public class AuthenticatorActivity extends BaseActivity {
                 if (event.getMessage() != null) {
                     showProgress(event.getMessage());
                 } else {
-                    showProgress(getString(R.string.init_resuming));
+                    showProgress(getString(R.string.session_resuming));
                 }
                 break;
             case OPEN:
@@ -290,7 +290,7 @@ public class AuthenticatorActivity extends BaseActivity {
     }
 
     private void openFacebookSession() {
-        hideLoginButton();
+        showProgress(getString(R.string.session_logging_in_facebook));
         if (!isAuthenticator()) {
             Session.getInstance().openFacebookSession(this, true);
         } else {

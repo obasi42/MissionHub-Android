@@ -44,7 +44,7 @@ public class PickAccountDialog extends BaseDialogFragment implements OnItemClick
         mListView.setOnItemClickListener(this);
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(getSupportActivity());
-        builder.setTitle(getString(R.string.init_choose_account));
+        builder.setTitle(getString(R.string.session_choose_account));
         builder.setView(view);
         return builder.create();
     }

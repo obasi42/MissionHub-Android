@@ -265,7 +265,7 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
         mTask = new SafeAsyncTask<Void>() {
             @Override
             public Void call() throws Exception {
-                Session.getInstance().updatePerson().get();
+                Session.getInstance().updatePerson(true).get();
                 return null;
             }
 

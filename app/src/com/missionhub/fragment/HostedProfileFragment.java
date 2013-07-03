@@ -167,8 +167,8 @@ public class HostedProfileFragment extends HostedFragment {
         DisplayMetrics metrics = DisplayUtils.getRealDisplayMetrics(getSupportActivity());
         String picture = person.getPictureUrl(metrics.widthPixels, metrics.heightPixels);
         DisplayImageOptions options = new DisplayImageOptions.Builder()
-                .cacheInMemory()
-                .cacheOnDisc()
+                .cacheInMemory(true)
+                .cacheOnDisc(true)
                 .showImageForEmptyUri(R.drawable.default_contact)
                 .showImageOnFail(R.drawable.default_contact)
                 .build();

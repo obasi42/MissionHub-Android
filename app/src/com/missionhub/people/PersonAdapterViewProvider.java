@@ -39,7 +39,7 @@ public class PersonAdapterViewProvider implements AdapterViewProvider {
      * The valid display options
      */
     public static enum Display {
-        NAME, STATUS, GENDER, EMAIL, PHONE, PERMISSION, DATE_CREATED
+        NAME, STATUS, GENDER, EMAIL, PHONE, PERMISSION
     }
 
     /**
@@ -112,9 +112,6 @@ public class PersonAdapterViewProvider implements AdapterViewProvider {
                 break;
             case PERMISSION:
                 safeSet(holder.text2, mCache.permission);
-                break;
-            case DATE_CREATED:
-                safeSet(holder.text2, mCache.dateCreated);
                 break;
             default:
                 safeSet(holder.text2, null);

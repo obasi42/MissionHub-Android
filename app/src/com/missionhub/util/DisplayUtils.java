@@ -58,8 +58,8 @@ public class DisplayUtils {
 
     public static DisplayImageOptions getContactImageDisplayOptions() {
         return new DisplayImageOptions.Builder()
-                .cacheInMemory()
-                .cacheOnDisc()
+                .cacheInMemory(true)
+                .cacheOnDisc(true)
                 .showImageForEmptyUri(R.drawable.default_contact)
                 .showImageOnFail(R.drawable.default_contact)
                 .showStubImage(R.drawable.default_contact)

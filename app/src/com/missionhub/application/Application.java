@@ -121,9 +121,9 @@ public class Application extends org.holoeverywhere.app.Application {
 
     private void initImageLoader() {
         DisplayImageOptions.Builder defaultOptions = new DisplayImageOptions.Builder();
-        defaultOptions.cacheInMemory();
+        defaultOptions.cacheInMemory(true);
         if (Configuration.isCacheFileEnabled()) {
-            defaultOptions.cacheOnDisc();
+            defaultOptions.cacheOnDisc(true);
         }
 
         int memoryCacheSize = (int) (Runtime.getRuntime().maxMemory() / 8);

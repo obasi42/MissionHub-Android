@@ -41,7 +41,7 @@ public class PreferencesFragment extends BaseFragment {
         setRetainInstance(true);
         setHasOptionsMenu(true);
 
-        mImageLoaderOptions = new DisplayImageOptions.Builder().displayer(new FadeInBitmapDisplayer(200)).showImageForEmptyUri(R.drawable.default_contact).cacheInMemory().cacheOnDisc().build();
+        mImageLoaderOptions = new DisplayImageOptions.Builder().displayer(new FadeInBitmapDisplayer(200)).showImageForEmptyUri(R.drawable.default_contact).cacheInMemory(true).cacheOnDisc(true).build();
     }
 
     @Override

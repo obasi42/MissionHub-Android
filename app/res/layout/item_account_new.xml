@@ -9,7 +9,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="@string/init_add_account"
+            android:text="@string/session_add_account"
             android:textSize="18.0dip"/>
 
 </FrameLayout>
