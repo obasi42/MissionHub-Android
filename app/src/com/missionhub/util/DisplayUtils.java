@@ -51,7 +51,7 @@ public class DisplayUtils {
                 metrics.heightPixels = (Integer) Display.class.getMethod("getRawHeight").invoke(display);
             }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            display.getMetrics(metrics);
         }
         return metrics;
     }
