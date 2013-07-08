@@ -4,4 +4,7 @@
         <attr name="tb_active" format="boolean"/>
         <attr name="tb_title" format="string|reference"/>
     </declare-styleable>
+    <declare-styleable name="SupportActivated">
+        <attr name="state_support_activated" format="boolean"/>
+    </declare-styleable>
 </resources>

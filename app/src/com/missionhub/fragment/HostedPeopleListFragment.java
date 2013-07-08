@@ -1,6 +1,7 @@
 package com.missionhub.fragment;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -11,10 +12,17 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.missionhub.R;
+import com.missionhub.api.PeopleListOptions;
 import com.missionhub.application.Application;
 import com.missionhub.event.ChangeHostFragmentEvent;
+import com.missionhub.event.OnHostedListOptionsChangedEvent;
+import com.missionhub.event.OnSidebarItemClickedEvent;
+import com.missionhub.exception.ExceptionHelper;
+import com.missionhub.model.Label;
+import com.missionhub.model.Permission;
 import com.missionhub.model.Person;
 import com.missionhub.people.ApiPeopleListProvider;
+import com.missionhub.people.DynamicPeopleListProvider;
 import com.missionhub.people.PeopleListView;
 import com.missionhub.people.PersonAdapterViewProvider;
 import com.missionhub.ui.ObjectArrayAdapter;
@@ -26,12 +34,12 @@ import org.holoeverywhere.widget.AdapterView;
 import org.holoeverywhere.widget.Spinner;
 import org.holoeverywhere.widget.TextView;
 
-public class HostedPeopleListFragment extends HostedFragment implements AdapterView.OnItemSelectedListener, PeopleListView.OnPersonClickListener {
+public class HostedPeopleListFragment extends HostedFragment implements AdapterView.OnItemSelectedListener, PeopleListView.OnPersonClickListener, DynamicPeopleListProvider.OnExceptionListener {
 
     public static final String TAG = HostedPeopleListFragment.class.getSimpleName();
 
     private PeopleListView mList;
-    private SelectableApiPeopleListController mProvider;
+    private SelectableApiPeopleListProvider mProvider;
 
     private ImageView mCheckmark;
     private TextView mCheckmarkText;
@@ -47,16 +55,48 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        Application.registerEventSubscriber(this, OnSidebarItemClickedEvent.class);
+    }
+
+    @SuppressWarnings("unused")
+    public void onEventMainThread(OnSidebarItemClickedEvent event) {
+        if (mProvider == null) return;
+
+        Object item = event.getItem();
+        synchronized (mList.getProvider().getLock()) {
+            PeopleListOptions options = mProvider.getRawPeopleListOptions();
+
+            if (item instanceof Person) {
+                options.toggle("assigned_to", ((Person) item).getId());
+            }
+            if (item instanceof Label) {
+                options.toggle("labels", ((Label) item).getId());
+            }
+            if (item instanceof Permission) {
+                options.toggle("permissions", ((Permission) item).getId());
+            }
+            mProvider.setPeopleListOptions(options);
+        }
+        Application.getEventBus().postSticky(new OnHostedListOptionsChangedEvent(mProvider.getPeopleListOptions()));
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_people_list, parent, false);
 
         // set up the person list and adapter
         mList = (PeopleListView) view.findViewById(android.R.id.list);
         if (mProvider == null) {
-            mProvider = new SelectableApiPeopleListController(inflater.getContext());
+            mProvider = new SelectableApiPeopleListProvider(inflater.getContext());
         } else {
             mProvider.setContext(inflater.getContext());
         }
+        mProvider.setOnExceptionListener(this);
+        Application.getEventBus().postSticky(new OnHostedListOptionsChangedEvent(mProvider.getPeopleListOptions()));
+
         mList.setProvider(mProvider);
         mList.setOnPersonClickListener(this);
         mList.setOnScrollListener(new PauseOnScrollListener(ImageLoader.getInstance(), false, true));
@@ -123,6 +163,39 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
         Application.postEvent(event);
     }
 
+    @Override
+    public void onException(Throwable t) {
+        if (getSupportActivity() == null) return;
+        ExceptionHelper eh = new ExceptionHelper(getSupportActivity(), t);
+        eh.setPositiveButton(new ExceptionHelper.DialogButton() {
+            @Override
+            public String getTitle() {
+                return "Retry";
+            }
+
+            @Override
+            public void onClick(DialogInterface dialog, int whichButton) {
+                if (mProvider != null) {
+                    mProvider.setPaused(false);
+                    mProvider.load();
+                }
+                dialog.dismiss();
+            }
+        });
+        eh.setNeutralButton(new ExceptionHelper.DialogButton() {
+            @Override
+            public String getTitle() {
+                return "Cancel";
+            }
+
+            @Override
+            public void onClick(DialogInterface dialog, int whichButton) {
+                dialog.dismiss();
+            }
+        });
+        eh.show();
+    }
+
     public static class StringRunnableItem {
         private int mText;
         private Runnable mRunnable;
@@ -139,9 +212,9 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
         }
     }
 
-    public static class SelectableApiPeopleListController extends ApiPeopleListProvider {
+    public static class SelectableApiPeopleListProvider extends ApiPeopleListProvider {
 
-        public SelectableApiPeopleListController(Context context) {
+        public SelectableApiPeopleListProvider(Context context) {
             super(context);
         }
 

@@ -1,5 +1,6 @@
 package com.missionhub.activity;
 
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -13,14 +14,27 @@ import android.view.View;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.Window;
 import com.missionhub.R;
+import com.missionhub.api.PeopleListOptions;
 import com.missionhub.application.Application;
+import com.missionhub.application.Session;
+import com.missionhub.authenticator.AuthenticatorActivity;
 import com.missionhub.event.ChangeHostFragmentEvent;
 import com.missionhub.event.DrawerClosedEvent;
 import com.missionhub.event.DrawerOpenedEvent;
 import com.missionhub.event.OnHostFragmentChangedEvent;
+import com.missionhub.event.OnHostedListOptionsChangedEvent;
+import com.missionhub.event.OnSidebarItemClickedEvent;
 import com.missionhub.fragment.HostedFragment;
 import com.missionhub.fragment.HostedPeopleListFragment;
+import com.missionhub.fragment.HostedSurveysFragment;
 import com.missionhub.fragment.SidebarFragment;
+import com.missionhub.fragment.dialog.SelectOrganizationDialogFragment;
+import com.missionhub.model.Label;
+import com.missionhub.model.Permission;
+import com.missionhub.model.Person;
+import com.missionhub.util.IntentHelper;
+
+import java.lang.reflect.Type;
 
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
 
@@ -77,7 +91,7 @@ public class HostActivity extends BaseAuthenticatedActivity implements FragmentM
         // create the global pull to refresh helper
         mPullToRefreshHelper = new PullToRefreshAttacher(this);
 
-        Application.registerEventSubscriber(this, ChangeHostFragmentEvent.class);
+        Application.registerEventSubscriber(this, ChangeHostFragmentEvent.class, OnSidebarItemClickedEvent.class);
     }
 
     public void attachSidebar(boolean created) {
@@ -113,6 +127,9 @@ public class HostActivity extends BaseAuthenticatedActivity implements FragmentM
             leftFrame.setVisibility(View.GONE);
         } else if (leftFrame != null) {
             leftFrame.setVisibility(View.VISIBLE);
+            mDrawerToggle.setDrawerIndicatorEnabled(false);
+            mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+            closeMenu();
         }
     }
 
@@ -120,6 +137,12 @@ public class HostActivity extends BaseAuthenticatedActivity implements FragmentM
     public void onDestroy() {
         Application.unregisterEventSubscriber(this);
         super.onDestroy();
+    }
+
+    @Override
+    public void onSessionClosed() {
+        Intent intent = new Intent(this, AuthenticatorActivity.class);
+        startActivity(intent);
     }
 
     public boolean isAtRoot() {
@@ -143,6 +166,8 @@ public class HostActivity extends BaseAuthenticatedActivity implements FragmentM
             getSupportActionBar().setHomeButtonEnabled(true);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+
+        Application.postEvent(new OnHostFragmentChangedEvent(mCurrentFragment));
     }
 
     @Override
@@ -206,6 +231,35 @@ public class HostActivity extends BaseAuthenticatedActivity implements FragmentM
 
     public SidebarFragment getSidebarFragment() {
         return mSidebarFragment;
+    }
+
+    @SuppressWarnings("unused")
+    public void onEventMainThread(OnSidebarItemClickedEvent event) {
+        Object item = event.getItem();
+        if (item instanceof Integer) {
+            switch (((Integer) item).intValue()) {
+                case R.id.menu_item_about:
+                    Intent intent = new Intent(this, AboutActivity.class);
+                    startActivity(intent);
+                    break;
+                case R.id.menu_item_surveys:
+                    onEventMainThread(new ChangeHostFragmentEvent(HostedSurveysFragment.class));
+                    break;
+                case R.id.menu_item_contacts:
+                    onEventMainThread(new ChangeHostFragmentEvent(HostedPeopleListFragment.class));
+                    break;
+                case R.id.menu_item_help:
+                    IntentHelper.openUrl(getString(R.string.main_help_url));
+                    break;
+                case R.id.menu_item_logout:
+                    Session.getInstance().close();
+                    break;
+                case R.id.menu_item_organization:
+                    SelectOrganizationDialogFragment.showForResult(getSupportFragmentManager(), 5);
+                    break;
+            }
+            closeMenu();
+        }
     }
 
     public void onEventMainThread(ChangeHostFragmentEvent event) {

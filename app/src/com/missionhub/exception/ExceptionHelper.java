@@ -77,11 +77,11 @@ public class ExceptionHelper {
     /**
      * Creates a new ExceptionHelper object
      */
-    public ExceptionHelper(final Context context, final Exception exception) {
+    public ExceptionHelper(final Context context, final Throwable throwable) {
         mContext = context;
         if (mContext == null) return;
         mTitle = context.getString(R.string.exception_helper_error);
-        setException(exception);
+        setThrowable(throwable);
     }
 
     /**
@@ -204,7 +204,7 @@ public class ExceptionHelper {
     /**
      * sets the exception and rebuilds the dialog if needed
      */
-    public void setException(final Throwable throwable) {
+    public void setThrowable(final Throwable throwable) {
         Log.e("ExceptionHelper", throwable.getMessage(), throwable);
 
         Application.trackException(Thread.currentThread().getName(), throwable, false);

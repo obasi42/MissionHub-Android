@@ -177,7 +177,7 @@ public abstract class SafeAsyncTask<ResultT> implements Callable<ResultT> {
                     doException(e);
                 } catch (Exception f) {
                     // logged but ignored
-                    Log.e(SafeAsyncTask.class.getSimpleName(), f.getMessage(), f);
+                    //Log.e(SafeAsyncTask.class.getSimpleName(), f.getMessage(), f);
                 }
 
             } catch (final Throwable t) {
@@ -185,7 +185,7 @@ public abstract class SafeAsyncTask<ResultT> implements Callable<ResultT> {
                     doThrowable(t);
                 } catch (Exception f) {
                     // logged but ignored
-                    Log.e(SafeAsyncTask.class.getSimpleName(), f.getMessage(), f);
+                    //Log.e(SafeAsyncTask.class.getSimpleName(), f.getMessage(), f);
                 }
             } finally {
                 doFinally();

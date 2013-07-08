@@ -18,6 +18,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.missionhub.R;
 import com.missionhub.api.Api;
 import com.missionhub.application.Application;
+import com.missionhub.event.OnOrganizationChangedEvent;
 import com.missionhub.exception.ExceptionHelper;
 import com.missionhub.exception.ExceptionHelper.DialogButton;
 import com.missionhub.exception.WebViewException;
@@ -50,9 +51,6 @@ public class HostedSurveysFragment extends HostedFragment {
     public void onCreateOptionsMenu(final Menu menu, final MenuInflater inflater) {
         menu.add(Menu.NONE, R.id.action_restart, Menu.NONE, getString(R.string.action_restart)).setIcon(R.drawable.ic_action_restart)
                 .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
-
-        menu.add(Menu.NONE, R.id.action_restart, Menu.NONE, "Label").setIcon(R.drawable.tag)
-                .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
     }
 
     @Override
@@ -101,7 +99,7 @@ public class HostedSurveysFragment extends HostedFragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        //TODO: Application.registerEventSubscriber(this, SessionOrganizationIdChanged.class);
+        Application.registerEventSubscriber(this, OnOrganizationChangedEvent.class);
     }
 
     @Override
@@ -228,9 +226,9 @@ public class HostedSurveysFragment extends HostedFragment {
         super.onDestroy();
     }
 
-// TODO: uncomment
-//    public void onEventMainThread(final SessionOrganizationIdChanged event) {
-//        goInitialUrl();
-//    }
+    @SuppressWarnings("unused")
+    public void onEvent(final OnOrganizationChangedEvent event) {
+        goInitialUrl();
+    }
 
 }

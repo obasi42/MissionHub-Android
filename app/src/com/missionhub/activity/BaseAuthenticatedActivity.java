@@ -7,7 +7,7 @@ import com.missionhub.event.SessionEvent;
 import com.missionhub.exception.ExceptionHelper;
 
 /**
- * Listens for SesisonEvents and responds accordingly.
+ * Listens for SessionEvents and responds accordingly.
  */
 public abstract class BaseAuthenticatedActivity extends BaseActivity {
 
@@ -21,6 +21,10 @@ public abstract class BaseAuthenticatedActivity extends BaseActivity {
     public void onDestroy() {
         Application.unregisterEventSubscriber(this);
         super.onDestroy();
+    }
+
+    public void onSessionClosed() {
+
     }
 
     /**
@@ -37,6 +41,7 @@ public abstract class BaseAuthenticatedActivity extends BaseActivity {
                     eh.makeToast();
                 }
             case CLOSED:
+                onSessionClosed();
                 finish();
         }
     }

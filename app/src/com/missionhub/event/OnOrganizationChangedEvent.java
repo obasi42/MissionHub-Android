@@ -1,10 +1,10 @@
 package com.missionhub.event;
 
-public class OrganizationChangedEvent {
+public class OnOrganizationChangedEvent {
 
     private final long mOrganizationId;
 
-    public OrganizationChangedEvent(long organizationId) {
+    public OnOrganizationChangedEvent(long organizationId) {
         mOrganizationId = organizationId;
     }
 

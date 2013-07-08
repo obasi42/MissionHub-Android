@@ -1,12 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- The Main Menu Items -->
-    <item name="menu_item_dashboard" type="id"/>
-    <item name="menu_item_my_contacts" type="id"/>
-    <item name="menu_item_all_contacts" type="id"/>
+    <!-- The Sidebar Main Menu Items -->
+    <item name="menu_item_contacts" type="id"/>
     <item name="menu_item_surveys" type="id"/>
-    <item name="menu_item_groups" type="id"/>
-    <item name="menu_item_preferences" type="id"/>
     <item name="menu_item_organization" type="id"/>
     <item name="menu_item_logout" type="id"/>
     <item name="menu_item_about" type="id"/>

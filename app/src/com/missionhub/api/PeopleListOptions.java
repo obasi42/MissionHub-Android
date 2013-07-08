@@ -26,13 +26,23 @@ public class PeopleListOptions extends ListOptions {
             return this;
         }
 
-        public Builder permission(final long roleId) {
-            filters.addFilter("permissions", roleId);
+        public Builder label(final long labelId) {
+            filters.addFilter("labels", labelId);
             return this;
         }
 
-        public Builder permissions(final Collection<Long> roleIds) {
-            filters.addFilter("permissions", roleIds);
+        public Builder labels(final Collection<Long> labelIds) {
+            filters.addFilter("labels", labelIds);
+            return this;
+        }
+
+        public Builder permission(final long permissionId) {
+            filters.addFilter("permissions", permissionId);
+            return this;
+        }
+
+        public Builder permissions(final Collection<Long> permissionIds) {
+            filters.addFilter("permissions", permissionIds);
             return this;
         }
 

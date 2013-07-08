@@ -188,6 +188,10 @@ public class ApiPeopleListProvider extends DynamicPeopleListProvider {
         return (PeopleListOptions) mOptions.clone();
     }
 
+    public PeopleListOptions getRawPeopleListOptions() {
+        return mOptions;
+    }
+
     /**
      * Sets the PeopleListOptions that filter the api people list.
      *

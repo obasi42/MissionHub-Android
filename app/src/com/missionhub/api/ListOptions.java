@@ -196,6 +196,21 @@ public class ListOptions {
         mFilters.clear();
     }
 
+    public void toggle(final String filter, final Object value) {
+        String val = objectToString(value);
+        if (val.equalsIgnoreCase("true")) {
+            setFilter(filter, "false");
+        } else if (val.equalsIgnoreCase("false")) {
+            setFilter(filter, "true");
+        } else {
+            if (hasFilter(filter, value)) {
+                removeFilterValue(filter, value);
+            } else {
+                addFilter(filter, value);
+            }
+        }
+    }
+
     /**
      * Clears all order by values
      */

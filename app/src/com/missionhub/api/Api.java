@@ -397,7 +397,7 @@ public class Api {
     public static String getSurveyUrl() throws ApiException {
         try {
             final Map<String, String> params = new HashMap<String, String>();
-            params.put("access_token", Session.getInstance().getAccessToken());
+            params.put("facebook_token", Session.getInstance().getAccessToken());
             params.put("org_id", String.valueOf(Session.getInstance().getOrganizationId()));
             params.put("mobile", "1");
             return HttpRequest.encode(HttpRequest.append(Configuration.getSurveyUrl(), params));

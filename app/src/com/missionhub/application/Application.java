@@ -191,7 +191,7 @@ public class Application extends org.holoeverywhere.app.Application {
      */
     public synchronized static SQLiteDatabase getRawDb() {
         if (mDb == null) {
-            final OpenHelper helper = new MissionHubOpenHelper(Application.getContext(), DB_NAME, null);
+            final OpenHelper helper = new MissionHubOpenHelper(getContext(), DB_NAME, null);
             mDb = helper.getWritableDatabase();
         }
         return mDb;
@@ -238,7 +238,7 @@ public class Application extends org.holoeverywhere.app.Application {
      */
     public static int getVersionCode() {
         try {
-            return Application.getContext().getPackageManager().getPackageInfo(Application.getContext().getPackageName(), 0).versionCode;
+            return getContext().getPackageManager().getPackageInfo(getContext().getPackageName(), 0).versionCode;
         } catch (final Exception e) {
             /* ignore */
         }
@@ -252,7 +252,7 @@ public class Application extends org.holoeverywhere.app.Application {
      */
     public static String getVersionName() {
         try {
-            return Application.getContext().getPackageManager().getPackageInfo(Application.getContext().getPackageName(), 0).versionName;
+            return getContext().getPackageManager().getPackageInfo(getContext().getPackageName(), 0).versionName;
         } catch (final Exception e) {
             /* ignore */
         }
@@ -260,48 +260,58 @@ public class Application extends org.holoeverywhere.app.Application {
     }
 
     /**
+     * Returns the default event bus
+     *
+     * @return
+     */
+    public static EventBus getEventBus() {
+        return EventBus.getDefault();
+    }
+
+    /**
      * Posts an event to the default EventBus
      */
     public static void postEvent(final Object event) {
-        EventBus.getDefault().post(event);
+        getEventBus().post(event);
     }
 
     /**
      * Register an EventBus event subscriber with the default bus
      */
     public static void registerEventSubscriber(final Object subscriber) {
-        EventBus.getDefault().register(subscriber);
+        getEventBus().register(subscriber);
     }
 
     /**
      * Register an EventBus event subscriber with the default bus
      */
     public static void registerEventSubscriber(final Object subscriber, final Class<?> eventType, final Class<?>... moreEventTypes) {
-        EventBus.getDefault().register(subscriber, eventType, moreEventTypes);
+        getEventBus().register(subscriber, eventType, moreEventTypes);
     }
 
     /**
      * Unregisters an EventBus event subscriber from the default bus
      */
     public static void unregisterEventSubscriber(final Object subscriber) {
-        EventBus.getDefault().unregister(subscriber);
+        getEventBus().unregister(subscriber);
     }
 
     /**
      * Unregisters an EventBus event subscriber from the default bus
      */
     public static void unregisterEventSubscriber(final Object subscriber, final Class<?>... eventTypes) {
-        EventBus.getDefault().unregister(subscriber, eventTypes);
+        getEventBus().unregister(subscriber, eventTypes);
     }
 
     public static void showToast(final int message, final int duration) {
-        showToast(Application.getContext().getString(message), duration);
+        showToast(getContext().getString(message), duration);
     }
 
     public static void showToast(final String message, final int duration) {
-        Application.postEvent(new ToastEvent(message, duration));
+        postEvent(new ToastEvent(message, duration));
     }
 
+    @SuppressWarnings("unused")
     public void onEventMainThread(final ToastEvent event) {
         Toast.makeText(getContext(), event.message, event.duration).show();
     }

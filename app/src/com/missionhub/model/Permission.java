@@ -1,5 +1,6 @@
 package com.missionhub.model;
 
+import com.missionhub.application.Application;
 import com.missionhub.model.DaoSession;
 
 import de.greenrobot.dao.DaoException;
@@ -155,6 +156,14 @@ public class Permission {
     public void refreshAll() {
         refresh();
         resetTranslatedName();
+    }
+
+    public static Permission getPermission(long permissionId) {
+        Permission permisson = Application.getDb().getPermissionDao().load(permissionId);
+        if (permisson == null) {
+            permisson = Application.getDb().getPermissionDao().load(NO_PERMISSIONS);
+        }
+        return permisson;
     }
     // KEEP METHODS END
 

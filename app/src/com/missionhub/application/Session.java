@@ -6,7 +6,6 @@ import android.accounts.AuthenticatorException;
 import android.accounts.OnAccountsUpdateListener;
 import android.accounts.OperationCanceledException;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.facebook.Request;
 import com.facebook.Response;
@@ -22,8 +21,9 @@ import com.missionhub.api.InvalidFacebookTokenException;
 import com.missionhub.authenticator.Authenticator;
 import com.missionhub.authenticator.AuthenticatorActivity;
 import com.missionhub.event.FacebookEvent;
-import com.missionhub.event.OrganizationChangedEvent;
+import com.missionhub.event.OnOrganizationChangedEvent;
 import com.missionhub.event.SessionEvent;
+import com.missionhub.model.Organization;
 import com.missionhub.model.Person;
 import com.missionhub.util.SafeAsyncTask;
 
@@ -373,6 +373,11 @@ public class Session implements OnAccountsUpdateListener {
         return mOrganizationId;
     }
 
+    public synchronized Organization getOrganization() {
+        return Application.getDb().getOrganizationDao().load(getOrganizationId());
+    }
+
+
     /**
      * Sets the user's organization id
      *
@@ -387,7 +392,7 @@ public class Session implements OnAccountsUpdateListener {
                 mOrganizationId = getPrimaryOrganizationId();
             }
             SettingsManager.setSessionOrganizationId(getPersonId(), mOrganizationId);
-            Application.postEvent(new OrganizationChangedEvent(mOrganizationId));
+            Application.postEvent(new OnOrganizationChangedEvent(mOrganizationId));
             updateCurrentOrganization(true);
         }
     }
@@ -550,7 +555,7 @@ public class Session implements OnAccountsUpdateListener {
 
                     Api.listPermissions().get();
 
-                    SettingsManager.getInstance().setUserSetting(getPersonId(), "permissions_updated", currentTime);
+                    SettingsManager.getInstance().setSetting("permissions_updated", currentTime);
                 }
 
                 return null;
