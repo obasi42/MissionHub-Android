@@ -45,7 +45,7 @@
         <dependency>
             <groupId>org.holoeverywhere</groupId>
             <artifactId>library</artifactId>
-            <version>1.6.2-SNAPSHOT</version>
+            <version>1.6.8</version>
             <type>apklib</type>
             <exclusions>
                 <exclusion>
@@ -57,7 +57,7 @@
         <dependency>
             <groupId>org.holoeverywhere</groupId>
             <artifactId>addon-preferences</artifactId>
-            <version>1.6.2-SNAPSHOT</version>
+            <version>1.6.8</version>
             <type>apklib</type>
             <exclusions>
                 <exclusion>
@@ -152,7 +152,7 @@
         <dependency>
             <groupId>com.github.chrisbanes.actionbarpulltorefresh</groupId>
             <artifactId>library</artifactId>
-            <version>0.4</version>
+            <version>0.5</version>
             <type>apklib</type>
         </dependency>
         <dependency>
