@@ -506,6 +506,7 @@ public class Session implements OnAccountsUpdateListener {
                             .include(Include.labels) //
                             .include(Include.surveys) //
                             .include(Include.organizational_permission) //
+                            .include(Include.interaction_types) //
                             .build()).get();
 
                     SettingsManager.getInstance().setUserSetting(getPersonId(), "organization_" + organizationId + "_updated", currentTime);

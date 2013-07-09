@@ -275,7 +275,6 @@ public class AuthenticatorActivity extends BaseActivity {
         hideProgress();
         if (mAccountDialog == null) {
             mAccountDialog = new PickAccountDialog();
-            mAccountDialog.setCancelable(false);
         }
         mAccountDialog.show(getSupportFragmentManager());
     }
@@ -285,7 +284,8 @@ public class AuthenticatorActivity extends BaseActivity {
         if (event.account != null) {
             Session.getInstance().open(event.account);
         } else {
-            openFacebookSession();
+            showProgress(getString(R.string.session_logging_in_facebook));
+            Session.getInstance().openFacebookSession(this, false);
         }
     }
 

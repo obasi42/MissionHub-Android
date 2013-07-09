@@ -10,7 +10,9 @@ import android.view.SoundEffectConstants;
 import android.view.View;
 import android.view.accessibility.AccessibilityEvent;
 import android.widget.AdapterView;
+import android.widget.ListAdapter;
 
+import com.missionhub.ui.ObjectArrayAdapter;
 import com.missionhub.util.DisplayUtils;
 
 import org.holoeverywhere.widget.ListView;
@@ -196,8 +198,14 @@ public class SelectableListView extends ListView {
         }
     }
 
-    public void clearChecked() {
-        clearChoices();
+    public synchronized void setAllItemsChecked(boolean checked) {
+        if (checked) {
+            for (int i = 0; i > getAdapter().getCount(); i++) {
+                setItemChecked(i, true);
+            }
+        } else {
+            clearChoices();
+        }
     }
 
     @Override

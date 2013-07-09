@@ -1,9 +1,13 @@
 package com.missionhub.model.gson;
 
 import com.missionhub.application.Application;
+import com.missionhub.model.EmailAddress;
+import com.missionhub.model.EmailAddressDao;
 import com.missionhub.model.InteractionType;
 import com.missionhub.model.InteractionTypeDao;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 public class GInteractionType {
@@ -54,4 +58,41 @@ public class GInteractionType {
         }
     }
 
+    public static List<InteractionType> replaceAll(final GInteractionType[] types, final boolean inTx) throws Exception {
+        final ArrayList<Long> orgIds = new ArrayList<Long>();
+        for (GInteractionType type : types) {
+            orgIds.add(type.id);
+        }
+        final Callable<List<InteractionType>> callable = new Callable<List<InteractionType>>() {
+            @Override
+            public List<InteractionType> call() throws Exception {
+                synchronized (lock) {
+                    final InteractionTypeDao dao = Application.getDb().getInteractionTypeDao();
+
+                    // delete current types
+                    List<Long> keys = dao.queryBuilder().where(InteractionTypeDao.Properties.Organization_id.in(orgIds)).listKeys();
+                    for (Long key : keys) {
+                        dao.deleteByKey(key);
+                    }
+
+                    // save the new types
+                    final List<InteractionType> interactionTypes = new ArrayList<InteractionType>();
+                    for (final GInteractionType gType : types) {
+                        final InteractionType type = gType.save(true);
+                        if (type != null) {
+                            interactionTypes.add(type);
+                        }
+                    }
+
+                    return interactionTypes;
+                }
+            }
+        };
+        if (inTx) {
+            return callable.call();
+        } else {
+            return Application.getDb().callInTx(callable);
+        }
+
+    }
 }

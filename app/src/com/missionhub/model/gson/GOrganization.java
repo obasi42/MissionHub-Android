@@ -26,6 +26,7 @@ public class GOrganization {
     public GSurvey[] surveys;
     public GSmsKeyword[] keywords;
     public GLabel[] labels;
+    public GInteractionType[] interaction_types;
 
     public static final Object lock = new Object();
 
@@ -88,6 +89,10 @@ public class GOrganization {
 
                     if (labels != null) {
                         GLabel.replaceAll(labels, id, true);
+                    }
+
+                    if (interaction_types != null) {
+                        GInteractionType.replaceAll(interaction_types, true);
                     }
 
                     return org;

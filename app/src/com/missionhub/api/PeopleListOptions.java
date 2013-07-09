@@ -46,6 +46,16 @@ public class PeopleListOptions extends ListOptions {
             return this;
         }
 
+        public Builder interaction(final long interactionTypeId) {
+            filters.addFilter("interactions", interactionTypeId);
+            return this;
+        }
+
+        public Builder interactions(final Collection<Long> interactionTypeIds) {
+            filters.addFilter("interactions", interactionTypeIds);
+            return this;
+        }
+
         public Builder firstNameLike(final String firstName) {
             filters.addFilter("first_name_like", firstName);
             return this;

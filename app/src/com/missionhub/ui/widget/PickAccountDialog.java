@@ -29,7 +29,6 @@ import org.holoeverywhere.widget.TextView;
 
 public class PickAccountDialog extends BaseDialogFragment implements OnItemClickListener, OnAccountsUpdateListener {
 
-    private AccountManager mAccountManager;
     private ListView mListView;
     private ObjectArrayAdapter mAdapter;
 
@@ -111,15 +110,14 @@ public class PickAccountDialog extends BaseDialogFragment implements OnItemClick
     public void onResume() {
         super.onResume();
 
-        mAccountManager = AccountManager.get(getSupportActivity());
-        mAccountManager.addOnAccountsUpdatedListener(this, null, false);
+        Session.getInstance().getAccountManager().addOnAccountsUpdatedListener(this, null, false);
 
         refreshAccounts();
     }
 
     @Override
     public void onPause() {
-        mAccountManager.removeOnAccountsUpdatedListener(this);
+        Session.getInstance().getAccountManager().removeOnAccountsUpdatedListener(this);
 
         super.onPause();
     }
@@ -128,7 +126,7 @@ public class PickAccountDialog extends BaseDialogFragment implements OnItemClick
         mAdapter.setNotifyOnChange(false);
         mAdapter.clear();
 
-        final Account[] accounts = mAccountManager.getAccountsByType(Authenticator.ACCOUNT_TYPE);
+        final Account[] accounts = Session.getInstance().getAllAccounts();
         for (final Account account : accounts) {
             mAdapter.add(new AccountItem(account));
         }

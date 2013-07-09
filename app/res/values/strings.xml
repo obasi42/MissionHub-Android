@@ -39,6 +39,7 @@
     <string name="my_contacts_completed">Completed</string>
 
     <!-- Person List Fragment -->
+    <string name="search_contacts">Search Contacts</string>
     <string name="display_status">Status</string>
     <string name="display_gender">Gender</string>
     <string name="display_permission">Permission</string>

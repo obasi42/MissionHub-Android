@@ -176,6 +176,8 @@ public class ApiPeopleListProvider extends DynamicPeopleListProvider {
         synchronized (getLock()) {
             try {
                 mTask.cancel(true);
+                mTask = null;
+                setLoading(false);
             } catch (Exception e) { /* ignore */ }
         }
     }

@@ -17,6 +17,14 @@ import java.util.List;
  */
 public class InteractionType {
 
+    public static final int COMMENT_ONLY = 1;
+    public static final int SPIRITUAL_CONVERSATION = 2;
+    public static final int PERSONAL_EVANGELISM = 3;
+    public static final int PERSONAL_EVANGELISM_DECISION_FOR_CHRIST = 4;
+    public static final int HOLY_SPIRIT_PRESENTATION = 5;
+    public static final int GRADUATING_ON_MISSION = 6;
+    public static final int FACULITY_ON_MISSION = 7;
+
     private Long id;
     private Long organization_id;
     private String name;

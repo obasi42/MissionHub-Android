@@ -20,6 +20,7 @@ import com.missionhub.event.OnOrganizationChangedEvent;
 import com.missionhub.event.OnHostFragmentChangedEvent;
 import com.missionhub.event.OnSidebarItemClickedEvent;
 import com.missionhub.fragment.dialog.SelectOrganizationDialogFragment;
+import com.missionhub.model.InteractionType;
 import com.missionhub.model.Label;
 import com.missionhub.model.Permission;
 import com.missionhub.model.Person;
@@ -147,24 +148,6 @@ public class SidebarFragment extends Fragment implements AdapterView.OnItemClick
 
                 // people list fragment
                 if (hostedFragment instanceof HostedPeopleListFragment) {
-                    // labels
-                    newItems.add(getOrCreateHeaderItem("Labels", "labels"));
-                    List<Label> labels = Session.getInstance().getOrganization().getAllLabels();
-                    SidebarListAdapter.ExpandItem labelExpand = getOrCreateExpandItem("labels");
-                    int lLimit = 5;
-                    if (labelExpand.isExpanded() || labels.size() < lLimit) {
-                        lLimit = labels.size();
-                    }
-                    for (int i = 0; i < lLimit; i++) {
-                        SidebarListAdapter.Item item = getOrCreateLabelItem(labels.get(i));
-                        if (item != null) {
-                            newItems.add(item);
-                        }
-                    }
-                    if (labels.size() > 5) {
-                        newItems.add(labelExpand);
-                    }
-
                     // admins/users
                     newItems.add(getOrCreateHeaderItem("Users", "users"));
                     SidebarListAdapter.ExpandItem userExpand = getOrCreateExpandItem("users");
@@ -186,6 +169,34 @@ public class SidebarFragment extends Fragment implements AdapterView.OnItemClick
                     }
                     if (users.size() > 4) {
                         newItems.add(userExpand);
+                    }
+
+                    // labels
+                    newItems.add(getOrCreateHeaderItem("Labels", "labels"));
+                    List<Label> labels = Session.getInstance().getOrganization().getAllLabels();
+                    SidebarListAdapter.ExpandItem labelExpand = getOrCreateExpandItem("labels");
+                    int lLimit = 5;
+                    if (labelExpand.isExpanded() || labels.size() < lLimit) {
+                        lLimit = labels.size();
+                    }
+                    for (int i = 0; i < lLimit; i++) {
+                        SidebarListAdapter.Item item = getOrCreateLabelItem(labels.get(i));
+                        if (item != null) {
+                            newItems.add(item);
+                        }
+                    }
+                    if (labels.size() > 5) {
+                        newItems.add(labelExpand);
+                    }
+
+                    // interactions
+                    List<InteractionType> interactionTypes = Session.getInstance().getOrganization().getAllInteractionTypes();
+                    if (!interactionTypes.isEmpty()) {
+                        newItems.add(getOrCreateHeaderItem("Interactions", "interactions"));
+                        for (InteractionType type : interactionTypes) {
+                            if (type.getId() == InteractionType.COMMENT_ONLY) continue;
+                            newItems.add(getOrCreateInteractionTypeItem(type));
+                        }
                     }
 
                     // permissions
@@ -321,6 +332,17 @@ public class SidebarFragment extends Fragment implements AdapterView.OnItemClick
                 } else {
                     item.setSelected(false);
                 }
+                return item;
+            }
+
+            private SidebarListAdapter.Item getOrCreateInteractionTypeItem(InteractionType interactionType) {
+                if (interactionType == null) return null;
+                if (StringUtils.isEmpty(interactionType.getTranslatedName())) return null;
+
+                boolean selected = mListOptions.hasFilter("interactions", String.valueOf(interactionType.getId()));
+
+                SidebarListAdapter.Item item = getOrCreateItem(interactionType.getTranslatedName(), interactionType, "interactions");
+                item.setSelected(selected);
                 return item;
             }
         };

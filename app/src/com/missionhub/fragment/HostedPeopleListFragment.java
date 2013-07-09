@@ -5,11 +5,8 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.text.Editable;
 import android.text.Html;
-import android.text.TextWatcher;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -24,6 +21,7 @@ import com.missionhub.event.OnHostedListOptionsChangedEvent;
 import com.missionhub.event.OnOrganizationChangedEvent;
 import com.missionhub.event.OnSidebarItemClickedEvent;
 import com.missionhub.exception.ExceptionHelper;
+import com.missionhub.model.InteractionType;
 import com.missionhub.model.Label;
 import com.missionhub.model.Permission;
 import com.missionhub.model.Person;
@@ -32,21 +30,20 @@ import com.missionhub.people.DynamicPeopleListProvider;
 import com.missionhub.people.PeopleListView;
 import com.missionhub.people.PersonAdapterViewProvider;
 import com.missionhub.ui.ObjectArrayAdapter;
+import com.missionhub.ui.SearchHelper;
 import com.missionhub.util.SafeAsyncTask;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.PauseOnScrollListener;
 
 import org.apache.commons.lang3.StringUtils;
 import org.holoeverywhere.LayoutInflater;
-import org.holoeverywhere.app.Activity;
 import org.holoeverywhere.widget.AdapterView;
-import org.holoeverywhere.widget.EditText;
 import org.holoeverywhere.widget.Spinner;
 import org.holoeverywhere.widget.TextView;
 
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
 
-public class HostedPeopleListFragment extends HostedFragment implements AdapterView.OnItemSelectedListener, PeopleListView.OnPersonClickListener, DynamicPeopleListProvider.OnExceptionListener, PullToRefreshAttacher.OnRefreshListener, View.OnKeyListener {
+public class HostedPeopleListFragment extends HostedFragment implements AdapterView.OnItemSelectedListener, PeopleListView.OnPersonClickListener, DynamicPeopleListProvider.OnExceptionListener, PullToRefreshAttacher.OnRefreshListener, SearchHelper.OnSearchQueryChangedListener {
 
     public static final String TAG = HostedPeopleListFragment.class.getSimpleName();
 
@@ -63,8 +60,9 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
     private ObjectArrayAdapter mOrderSpinnerAdapter;
     private int mOrderPosition;
     private SafeAsyncTask<Void> mReloadStatusTask;
-    private Handler mHandler = new Handler(Looper.getMainLooper());
-    private Runnable mSearchRunnable;
+
+    private SearchHelper mSearchHelper;
+    private CheckmarkHelper mCheckmarkHelper;
 
     public HostedPeopleListFragment() {
         // empty fragment constructor
@@ -95,6 +93,8 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
             options.toggle("labels", ((Label) item).getId());
         } else if (item instanceof Permission) {
             options.toggle("permissions", ((Permission) item).getId());
+        } else if (item instanceof InteractionType) {
+            options.toggle("interactions", ((InteractionType) item).getId());
         } else {
             return;
         }
@@ -129,9 +129,16 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
 
         // set up the list controller
         mSearchView = (SearchView) view.findViewById(R.id.search);
-        setupSearchView();
+        if (mSearchHelper == null) {
+            mSearchHelper = new SearchHelper();
+            mSearchHelper.setOnSearchQueryChangedListener(this);
+        }
+        mSearchHelper.setSearchView(mSearchView);
         mCheckmark = (ImageView) view.findViewById(R.id.checkmark);
         mCheckmarkText = (TextView) view.findViewById(R.id.checkmark_text);
+        if (mCheckmarkHelper == null) {
+            mCheckmarkHelper = new CheckmarkHelper();
+        }
         mDisplaySpinner = (Spinner) view.findViewById(R.id.display);
         mDisplaySpinner.setOnItemSelectedListener(this);
         mOrderSpinner = (Spinner) view.findViewById(R.id.order);
@@ -215,7 +222,7 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
         eh.setPositiveButton(new ExceptionHelper.DialogButton() {
             @Override
             public String getTitle() {
-                return "Retry";
+                return getString(R.string.action_retry);
             }
 
             @Override
@@ -230,11 +237,15 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
         eh.setNeutralButton(new ExceptionHelper.DialogButton() {
             @Override
             public String getTitle() {
-                return "Cancel";
+                return getString(R.string.action_cancel);
             }
 
             @Override
             public void onClick(DialogInterface dialog, int whichButton) {
+                if (mProvider != null) {
+                    mProvider.setDone(true);
+                    mProvider.cancelLoadMore();
+                }
                 dialog.dismiss();
             }
         });
@@ -269,8 +280,16 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
     }
 
     @Override
-    public boolean onKey(View view, int i, KeyEvent keyEvent) {
-        return false;
+    public void onSearchQueryChanged(String query) {
+        if (mProvider == null) return;
+
+        PeopleListOptions options = mProvider.getPeopleListOptions();
+        if (StringUtils.isNotEmpty(query)) {
+            options.setFilter("name_or_email_like", query);
+        } else {
+            options.removeFilter("name_or_email_like");
+        }
+        mProvider.setPeopleListOptions(options);
     }
 
     public static class StringRunnableItem {
@@ -403,55 +422,33 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
         return adapter;
     }
 
-    private void setupSearchView() {
-        if (mSearchView == null) return;
+    private class CheckmarkHelper {
 
-        mSearchView.setIconifiedByDefault(false);
-        mSearchView.setIconified(false);
-        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String s) {
-                if (mSearchView != null) {
-                    mSearchView.clearFocus();
-                }
-                return onQueryTextChange(s);
-            }
+        private boolean mAllChecked;
 
-            @Override
-            public boolean onQueryTextChange(final String s) {
-                if (mProvider != null) {
-                    if (mSearchRunnable != null) {
-                        mHandler.removeCallbacks(mSearchRunnable);
-                    }
-                    mSearchRunnable = new Runnable() {
-                        @Override
-                        public void run() {
-                            if (mProvider == null) return;
+        public void setCheckmarkView(ImageView mCheckmark) {
 
-                            PeopleListOptions options = mProvider.getPeopleListOptions();
-                            if (StringUtils.isNotEmpty(s)) {
-                                options.setFilter("name_or_email_like", s);
-                            } else {
-                                options.removeFilter("name_or_email_like");
-                            }
-                            mProvider.setPeopleListOptions(options);
-                        }
-                    };
-                    mHandler.postDelayed(mSearchRunnable, 250);
-                }
-                return true;
-            }
-        });
-        mSearchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean hasFocus) {
-                if (!hasFocus) {
-                    if (mSearchView != null) {
-                        mSearchView.clearFocus();
-                    }
-                }
-            }
-        });
-        mSearchView.setQueryHint("Search Contacts...");
+        }
+
+
+        public void setCheckmarkTextView(TextView mCheckmarkText) {
+
+
+        }
+
+        public void setAllChecked() {
+
+        }
+
+        public void setNoneChecked() {
+
+        }
+
+        public void setAllChecked(boolean all) {
+            mAllChecked = all;
+
+
+        }
+
     }
 }

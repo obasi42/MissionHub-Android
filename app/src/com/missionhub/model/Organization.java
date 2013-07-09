@@ -12,8 +12,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 
-import com.missionhub.util.PeopleUtils;
 import com.missionhub.util.Profiler;
+import com.missionhub.util.SortUtils;
 // KEEP INCLUDES END
 
 /**
@@ -51,6 +51,8 @@ public class Organization {
     private List<Organization> mSubOrganizations;
     private Organization mParent;
     private List<Organization> mAllSubOrganizations;
+    private List<InteractionType> mAllInteractionTypes;
+    private List<Label> mAllLabels;
     // KEEP FIELDS END
 
     public Organization() {
@@ -305,6 +307,8 @@ public class Organization {
 
     // KEEP METHODS - put your custom methods here
     public synchronized void refreshAll() {
+        mAllInteractionTypes = null;
+        mAllLabels = null;
         mSubOrganizations = null;
         mParent = null;
         mUsersAdmins = null;
@@ -357,8 +361,24 @@ public class Organization {
         if (daoSession == null) {
             throw new DaoException("Entity is detached from DAO context");
         }
+        if (mAllLabels == null) {
+            synchronized (this) {
+                mAllLabels = SortUtils.sortLabels(daoSession.getLabelDao().queryBuilder().where(LabelDao.Properties.Organization_id.in(0, getId())).list(), true);
+            }
+        }
+        return mAllLabels;
+    }
 
-        return daoSession.getLabelDao().queryBuilder().where(LabelDao.Properties.Organization_id.in(0, getId())).list();
+    public List<InteractionType> getAllInteractionTypes() {
+        if (daoSession == null) {
+            throw new DaoException("Entity is detached from DAO context");
+        }
+        if (mAllInteractionTypes == null) {
+            synchronized (this) {
+                mAllInteractionTypes = SortUtils.sortInteractionTypes(daoSession.getInteractionTypeDao().queryBuilder().where(InteractionTypeDao.Properties.Organization_id.in(0, getId())).list(), true);
+            }
+        }
+        return mAllInteractionTypes;
     }
 
     public Organization getParent() {
@@ -398,7 +418,7 @@ public class Organization {
                         break;
                     }
                 }
-                mUsersAdmins = PeopleUtils.sortPeople(people, true);
+                mUsersAdmins = SortUtils.sortPeople(people, true);
             }
         }
         return mUsersAdmins;
