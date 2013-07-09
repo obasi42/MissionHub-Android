@@ -39,12 +39,12 @@ public class LockableViewPager extends ViewPager {
 
     public LockableViewPager(Context context) {
         super(context);
-        setOnPageChangeListener(null);
+        super.setOnPageChangeListener(null);
     }
 
     public LockableViewPager(Context context, AttributeSet attrs) {
         super(context, attrs);
-        setOnPageChangeListener(null);
+        super.setOnPageChangeListener(null);
     }
 
     @Override

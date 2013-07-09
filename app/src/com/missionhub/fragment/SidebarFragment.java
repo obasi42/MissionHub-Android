@@ -66,7 +66,7 @@ public class SidebarFragment extends Fragment implements AdapterView.OnItemClick
 
     @SuppressWarnings("unused")
     public void onEvent(OnHostFragmentChangedEvent event) {
-        if (mHostedFragment != null && mHostedFragment.get() != event.mFragment) {
+        if (mHostedFragment == null || mHostedFragment.get() != event.mFragment) {
             mHostedFragment = new WeakReference<HostedFragment>(event.mFragment);
             update();
         }
@@ -117,7 +117,7 @@ public class SidebarFragment extends Fragment implements AdapterView.OnItemClick
         return (HostActivity) getSupportActivity();
     }
 
-    private void update() {
+    public void update() {
         if (mAdapter == null) return;
 
         cancelUpdate();
@@ -127,16 +127,22 @@ public class SidebarFragment extends Fragment implements AdapterView.OnItemClick
             public List<Object> call() throws Exception {
                 ArrayList<Object> newItems = new ArrayList<Object>();
 
-                HostedFragment hostedFragment = getHostActivity().getCurrentFragment();
+                final HostedFragment hostedFragment = getHostActivity().getCurrentFragment();
+
+                List<Survey> surveys = Session.getInstance().getOrganization().getSurveys();
 
                 // top level item
                 if (hostedFragment instanceof HostedSurveysFragment) {
                     newItems.add(getOrCreateMainItem("Contacts", R.id.menu_item_contacts));
                 } else if (hostedFragment instanceof HostedPeopleListFragment) {
-                    newItems.add(getOrCreateMainItem("Surveys", R.id.menu_item_surveys));
+                    if (!surveys.isEmpty()) {
+                        newItems.add(getOrCreateMainItem("Surveys", R.id.menu_item_surveys));
+                    }
                 } else if (hostedFragment instanceof HostedProfileFragment) {
                     newItems.add(getOrCreateMainItem("Contacts", R.id.menu_item_contacts));
-                    newItems.add(getOrCreateMainItem("Surveys", R.id.menu_item_surveys));
+                    if (!surveys.isEmpty()) {
+                        newItems.add(getOrCreateMainItem("Surveys", R.id.menu_item_surveys));
+                    }
                 }
 
                 // people list fragment
@@ -146,7 +152,7 @@ public class SidebarFragment extends Fragment implements AdapterView.OnItemClick
                     List<Label> labels = Session.getInstance().getOrganization().getAllLabels();
                     SidebarListAdapter.ExpandItem labelExpand = getOrCreateExpandItem("labels");
                     int lLimit = 5;
-                    if (labelExpand.isExpanded()) {
+                    if (labelExpand.isExpanded() || labels.size() < lLimit) {
                         lLimit = labels.size();
                     }
                     for (int i = 0; i < lLimit; i++) {
@@ -155,7 +161,9 @@ public class SidebarFragment extends Fragment implements AdapterView.OnItemClick
                             newItems.add(item);
                         }
                     }
-                    newItems.add(labelExpand);
+                    if (labels.size() > 5) {
+                        newItems.add(labelExpand);
+                    }
 
                     // admins/users
                     newItems.add(getOrCreateHeaderItem("Users", "users"));
@@ -167,7 +175,7 @@ public class SidebarFragment extends Fragment implements AdapterView.OnItemClick
                     newItems.add(getOrCreateUserItem(currentUser));
 
                     int uLimit = 4;
-                    if (userExpand.isExpanded()) {
+                    if (userExpand.isExpanded() || users.size() < uLimit) {
                         uLimit = users.size();
                     }
                     for (int i = 0; i < uLimit; i++) {
@@ -176,7 +184,9 @@ public class SidebarFragment extends Fragment implements AdapterView.OnItemClick
                             newItems.add(item);
                         }
                     }
-                    newItems.add(userExpand);
+                    if (users.size() > 4) {
+                        newItems.add(userExpand);
+                    }
 
                     // permissions
                     newItems.add(getOrCreateHeaderItem("Permissions", "permissions"));
@@ -187,10 +197,11 @@ public class SidebarFragment extends Fragment implements AdapterView.OnItemClick
 
                 // surveys fragment
                 if (hostedFragment instanceof HostedSurveysFragment) {
-                    newItems.add(getOrCreateHeaderItem("Surveys", "surveys"));
-                    List<Survey> surveys = Application.getDb().getSurveyDao().queryBuilder().where(SurveyDao.Properties.Organization_id.eq(Session.getInstance().getOrganizationId())).list();
-                    for (Survey survey : surveys) {
-                        getOrCreateSurveyItem(survey);
+                    if (!surveys.isEmpty()) {
+                        newItems.add(getOrCreateHeaderItem("Surveys", "surveys"));
+                        for (Survey survey : surveys) {
+                            newItems.add(getOrCreateSurveyItem(survey));
+                        }
                     }
                 }
 
@@ -303,7 +314,14 @@ public class SidebarFragment extends Fragment implements AdapterView.OnItemClick
                 if (survey == null) return null;
                 if (StringUtils.isEmpty(survey.getTitle())) return null;
 
-                return getOrCreateItem(survey.getTitle(), survey, "surveys");
+
+                SidebarListAdapter.Item item = getOrCreateItem(survey.getTitle(), survey, "surveys");
+                if (getHostActivity() != null && getHostActivity().getCurrentFragment() != null && getHostActivity().getCurrentFragment() instanceof HostedSurveysFragment) {
+                    item.setSelected(survey.getId() == ((HostedSurveysFragment) getHostActivity().getCurrentFragment()).getCurrentSurveyId());
+                } else {
+                    item.setSelected(false);
+                }
+                return item;
             }
         };
         Application.getExecutor().execute(mBuildTask.future());

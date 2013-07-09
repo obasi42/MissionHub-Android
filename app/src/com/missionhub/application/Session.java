@@ -25,6 +25,7 @@ import com.missionhub.event.OnOrganizationChangedEvent;
 import com.missionhub.event.SessionEvent;
 import com.missionhub.model.Organization;
 import com.missionhub.model.Person;
+import com.missionhub.util.Profiler;
 import com.missionhub.util.SafeAsyncTask;
 
 import org.acra.ACRA;
@@ -464,8 +465,9 @@ public class Session implements OnAccountsUpdateListener {
 
                 // update the person's organization hierarchy, as it is too expensive to do from the ui thread.
                 getPerson().resetOrganizationHierarchy();
+                Profiler.start("getOrganizationHierarchy");
                 getPerson().getOrganizationHierarchy();
-
+                Profiler.stop("getOrganizationHierarchy");
                 mUpdatePersonTask = null;
 
                 return getPerson();

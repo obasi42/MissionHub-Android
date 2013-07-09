@@ -394,13 +394,17 @@ public class Api {
     }
 
     /* Surveys */
-    public static String getSurveyUrl() throws ApiException {
+    public static String getSurveyUrl(Survey survey) throws ApiException {
         try {
             final Map<String, String> params = new HashMap<String, String>();
             params.put("facebook_token", Session.getInstance().getAccessToken());
             params.put("org_id", String.valueOf(Session.getInstance().getOrganizationId()));
             params.put("mobile", "1");
-            return HttpRequest.encode(HttpRequest.append(Configuration.getSurveyUrl(), params));
+            String url = Configuration.getSurveyUrl();
+            if (survey != null) {
+                url += "/" + String.valueOf(survey.getId());
+            }
+            return HttpRequest.encode(HttpRequest.append(url, params));
         } catch (Exception e) {
             throw ApiException.wrap(e);
         }

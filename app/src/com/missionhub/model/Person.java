@@ -736,6 +736,11 @@ public class Person {
                 }
             }
         }
+
+        synchronized (this) {
+            mPermissionCache.put(organizationId, new PermissionEntry(Permission.ADMIN, false));
+            mPermissionCache.put(organizationId, new PermissionEntry(Permission.USER, false));
+        }
         return Permission.NO_PERMISSIONS;
     }
 
@@ -880,6 +885,12 @@ public class Person {
 
                 for (final Organization organization : organizations) {
                     recursiveBuildOrganizationHierarchy(tree, organization);
+                    if (organization.getShow_sub_orgs()) {
+                        final List<Organization> allsubs = organization.getAllSubOrganizations();
+                        for (Organization suborg : allsubs) {
+                            recursiveBuildOrganizationHierarchy(tree, suborg);
+                        }
+                    }
                 }
 
                 mOrganizationHierarchy = tree;
@@ -891,13 +902,9 @@ public class Person {
     private void recursiveBuildOrganizationHierarchy(final TreeDataStructure<Long> tree, final Organization organization) {
         if (organization.getAncestry() != null) {
             TreeDataStructure<Long> parent = tree;
-            boolean hasPermissions = false;
             for (final String ancestor : organization.getAncestry().trim().split("/")) {
                 final Long a = Long.parseLong(ancestor);
                 if (isAdminOrUser(a)) {
-                    hasPermissions = true;
-                }
-                if (hasPermissions) {
                     if (parent.getTree(a) == null) {
                         parent = parent.addLeaf(a);
                     } else {
@@ -915,14 +922,14 @@ public class Person {
                 }
             }
         }
-
-        // parse sub orgs
-        if (organization.getShow_sub_orgs()) {
-            final List<Organization> subOrgs = organization.getSubOrganizations();
-            for (final Organization subOrg : subOrgs) {
-                recursiveBuildOrganizationHierarchy(tree, subOrg);
-            }
-        }
+//
+//        // parse sub orgs
+//        if (organization.getShow_sub_orgs()) {
+//            final List<Organization> subOrgs = organization.getSubOrganizations();
+//            for (final Organization subOrg : subOrgs) {
+//                recursiveBuildOrganizationHierarchy(tree, subOrg);
+//            }
+//        }
     }
 
     /**
@@ -1096,6 +1103,8 @@ public class Person {
         resetPrimaryEmailAddress();
         resetPrimaryPhoneNumber();
         resetContactAssignments();
+        resetPermissionCache();
+        resetOrganizationHierarchy();
         invalidateViewCache();
     }
 

@@ -94,7 +94,9 @@ public abstract class DynamicPeopleListProvider extends PeopleListProvider {
      * @return true if the provider can load more people
      */
     public boolean shouldLoad() {
-        return isStarted() && !isPaused() && !isLoading() && !isDone();
+        synchronized (getLock()) {
+            return isStarted() && !isPaused() && !isLoading() && !isDone();
+        }
     }
 
     /**
@@ -112,17 +114,19 @@ public abstract class DynamicPeopleListProvider extends PeopleListProvider {
      * Loads more people for the {@link PeopleListView}
      */
     public void load() {
-        setLoading(true);
+        synchronized (getLock()) {
+            setLoading(true);
 
-        Collection<Person> people = null;
-        try {
-            people = loadMore();
-        } catch (Exception e) {
-            onException(e);
+            Collection<Person> people = null;
+            try {
+                people = loadMore();
+            } catch (Exception e) {
+                onException(e);
+            }
+            onAfterLoad(people);
+
+            setLoading(false);
         }
-        onAfterLoad(people);
-
-        setLoading(false);
     }
 
     /**
@@ -145,8 +149,10 @@ public abstract class DynamicPeopleListProvider extends PeopleListProvider {
      */
     public void onAfterLoad(Collection<Person> people) {
         if (people != null) {
-            addAll(people);
-            notifyDataSetChanged();
+            synchronized (getLock()) {
+                addAll(people);
+                notifyDataSetChanged();
+            }
         }
     }
 
@@ -154,23 +160,27 @@ public abstract class DynamicPeopleListProvider extends PeopleListProvider {
      * Clears all data and state parameters and begins loading from the beginning
      */
     public void reload() {
-        try {
-            cancelLoadMore();
-        } catch (Exception e) {
-            onException(e);
+        synchronized (getLock()) {
+            try {
+                cancelLoadMore();
+            } catch (Exception e) {
+                onException(e);
+            }
+            clear();
+            setLoading(false);
+            setPaused(false);
+            setDone(false);
+            load();
         }
-        clear();
-        setLoading(false);
-        setPaused(false);
-        setDone(false);
-        load();
     }
 
     /**
      * @return true if the provider is loading
      */
     public boolean isLoading() {
-        return mLoading;
+        synchronized (getLock()) {
+            return mLoading;
+        }
     }
 
     /**
@@ -179,21 +189,25 @@ public abstract class DynamicPeopleListProvider extends PeopleListProvider {
      * @param loading true if the provider is loading
      */
     public void setLoading(boolean loading) {
-        mLoading = loading;
-        setNotifyOnChange(false);
-        remove(mLoadingItem);
-        if (mLoading) {
-            add(mLoadingItem);
+        synchronized (getLock()) {
+            mLoading = loading;
+            setNotifyOnChange(false);
+            remove(mLoadingItem);
+            if (mLoading) {
+                add(mLoadingItem);
+            }
+            notifyDataSetChanged();
+            onLoading(loading);
         }
-        notifyDataSetChanged();
-        onLoading(loading);
     }
 
     /**
      * @return true if the provider has been started
      */
     public boolean isStarted() {
-        return mStarted;
+        synchronized (getLock()) {
+            return mStarted;
+        }
     }
 
     /**
@@ -202,18 +216,22 @@ public abstract class DynamicPeopleListProvider extends PeopleListProvider {
      * @param started
      */
     public void setStarted(boolean started) {
-        if (started && !mStarted) {
+        synchronized (getLock()) {
+            if (started && !mStarted) {
+                mStarted = started;
+                load();
+            }
             mStarted = started;
-            load();
         }
-        mStarted = started;
     }
 
     /**
      * @return true when the provider is paused
      */
     public boolean isPaused() {
-        return mPaused;
+        synchronized (getLock()) {
+            return mPaused;
+        }
     }
 
     /**
@@ -222,15 +240,17 @@ public abstract class DynamicPeopleListProvider extends PeopleListProvider {
      * @param paused true pauses the provider
      */
     public void setPaused(boolean paused) {
-        if (mPaused != paused && paused) {
-            try {
+        synchronized (getLock()) {
+            if (mPaused != paused && paused) {
+                try {
+                    mPaused = paused;
+                    cancelLoadMore();
+                } catch (Exception e) {
+                    onException(e);
+                }
+            } else {
                 mPaused = paused;
-                cancelLoadMore();
-            } catch (Exception e) {
-                onException(e);
             }
-        } else {
-            mPaused = paused;
         }
     }
 
@@ -238,7 +258,9 @@ public abstract class DynamicPeopleListProvider extends PeopleListProvider {
      * @return true when the last person record has been loaded
      */
     public boolean isDone() {
-        return mDone;
+        synchronized (getLock()) {
+            return mDone;
+        }
     }
 
     /**
@@ -247,7 +269,9 @@ public abstract class DynamicPeopleListProvider extends PeopleListProvider {
      * @param done true if the last person record has been loaded
      */
     public void setDone(boolean done) {
-        mDone = done;
+        synchronized (getLock()) {
+            mDone = done;
+        }
     }
 
     /**

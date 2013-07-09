@@ -5,9 +5,14 @@ import android.os.Bundle;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
 import com.missionhub.activity.HostActivity;
+import com.missionhub.application.Application;
+import com.missionhub.event.ChangeHostFragmentEvent;
+import com.missionhub.event.OnHostFragmentChangedEvent;
 import com.missionhub.util.FragmentUtils;
 
 public abstract class HostedFragment extends BaseFragment {
+
+    private ChangeHostFragmentEvent.OnFragmentChangedCallback mCallback;
 
     public HostedFragment() {
     }
@@ -17,6 +22,20 @@ public abstract class HostedFragment extends BaseFragment {
         super.onCreate(savedInstanceState);
         FragmentUtils.retainInstance(this);
         setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getHost()._setCurrentFragment(this);
+        if (mCallback != null) {
+            mCallback.onFragmentChanged(this);
+            mCallback = null;
+        }
+    }
+
+    public void setOnFragmentChangedCallback(ChangeHostFragmentEvent.OnFragmentChangedCallback callback) {
+        mCallback = callback;
     }
 
     @Override

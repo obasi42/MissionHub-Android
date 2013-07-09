@@ -1,7 +1,5 @@
 package com.missionhub.model;
 
-import com.missionhub.util.PeopleUtils;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -13,6 +11,9 @@ import de.greenrobot.dao.DaoException;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+
+import com.missionhub.util.PeopleUtils;
+import com.missionhub.util.Profiler;
 // KEEP INCLUDES END
 
 /**
@@ -49,6 +50,7 @@ public class Organization {
     private List<Person> mUsersAdmins;
     private List<Organization> mSubOrganizations;
     private Organization mParent;
+    private List<Organization> mAllSubOrganizations;
     // KEEP FIELDS END
 
     public Organization() {
@@ -313,14 +315,42 @@ public class Organization {
             if (myDao == null) {
                 throw new DaoException("Entity is detached from DAO context");
             }
+            Profiler.start("getSubOrganizations");
             synchronized (this) {
                 mSubOrganizations = myDao.queryBuilder() //
                         .where(OrganizationDao.Properties.Status.eq("active")) //
                         .whereOr(OrganizationDao.Properties.Ancestry.eq(getId()), OrganizationDao.Properties.Ancestry.eq(getAncestry() + "/" + getId())) //
                         .orderAsc(OrganizationDao.Properties.Name).list();
             }
+            Profiler.stop("getSubOrganizations");
         }
         return mSubOrganizations;
+    }
+
+    public List<Organization> getAllSubOrganizations() {
+        if (mAllSubOrganizations == null) {
+            synchronized (this) {
+                List<Organization> orgs = myDao.queryBuilder() //
+                        .where(OrganizationDao.Properties.Status.eq("active")) //
+                        .whereOr(
+                                OrganizationDao.Properties.Ancestry.eq(getId()),
+                                OrganizationDao.Properties.Ancestry.eq(getAncestry() + "/" + getId()),
+                                OrganizationDao.Properties.Ancestry.like(getAncestry() + "/" + getId() + "/%")) //
+                        .orderAsc(OrganizationDao.Properties.Name).list();
+
+                List<Organization> filteredOrgs = new ArrayList<Organization>();
+                for (Organization org : orgs) {
+                    if (org.getParent() != null) {
+                        if (!org.getParent().getShow_sub_orgs()) {
+                            continue;
+                        }
+                    }
+                    filteredOrgs.add(org);
+                }
+                mAllSubOrganizations = filteredOrgs;
+            }
+        }
+        return mAllSubOrganizations;
     }
 
     public List<Label> getAllLabels() {

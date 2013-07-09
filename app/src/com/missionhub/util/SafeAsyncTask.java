@@ -102,6 +102,19 @@ public abstract class SafeAsyncTask<ResultT> implements Callable<ResultT> {
         return future.cancel(mayInterruptIfRunning);
     }
 
+    public boolean isCanceled() {
+        if (future == null)
+            throw new UnsupportedOperationException("You cannot cancel this task before calling future()");
+
+        return future.isCancelled();
+    }
+
+    public boolean isDone() {
+        if (future == null)
+            throw new UnsupportedOperationException("You cannot cancel this task before calling future()");
+
+        return future.isDone();
+    }
 
     /**
      * @throws Exception, captured on passed to onException() if present.
@@ -128,7 +141,7 @@ public abstract class SafeAsyncTask<ResultT> implements Callable<ResultT> {
      * @param e an InterruptedException or InterruptedIOException
      */
     protected void onInterrupted(Exception e) {
-        onException(e);
+        Log.e(SafeAsyncTask.class.getSimpleName(), e.getMessage(), e);
     }
 
     /**

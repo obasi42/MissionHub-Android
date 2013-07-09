@@ -14,7 +14,6 @@ import android.view.View;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.Window;
 import com.missionhub.R;
-import com.missionhub.api.PeopleListOptions;
 import com.missionhub.application.Application;
 import com.missionhub.application.Session;
 import com.missionhub.authenticator.AuthenticatorActivity;
@@ -22,21 +21,15 @@ import com.missionhub.event.ChangeHostFragmentEvent;
 import com.missionhub.event.DrawerClosedEvent;
 import com.missionhub.event.DrawerOpenedEvent;
 import com.missionhub.event.OnHostFragmentChangedEvent;
-import com.missionhub.event.OnHostedListOptionsChangedEvent;
 import com.missionhub.event.OnSidebarItemClickedEvent;
 import com.missionhub.fragment.HostedFragment;
 import com.missionhub.fragment.HostedPeopleListFragment;
 import com.missionhub.fragment.HostedSurveysFragment;
 import com.missionhub.fragment.SidebarFragment;
 import com.missionhub.fragment.dialog.SelectOrganizationDialogFragment;
-import com.missionhub.model.Label;
-import com.missionhub.model.Permission;
-import com.missionhub.model.Person;
 import com.missionhub.util.IntentHelper;
 
-import java.lang.reflect.Type;
-
-import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
+import uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefreshAttacher;
 
 public class HostActivity extends BaseAuthenticatedActivity implements FragmentManager.OnBackStackChangedListener {
 
@@ -113,8 +106,12 @@ public class HostActivity extends BaseAuthenticatedActivity implements FragmentM
                 SidebarFragment oldFragment = mSidebarFragment;
                 mSidebarFragment = new SidebarFragment();
                 mSidebarFragment.clone(oldFragment);
-                getSupportFragmentManager().beginTransaction().remove(oldFragment).commit();
-                getSupportFragmentManager().executePendingTransactions();
+                getSupportFragmentManager().beginTransaction().remove(oldFragment).commitAllowingStateLoss();
+                try {
+                    getSupportFragmentManager().executePendingTransactions();
+                } catch (IllegalStateException e) {
+                    Log.e("HostActivity", e.getMessage(), e);
+                }
             }
         } else {
             mSidebarFragment = new SidebarFragment();
@@ -127,9 +124,6 @@ public class HostActivity extends BaseAuthenticatedActivity implements FragmentM
             leftFrame.setVisibility(View.GONE);
         } else if (leftFrame != null) {
             leftFrame.setVisibility(View.VISIBLE);
-            mDrawerToggle.setDrawerIndicatorEnabled(false);
-            mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-            closeMenu();
         }
     }
 
@@ -151,10 +145,15 @@ public class HostActivity extends BaseAuthenticatedActivity implements FragmentM
 
     @Override
     public void onBackStackChanged() {
+        refreshMenuState();
+    }
+
+    private void refreshMenuState() {
         if (isAtRoot() && (!mTabletSidebarStatic || mLeftDrawerId == R.id.left_drawer)) {
             mDrawerToggle.setDrawerIndicatorEnabled(true);
             mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
         } else {
+            closeMenu();
             mDrawerToggle.setDrawerIndicatorEnabled(false);
             mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         }
@@ -166,8 +165,6 @@ public class HostActivity extends BaseAuthenticatedActivity implements FragmentM
             getSupportActionBar().setHomeButtonEnabled(true);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
-
-        Application.postEvent(new OnHostFragmentChangedEvent(mCurrentFragment));
     }
 
     @Override
@@ -197,6 +194,7 @@ public class HostActivity extends BaseAuthenticatedActivity implements FragmentM
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         mDrawerToggle.syncState();
+        refreshMenuState();
     }
 
     @Override
@@ -268,9 +266,13 @@ public class HostActivity extends BaseAuthenticatedActivity implements FragmentM
         if (mCurrentFragment != null && ((Object) mCurrentFragment).getClass() == clss && !event.isNewInstance())
             return;
 
+        if (!isAtRoot() && !event.isAddToBackstack()) {
+            getSupportFragmentManager().popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        }
+
         HostedFragment fragment = (HostedFragment) getSupportFragmentManager().findFragmentByTag(event.getFragmentTag());
         if (fragment != null && !event.isNewInstance()) {
-            getSupportFragmentManager().popBackStack(event.getFragmentTag(), 0);
+            getSupportFragmentManager().popBackStackImmediate(event.getFragmentTag(), 0);
         } else {
             if (fragment == null || event.isNewInstance()) {
                 try {
@@ -284,6 +286,7 @@ public class HostActivity extends BaseAuthenticatedActivity implements FragmentM
                     // ignore
                 }
             }
+            fragment.setOnFragmentChangedCallback(event.getCallback());
             FragmentManager fm = getSupportFragmentManager();
             FragmentTransaction ft = fm.beginTransaction();
             ft.setCustomAnimations(event.getInAnimation(), event.getOutAnimation(), event.getPopInAnimation(), event.getPopOutAnimation());
@@ -293,12 +296,7 @@ public class HostActivity extends BaseAuthenticatedActivity implements FragmentM
             }
             ft.commit();
         }
-        if (event.getCallback() != null) {
-            event.getCallback().onFragmentChanged(fragment);
-        }
-
         mCurrentFragment = fragment;
-        Application.postEvent(new OnHostFragmentChangedEvent(fragment));
     }
 
     public PullToRefreshAttacher getPullToRefreshAttacher() {
@@ -307,10 +305,9 @@ public class HostActivity extends BaseAuthenticatedActivity implements FragmentM
 
     public void setTabletSidebarStatic(boolean tabletSidebarStatic) {
         if (mTabletSidebarStatic == tabletSidebarStatic) return;
-
+        mTabletSidebarStatic = tabletSidebarStatic;
         attachSidebar(true);
-
-        onBackStackChanged();
+        refreshMenuState();
     }
 
     @Override
@@ -323,5 +320,10 @@ public class HostActivity extends BaseAuthenticatedActivity implements FragmentM
     public void onRestoreInstanceState(Bundle savedInstanceState) {
         mTabletSidebarStatic = savedInstanceState.getBoolean("mTabletSidebarStatic");
         super.onRestoreInstanceState(savedInstanceState);
+    }
+
+    public void _setCurrentFragment(HostedFragment currentFragment) {
+        mCurrentFragment = currentFragment;
+        Application.postEvent(new OnHostFragmentChangedEvent(mCurrentFragment));
     }
 }

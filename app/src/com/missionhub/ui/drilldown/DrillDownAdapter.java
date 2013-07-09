@@ -436,9 +436,9 @@ public class DrillDownAdapter extends PagerAdapter implements ViewPager.OnPageCh
                     mViews.remove(i);
                     i--;
                 }
+                mPageChanged = false;
+                super.notifyDataSetChanged();
             }
-            mPageChanged = false;
-            super.notifyDataSetChanged();
         }
     }
 

@@ -107,56 +107,65 @@ public class ApiPeopleListProvider extends DynamicPeopleListProvider {
      */
     @Override
     public Collection<Person> loadMore() {
-        mTask = new SafeAsyncTask<List<Person>>() {
-            @Override
-            public List<Person> call() throws Exception {
-                List<Person> people = Api.listPeople(mOptions, ApiOptions.builder()
-                        .include(Api.Include.assigned_tos)
-                        .include(Api.Include.current_address)
-                        .include(Api.Include.email_addresses)
-                        .include(Api.Include.organizational_permission)
-                        .include(Api.Include.organizational_labels)
-                        .include(Api.Include.phone_numbers)
-                        .build()).get();
+        synchronized (getLock()) {
+            mTask = new SafeAsyncTask<List<Person>>() {
+                @Override
+                public List<Person> call() throws Exception {
+                    List<Person> people = Api.listPeople(mOptions, ApiOptions.builder()
+                            .include(Api.Include.assigned_tos)
+                            .include(Api.Include.current_address)
+                            .include(Api.Include.email_addresses)
+                            .include(Api.Include.organizational_permission)
+                            .include(Api.Include.organizational_labels)
+                            .include(Api.Include.phone_numbers)
+                            .build()).get();
 
-                // init the view cache
-                if (people != null) {
-                    for (Person p : people) {
-                        p.getViewCache();
+                    // init the view cache
+                    if (people != null) {
+                        for (Person p : people) {
+                            p.getViewCache();
+                        }
+                    }
+                    return people;
+                }
+
+                @Override
+                public void onSuccess(final List<Person> people) {
+                    if (isCanceled()) return;
+                    synchronized (getLock()) {
+                        mOptions.advanceOffset();
+                        if (people.size() < mOptions.getLimit()) {
+                            setDone(true);
+                        }
+                        onAfterLoad(people);
                     }
                 }
-                return people;
-            }
 
-            @Override
-            public void onSuccess(final List<Person> people) {
-                mOptions.advanceOffset();
-                if (people.size() < mOptions.getLimit()) {
-                    setDone(true);
+                @Override
+                public void onFinally() {
+                    if (isCanceled()) return;
+                    synchronized (getLock()) {
+                        mTask = null;
+                        setLoading(false);
+                    }
                 }
-                onAfterLoad(people);
-            }
 
-            @Override
-            public void onFinally() {
-                mTask = null;
-                setLoading(false);
-            }
+                @Override
+                public void onException(final Exception e) {
+                    if (isCanceled()) return;
+                    setPaused(true);
+                    ApiPeopleListProvider.this.onException(e);
+                }
 
-            @Override
-            public void onException(final Exception e) {
-                setPaused(true);
-                ApiPeopleListProvider.this.onException(e);
-            }
+                @Override
+                public void onInterrupted(final Exception e) {
 
-            @Override
-            public void onInterrupted(final Exception e) {
-
-            }
-        };
-        setLoading(true);
-        mExecutor.execute(mTask.future());
-        return null;
+                }
+            };
+            setLoading(true);
+            mExecutor.execute(mTask.future());
+            return null;
+        }
     }
 
     /**
@@ -164,9 +173,11 @@ public class ApiPeopleListProvider extends DynamicPeopleListProvider {
      */
     @Override
     public void cancelLoadMore() {
-        try {
-            mTask.cancel(true);
-        } catch (Exception e) { /* ignore */ }
+        synchronized (getLock()) {
+            try {
+                mTask.cancel(true);
+            } catch (Exception e) { /* ignore */ }
+        }
     }
 
     /**
@@ -174,8 +185,10 @@ public class ApiPeopleListProvider extends DynamicPeopleListProvider {
      */
     @Override
     public void reload() {
-        mOptions.setOffset(0);
-        super.reload();
+        synchronized (getLock()) {
+            mOptions.setOffset(0);
+            super.reload();
+        }
     }
 
     /**
@@ -185,11 +198,9 @@ public class ApiPeopleListProvider extends DynamicPeopleListProvider {
      * @return
      */
     public PeopleListOptions getPeopleListOptions() {
-        return (PeopleListOptions) mOptions.clone();
-    }
-
-    public PeopleListOptions getRawPeopleListOptions() {
-        return mOptions;
+        synchronized (getLock()) {
+            return (PeopleListOptions) mOptions.clone();
+        }
     }
 
     /**
@@ -198,7 +209,9 @@ public class ApiPeopleListProvider extends DynamicPeopleListProvider {
      * @param options the list options
      */
     public void setPeopleListOptions(PeopleListOptions options) {
-        mOptions = (PeopleListOptions) options.clone();
-        reload();
+        synchronized (getLock()) {
+            mOptions = (PeopleListOptions) options.clone();
+            reload();
+        }
     }
 }
