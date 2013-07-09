@@ -3,20 +3,21 @@ package com.missionhub.ui.drilldown;
 import android.content.Context;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
-import android.widget.*;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import com.missionhub.R;
-import com.missionhub.application.Application;
-
-import org.holoeverywhere.widget.ListAdapterWrapper;
 
 import java.lang.ref.WeakReference;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 public class DrillDownAdapter extends PagerAdapter implements ViewPager.OnPageChangeListener {
 

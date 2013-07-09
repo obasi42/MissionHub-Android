@@ -8,8 +8,6 @@ import com.missionhub.model.SettingDao;
 import com.missionhub.model.UserSetting;
 import com.missionhub.model.UserSettingDao;
 
-import org.apache.commons.lang3.ClassUtils;
-
 /**
  * Manages the user's settings
  */

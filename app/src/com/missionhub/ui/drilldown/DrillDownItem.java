@@ -1,8 +1,5 @@
 package com.missionhub.ui.drilldown;
 
-import android.view.View;
-
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;

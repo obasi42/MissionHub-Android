@@ -5,9 +5,7 @@ import android.os.Bundle;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
 import com.missionhub.activity.HostActivity;
-import com.missionhub.application.Application;
 import com.missionhub.event.ChangeHostFragmentEvent;
-import com.missionhub.event.OnHostFragmentChangedEvent;
 import com.missionhub.util.FragmentUtils;
 
 public abstract class HostedFragment extends BaseFragment {

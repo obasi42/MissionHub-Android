@@ -13,7 +13,6 @@ import com.missionhub.R;
 import com.missionhub.application.Application;
 import com.missionhub.model.Address;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.holoeverywhere.widget.Toast;
 

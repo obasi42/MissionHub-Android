@@ -1,8 +1,6 @@
 package com.missionhub.model.gson;
 
 import com.missionhub.application.Application;
-import com.missionhub.model.EmailAddress;
-import com.missionhub.model.EmailAddressDao;
 import com.missionhub.model.InteractionType;
 import com.missionhub.model.InteractionTypeDao;
 

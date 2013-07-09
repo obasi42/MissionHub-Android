@@ -11,11 +11,9 @@ import com.missionhub.model.OrganizationalPermissionDao;
 import com.missionhub.model.Person;
 import com.missionhub.model.PersonDao;
 import com.missionhub.util.ObjectUtils;
-import com.missionhub.util.Profiler;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;

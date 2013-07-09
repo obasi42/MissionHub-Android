@@ -1,10 +1,7 @@
 package com.missionhub.people;
 
 import android.content.Context;
-import android.view.View;
-import android.view.ViewGroup;
 
-import com.missionhub.R;
 import com.missionhub.model.Person;
 
 import java.util.Collection;

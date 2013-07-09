@@ -7,7 +7,11 @@
 package com.missionhub.util;
 
 import java.lang.ref.WeakReference;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 @SuppressWarnings({"serial"})
 public class WeakArrayList<T> extends ArrayList<WeakReference<T>> {

@@ -1,13 +1,14 @@
 package com.missionhub.authenticator;
 
-import android.accounts.*;
+import android.accounts.AbstractAccountAuthenticator;
+import android.accounts.Account;
+import android.accounts.AccountAuthenticatorResponse;
+import android.accounts.AccountManager;
+import android.accounts.NetworkErrorException;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-
-import com.facebook.Session;
-import com.missionhub.application.Configuration;
 
 /**
  * Authenticates MissionHub accounts using the system account manager

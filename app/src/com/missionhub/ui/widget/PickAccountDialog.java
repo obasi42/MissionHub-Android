@@ -1,7 +1,6 @@
 package com.missionhub.ui.widget;
 
 import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.accounts.OnAccountsUpdateListener;
 import android.content.Context;
 import android.os.Bundle;
@@ -14,12 +13,9 @@ import com.missionhub.R;
 import com.missionhub.application.Application;
 import com.missionhub.application.Session;
 import com.missionhub.application.SettingsManager;
-import com.missionhub.authenticator.Authenticator;
 import com.missionhub.fragment.dialog.BaseDialogFragment;
 import com.missionhub.model.Organization;
-import com.missionhub.model.Person;
 import com.missionhub.ui.ObjectArrayAdapter;
-import com.missionhub.util.ObjectUtils;
 
 import org.holoeverywhere.LayoutInflater;
 import org.holoeverywhere.app.AlertDialog;

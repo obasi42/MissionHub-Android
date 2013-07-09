@@ -21,13 +21,14 @@ import com.missionhub.ui.drilldown.DrillDownView;
 import com.missionhub.util.SafeAsyncTask;
 import com.missionhub.util.TreeDataStructure;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.holoeverywhere.app.AlertDialog;
-import org.apache.commons.lang3.ArrayUtils;
 import org.holoeverywhere.widget.TextView;
 import org.holoeverywhere.widget.Toast;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
 
 public class SelectOrganizationDialogFragment extends RefreshableDialogFragment implements DialogInterface.OnKeyListener {
 

@@ -3,7 +3,6 @@ package com.missionhub.model.gson;
 import com.missionhub.application.Application;
 import com.missionhub.model.Address;
 import com.missionhub.model.AddressDao;
-import com.missionhub.model.PhoneNumber;
 
 import java.util.ArrayList;
 import java.util.List;

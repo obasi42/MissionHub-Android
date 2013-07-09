@@ -22,7 +22,9 @@ import com.missionhub.application.DrawableCache;
 import com.missionhub.application.Session;
 import com.missionhub.exception.ExceptionHelper;
 import com.missionhub.fragment.BaseFragment;
-import com.missionhub.model.*;
+import com.missionhub.model.ContactAssignment;
+import com.missionhub.model.ContactAssignmentDao;
+import com.missionhub.model.Person;
 import com.missionhub.model.gson.GContactAssignment;
 import com.missionhub.ui.AnimateOnceImageLoadingListener;
 import com.missionhub.ui.ObjectArrayAdapter;
@@ -39,7 +41,11 @@ import org.holoeverywhere.widget.ListView;
 import org.holoeverywhere.widget.TextView;
 import org.holoeverywhere.widget.Toast;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class ContactAssignmentDialogFragment extends RefreshableDialogFragment implements OnKeyListener, OnItemClickListener {
 
