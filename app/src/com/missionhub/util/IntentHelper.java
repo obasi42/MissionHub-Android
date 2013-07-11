@@ -12,9 +12,17 @@ import com.google.i18n.phonenumbers.Phonenumber;
 import com.missionhub.R;
 import com.missionhub.application.Application;
 import com.missionhub.model.Address;
+import com.missionhub.model.EmailAddress;
+import com.missionhub.model.EmailAddressDao;
+import com.missionhub.model.PhoneNumber;
+import com.missionhub.model.PhoneNumberDao;
 
 import org.apache.commons.lang3.StringUtils;
 import org.holoeverywhere.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * A set of methods for creating and starting intents.
@@ -39,17 +47,17 @@ public class IntentHelper {
     /**
      * Creates and starts an intent chooser for sending an email
      *
-     * @param address
+     * @param addresses
      * @param subject
      * @param body
      */
-    public static void sendEmail(final String address, final String subject, final String body) {
+    public static void sendEmail(final String[] addresses, final String subject, final String body) {
         try {
             final Intent intent = new Intent(android.content.Intent.ACTION_SEND);
             addTaskFlags(intent);
             intent.setType("message/rfc822");
-            if (StringUtils.isNotBlank(address)) {
-                intent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{address});
+            if (addresses != null && addresses.length > 0) {
+                intent.putExtra(android.content.Intent.EXTRA_EMAIL, addresses);
             }
             if (StringUtils.isNotEmpty(subject)) {
                 intent.putExtra(android.content.Intent.EXTRA_SUBJECT, subject);
@@ -168,14 +176,23 @@ public class IntentHelper {
     /**
      * Creates and starts an intent to send an SMS.
      *
-     * @param number
+     * @param numbers
      */
-    public static void sendSms(final Phonenumber.PhoneNumber number) {
+    public static void sendSms(final List<Phonenumber.PhoneNumber> numbers) {
         try {
             final Intent intent = new Intent(Intent.ACTION_SENDTO);
             addTaskFlags(intent);
             intent.setType("vnd.android-dir/mms-sms");
-            intent.setData(Uri.parse(PhoneNumberUtil.getInstance().format(number, PhoneNumberUtil.PhoneNumberFormat.RFC3966).replace("tel:", "sms:")));
+
+            String delimeter = ";";
+            if (android.os.Build.MANUFACTURER != null && android.os.Build.MANUFACTURER.toLowerCase().contains("samsung")) {
+                delimeter = ",";
+            }
+            List<String> nums = new ArrayList<String>();
+            for (Phonenumber.PhoneNumber number : numbers) {
+                nums.add(PhoneNumberUtil.getInstance().format(number, PhoneNumberUtil.PhoneNumberFormat.RFC3966).replace("tel:", ""));
+            }
+            intent.setData(Uri.parse("smsto:" + StringUtils.join(nums, delimeter)));
 
             startChooser(intent, R.string.intent_helper_send_sms);
         } catch (final Exception e) {
@@ -250,5 +267,35 @@ public class IntentHelper {
     private static boolean hasIntentHandler(Intent intent) {
         ResolveInfo info = Application.getContext().getPackageManager().resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY);
         return info != null;
+    }
+
+    public static void sendEmail(long[] personIds) {
+        List<Long> ids = new ArrayList<Long>();
+        for (long id : personIds) {
+            ids.add(id);
+        }
+
+        List<String> emails = new ArrayList<String>();
+        List<EmailAddress> addresses = Application.getDb().getEmailAddressDao().queryBuilder().where(EmailAddressDao.Properties.Person_id.in(ids), EmailAddressDao.Properties.Primary.eq(true)).list();
+        for (EmailAddress address : addresses) {
+            if (address == null || StringUtils.isEmpty(address.getEmail())) continue;
+            emails.add(address.getEmail().trim());
+        }
+
+        sendEmail(emails.toArray(new String[emails.size()]), null, null);
+    }
+
+    public static void sendSms(long[] personIds) {
+        List<Long> ids = new ArrayList<Long>();
+        for (long id : personIds) {
+            ids.add(id);
+        }
+        List<Phonenumber.PhoneNumber> phoneNumbers = new ArrayList<Phonenumber.PhoneNumber>();
+        List<PhoneNumber> numbers = Application.getDb().getPhoneNumberDao().queryBuilder().where(PhoneNumberDao.Properties.Person_id.in(ids), PhoneNumberDao.Properties.Primary.eq(true)).list();
+        for (PhoneNumber number : numbers) {
+            if (number == null) continue;
+            phoneNumbers.add(number.getPhoneNumber());
+        }
+        sendSms(phoneNumbers);
     }
 }

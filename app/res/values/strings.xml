@@ -13,12 +13,17 @@
     <string name="action_refresh">Refresh</string>
     <string name="action_assign">Assign</string>
     <string name="action_delete">Delete</string>
+    <string name="action_permissions">Permissions</string>
+    <string name="action_archive">Archive</string>
+    <string name="action_email">Email</string>
+    <string name="action_text">Text</string>
     <string name="action_no_permissions">You do not have the required permissions to perform this
         action.
     </string>
     <string name="action_add_contact">Add Contact</string>
     <string name="action_save">Save</string>
-    <string name="action_label">Label</string>
+    <string name="action_labels">Labels</string>
+    <string name="action_done">Done</string>
 
     <!-- Main Menu -->
     <string name="menu_surveys">Surveys</string>
@@ -46,11 +51,17 @@
     <string name="display_phone">Phone</string>
     <string name="display_email">Email</string>
 
-    <string name="sort_off"><b>Sort:</b>Off
+    <string name="sort_off">
+        <b>Sort:</b>
+        Off
     </string>
-    <string name="sort_asc"><b>Sort:</b>Asc
+    <string name="sort_asc">
+        <b>Sort:</b>
+        Asc
     </string>
-    <string name="sort_desc"><b>Sort:</b>Desc
+    <string name="sort_desc">
+        <b>Sort:</b>
+        Desc
     </string>
 
     <!-- Contact -->
@@ -95,7 +106,7 @@
     <string name="about_terms">Terms and Conditions</string>
     <string name="about_feedback">Have a problem? Want a new feature?</string>
     <string name="about_contact_us">Contact Us</string>
-    <string name="about_copyright">© 2012 Cru Global</string>
+    <string name="about_copyright">© 2013 Cru Global</string>
     <string name="about_feedback_email">support@missionhub.com</string>
     <string name="about_privacy_url">https://www.missionhub.com/privacy</string>
     <string name="about_terms_url">https://www.missionhub.com/terms</string>
@@ -201,6 +212,15 @@
     <string name="rejoicable_gospel">Gospel Presentation</string>
     <string name="rejoicable_convo">Spiritual Conversation</string>
 
+    <!-- Interaction Visibility -->
+    <string name="interaction_visibility_everyone">Everyone</string>
+    <string name="interaction_visibility_me">Me only</string>
+    <string name="interaction_visibility_everyone_in">Everyone in %1$s</string>
+    <string name="interaction_visibility_everyone_in_parent">Everyone in parent</string>
+    <string name="interaction_visibility_everyone_in_organization">Everyone in organization</string>
+    <string name="interaction_visibility_admins_in">Admins in %1$s</string>
+    <string name="interaction_visibility_admins_in_organization">Admins in organization</string>
+
     <!-- Add Contact Dialog -->
     <string name="add_contact_title">Add Contact</string>
     <string name="add_contact_section_bio">Bio</string>
@@ -278,5 +298,9 @@
         interface using a web browser at www.missionhub.com.
     </string>
     <string name="exception_user_not_found_title">MissionHub user not found</string>
+
+    <!-- Interaction Dialog -->
+    <string name="interaction_dialog_title_new">Record New Interaction</string>
+    <string name="interaction_dialog_title_edit">Edit Interaction</string>
 
 </resources>

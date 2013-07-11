@@ -45,7 +45,7 @@ public class PersonAdapterViewProvider implements AdapterViewProvider {
     /**
      * The current line 2 display option
      */
-    private Display mLine2 = Display.GENDER;
+    private Display mLine2 = Display.STATUS;
 
     /**
      * {@inheritDoc}

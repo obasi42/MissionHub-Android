@@ -1,6 +1,11 @@
 package com.missionhub.model;
 
+import android.telephony.PhoneNumberUtils;
+
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.Phonenumber;
 import com.missionhub.model.DaoSession;
+import com.missionhub.util.PhoneUtils;
 
 import de.greenrobot.dao.DaoException;
 
@@ -198,6 +203,9 @@ public class PhoneNumber {
     }
 
     // KEEP METHODS - put your custom methods here
+    public Phonenumber.PhoneNumber getPhoneNumber() {
+        return PhoneUtils.parsePhoneNumber(getNumber());
+    }
     // KEEP METHODS END
 
 }

@@ -15,10 +15,6 @@ public enum FollowupStatus {
         }
     }
 
-    private static String getString(int id) {
-        return ResourceUtils.getString(id);
-    }
-
     @Override
     public String toString() {
         if (mTranslatedName == null) {

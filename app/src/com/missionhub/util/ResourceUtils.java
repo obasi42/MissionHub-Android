@@ -22,6 +22,16 @@ public class ResourceUtils {
         return def;
     }
 
+    public static int getDrawableId(String name, int def) {
+        if (StringUtils.isNotEmpty(name)) {
+            final int id = getContext().getResources().getIdentifier(name, "drawable", getContext().getPackageName());
+            if (id != 0) {
+                return id;
+            }
+        }
+        return def;
+    }
+
     private static Context getContext() {
         return Application.getContext();
     }

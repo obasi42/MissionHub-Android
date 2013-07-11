@@ -167,6 +167,9 @@ public abstract class DynamicPeopleListProvider extends PeopleListProvider {
             setLoading(false);
             setPaused(false);
             setDone(false);
+            if (getPeopleList() != null) {
+                getPeopleList().clearChoices();
+            }
             load();
         }
     }

@@ -220,6 +220,10 @@ public class ListOptions {
         }
     }
 
+    public Map<String, Direction> getOrders() {
+        return mOrderBy;
+    }
+
     /**
      * Clears all order by values
      */

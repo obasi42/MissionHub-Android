@@ -1123,7 +1123,7 @@ public class Person {
                 mPersonViewCache.emailClickListener = new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        IntentHelper.sendEmail(getPrimaryEmailAddress().getEmail(), null, null);
+                        IntentHelper.sendEmail(new String[]{getPrimaryEmailAddress().getEmail()}, null, null);
                     }
                 };
             }

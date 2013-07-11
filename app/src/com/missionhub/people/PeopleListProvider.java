@@ -15,7 +15,7 @@ import java.lang.ref.WeakReference;
  * underlying data for that view. The Provider provides access to the data items. The provider
  * is also responsible for making a {@link android.view.View} for each item in the data set.
  */
-public abstract class PeopleListProvider extends ObjectArrayAdapter {
+public class PeopleListProvider extends ObjectArrayAdapter {
 
     /**
      * The android logging tag

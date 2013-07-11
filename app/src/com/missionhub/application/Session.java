@@ -479,7 +479,7 @@ public class Session implements OnAccountsUpdateListener {
         return mUpdatePersonTask;
     }
 
-    private FutureTask<Void> updateCurrentOrganization(final boolean force) {
+    public FutureTask<Void> updateCurrentOrganization(final boolean force) {
         try {
             mUpdateOrganizationTask.cancel(true);
         } catch (final Exception e) {

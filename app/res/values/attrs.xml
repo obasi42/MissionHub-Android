@@ -7,4 +7,8 @@
     <declare-styleable name="SupportActivated">
         <attr name="state_support_activated" format="boolean"/>
     </declare-styleable>
+    <declare-styleable name="CheckmarkImageView">
+        <attr name="state_checkmark_some" format="boolean"/>
+        <attr name="state_checkmark_all" format="boolean"/>
+    </declare-styleable>
 </resources>

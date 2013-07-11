@@ -2,18 +2,21 @@ package com.missionhub.fragment;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.view.ActionMode;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.widget.SearchView;
 import com.missionhub.R;
+import com.missionhub.api.ListOptions;
 import com.missionhub.api.PeopleListOptions;
 import com.missionhub.application.Application;
 import com.missionhub.event.ChangeHostFragmentEvent;
@@ -21,6 +24,8 @@ import com.missionhub.event.OnHostedListOptionsChangedEvent;
 import com.missionhub.event.OnOrganizationChangedEvent;
 import com.missionhub.event.OnSidebarItemClickedEvent;
 import com.missionhub.exception.ExceptionHelper;
+import com.missionhub.fragment.dialog.CheckAllDialog;
+import com.missionhub.fragment.dialog.ContactAssignmentDialogFragment;
 import com.missionhub.model.InteractionType;
 import com.missionhub.model.Label;
 import com.missionhub.model.Permission;
@@ -31,6 +36,8 @@ import com.missionhub.people.PeopleListView;
 import com.missionhub.people.PersonAdapterViewProvider;
 import com.missionhub.ui.ObjectArrayAdapter;
 import com.missionhub.ui.SearchHelper;
+import com.missionhub.ui.widget.CheckmarkImageView;
+import com.missionhub.util.IntentHelper;
 import com.missionhub.util.SafeAsyncTask;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.PauseOnScrollListener;
@@ -43,15 +50,15 @@ import org.holoeverywhere.widget.TextView;
 
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
 
-public class HostedPeopleListFragment extends HostedFragment implements AdapterView.OnItemSelectedListener, PeopleListView.OnPersonClickListener, DynamicPeopleListProvider.OnExceptionListener, PullToRefreshAttacher.OnRefreshListener, SearchHelper.OnSearchQueryChangedListener {
+public class HostedPeopleListFragment extends HostedFragment implements AdapterView.OnItemSelectedListener,
+        PeopleListView.OnPersonClickListener, DynamicPeopleListProvider.OnExceptionListener, PullToRefreshAttacher.OnRefreshListener,
+        SearchHelper.OnSearchQueryChangedListener, CheckAllDialog.CheckAllDialogListener, ActionMode.Callback {
 
     public static final String TAG = HostedPeopleListFragment.class.getSimpleName();
-
     private PeopleListView mList;
     private SelectableApiPeopleListProvider mProvider;
-
     private SearchView mSearchView;
-    private ImageView mCheckmark;
+    private CheckmarkImageView mCheckmark;
     private TextView mCheckmarkText;
     private Spinner mDisplaySpinner;
     private ObjectArrayAdapter mDisplaySpinnerAdapter;
@@ -60,9 +67,9 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
     private ObjectArrayAdapter mOrderSpinnerAdapter;
     private int mOrderPosition;
     private SafeAsyncTask<Void> mReloadStatusTask;
-
     private SearchHelper mSearchHelper;
-    private CheckmarkHelper mCheckmarkHelper;
+    private CheckmarkHelper mCheckmarkHelper = new CheckmarkHelper();
+    private ActionMode mActionMode;
 
     public HostedPeopleListFragment() {
         // empty fragment constructor
@@ -121,10 +128,14 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
             mProvider.setContext(inflater.getContext());
         }
         mProvider.setOnExceptionListener(this);
+        try {
+            mProvider.registerDataSetObserver(mCheckmarkHelper);
+        } catch (IllegalStateException exception) { /* ignore already registered */ }
         Application.getEventBus().postSticky(new OnHostedListOptionsChangedEvent(mProvider.getPeopleListOptions()));
 
         mList.setProvider(mProvider);
         mList.setOnPersonClickListener(this);
+        mList.setOnPersonCheckedListener(mCheckmarkHelper);
         mList.setOnScrollListener(new PauseOnScrollListener(ImageLoader.getInstance(), false, true));
 
         // set up the list controller
@@ -134,16 +145,15 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
             mSearchHelper.setOnSearchQueryChangedListener(this);
         }
         mSearchHelper.setSearchView(mSearchView);
-        mCheckmark = (ImageView) view.findViewById(R.id.checkmark);
+
+        mCheckmark = (CheckmarkImageView) view.findViewById(R.id.checkmark);
+        mCheckmark.setOnClickListener(mCheckmarkHelper);
         mCheckmarkText = (TextView) view.findViewById(R.id.checkmark_text);
-        if (mCheckmarkHelper == null) {
-            mCheckmarkHelper = new CheckmarkHelper();
-        }
+        mCheckmarkHelper.refreshCheckedState();
         mDisplaySpinner = (Spinner) view.findViewById(R.id.display);
         mDisplaySpinner.setOnItemSelectedListener(this);
         mOrderSpinner = (Spinner) view.findViewById(R.id.order);
         mOrderSpinner.setOnItemSelectedListener(this);
-        mOrderSpinner.setVisibility(View.GONE);
 
         if (mDisplaySpinnerAdapter == null) {
             mDisplaySpinnerAdapter = buildDisplaySpinner(inflater.getContext());
@@ -163,10 +173,29 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
     }
 
     @Override
+    public void onStart() {
+        super.onResume();
+
+        if (mActionMode != null) {
+            startActionMode(true);
+        }
+        mCheckmarkHelper.refreshCheckedState();
+
+        getHost().getPullToRefreshAttacher().setRefreshableView(mList, this);
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
 
         getHost().getPullToRefreshAttacher().setRefreshableView(mList, this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        finishActionMode();
     }
 
     @Override
@@ -292,6 +321,121 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
         mProvider.setPeopleListOptions(options);
     }
 
+    private SimpleSpinnerAdapter buildDisplaySpinner(Context context) {
+        SimpleSpinnerAdapter adapter = new SimpleSpinnerAdapter(context);
+        adapter.add(new StringRunnableItem(R.string.display_status, new Runnable() {
+            @Override
+            public void run() {
+                mProvider.setDisplay(PersonAdapterViewProvider.Display.STATUS);
+                ((StringRunnableItem) mOrderSpinner.getSelectedItem()).run();
+            }
+        }));
+        adapter.add(new StringRunnableItem(R.string.display_gender, new Runnable() {
+            @Override
+            public void run() {
+                mProvider.setDisplay(PersonAdapterViewProvider.Display.GENDER);
+                ((StringRunnableItem) mOrderSpinner.getSelectedItem()).run();
+            }
+        }));
+        adapter.add(new StringRunnableItem(R.string.display_permission, new Runnable() {
+            @Override
+            public void run() {
+                mProvider.setDisplay(PersonAdapterViewProvider.Display.PERMISSION);
+                ((StringRunnableItem) mOrderSpinner.getSelectedItem()).run();
+            }
+        }));
+        adapter.add(new StringRunnableItem(R.string.display_phone, new Runnable() {
+            @Override
+            public void run() {
+                mProvider.setDisplay(PersonAdapterViewProvider.Display.PHONE);
+                ((StringRunnableItem) mOrderSpinner.getSelectedItem()).run();
+            }
+        }));
+        adapter.add(new StringRunnableItem(R.string.display_email, new Runnable() {
+            @Override
+            public void run() {
+                mProvider.setDisplay(PersonAdapterViewProvider.Display.EMAIL);
+                ((StringRunnableItem) mOrderSpinner.getSelectedItem()).run();
+            }
+        }));
+        return adapter;
+    }
+
+    private SimpleSpinnerAdapter buildOrderSpinner(Context context) {
+        SimpleSpinnerAdapter adapter = new SimpleSpinnerAdapter(context);
+        adapter.add(new StringRunnableItem(R.string.sort_off, new Runnable() {
+            @Override
+            public void run() {
+                PeopleListOptions options = mProvider.getPeopleListOptions();
+                if (!options.getOrders().isEmpty()) {
+                    options.clearOrders();
+                    mProvider.setPeopleListOptions(options);
+                }
+            }
+        }));
+        adapter.add(new StringRunnableItem(R.string.sort_asc, new Runnable() {
+            @Override
+            public void run() {
+                PeopleListOptions options = mProvider.getPeopleListOptions();
+                options.clearOrders();
+                switch (mProvider.getDisplay()) {
+                    case STATUS:
+                        options.addOrder("followup_status", ListOptions.Direction.ASC);
+                        break;
+                    case GENDER:
+                        options.addOrder("gender", ListOptions.Direction.ASC);
+                        break;
+                    case EMAIL:
+                        options.addOrder("primary_email", ListOptions.Direction.ASC);
+                        break;
+                    case PHONE:
+                        options.addOrder("primary_phone", ListOptions.Direction.ASC);
+                        break;
+                    case PERMISSION:
+                        options.addOrder("permission", ListOptions.Direction.ASC);
+                        break;
+                }
+                options.addOrder("last_name", ListOptions.Direction.ASC);
+                options.addOrder("first_name", ListOptions.Direction.ASC);
+                mProvider.setPeopleListOptions(options);
+                mProvider.setPeopleListOptions(options);
+            }
+        }));
+        adapter.add(new StringRunnableItem(R.string.sort_desc, new Runnable() {
+            @Override
+            public void run() {
+                PeopleListOptions options = mProvider.getPeopleListOptions();
+                options.clearOrders();
+                switch (mProvider.getDisplay()) {
+                    case STATUS:
+                        options.addOrder("followup_status", ListOptions.Direction.DESC);
+                        break;
+                    case GENDER:
+                        options.addOrder("gender", ListOptions.Direction.DESC);
+                        break;
+                    case EMAIL:
+                        options.addOrder("primary_email", ListOptions.Direction.DESC);
+                        break;
+                    case PHONE:
+                        options.addOrder("primary_phone", ListOptions.Direction.DESC);
+                        break;
+                    case PERMISSION:
+                        options.addOrder("permission", ListOptions.Direction.DESC);
+                        break;
+                }
+                options.addOrder("last_name", ListOptions.Direction.ASC);
+                options.addOrder("first_name", ListOptions.Direction.ASC);
+                mProvider.setPeopleListOptions(options);
+            }
+        }));
+        return adapter;
+    }
+
+    @Override
+    public void setAllChecked(boolean all) {
+        mCheckmarkHelper.setAllChecked(all);
+    }
+
     public static class StringRunnableItem {
         private int mText;
         private Runnable mRunnable;
@@ -324,6 +468,10 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
                 }
             });
         }
+
+        public PersonAdapterViewProvider.Display getDisplay() {
+            return ((PersonAdapterViewProvider) getAdapterViewProvider()).getLine2();
+        }
     }
 
     public static class SimpleSpinnerAdapter extends ObjectArrayAdapter<StringRunnableItem> {
@@ -354,7 +502,7 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
                 holder = (ViewHolder) view.getTag();
             }
 
-            holder.text1.setText(Html.fromHtml(getContext().getString(item.mText)));
+            holder.text1.setText(item.mText);
 
             return view;
         }
@@ -364,91 +512,186 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
         }
     }
 
-    private SimpleSpinnerAdapter buildDisplaySpinner(Context context) {
-        SimpleSpinnerAdapter adapter = new SimpleSpinnerAdapter(context);
-        adapter.add(new StringRunnableItem(R.string.display_gender, new Runnable() {
-            @Override
-            public void run() {
-                mProvider.setDisplay(PersonAdapterViewProvider.Display.GENDER);
-            }
-        }));
-        adapter.add(new StringRunnableItem(R.string.display_status, new Runnable() {
-            @Override
-            public void run() {
-                mProvider.setDisplay(PersonAdapterViewProvider.Display.STATUS);
-            }
-        }));
-        adapter.add(new StringRunnableItem(R.string.display_permission, new Runnable() {
-            @Override
-            public void run() {
-                mProvider.setDisplay(PersonAdapterViewProvider.Display.PERMISSION);
-            }
-        }));
-        adapter.add(new StringRunnableItem(R.string.display_phone, new Runnable() {
-            @Override
-            public void run() {
-                mProvider.setDisplay(PersonAdapterViewProvider.Display.PHONE);
-            }
-        }));
-        adapter.add(new StringRunnableItem(R.string.display_email, new Runnable() {
-            @Override
-            public void run() {
-                mProvider.setDisplay(PersonAdapterViewProvider.Display.EMAIL);
-            }
-        }));
-        return adapter;
-    }
-
-    private SimpleSpinnerAdapter buildOrderSpinner(Context context) {
-        SimpleSpinnerAdapter adapter = new SimpleSpinnerAdapter(context);
-        adapter.add(new StringRunnableItem(R.string.sort_off, new Runnable() {
-            @Override
-            public void run() {
-
-            }
-        }));
-        adapter.add(new StringRunnableItem(R.string.sort_asc, new Runnable() {
-            @Override
-            public void run() {
-
-            }
-        }));
-        adapter.add(new StringRunnableItem(R.string.sort_desc, new Runnable() {
-            @Override
-            public void run() {
-
-            }
-        }));
-        return adapter;
-    }
-
-    private class CheckmarkHelper {
-
+    public class CheckmarkHelper extends DataSetObserver implements PeopleListView.OnPersonCheckedListener, View.OnClickListener {
+        private Context mContext;
         private boolean mAllChecked;
-
-        public void setCheckmarkView(ImageView mCheckmark) {
-
-        }
-
-
-        public void setCheckmarkTextView(TextView mCheckmarkText) {
-
-
-        }
+        private CheckAllDialog mDialog;
 
         public void setAllChecked() {
-
-        }
-
-        public void setNoneChecked() {
-
+            if (mDialog == null || mDialog.getFragmentManager() != getChildFragmentManager()) {
+                mDialog = new CheckAllDialog();
+            }
+            mDialog.show(getChildFragmentManager());
         }
 
         public void setAllChecked(boolean all) {
+            if (mList == null) return;
+
             mAllChecked = all;
-
-
+            mList.setAllItemsChecked();
+            refreshCheckedState();
         }
 
+        public void setNoneChecked() {
+            if (mList == null) return;
+
+            mList.clearChoices();
+            mAllChecked = false;
+            refreshCheckedState();
+        }
+
+        @Override
+        public void onChanged() {
+            if (mAllChecked) {
+                setAllChecked(true);
+            } else {
+                refreshCheckedState();
+            }
+        }
+
+        @Override
+        public void onPersonChecked(PeopleListView list, Person person, int position, boolean checked) {
+            refreshCheckedState();
+        }
+
+        @Override
+        public void onAllPeopleUnchecked() {
+            refreshCheckedState();
+        }
+
+        public synchronized void refreshCheckedState() {
+            if (mList == null || mCheckmark == null || mCheckmarkText == null) return;
+
+            if (mList.getCheckedItemCount() > 0) {
+                if (mAllChecked) {
+                    mCheckmark.setCheckmarkState(CheckmarkImageView.STATE_ALL);
+                    mCheckmarkText.setText("NONE");
+                } else {
+                    mCheckmark.setCheckmarkState(CheckmarkImageView.STATE_SOME);
+                    mCheckmarkText.setText("SOME");
+                }
+                startActionMode(false);
+            } else {
+                mCheckmark.setCheckmarkState(CheckmarkImageView.STATE_NONE);
+                mCheckmarkText.setText("ALL");
+                finishActionMode();
+                closeDialog();
+            }
+        }
+
+        @Override
+        public void onClick(View view) {
+            if (mList.getCheckedItemCount() > 0) {
+                setNoneChecked();
+            } else {
+                setAllChecked();
+            }
+        }
+
+        public void closeDialog() {
+            if (mDialog != null && mDialog.isVisible()) {
+                mDialog.cancel();
+                mDialog = null;
+            }
+        }
+    }
+
+    @Override
+    public boolean onCreateActionMode(final ActionMode mode, final Menu menu) {
+        menu.add(Menu.NONE, R.id.action_assign, Menu.NONE, R.string.action_assign).setIcon(R.drawable.ic_action_assign)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+
+        menu.add(Menu.NONE, R.id.action_label, Menu.NONE, R.string.action_labels).setIcon(R.drawable.ic_action_labels)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+
+        menu.add(Menu.NONE, R.id.action_permission, Menu.NONE, R.string.action_permissions).setIcon(R.drawable.ic_action_permissions)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+
+        menu.add(Menu.NONE, R.id.action_delete, Menu.NONE, R.string.action_delete).setIcon(R.drawable.ic_action_delete)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+
+        menu.add(Menu.NONE, R.id.action_archive, Menu.NONE, R.string.action_archive).setIcon(R.drawable.ic_action_archive)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+
+        menu.add(Menu.NONE, R.id.action_email, Menu.NONE, R.string.action_email).setIcon(R.drawable.ic_action_email)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+
+        menu.add(Menu.NONE, R.id.action_text, Menu.NONE, R.string.action_text).setIcon(R.drawable.ic_action_text)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareActionMode(final ActionMode mode, final Menu menu) {
+        return false;
+    }
+
+    @Override
+    public synchronized boolean onActionItemClicked(final ActionMode mode, final MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_assign:
+                //ContactAssignmentDialogFragment.showForResult(getChildFragmentManager(), mList.getCheckedItemIds(), R.id.action_assign);
+                break;
+            case R.id.action_label:
+                // TODO: implement label
+                //LabelDialogFragment.showForResult(getChildFragmentManager())
+
+                break;
+            case R.id.action_permission:
+                // TODO: implement action permission
+
+                break;
+            case R.id.action_delete:
+                // TODO: implement delete
+
+                break;
+            case R.id.action_archive:
+                // TODO: implement archive
+
+                break;
+            case R.id.action_email:
+                IntentHelper.sendEmail(mList.getCheckedItemIds());
+                finishActionMode();
+                break;
+            case R.id.action_text:
+                IntentHelper.sendSms(mList.getCheckedItemIds());
+                finishActionMode();
+                break;
+        }
+
+        return true;
+    }
+
+    @Override
+    public void onDestroyActionMode(final ActionMode mode) {
+        mActionMode = null;
+        if (isVisible() && isResumed()) {
+            mCheckmarkHelper.setNoneChecked();
+        }
+    }
+
+    protected void startActionMode(boolean force) {
+        if (mActionMode == null || force) {
+            mActionMode = getSupportActivity().startActionMode(this);
+        }
+    }
+
+    protected void finishActionMode() {
+        if (mActionMode != null) {
+            mActionMode.finish();
+        }
+    }
+
+    public boolean onFragmentResult(int requestCode, int resultCode, Object data) {
+        switch (requestCode) {
+            case R.id.action_assign:
+                if (mProvider.getPeopleListOptions().hasFilter("assigned_to")) {
+                    mProvider.reload();
+                }
+                return true;
+        }
+        return false;
     }
 }
+

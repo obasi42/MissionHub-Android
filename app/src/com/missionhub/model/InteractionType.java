@@ -1,5 +1,6 @@
 package com.missionhub.model;
 
+import com.missionhub.R;
 import com.missionhub.model.DaoSession;
 
 import de.greenrobot.dao.DaoException;
@@ -8,6 +9,8 @@ import de.greenrobot.dao.DaoException;
 
 // KEEP INCLUDES - put your custom includes here
 import com.missionhub.util.ResourceUtils;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 // KEEP INCLUDES END
@@ -49,6 +52,7 @@ public class InteractionType {
 
     // KEEP FIELDS - put your custom fields here
     private String mTranslatedName;
+    private int mIconResource;
     // KEEP FIELDS END
 
     public InteractionType() {
@@ -215,6 +219,20 @@ public class InteractionType {
     public void refreshAll() {
         refresh();
         resetTranslatedName();
+    }
+
+    public int getIconResource() {
+        if (mIconResource == 0) {
+            synchronized (this) {
+                if (StringUtils.isNotEmpty(getIcon())) {
+                    String icon = getIcon().substring(0, getIcon().lastIndexOf('.')); // remove extension
+                    mIconResource = ResourceUtils.getDrawableId("ic_interaction_type_" + icon, 0);
+                }
+            }
+        }
+        return mIconResource;
+
+
     }
     // KEEP METHODS END
 

@@ -196,14 +196,12 @@ public class SelectableListView extends ListView {
         }
     }
 
-    public synchronized void setAllItemsChecked(boolean checked) {
-        if (checked) {
-            for (int i = 0; i > getAdapter().getCount(); i++) {
+    public synchronized void setAllItemsChecked() {
+        try {
+            for (int i = 0; i < getAdapter().getCount(); i++) {
                 setItemChecked(i, true);
             }
-        } else {
-            clearChoices();
-        }
+        } catch (Exception e) { /* ignore */ }
     }
 
     @Override

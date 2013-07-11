@@ -16,5 +16,10 @@
     <item name="action_add_contact" type="id"/>
     <item name="action_edit_contact" type="id"/>
     <item name="action_search" type="id"/>
+    <item name="action_permission" type="id"/>
+    <item name="action_delete" type="id"/>
+    <item name="action_archive" type="id"/>
+    <item name="action_email" type="id"/>
+    <item name="action_text" type="id"/>
 
 </resources>

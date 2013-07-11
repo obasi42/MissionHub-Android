@@ -6,13 +6,12 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class ViewArrayPagerAdapter extends PagerAdapter {
 
     public final Object mLock = new Object();
-    List<View> mViews = Collections.synchronizedList(new ArrayList<View>());
+    private List<View> mViews = new ArrayList<View>();
     private boolean mNotifyOnChange = true;
 
     @Override
@@ -48,7 +47,11 @@ public class ViewArrayPagerAdapter extends PagerAdapter {
     @Override
     public int getItemPosition(Object item) {
         synchronized (mLock) {
-            return mViews.indexOf(item);
+            final int position = mViews.indexOf(item);
+            if (position >= 0) {
+                return position;
+            }
+            return POSITION_NONE;
         }
     }
 
@@ -57,6 +60,12 @@ public class ViewArrayPagerAdapter extends PagerAdapter {
             mViews.add(item);
         }
         maybeNotifyDataSetChanged();
+    }
+
+    public void setView(int position, View view) {
+        synchronized (mLock) {
+            mViews.set(position, view);
+        }
     }
 
     public void removeView(View item) {

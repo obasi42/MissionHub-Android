@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbarStyle="insideOverlay">
+
+    <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="16dip"
+            android:paddingRight="16dip"
+            android:paddingTop="8dip"
+            android:paddingBottom="8dip"
+            android:focusableInTouchMode="true"
+            android:descendantFocusability="beforeDescendants">
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Initiator(s)"
+                style="@style/MissionHub.InteractionDialog.Label"/>
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/initiators"
+                style="@style/MissionHub.InteractionDialog.TextView"
+                android:background="@drawable/bg_box_caret"/>
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Interaction"
+                style="@style/MissionHub.InteractionDialog.Label"
+                android:layout_marginTop="14dip"
+                />
+
+        <Spinner
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/type"
+                android:background="@drawable/bg_box"/>
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Receiver"
+                style="@style/MissionHub.InteractionDialog.Label"
+                android:layout_marginTop="14dip"
+                />
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/receiver"
+                style="@style/MissionHub.InteractionDialog.TextView"
+                android:background="@drawable/bg_box_caret"/>
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Visibility"
+                style="@style/MissionHub.InteractionDialog.Label"
+                android:layout_marginTop="14dip"
+                />
+
+        <Spinner
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/visibility"
+                android:background="@drawable/bg_box"/>
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Date / Time"
+                style="@style/MissionHub.InteractionDialog.Label"
+                android:layout_marginTop="14dip"
+                />
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="11 June 2013 13:47"
+                android:id="@+id/date_time"
+                style="@style/MissionHub.InteractionDialog.TextView"
+                android:background="@drawable/bg_box_caret"/>
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Comment"
+                style="@style/MissionHub.InteractionDialog.Label"
+                android:layout_marginTop="14dip"/>
+
+        <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:lines="4"
+                android:id="@+id/comment"
+                android:padding="5dip"
+                android:gravity="top|left"
+                android:background="@drawable/bg_box"/>
+
+    </LinearLayout>
+</ScrollView>

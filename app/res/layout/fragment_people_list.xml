@@ -31,7 +31,7 @@
             android:gravity="center"
             android:minHeight="44dip">
 
-        <ImageView
+        <com.missionhub.ui.widget.CheckmarkImageView
                 android:id="@+id/checkmark"
                 android:layout_width="24dip"
                 android:layout_height="24dip"
@@ -39,7 +39,7 @@
                 android:layout_marginRight="14dip"/>
 
         <TextView
-                android:id="@+id/checked"
+                android:id="@+id/checkmark_text"
                 android:layout_width="64dip"
                 android:layout_height="fill_parent"
                 android:text="All"
@@ -53,14 +53,14 @@
                 android:layout_width="0dip"
                 android:layout_height="fill_parent"
                 android:layout_weight="1"
-                android:background="@drawable/simple_rounded_background"
+                android:background="@drawable/bg_spinner"
                 android:layout_marginRight="4dip"/>
 
         <Spinner
                 android:id="@+id/order"
                 android:layout_width="wrap_content"
                 android:layout_height="fill_parent"
-                android:background="@drawable/simple_rounded_background"/>
+                android:background="@drawable/bg_white_box"/>
 
     </LinearLayout>
 

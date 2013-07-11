@@ -26,6 +26,7 @@ import com.missionhub.fragment.HostedFragment;
 import com.missionhub.fragment.HostedPeopleListFragment;
 import com.missionhub.fragment.HostedSurveysFragment;
 import com.missionhub.fragment.SidebarFragment;
+import com.missionhub.fragment.dialog.InteractionDialogFragment;
 import com.missionhub.fragment.dialog.SelectOrganizationDialogFragment;
 import com.missionhub.util.IntentHelper;
 
@@ -85,6 +86,10 @@ public class HostActivity extends BaseAuthenticatedActivity implements FragmentM
         mPullToRefreshHelper = new PullToRefreshAttacher(this);
 
         Application.registerEventSubscriber(this, ChangeHostFragmentEvent.class, OnSidebarItemClickedEvent.class);
+
+        if (savedInstanceState == null) {
+            InteractionDialogFragment.showForResult(getSupportFragmentManager(), 0);
+        }
     }
 
     public void attachSidebar(boolean created) {

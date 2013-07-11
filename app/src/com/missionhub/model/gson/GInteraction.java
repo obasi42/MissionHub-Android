@@ -194,4 +194,14 @@ public class GInteraction {
         }
     }
 
+    public static GInteraction from(Interaction interaction) {
+        GInteraction gint = new GInteraction();
+        gint.id = interaction.getId();
+        gint.interaction_type_id = interaction.getInteraction_type_id();
+        gint.initiator_ids = interaction.getInitiatorIds();
+        gint.organization_id = interaction.getOrganization_id();
+        gint.comment = interaction.getComment();
+        gint.timestamp = interaction.getTimestamp();
+        return gint;
+    }
 }
