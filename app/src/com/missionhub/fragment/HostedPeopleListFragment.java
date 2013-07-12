@@ -26,6 +26,8 @@ import com.missionhub.event.OnOrganizationChangedEvent;
 import com.missionhub.event.OnSidebarItemClickedEvent;
 import com.missionhub.exception.ExceptionHelper;
 import com.missionhub.fragment.dialog.CheckAllDialog;
+import com.missionhub.fragment.dialog.DeletePeopleDialogFragment;
+import com.missionhub.fragment.dialog.EditContactDialogFragment;
 import com.missionhub.fragment.dialog.InteractionDialogFragment;
 import com.missionhub.model.InteractionType;
 import com.missionhub.model.Label;
@@ -34,7 +36,6 @@ import com.missionhub.model.Person;
 import com.missionhub.people.ApiPeopleListProvider;
 import com.missionhub.people.DynamicPeopleListProvider;
 import com.missionhub.people.PeopleListView;
-import com.missionhub.people.PersonAdapterViewProvider;
 import com.missionhub.people.PersonAdapterViewProvider;
 import com.missionhub.ui.AdapterViewProvider;
 import com.missionhub.ui.ObjectArrayAdapter;
@@ -50,7 +51,10 @@ import org.holoeverywhere.LayoutInflater;
 import org.holoeverywhere.widget.AdapterView;
 import org.holoeverywhere.widget.Spinner;
 import org.holoeverywhere.widget.TextView;
-import org.holoeverywhere.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
 
@@ -85,30 +89,6 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
         setHasOptionsMenu(true);
 
         Application.registerEventSubscriber(this, OnSidebarItemClickedEvent.class, OnOrganizationChangedEvent.class);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-
-        menu.add(Menu.NONE, R.id.action_add_contact, Menu.NONE, R.string.action_add_contact).setIcon(R.drawable.ic_action_add_contact)
-                .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-        menu.add(Menu.NONE, R.id.action_interaction, Menu.NONE, R.string.action_record_interaction).setIcon(R.drawable.ic_action_interaction)
-                .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_interaction:
-                InteractionDialogFragment.showForResult(getChildFragmentManager(), R.id.action_interaction);
-                return true;
-            case R.id.action_add_contact:
-                Application.showToast("Click Add Contact", Toast.LENGTH_SHORT);
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -250,7 +230,7 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
         try {
             item.run();
         } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
+            Log.e(TAG, "Exception", e);
         }
     }
 
@@ -261,13 +241,17 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
 
     @Override
     public void onPersonClick(PeopleListView list, Person person, int position, long id) {
+        openProfile(person.getId());
+    }
+
+    public void openProfile(long personId) {
         ChangeHostFragmentEvent event = new ChangeHostFragmentEvent(HostedProfileFragment.class);
         event.setAddToBackstack(true);
         event.setInAnimation(R.anim.slide_in_right, R.anim.slide_in_left);
         event.setOutAnimation(R.anim.slide_out_left, R.anim.slide_out_right);
 
         Bundle bundle = new Bundle();
-        bundle.putLong("personId", person.getId());
+        bundle.putLong("personId", personId);
         event.setNewInstance(true, bundle);
 
         Application.postEvent(event);
@@ -488,7 +472,7 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
         }
 
         @Override
-        public AdapterViewProvider onGetViewProvider() {
+        public AdapterViewProvider onCreateViewProvider() {
             return new PersonAdapterViewProvider();
         }
 
@@ -550,6 +534,10 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
         private Context mContext;
         private boolean mAllChecked;
         private CheckAllDialog mDialog;
+
+        public boolean isAllChecked() {
+            return mAllChecked;
+        }
 
         public void setAllChecked() {
             if (mDialog == null || mDialog.getFragmentManager() != getChildFragmentManager()) {
@@ -631,6 +619,30 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+
+        menu.add(Menu.NONE, R.id.action_add_contact, Menu.NONE, R.string.action_add_contact).setIcon(R.drawable.ic_action_add_contact)
+                .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+        menu.add(Menu.NONE, R.id.action_interaction, Menu.NONE, R.string.action_record_interaction).setIcon(R.drawable.ic_action_interaction)
+                .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_interaction:
+                InteractionDialogFragment.showForResult(getChildFragmentManager(), R.id.action_interaction);
+                return true;
+            case R.id.action_add_contact:
+                EditContactDialogFragment.showForResult(getChildFragmentManager(), R.id.action_add_contact);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public boolean onCreateActionMode(final ActionMode mode, final Menu menu) {
         menu.add(Menu.NONE, R.id.action_assign, Menu.NONE, R.string.action_assign).setIcon(R.drawable.ic_action_assign)
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
@@ -644,8 +656,8 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
         menu.add(Menu.NONE, R.id.action_delete, Menu.NONE, R.string.action_delete).setIcon(R.drawable.ic_action_delete)
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
-        menu.add(Menu.NONE, R.id.action_archive, Menu.NONE, R.string.action_archive).setIcon(R.drawable.ic_action_archive)
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+//        menu.add(Menu.NONE, R.id.action_archive, Menu.NONE, R.string.action_archive).setIcon(R.drawable.ic_action_archive)
+//                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
         menu.add(Menu.NONE, R.id.action_email, Menu.NONE, R.string.action_email).setIcon(R.drawable.ic_action_email)
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
@@ -677,12 +689,14 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
 
                 break;
             case R.id.action_delete:
-                // TODO: implement delete
-
+                if (mCheckmarkHelper.isAllChecked()) {
+                    DeletePeopleDialogFragment.showForResult(getChildFragmentManager(), mProvider.getPeopleListOptions(), R.id.action_delete);
+                } else {
+                    DeletePeopleDialogFragment.showForResult(getChildFragmentManager(), mList.getCheckedItemIds(), R.id.action_delete);
+                }
                 break;
             case R.id.action_archive:
                 // TODO: implement archive
-
                 break;
             case R.id.action_email:
                 IntentHelper.sendEmail(mList.getCheckedItemIds());
@@ -717,12 +731,30 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
         }
     }
 
+    @Override
     public boolean onFragmentResult(int requestCode, int resultCode, Object data) {
         switch (requestCode) {
             case R.id.action_assign:
                 if (mProvider.getPeopleListOptions().hasFilter("assigned_to")) {
                     mProvider.reload();
                 }
+                return true;
+            case R.id.action_add_contact:
+                if (data != null && data instanceof Long) {
+                    openProfile((Long) data);
+                }
+                return true;
+            case R.id.action_delete:
+                HashSet<Long> personIds = (HashSet<Long>) data;
+                List<Person> people = new ArrayList<Person>();
+                for (Long id : personIds) {
+                    Person person = Application.getDb().getPersonDao().load(id);
+                    if (person != null) {
+                        people.add(person);
+                    }
+                }
+                mProvider.removeAll(people);
+                mCheckmarkHelper.setNoneChecked();
                 return true;
         }
         return false;

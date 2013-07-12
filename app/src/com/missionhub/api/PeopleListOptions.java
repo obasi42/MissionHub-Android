@@ -3,10 +3,11 @@ package com.missionhub.api;
 import com.missionhub.model.generic.FollowupStatus;
 import com.missionhub.model.generic.Gender;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Set;
 
-public class PeopleListOptions extends ListOptions {
+public class PeopleListOptions extends ListOptions implements Serializable {
 
     private PeopleListOptions(final ListOptions filters) {
         super(filters);

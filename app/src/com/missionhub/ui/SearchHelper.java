@@ -7,6 +7,8 @@ import android.view.ViewGroup;
 
 import com.actionbarsherlock.widget.SearchView;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.lang.ref.WeakReference;
 
 public class SearchHelper implements SearchView.OnQueryTextListener, View.OnFocusChangeListener {
@@ -19,7 +21,9 @@ public class SearchHelper implements SearchView.OnQueryTextListener, View.OnFocu
 
     public void setSearchView(SearchView searchView) {
         mSearchView = new WeakReference<SearchView>(searchView);
-
+        if (StringUtils.isNotEmpty(mSearchQuery)) {
+            searchView.setQuery(mSearchQuery, false);
+        }
         searchView.setOnQueryTextListener(this);
         searchView.setOnQueryTextFocusChangeListener(this);
         searchView.clearFocus();

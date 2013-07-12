@@ -8,6 +8,7 @@ import com.missionhub.api.ListOptions.ListFilterOrderJson.Order;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -20,7 +21,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-public class ListOptions {
+public class ListOptions implements Serializable {
 
     /**
      * the filters
@@ -267,6 +268,10 @@ public class ListOptions {
 
     public void setLimit(final Integer limit) {
         mLimit = limit;
+    }
+
+    public void removeLimit() {
+        setLimit(null);
     }
 
     public Integer getOffset() {
