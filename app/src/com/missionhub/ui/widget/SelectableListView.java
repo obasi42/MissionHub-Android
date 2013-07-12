@@ -163,6 +163,7 @@ public class SelectableListView extends ListView {
         bundle.putInt("mActivatedItem", mActivatedItem);
         bundle.putInt("mSelectionSide", mSelectionSide);
         bundle.putInt("mSelectionWidth", mSelectionWidth);
+        bundle.putInt("mMode", mMode);
         return bundle;
     }
 
@@ -173,6 +174,7 @@ public class SelectableListView extends ListView {
             mActivatedItem = bundle.getInt("mActivatedItem");
             mSelectionSide = bundle.getInt("mSelectionSide");
             mSelectionWidth = bundle.getInt("mSelectionWidth");
+            mMode = bundle.getInt("mMode");
             super.onRestoreInstanceState(bundle.getParcelable("superState"));
             return;
         }
@@ -265,5 +267,9 @@ public class SelectableListView extends ListView {
      */
     public void setOnItemCheckedListener(final OnItemCheckedListener onItemCheckedListener) {
         mOnItemCheckedListener = onItemCheckedListener;
+    }
+
+    public void setSelectionMode(int mode) {
+        mMode = mode;
     }
 }

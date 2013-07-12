@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item android:drawable="@drawable/btn_check_on_holo_light" app:state_checkmark_all="true"/>
-    <item android:drawable="@drawable/btn_check_on_disable_holo_light" app:state_checkmark_some="true"/>
-    <item android:drawable="@drawable/check_on_normal_holo_light" android:state_checked="true"/>
-    <item android:drawable="@drawable/check_off_normal_holo_light" android:state_checked="false"/>
+    <item android:drawable="@drawable/checkbox_checked" app:state_checkmark_all="true"/>
+    <item android:drawable="@drawable/checkbox_partial" app:state_checkmark_some="true"/>
+    <item android:drawable="@drawable/checkbox_checked" android:state_checked="true"/>
+    <item android:drawable="@drawable/checkbox_unchecked" android:state_checked="false"/>
 </selector>

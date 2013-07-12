@@ -21,5 +21,6 @@
     <item name="action_archive" type="id"/>
     <item name="action_email" type="id"/>
     <item name="action_text" type="id"/>
+    <item name="action_interaction" type="id"/>
 
 </resources>

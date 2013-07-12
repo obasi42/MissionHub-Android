@@ -94,7 +94,7 @@ public class PeopleListProvider extends ObjectArrayAdapter {
      */
     public AdapterViewProvider onGetViewProvider() {
         if (mAdapterViewProvider == null) {
-            mAdapterViewProvider = new PersonAdapterViewProvider();
+            mAdapterViewProvider = new SimplePersonAdapterViewProvider();
         }
         return mAdapterViewProvider;
     }

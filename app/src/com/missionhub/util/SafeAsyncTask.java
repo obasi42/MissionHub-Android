@@ -35,7 +35,7 @@ public abstract class SafeAsyncTask<ResultT> implements Callable<ResultT> {
     protected Handler handler;
     protected Executor executor;
     protected StackTraceElement[] launchLocation;
-    protected FutureTask<Void> future;
+    protected FutureTask<ResultT> future;
 
 
     /**
@@ -67,8 +67,10 @@ public abstract class SafeAsyncTask<ResultT> implements Callable<ResultT> {
     }
 
 
-    public FutureTask<Void> future() {
-        future = new FutureTask<Void>(newTask());
+    public FutureTask<ResultT> future() {
+        if (future == null) {
+            future = new FutureTask<ResultT>((Callable<ResultT>) newTask());
+        }
         return future;
     }
 

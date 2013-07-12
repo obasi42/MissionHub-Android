@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.DataSetObserver;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
@@ -19,6 +20,8 @@ import android.widget.ImageView;
 
 import com.actionbarsherlock.widget.SearchView;
 import com.missionhub.R;
+import com.missionhub.api.Api;
+import com.missionhub.api.PeopleListOptions;
 import com.missionhub.application.Application;
 import com.missionhub.application.Session;
 import com.missionhub.exception.ExceptionHelper;
@@ -31,12 +34,17 @@ import com.missionhub.people.ApiPeopleListProvider;
 import com.missionhub.people.DynamicPeopleListProvider;
 import com.missionhub.people.PeopleListProvider;
 import com.missionhub.people.PeopleListView;
+import com.missionhub.people.SimplePersonAdapterViewProvider;
 import com.missionhub.ui.ObjectArrayAdapter;
+import com.missionhub.ui.SearchHelper;
 import com.missionhub.ui.ViewArrayPagerAdapter;
 import com.missionhub.ui.widget.LockableViewPager;
+import com.missionhub.ui.widget.SelectableListView;
 import com.missionhub.util.DateUtils;
 import com.missionhub.util.SafeAsyncTask;
+import com.missionhub.util.SortUtils;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.holoeverywhere.LayoutInflater;
 import org.holoeverywhere.app.DialogFragment;
@@ -48,17 +56,19 @@ import org.holoeverywhere.widget.ListView;
 import org.holoeverywhere.widget.Spinner;
 import org.holoeverywhere.widget.TextView;
 import org.holoeverywhere.widget.TimePicker;
+import org.holoeverywhere.widget.Toast;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
-public class InteractionDialogFragment extends BaseDialogFragment implements ViewPager.OnPageChangeListener, DialogInterface.OnKeyListener, DatePicker.OnDateChangedListener, TimePicker.OnTimeChangedListener {
+public class InteractionDialogFragment extends BaseDialogFragment implements ViewPager.OnPageChangeListener, DialogInterface.OnKeyListener, DatePicker.OnDateChangedListener, TimePicker.OnTimeChangedListener, PeopleListView.OnPersonCheckedListener, SearchHelper.OnSearchQueryChangedListener {
 
     public static final String TAG = InteractionDialogFragment.class.getSimpleName();
 
@@ -68,9 +78,12 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
     private DialogTitle mTitle;
     private ImageView mRefresh;
     private Animation mRefreshAnimation;
+    private View mAction;
+    private TextView mActionText;
     private LockableViewPager mViewPager;
     private Button mButton1;
     private Button mButton2;
+    private Button mButton3;
 
     private ViewArrayPagerAdapter mPagerAdaper;
 
@@ -94,12 +107,12 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
     private View mPeopleView;
     private TextView mPeopleListTitle;
     private SearchView mPeopleListSearchView;
+    private SearchHelper mSearchHelper = new SearchHelper();
     private PeopleListView mPeopleListView;
     private ApiPeopleListProvider mReceiverPeopleListProvider;
     private PeopleListProvider mInitiatorsPeopleListProvider;
 
     private SafeAsyncTask<Void> mRefreshInitiatorsTask;
-    private SafeAsyncTask<Void> mSaveInteractionTask;
 
     private static final int STATE_FORM = 0;
     private static final int STATE_DATE_TIME = 1;
@@ -108,6 +121,12 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
 
     private int mState = STATE_FORM;
     private SafeAsyncTask<List<Person>> mRebuildInitiatorsProviderTask;
+
+    private static final int ACTION_CREATE = 0;
+    private static final int ACTION_UPDATE = 1;
+    private static final int ACTION_DELETE = 2;
+    private SafeAsyncTask<Void> mActionTask;
+    private int mActionTaskAction;
 
     public static void showForResult(FragmentManager fm, int requestCode) {
         showForResult(InteractionDialogFragment.class, fm, requestCode);
@@ -180,9 +199,12 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
         });
         mRefreshAnimation = AnimationUtils.loadAnimation(getSupportActivity(), R.anim.clockwise_refresh);
         mRefreshAnimation.setRepeatCount(Animation.INFINITE);
+        mAction = frame.findViewById(R.id.action);
+        mActionText = (TextView) frame.findViewById(R.id.action_text);
         mViewPager = (LockableViewPager) frame.findViewById(R.id.pager);
         mButton1 = (Button) frame.findViewById(R.id.button1);
         mButton2 = (Button) frame.findViewById(R.id.button2);
+        mButton3 = (Button) frame.findViewById(R.id.button3);
 
         // the interaction form
         mInteractionForm = inflater.inflate(R.layout.dialog_fragment_interaction_form, mViewPager, false);
@@ -236,10 +258,14 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
         mPeopleView = inflater.inflate(R.layout.dialog_fragment_interaction_people, mViewPager, false);
         mPeopleListTitle = (TextView) mPeopleView.findViewById(R.id.title);
         mPeopleListSearchView = (SearchView) mPeopleView.findViewById(R.id.search);
+        mSearchHelper.setSearchView(mPeopleListSearchView);
+        mSearchHelper.setOnSearchQueryChangedListener(this);
         mPeopleListView = (PeopleListView) mPeopleView.findViewById(android.R.id.list);
+        mPeopleListView.setSelectionMode(SelectableListView.MODE_SELECT_ONLY);
 
         if (mInitiatorsPeopleListProvider == null) {
             mInitiatorsPeopleListProvider = new PeopleListProvider(getSupportActivity());
+            mInitiatorsPeopleListProvider.setAdapterViewProvider(new SimplePersonAdapterViewProvider());
             rebuildInitiatorsProvider();
         } else {
             mInitiatorsPeopleListProvider.setContext(getSupportActivity());
@@ -256,6 +282,12 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
                 @Override
                 public void onLoading(boolean loading) {
                     updateRefreshState();
+                }
+            });
+            mReceiverPeopleListProvider.registerDataSetObserver(new DataSetObserver() {
+                @Override
+                public void onChanged() {
+                    updatePersonListCheckedState();
                 }
             });
         } else {
@@ -418,7 +450,7 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
 
         mInteractionVisibilityAdapter.add(InteractionVisibility.everyone);
         if (Session.getInstance().getOrganization().getParent() != null) {
-            mInteractionVisibilityAdapter.add(InteractionVisibility.parent);
+            mInteractionVisibilityAdapter.add(InteractionVisibility.parents);
         }
         mInteractionVisibilityAdapter.add(InteractionVisibility.organization);
         mInteractionVisibilityAdapter.add(InteractionVisibility.admins);
@@ -428,8 +460,14 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
     }
 
     public synchronized void saveToInteraction() {
-        mInteraction.privacy_setting = ((InteractionVisibility) mInteractionVisibility.getSelectedItem()).name();
-        mInteraction.interaction_type_id = ((InteractionType) mInteractionType.getSelectedItem()).getId();
+        InteractionVisibility visibility = ((InteractionVisibility) mInteractionVisibility.getSelectedItem());
+        if (visibility != null) {
+            mInteraction.privacy_setting = ((InteractionVisibility) mInteractionVisibility.getSelectedItem()).name();
+        }
+        InteractionType type = ((InteractionType) mInteractionType.getSelectedItem());
+        if (type != null) {
+            mInteraction.interaction_type_id = ((InteractionType) mInteractionType.getSelectedItem()).getId();
+        }
         mInteraction.comment = mInteractionComment.getText().toString();
     }
 
@@ -449,7 +487,7 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
         super.onDestroyView();
     }
 
-    private void setState(int state, boolean scroll) {
+    private synchronized void setState(int state, boolean scroll) {
         if (mViewPager == null || (mState == state && isResumed())) return;
 
         mState = state;
@@ -472,10 +510,22 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
         updateButtonStates();
         updateRefreshState();
         updatePersonListViewState();
+        updateActionState();
     }
 
-    private void updateButtonStates() {
-        if (mButton1 == null || mButton2 == null) return;
+    private synchronized void updateButtonStates() {
+        if (mButton1 == null || mButton2 == null || mButton3 == null) return;
+
+        if (isInAction()) {
+            mButton1.setEnabled(false);
+            mButton2.setEnabled(false);
+            mButton3.setEnabled(false);
+            return;
+        } else {
+            mButton1.setEnabled(true);
+            mButton2.setEnabled(true);
+            mButton3.setEnabled(true);
+        }
 
         switch (mState) {
             case STATE_FORM:
@@ -498,6 +548,19 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
                     }
                 });
                 mButton2.setVisibility(View.VISIBLE);
+
+                if (canDelete()) {
+                    mButton3.setText(R.string.action_delete);
+                    mButton3.setVisibility(View.VISIBLE);
+                    mButton3.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            deleteInteraction();
+                        }
+                    });
+                } else {
+                    mButton3.setVisibility(View.GONE);
+                }
                 break;
             case STATE_DATE_TIME:
             case STATE_RECEIVER:
@@ -512,18 +575,18 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
                     }
                 });
                 mButton2.setVisibility(View.VISIBLE);
+                mButton3.setVisibility(View.GONE);
                 break;
         }
     }
 
-    private void updateRefreshState() {
+    private synchronized void updateRefreshState() {
         if (mRefresh == null || mRefreshAnimation == null) return;
 
         switch (mState) {
             case STATE_RECEIVER:
             case STATE_INITIATORS:
                 mRefresh.setVisibility(View.VISIBLE);
-
                 if (mRefreshInitiatorsTask != null || mRebuildInitiatorsProviderTask != null || mReceiverPeopleListProvider.isLoading()) {
                     mRefresh.startAnimation(mRefreshAnimation);
                     mRefresh.setEnabled(false);
@@ -538,30 +601,77 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
         }
     }
 
-    private void updatePersonListViewState() {
+    private synchronized void updatePersonListViewState() {
+        if (mPeopleListTitle == null) return;
+
         switch (mState) {
             case STATE_RECEIVER:
                 mPeopleListTitle.setText("Receiver");
                 mPeopleListSearchView.setVisibility(View.VISIBLE);
                 mPeopleListView.setProvider(mReceiverPeopleListProvider);
                 mPeopleListView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-                //setCheckedPositions(mPeopleListView, mInteraction.receiver_id);
                 break;
             case STATE_INITIATORS:
                 mPeopleListTitle.setText("Initiator(s)");
                 mPeopleListSearchView.setVisibility(View.GONE);
                 mPeopleListView.setProvider(mInitiatorsPeopleListProvider);
                 mPeopleListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-                //setCheckedPositions(mPeopleListView, mInteraction.initiator_ids);
                 break;
         }
+        updatePersonListCheckedState();
     }
 
-    private void saveInteraction() {
-        // TODO:
+    private synchronized void updatePersonListCheckedState() {
+        if (mPeopleListTitle == null) return;
+
+        mPeopleListView.setOnPersonCheckedListener(null);
+        mPeopleListView.clearChoices();
+
+        switch (mState) {
+            case STATE_RECEIVER:
+                long receiverId = mInteraction.receiver_id;
+                if (receiverId > 0) {
+                    Person receiver = Application.getDb().getPersonDao().load(receiverId);
+                    synchronized (mReceiverPeopleListProvider.getLock()) {
+                        if (!mReceiverPeopleListProvider.contains(receiver)) {
+                            mReceiverPeopleListProvider.insert(receiver, 0);
+                        }
+                    }
+                    int position = mReceiverPeopleListProvider.getPositionById(receiverId);
+                    if (position >= 0) {
+                        mPeopleListView.setItemChecked(position, true);
+                    }
+                }
+                break;
+            case STATE_INITIATORS:
+                Long[] initiators = mInteraction.initiator_ids;
+                if (initiators.length > 0) {
+                    synchronized (mInitiatorsPeopleListProvider.getLock()) {
+                        List<Person> people = mInitiatorsPeopleListProvider.getObjects();
+                        for (Long initiator : initiators) {
+                            final Person person = Application.getDb().getPersonDao().load(initiator);
+                            if (person != null) {
+                                if (!people.contains(person)) {
+                                    people.add(person);
+                                }
+                            }
+                        }
+                        mInitiatorsPeopleListProvider.setNotifyOnChange(true);
+                        mInitiatorsPeopleListProvider.clear();
+                        mInitiatorsPeopleListProvider.addAll(SortUtils.sortPeople(people, true));
+                        mInitiatorsPeopleListProvider.notifyDataSetChanged();
+                    }
+                    List<Integer> checkedPositions = mInitiatorsPeopleListProvider.getPositionById(Arrays.asList(initiators));
+                    for (Integer position : checkedPositions) {
+                        mPeopleListView.setItemChecked(position, true);
+                    }
+                }
+                break;
+        }
+        mPeopleListView.setOnPersonCheckedListener(this);
     }
 
-    private void setSecondaryPage(View view, boolean scroll) {
+    private synchronized void setSecondaryPage(View view, boolean scroll) {
         if (mPagerAdaper.getCount() > 1) {
             mPagerAdaper.setView(1, view);
         } else {
@@ -605,6 +715,53 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
         DateTime dateTime = DateUtils.fixInstantDateTime(mDatePicker.getYear(), mDatePicker.getMonth() + 1, mDatePicker.getDayOfMonth(), hourOfDay, minute);
         mInteraction.timestamp = DateUtils.toSqlTimestamp(dateTime);
         updateDateTimeBox(false);
+    }
+
+    @Override
+    public synchronized void onPersonChecked(PeopleListView list, Person person, int position, boolean checked) {
+        List<Long> ids = Arrays.asList(ArrayUtils.toObject(list.getCheckedItemIds()));
+        switch (mState) {
+            case STATE_INITIATORS:
+                setInitiatorIds(ids);
+                break;
+            case STATE_RECEIVER:
+                mSearchHelper.clearFocus();
+                if (ids.size() > 0) {
+                    setReceiverId(ids.get(0));
+                } else {
+                    setReceiverId(0);
+                }
+                break;
+        }
+        updatePersonListCheckedState();
+    }
+
+    @Override
+    public synchronized void onAllPeopleUnchecked() {
+        switch (mState) {
+            case STATE_INITIATORS:
+                setInitiatorIds(new ArrayList<Long>());
+                break;
+            case STATE_RECEIVER:
+                setReceiverId(0);
+                break;
+        }
+        updatePersonListCheckedState();
+    }
+
+    @Override
+    public void onSearchQueryChanged(String query) {
+        if (mState != STATE_RECEIVER) return;
+
+        synchronized (mReceiverPeopleListProvider.getLock()) {
+            if (StringUtils.isNotEmpty(query)) {
+                mReceiverPeopleListProvider.setPeopleListOptions(new PeopleListOptions.Builder().nameOrEmailLike(query).build());
+            } else {
+                mReceiverPeopleListProvider.setDone(true);
+                mReceiverPeopleListProvider.clear();
+            }
+        }
+        updatePersonListCheckedState();
     }
 
     private static class SpinnerAdapter<T> extends ObjectArrayAdapter<T> {
@@ -702,7 +859,11 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
         mRebuildInitiatorsProviderTask = new SafeAsyncTask<List<Person>>() {
             @Override
             public List<Person> call() throws Exception {
-                return Session.getInstance().getOrganization().getUsersAdmins();
+                final List<Person> people = Session.getInstance().getOrganization().getUsersAdmins();
+                final Person currentPerson = Session.getInstance().getPerson();
+                people.remove(currentPerson);
+                people.add(0, currentPerson);
+                return people;
             }
 
             @Override
@@ -713,6 +874,7 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
                     mInitiatorsPeopleListProvider.addAll(people);
                     mInitiatorsPeopleListProvider.notifyDataSetChanged();
                 }
+                updatePersonListCheckedState();
             }
 
             @Override
@@ -772,4 +934,146 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
                 break;
         }
     }
+
+    private synchronized void saveInteraction() {
+        saveToInteraction();
+
+        if (mInteraction.initiator_ids == null || mInteraction.initiator_ids.length == 0) {
+            Application.showToast(R.string.interaction_dialog_error_no_initiators, Toast.LENGTH_LONG);
+            setState(STATE_INITIATORS, true);
+            return;
+        }
+
+        if (mInteraction.receiver_id <= 0) {
+            Application.showToast(R.string.interaction_dialog_error_no_receiver, Toast.LENGTH_LONG);
+            setState(STATE_RECEIVER, true);
+            return;
+        }
+
+        if (mInteraction.interaction_type_id == InteractionType.COMMENT_ONLY && StringUtils.isEmpty(mInteraction.comment)) {
+            Application.showToast(R.string.interaction_dialog_error_no_comment, Toast.LENGTH_LONG);
+            mInteractionComment.requestFocus();
+            return;
+        }
+
+        if (isNew()) {
+            doAction(ACTION_CREATE);
+        } else {
+            if (!canEdit()) {
+                Application.showToast(R.string.action_no_permissions, Toast.LENGTH_LONG);
+                return;
+            }
+            doAction(ACTION_UPDATE);
+        }
+    }
+
+    private synchronized void deleteInteraction() {
+        if (!canDelete()) {
+            Application.showToast(R.string.action_no_permissions, Toast.LENGTH_LONG);
+            return;
+        }
+        doAction(ACTION_DELETE);
+    }
+
+    private void doAction(final int action) {
+        if (mActionTask != null) return;
+
+        mActionTaskAction = action;
+
+        mActionTask = new SafeAsyncTask<Void>() {
+
+            @Override
+            public Void call() throws Exception {
+                switch (action) {
+                    case ACTION_CREATE:
+                        Api.createInteraction(mInteraction).get();
+                        break;
+                    case ACTION_UPDATE:
+                        Api.updateInteraction(mInteraction).get();
+                        break;
+                    case ACTION_DELETE:
+                        Api.deleteInteraction(mInteraction.id).get();
+                        break;
+                }
+                return null;
+            }
+
+            @Override
+            protected void onSuccess(Void aVoid) throws Exception {
+                super.onSuccess(aVoid);
+                if (isVisible()) {
+                    switch (action) {
+                        case ACTION_CREATE:
+                            Application.showToast(R.string.interaction_dialog_interaction_created, Toast.LENGTH_SHORT);
+                            break;
+                        case ACTION_UPDATE:
+                            Application.showToast(R.string.interaction_dialog_interaction_updated, Toast.LENGTH_SHORT);
+                            break;
+                        case ACTION_DELETE:
+                            Application.showToast(R.string.interaction_dialog_interaction_deleted, Toast.LENGTH_SHORT);
+                            break;
+                    }
+                    dismiss();
+                }
+            }
+
+            @Override
+            protected void onFinally() throws RuntimeException {
+                mActionTask = null;
+                updateActionState();
+            }
+
+            @Override
+            protected void onException(Exception e) throws RuntimeException {
+                ExceptionHelper eh = new ExceptionHelper(Application.getContext(), e);
+                eh.makeToast();
+            }
+        };
+        updateActionState();
+        Application.getExecutor().execute(mActionTask.future());
+    }
+
+    private void updateActionState() {
+        if (isInAction()) {
+            mAction.setVisibility(View.VISIBLE);
+            mViewPager.setVisibility(View.GONE);
+
+            switch (mActionTaskAction) {
+                case ACTION_CREATE:
+                case ACTION_UPDATE:
+                    mActionText.setText(R.string.interaction_dialog_saving_interaction);
+                    break;
+                case ACTION_DELETE:
+                    mActionText.setText(R.string.interaction_dialog_deleting_interaction);
+                    break;
+            }
+        } else {
+            mViewPager.setVisibility(View.VISIBLE);
+            mAction.setVisibility(View.GONE);
+        }
+        updateButtonStates();
+    }
+
+    public boolean isInAction() {
+        return mActionTask != null;
+    }
+
+    private boolean canDelete() {
+        if (isNew()) return false;
+
+        if (mInteraction.created_by_id != Session.getInstance().getPersonId()) return false;
+
+        return true;
+    }
+
+    private boolean canEdit() {
+        if (isNew()) return false;
+
+        if (Session.getInstance().isAdmin()) return true;
+
+        if (mInteraction.created_by_id == Session.getInstance().getPersonId()) return true;
+
+        return false;
+    }
+
 }

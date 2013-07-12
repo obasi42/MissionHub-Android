@@ -86,10 +86,6 @@ public class HostActivity extends BaseAuthenticatedActivity implements FragmentM
         mPullToRefreshHelper = new PullToRefreshAttacher(this);
 
         Application.registerEventSubscriber(this, ChangeHostFragmentEvent.class, OnSidebarItemClickedEvent.class);
-
-        if (savedInstanceState == null) {
-            InteractionDialogFragment.showForResult(getSupportFragmentManager(), 0);
-        }
     }
 
     public void attachSidebar(boolean created) {

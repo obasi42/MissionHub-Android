@@ -20,6 +20,10 @@ public abstract class DynamicPeopleListProvider extends PeopleListProvider {
      */
     private final LoadingItem mLoadingItem = new LoadingItem();
     /**
+     * The empty list item object
+     */
+    private final EmptyItem mEmptyItem = new EmptyItem();
+    /**
      * The started state flag. True if the provider has begun loading people.
      */
     private boolean mStarted = true;
@@ -60,7 +64,7 @@ public abstract class DynamicPeopleListProvider extends PeopleListProvider {
      * @param start   True if the provider should begin loading immediately.
      */
     public DynamicPeopleListProvider(Context context, boolean start) {
-        this(context, start, 2);
+        this(context, start, 3);
     }
 
     /**
@@ -195,6 +199,10 @@ public abstract class DynamicPeopleListProvider extends PeopleListProvider {
             remove(mLoadingItem);
             if (mLoading) {
                 add(mLoadingItem);
+            }
+            remove(mEmptyItem);
+            if (!mLoading && isEmpty()) {
+                add(mEmptyItem);
             }
             notifyDataSetChanged();
             onLoading(loading);
@@ -351,6 +359,16 @@ public abstract class DynamicPeopleListProvider extends PeopleListProvider {
         @Override
         public long getItemId() {
             return Integer.MIN_VALUE;
+        }
+    }
+
+    /**
+     * Simple object to define the empty item in the list
+     */
+    public static class EmptyItem extends DisabledItem implements ItemIdProvider {
+        @Override
+        public long getItemId() {
+            return Integer.MIN_VALUE + 1;
         }
     }
 }

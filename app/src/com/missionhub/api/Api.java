@@ -655,7 +655,7 @@ public class Api {
         answers(GAnswerSheet.class), survey(GAnswerSheet.class),
         assigned_to(GContactAssignment.class), person(GContactAssignment.class),
         initiators(GInteraction.class), interaction_type(GInteraction.class), receiver(GInteraction.class), creator(GInteraction.class), last_updater(GInteraction.class), // interactions
-        contacts(GOrganization.class), admins(GOrganization.class), leaders(GOrganization.class), people(GOrganization.class), surveys(GOrganization.class), groups(GOrganization.class), keywords(GOrganization.class), labels(GOrganization.class), interaction_types(GOrganization.class), // organizations
+        contacts(GOrganization.class), admins(GOrganization.class), users(GOrganization.class), people(GOrganization.class), surveys(GOrganization.class), groups(GOrganization.class), keywords(GOrganization.class), labels(GOrganization.class), interaction_types(GOrganization.class), // organizations
         label(GLabel.class), // organizational label
         permission(GPermission.class), // organizational permission
         phone_numbers(GPerson.class), email_addresses(GPerson.class), person_transfers(GPerson.class), contact_assignments(GPerson.class), assigned_tos(GPerson.class), // people

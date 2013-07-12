@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import com.missionhub.R;
 import com.missionhub.model.Person;
 import com.missionhub.people.DynamicPeopleListProvider.LoadingItem;
+import com.missionhub.people.DynamicPeopleListProvider.EmptyItem;
 import com.missionhub.ui.AdapterViewProvider;
 import com.missionhub.ui.AnimateOnceImageLoadingListener;
 import com.missionhub.ui.ObjectArrayAdapter;
@@ -25,15 +26,15 @@ public class PersonAdapterViewProvider implements AdapterViewProvider {
     /**
      * The size in pixels of the avatar
      */
-    private final int mAvatarSizePx = Math.round(DisplayUtils.dpToPixel(50));
+    protected final int mAvatarSizePx = Math.round(DisplayUtils.dpToPixel(50));
     /**
      * The {@link ImageLoader} display options for avatars
      */
-    private DisplayImageOptions mImageLoaderOptions;
+    protected DisplayImageOptions mImageLoaderOptions;
     /**
      * The loading listener for avatars
      */
-    private AnimateOnceImageLoadingListener mImageLoaderListener;
+    protected AnimateOnceImageLoadingListener mImageLoaderListener;
 
     /**
      * The valid display options
@@ -57,6 +58,8 @@ public class PersonAdapterViewProvider implements AdapterViewProvider {
             return getPersonView(adapter, (Person) object, position, convertView, parent);
         } else if (object instanceof LoadingItem) {
             return getLoadingView(adapter, (LoadingItem) object, position, convertView, parent);
+        } else if (object instanceof EmptyItem) {
+            return getEmptyView(adapter, (EmptyItem) object, position, convertView, parent);
         }
         throw new RuntimeException("Unsupported list item type.");
     }
@@ -71,7 +74,7 @@ public class PersonAdapterViewProvider implements AdapterViewProvider {
         PersonViewHolder holder;
         if (view == null) {
             holder = new PersonViewHolder();
-            view = adapter.getLayoutInflater().inflate(R.layout.item_person);
+            view = adapter.getLayoutInflater().inflate(R.layout.item_person, parent, false);
             holder.avatar = (ImageView) view.findViewById(R.id.avatar);
             holder.text1 = (TextView) view.findViewById(android.R.id.text1);
             holder.text2 = (TextView) view.findViewById(android.R.id.text2);
@@ -126,7 +129,7 @@ public class PersonAdapterViewProvider implements AdapterViewProvider {
      * @param view
      * @param text
      */
-    private void safeSet(TextView view, CharSequence text) {
+    protected void safeSet(TextView view, CharSequence text) {
         if (StringUtils.isNotEmpty(text)) {
             view.setText(text);
         } else {
@@ -147,9 +150,21 @@ public class PersonAdapterViewProvider implements AdapterViewProvider {
     }
 
     /**
+     * Responsible for the creation and layout of the empty list item
+     *
+     * @see android.widget.Adapter#getView(int, android.view.View, android.view.ViewGroup)
+     */
+    public View getEmptyView(ObjectArrayAdapter adapter, EmptyItem item, int position, View convertView, ViewGroup parent) {
+        if (convertView == null) {
+            convertView = adapter.getLayoutInflater().inflate(R.layout.item_empty, parent, false);
+        }
+        return convertView;
+    }
+
+    /**
      * View holder for person to optimize list view performance
      */
-    private static class PersonViewHolder {
+    public static class PersonViewHolder {
         ImageView avatar;
         TextView text1;
         TextView text2;

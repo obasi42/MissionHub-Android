@@ -24,6 +24,7 @@
     <string name="action_save">Save</string>
     <string name="action_labels">Labels</string>
     <string name="action_done">Done</string>
+    <string name="action_record_interaction">Record Interaction</string>
 
     <!-- Main Menu -->
     <string name="menu_surveys">Surveys</string>
@@ -302,5 +303,17 @@
     <!-- Interaction Dialog -->
     <string name="interaction_dialog_title_new">Record New Interaction</string>
     <string name="interaction_dialog_title_edit">Edit Interaction</string>
+    <string name="no_items">No items to display</string>
+    <string name="interaction_dialog_error_no_initiators">Please select at least one initiator
+    </string>
+    <string name="interaction_dialog_error_no_receiver">Please select a receiver</string>
+    <string name="interaction_dialog_error_no_comment">You must enter a comment on a Comment Only
+        interaction
+    </string>
+    <string name="interaction_dialog_interaction_deleted">Interaction deleted</string>
+    <string name="interaction_dialog_interaction_updated">Interaction updated</string>
+    <string name="interaction_dialog_interaction_created">Interaction created</string>
+    <string name="interaction_dialog_saving_interaction">Saving interaction</string>
+    <string name="interaction_dialog_deleting_interaction">Deleting interaction</string>
 
 </resources>

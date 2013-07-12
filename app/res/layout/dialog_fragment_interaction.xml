@@ -66,11 +66,44 @@
                 android:visibility="visible"/>
     </LinearLayout>
 
-    <com.missionhub.ui.widget.LockableViewPager
-            android:id="@+id/pager"
+    <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dip"
-            android:layout_weight="1"/>
+            android:layout_weight="1">
+
+        <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:orientation="vertical"
+                android:id="@+id/action"
+                android:layout_margin="28dip"
+                android:visibility="visible">
+
+            <ProgressBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"/>
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:id="@+id/action_text"
+                    android:fontFamily="roboto-light"
+                    android:textSize="20sp"
+                    android:layout_marginTop="16dip"
+                    android:textColor="#808286"/>
+        </LinearLayout>
+
+
+        <com.missionhub.ui.widget.LockableViewPager
+                android:id="@+id/pager"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"/>
+
+    </FrameLayout>
 
     <LinearLayout
             android:layout_width="match_parent"
@@ -101,6 +134,17 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:id="@+id/button1"
+                    android:maxLines="2"/>
+
+            <Button
+                    android:layout_width="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    style="@style/Holo.Button.Borderless.Light"
+                    android:minHeight="@dimen/alert_dialog_button_bar_height"
+                    android:textSize="14sp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:id="@+id/button3"
                     android:maxLines="2"/>
 
             <Button

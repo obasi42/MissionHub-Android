@@ -922,14 +922,6 @@ public class Person {
                 }
             }
         }
-//
-//        // parse sub orgs
-//        if (organization.getShow_sub_orgs()) {
-//            final List<Organization> subOrgs = organization.getSubOrganizations();
-//            for (final Organization subOrg : subOrgs) {
-//                recursiveBuildOrganizationHierarchy(tree, subOrg);
-//            }
-//        }
     }
 
     /**
@@ -1110,41 +1102,42 @@ public class Person {
 
     public PersonViewCache getViewCache() {
         if (mPersonViewCache == null) {
-            mPersonViewCache = new PersonViewCache();
-            mPersonViewCache.name = getName();
-            if (getGenderEnum() != null) {
-                mPersonViewCache.gender = getGenderEnum().toString();
-            }
-            if (getStatus() != null) {
-                mPersonViewCache.status = getStatus().toString();
-            }
-            if (getPrimaryEmailAddress() != null) {
-                mPersonViewCache.email = getPrimaryEmailAddress().getEmail();
-                mPersonViewCache.emailClickListener = new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        IntentHelper.sendEmail(new String[]{getPrimaryEmailAddress().getEmail()}, null, null);
-                    }
-                };
-            }
-            final Phonenumber.PhoneNumber number = PhoneUtils.parsePhoneNumber(getPrimaryPhoneNumber());
-            if (number != null) {
-                if (PhoneNumberUtil.getInstance().isPossibleNumber(number)) {
-                    mPersonViewCache.phone = PhoneNumberUtil.getInstance().format(number, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL);
-                    mPersonViewCache.phoneClickListener = new View.OnClickListener() {
+            synchronized (this) {
+                mPersonViewCache = new PersonViewCache();
+                mPersonViewCache.name = getName();
+                if (getGenderEnum() != null) {
+                    mPersonViewCache.gender = getGenderEnum().toString();
+                }
+                if (getStatus() != null) {
+                    mPersonViewCache.status = getStatus().toString();
+                }
+                if (getPrimaryEmailAddress() != null) {
+                    mPersonViewCache.email = getPrimaryEmailAddress().getEmail();
+                    mPersonViewCache.emailClickListener = new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            IntentHelper.dialNumber(number);
+                            IntentHelper.sendEmail(new String[]{getPrimaryEmailAddress().getEmail()}, null, null);
                         }
                     };
                 }
-            }
-            Permission permission = Application.getDb().getPermissionDao().load(getPermission(Session.getInstance().getOrganizationId()));
-            if (permission != null) {
-                mPersonViewCache.permission = permission.getTranslatedName();
+                final Phonenumber.PhoneNumber number = PhoneUtils.parsePhoneNumber(getPrimaryPhoneNumber());
+                if (number != null) {
+                    if (PhoneNumberUtil.getInstance().isPossibleNumber(number)) {
+                        mPersonViewCache.phone = PhoneNumberUtil.getInstance().format(number, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL);
+                        mPersonViewCache.phoneClickListener = new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                IntentHelper.dialNumber(number);
+                            }
+                        };
+                    }
+                }
+                Permission permission = Application.getDb().getPermissionDao().load(getPermission(Session.getInstance().getOrganizationId()));
+                if (permission != null) {
+                    mPersonViewCache.permission = permission.getTranslatedName();
+                }
             }
         }
-
         return mPersonViewCache;
     }
 

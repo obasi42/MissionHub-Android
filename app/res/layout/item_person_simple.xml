@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.missionhub.ui.widget.CheckableRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                                  android:layout_width="match_parent"
+                                                  android:layout_height="64dip"
+                                                  android:minHeight="64dip"
+                                                  android:gravity="center_vertical"
+                                                  android:paddingLeft="14dip"
+                                                  android:background="@drawable/list_item_background">
+
+    <ImageView
+            android:layout_width="24dip"
+            android:layout_height="24dip"
+            android:id="@+id/checkmark"
+            android:src="@drawable/checkmark"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginRight="14dip"
+            android:layout_marginBottom="8dip"
+            android:duplicateParentState="true"/>
+
+    <ImageView
+            android:layout_width="50dip"
+            android:layout_height="50dip"
+            android:id="@+id/avatar"
+            android:scaleType="centerCrop"
+            android:src="@drawable/default_contact"
+            android:layout_marginRight="14dip"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/checkmark"
+            android:duplicateParentState="true"
+            />
+
+    <TextView
+            android:layout_toRightOf="@+id/avatar"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:id="@android:id/text1"
+            android:maxLines="1"
+            android:textSize="20sp"
+            android:textColor="#808286"
+            android:paddingLeft="10dip"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:textStyle="bold"
+            />
+</com.missionhub.ui.widget.CheckableRelativeLayout>

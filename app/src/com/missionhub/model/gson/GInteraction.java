@@ -168,9 +168,6 @@ public class GInteraction {
     }
 
     public void toParams(final Map<String, String> params) {
-        if (id > 0) {
-            params.put("interaction[id]", String.valueOf(id));
-        }
         if (interaction_type_id > 0) {
             params.put("interaction[interaction_type_id]", String.valueOf(interaction_type_id));
         }
@@ -179,9 +176,6 @@ public class GInteraction {
         }
         if (ObjectUtils.isNotEmpty(initiator_ids)) {
             params.put("interaction[initiator_ids]", StringUtils.join(initiator_ids, ','));
-        }
-        if (organization_id > 0) {
-            params.put("interaction[organization_id]", String.valueOf(organization_id));
         }
         if (comment != null) {
             params.put("interaction[comment]", comment);
@@ -198,8 +192,10 @@ public class GInteraction {
         GInteraction gint = new GInteraction();
         gint.id = interaction.getId();
         gint.interaction_type_id = interaction.getInteraction_type_id();
+        gint.receiver_id = interaction.getReceiver_id();
         gint.initiator_ids = interaction.getInitiatorIds();
         gint.organization_id = interaction.getOrganization_id();
+        gint.privacy_setting = interaction.getPrivacy_setting();
         gint.comment = interaction.getComment();
         gint.timestamp = interaction.getTimestamp();
         return gint;

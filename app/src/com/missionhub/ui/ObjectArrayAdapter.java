@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
 import org.holoeverywhere.LayoutInflater;
+import org.holoeverywhere.util.ArrayUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -502,6 +503,41 @@ public abstract class ObjectArrayAdapter<T> extends BaseAdapter {
     public List<T> getObjects() {
         synchronized (mLock) {
             return new ArrayList<T>(mObjects);
+        }
+    }
+
+    /**
+     * Returns the position of an item by it's id.
+     *
+     * @param id
+     * @return
+     */
+    public int getPositionById(long id) {
+        synchronized (mLock) {
+            for (int i = 0; i < getCount(); i++) {
+                if (getItemId(i) == id) {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * Returns the positions of the items by their ids
+     *
+     * @param ids
+     * @return
+     */
+    public List<Integer> getPositionById(Collection<Long> ids) {
+        synchronized (mLock) {
+            ArrayList<Integer> positions = new ArrayList<Integer>();
+            for (int i = 0; i < getCount(); i++) {
+                if (ids.contains(getItemId(i))) {
+                    positions.add(i);
+                }
+            }
+            return positions;
         }
     }
 }

@@ -73,7 +73,7 @@ public class ApiPeopleListProvider extends DynamicPeopleListProvider {
      * @param start   True if the provider should begin loading immediately.
      */
     public ApiPeopleListProvider(Context context, PeopleListOptions options, boolean start) {
-        this(context, options, start, 2);
+        this(context, options, start, 3);
     }
 
     /**

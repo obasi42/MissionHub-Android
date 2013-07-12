@@ -696,7 +696,7 @@ public class ContactAssignmentDialogFragment extends RefreshableDialogFragment i
                 @Override
                 public Void call() throws Exception {
                     Api.getOrganization(Session.getInstance().getOrganizationId(), ApiOptions.builder()//
-                            .include(Include.leaders) //
+                            .include(Include.users) //
                             .include(Include.organizational_permission) //
                             .build()).get();
                     return null;

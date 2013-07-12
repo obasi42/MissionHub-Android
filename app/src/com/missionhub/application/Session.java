@@ -65,7 +65,7 @@ public class Session implements OnAccountsUpdateListener {
     /**
      * task used to update the current person data
      */
-    private FutureTask<Person> mUpdatePersonTask;
+    private SafeAsyncTask<Person> mUpdatePersonTask;
     /**
      * task used to update current organization
      */
@@ -426,15 +426,16 @@ public class Session implements OnAccountsUpdateListener {
      * Updates the person from the MissionHub Server Posts SessionUpdatePersonEvent
      */
     public FutureTask<Person> updatePerson(final boolean force) {
-        if (mUpdatePersonTask != null) return mUpdatePersonTask;
+        if (!force && mUpdatePersonTask != null) return mUpdatePersonTask.future();
+        try {
+            mUpdatePersonTask.cancel(true);
+        } catch (Exception e) { /* ignore */ }
 
-        final Callable<Person> callable = new Callable<Person>() {
-
+        mUpdatePersonTask = new SafeAsyncTask<Person>() {
             private final long mOneDayMillis = 60 * 60 * 24 * 1000;
 
             @Override
             public Person call() throws Exception {
-
                 final long lastUpdated = SettingsManager.getInstance().getUserSetting(getPersonId(), "person_" + getPersonId() + "_updated", 0l);
                 final long currentTime = System.currentTimeMillis() - 1000;
 
@@ -464,19 +465,30 @@ public class Session implements OnAccountsUpdateListener {
                 getPerson().refreshAll();
 
                 // update the person's organization hierarchy, as it is too expensive to do from the ui thread.
-                getPerson().resetOrganizationHierarchy();
-                Profiler.start("getOrganizationHierarchy");
                 getPerson().getOrganizationHierarchy();
-                Profiler.stop("getOrganizationHierarchy");
-                mUpdatePersonTask = null;
 
                 return getPerson();
             }
-        };
 
-        mUpdatePersonTask = new FutureTask<Person>(callable);
-        Application.getExecutor().submit(mUpdatePersonTask);
-        return mUpdatePersonTask;
+            @Override
+            public void onSuccess(final Person person) {
+            }
+
+            @Override
+            public void onFinally() {
+                mUpdatePersonTask = null;
+            }
+
+            @Override
+            public void onException(final Exception e) {
+            }
+
+            @Override
+            public void onInterrupted(final Exception e) {
+            }
+        };
+        Application.getExecutor().execute(mUpdatePersonTask.future());
+        return mUpdatePersonTask.future();
     }
 
     public FutureTask<Void> updateCurrentOrganization(final boolean force) {
@@ -500,14 +512,18 @@ public class Session implements OnAccountsUpdateListener {
 
                     Api.getOrganization(organizationId, ApiOptions.builder() //
                             .include(Include.all_questions) //
-                            .include(Include.groups) //
+                                    //.include(Include.groups) //
                             .include(Include.keywords) //
-                            .include(Include.leaders) //
+                            .include(Include.users) //
                             .include(Include.labels) //
                             .include(Include.surveys) //
                             .include(Include.organizational_permission) //
                             .include(Include.interaction_types) //
                             .build()).get();
+
+                    getOrganization().refreshAll();
+                    getPerson().refreshAll();
+                    getPerson().getOrganizationHierarchy();
 
                     SettingsManager.getInstance().setUserSetting(getPersonId(), "organization_" + organizationId + "_updated", currentTime);
                 }
@@ -533,9 +549,8 @@ public class Session implements OnAccountsUpdateListener {
             }
         };
 
-        final FutureTask<Void> future = mUpdateOrganizationTask.future();
-        Application.getExecutor().submit(future);
-        return future;
+        Application.getExecutor().execute(mUpdateOrganizationTask.future());
+        return mUpdateOrganizationTask.future();
     }
 
     private FutureTask<Void> updatePermissions(final boolean force) {

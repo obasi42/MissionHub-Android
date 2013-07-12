@@ -8,7 +8,7 @@ import com.missionhub.util.ResourceUtils;
 import org.apache.commons.lang3.StringUtils;
 
 public enum InteractionVisibility {
-    everyone, parent, organization, admins, me;
+    everyone, parents, organization, admins, me;
 
     private String mTranslatedName;
 
@@ -27,7 +27,7 @@ public enum InteractionVisibility {
                 case everyone:
                     mTranslatedName = ResourceUtils.getString(R.string.interaction_visibility_everyone);
                     break;
-                case parent:
+                case parents:
                     Organization parent = Session.getInstance().getOrganization().getParent();
                     if (parent != null && StringUtils.isNotEmpty(parent.getName())) {
                         mTranslatedName = String.format(ResourceUtils.getString(R.string.interaction_visibility_everyone_in), parent.getName());

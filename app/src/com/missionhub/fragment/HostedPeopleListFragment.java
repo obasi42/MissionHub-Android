@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.widget.SearchView;
 import com.missionhub.R;
@@ -25,7 +26,7 @@ import com.missionhub.event.OnOrganizationChangedEvent;
 import com.missionhub.event.OnSidebarItemClickedEvent;
 import com.missionhub.exception.ExceptionHelper;
 import com.missionhub.fragment.dialog.CheckAllDialog;
-import com.missionhub.fragment.dialog.ContactAssignmentDialogFragment;
+import com.missionhub.fragment.dialog.InteractionDialogFragment;
 import com.missionhub.model.InteractionType;
 import com.missionhub.model.Label;
 import com.missionhub.model.Permission;
@@ -34,6 +35,8 @@ import com.missionhub.people.ApiPeopleListProvider;
 import com.missionhub.people.DynamicPeopleListProvider;
 import com.missionhub.people.PeopleListView;
 import com.missionhub.people.PersonAdapterViewProvider;
+import com.missionhub.people.PersonAdapterViewProvider;
+import com.missionhub.ui.AdapterViewProvider;
 import com.missionhub.ui.ObjectArrayAdapter;
 import com.missionhub.ui.SearchHelper;
 import com.missionhub.ui.widget.CheckmarkImageView;
@@ -47,6 +50,7 @@ import org.holoeverywhere.LayoutInflater;
 import org.holoeverywhere.widget.AdapterView;
 import org.holoeverywhere.widget.Spinner;
 import org.holoeverywhere.widget.TextView;
+import org.holoeverywhere.widget.Toast;
 
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
 
@@ -78,8 +82,33 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
 
         Application.registerEventSubscriber(this, OnSidebarItemClickedEvent.class, OnOrganizationChangedEvent.class);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+
+        menu.add(Menu.NONE, R.id.action_add_contact, Menu.NONE, R.string.action_add_contact).setIcon(R.drawable.ic_action_add_contact)
+                .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+        menu.add(Menu.NONE, R.id.action_interaction, Menu.NONE, R.string.action_record_interaction).setIcon(R.drawable.ic_action_interaction)
+                .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_interaction:
+                InteractionDialogFragment.showForResult(getChildFragmentManager(), R.id.action_interaction);
+                return true;
+            case R.id.action_add_contact:
+                Application.showToast("Click Add Contact", Toast.LENGTH_SHORT);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -456,6 +485,11 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
 
         public SelectableApiPeopleListProvider(Context context) {
             super(context);
+        }
+
+        @Override
+        public AdapterViewProvider onGetViewProvider() {
+            return new PersonAdapterViewProvider();
         }
 
         public void setDisplay(PersonAdapterViewProvider.Display display) {
