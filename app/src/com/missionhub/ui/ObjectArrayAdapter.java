@@ -6,7 +6,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
 import org.holoeverywhere.LayoutInflater;
-import org.holoeverywhere.util.ArrayUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;

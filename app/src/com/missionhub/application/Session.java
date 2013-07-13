@@ -25,7 +25,6 @@ import com.missionhub.event.OnOrganizationChangedEvent;
 import com.missionhub.event.SessionEvent;
 import com.missionhub.model.Organization;
 import com.missionhub.model.Person;
-import com.missionhub.util.Profiler;
 import com.missionhub.util.SafeAsyncTask;
 
 import org.acra.ACRA;
@@ -33,7 +32,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.holoeverywhere.widget.Toast;
 
 import java.io.IOException;
-import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 
 public class Session implements OnAccountsUpdateListener {

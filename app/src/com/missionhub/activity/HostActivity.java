@@ -26,7 +26,6 @@ import com.missionhub.fragment.HostedFragment;
 import com.missionhub.fragment.HostedPeopleListFragment;
 import com.missionhub.fragment.HostedSurveysFragment;
 import com.missionhub.fragment.SidebarFragment;
-import com.missionhub.fragment.dialog.InteractionDialogFragment;
 import com.missionhub.fragment.dialog.SelectOrganizationDialogFragment;
 import com.missionhub.util.IntentHelper;
 

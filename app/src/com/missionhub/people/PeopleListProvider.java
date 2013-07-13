@@ -89,6 +89,7 @@ public class PeopleListProvider extends ObjectArrayAdapter {
 
     /**
      * Returns the new default view provider used to create views for the list items.
+     *
      * @return
      */
     public AdapterViewProvider onCreateViewProvider() {

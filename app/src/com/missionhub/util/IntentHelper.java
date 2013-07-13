@@ -21,7 +21,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.holoeverywhere.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**

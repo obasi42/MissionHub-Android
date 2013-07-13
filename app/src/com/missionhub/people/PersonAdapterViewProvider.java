@@ -6,8 +6,8 @@ import android.widget.ImageView;
 
 import com.missionhub.R;
 import com.missionhub.model.Person;
-import com.missionhub.people.DynamicPeopleListProvider.LoadingItem;
 import com.missionhub.people.DynamicPeopleListProvider.EmptyItem;
+import com.missionhub.people.DynamicPeopleListProvider.LoadingItem;
 import com.missionhub.ui.AdapterViewProvider;
 import com.missionhub.ui.AnimateOnceImageLoadingListener;
 import com.missionhub.ui.ObjectArrayAdapter;
