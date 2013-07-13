@@ -124,3 +124,7 @@
 -keep class com.facebook.** {
     *;
 }
+
+# Joda-Time
+-dontwarn org.joda.convert.FromString
+-dontwarn org.joda.convert.ToString
