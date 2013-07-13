@@ -323,5 +323,6 @@
     </string>
     <string name="delete_people_dialog_deleting">Deleting person(s)…</string>
     <string name="delete_people_dialog_deleted">Deleted person(s)</string>
+    <string name="fragment_assignment_dialog_warning_mass">Assigning in mass filter mode.</string>
 
 </resources>

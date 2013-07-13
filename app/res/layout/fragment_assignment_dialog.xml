@@ -31,9 +31,28 @@
                 android:text="@string/assignment_progress"/>
     </RelativeLayout>
 
-    <com.missionhub.ui.widget.LockableViewPager
-            android:id="@+id/pager"
+    <LinearLayout
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:id="@+id/container">
 
+        <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/warning"
+                android:text="@string/fragment_assignment_dialog_warning_mass"
+                android:padding="5dip"
+                android:background="#FFBB33"
+                android:textColor="#FFF"
+                android:gravity="center"
+                android:visibility="gone"
+                />
+
+        <ListView
+                android:id="@android:id/list"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"/>
+
+    </LinearLayout>
 </FrameLayout>

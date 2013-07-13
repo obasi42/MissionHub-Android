@@ -14,7 +14,7 @@
 //import com.missionhub.activity.ProfileActivity;
 //import com.missionhub.contactlist.ContactListFragment;
 //import com.missionhub.exception.ExceptionHelper;
-//import com.missionhub.fragment.dialog.ContactAssignmentDialogFragment;
+//import com.missionhub.fragment.dialog.AssignmentDialogFragment;
 //import com.missionhub.fragment.dialog.ContactLabelsDialogFragment;
 //import com.missionhub.fragment.dialog.EditContactDialogFragment;
 //import com.missionhub.model.Person;
@@ -172,7 +172,7 @@
 //    @Override
 //    public boolean onActionItemClicked(final ActionMode mode, final MenuItem item) {
 //        if (item.getItemId() == R.id.action_assign) {
-//            ContactAssignmentDialogFragment.showForResult(getChildFragmentManager(), getContactListFragment().getCheckedPeople(), REQUEST_ASSIGNMENT);
+//            AssignmentDialogFragment.showForResult(getChildFragmentManager(), getContactListFragment().getCheckedPeople(), REQUEST_ASSIGNMENT);
 //        }
 //        if (item.getItemId() == R.id.action_label) {
 //            ContactLabelsDialogFragment.showForResult(getChildFragmentManager(), getContactListFragment().getCheckedPeople(), REQUEST_LABELS);

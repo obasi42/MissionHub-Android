@@ -1,5 +1,7 @@
 package com.missionhub.model;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import com.missionhub.model.DaoSession;
@@ -32,6 +34,7 @@ import com.missionhub.util.TreeDataStructure;
 import de.greenrobot.dao.AbstractDao;
 import de.greenrobot.dao.query.WhereCondition;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -1169,6 +1172,30 @@ public class Person {
         public String phone;
         public View.OnClickListener phoneClickListener;
         public String permission;
+    }
+
+    public static Collection<Person> getAllById(Collection<Long> ids) {
+        return getAllById(ArrayUtils.toPrimitive(ids.toArray(new Long[ids.size()])));
+    }
+
+    public static Collection<Person> getAllById(long[] ids) {
+        Set<Person> people = new HashSet<Person>();
+        for (long id : ids) {
+            final Person p = Application.getDb().getPersonDao().load(id);
+            if (p != null) {
+                people.add(p);
+            }
+        }
+        return people;
+    }
+
+
+    public static Collection<Long> getIds(Collection<Person> mPeople) {
+        Set<Long> ids = new HashSet<Long>();
+        for (Person p : mPeople) {
+            ids.add(p.getId());
+        }
+        return ids;
     }
     // KEEP METHODS END
 

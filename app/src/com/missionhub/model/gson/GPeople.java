@@ -11,6 +11,7 @@ public class GPeople {
 
     public GPerson[] people;
     public GPerson person;
+    public Long[] people_ids;
 
     public GPerson[] organizational_roles; // returned by organizational_roles/bulk.. yes it's people
     public GPerson[] organizational_labels;

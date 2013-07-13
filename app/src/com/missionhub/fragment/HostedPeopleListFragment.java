@@ -26,9 +26,11 @@ import com.missionhub.event.OnOrganizationChangedEvent;
 import com.missionhub.event.OnSidebarItemClickedEvent;
 import com.missionhub.exception.ExceptionHelper;
 import com.missionhub.fragment.dialog.CheckAllDialog;
+import com.missionhub.fragment.dialog.AssignmentDialogFragment;
 import com.missionhub.fragment.dialog.DeletePeopleDialogFragment;
 import com.missionhub.fragment.dialog.EditContactDialogFragment;
 import com.missionhub.fragment.dialog.InteractionDialogFragment;
+import com.missionhub.fragment.dialog.PermissionLabelDialogFragment;
 import com.missionhub.model.InteractionType;
 import com.missionhub.model.Label;
 import com.missionhub.model.Permission;
@@ -677,16 +679,25 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
     public synchronized boolean onActionItemClicked(final ActionMode mode, final MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_assign:
-                //ContactAssignmentDialogFragment.showForResult(getChildFragmentManager(), mList.getCheckedItemIds(), R.id.action_assign);
+                if (mCheckmarkHelper.isAllChecked()) {
+                    AssignmentDialogFragment.showForResult(getChildFragmentManager(), mProvider.getPeopleListOptions(), R.id.action_assign);
+                } else {
+                    AssignmentDialogFragment.showForResult(getChildFragmentManager(), mList.getCheckedItemIds(), R.id.action_assign);
+                }
                 break;
             case R.id.action_label:
-                // TODO: implement label
-                //LabelDialogFragment.showForResult(getChildFragmentManager())
-
+                if (mCheckmarkHelper.isAllChecked()) {
+                    PermissionLabelDialogFragment.showForResult(getChildFragmentManager(), PermissionLabelDialogFragment.TYPE_LABELS, mProvider.getPeopleListOptions(), R.id.action_label);
+                } else {
+                    PermissionLabelDialogFragment.showForResult(getChildFragmentManager(), PermissionLabelDialogFragment.TYPE_LABELS, mList.getCheckedItemIds(), R.id.action_label);
+                }
                 break;
             case R.id.action_permission:
-                // TODO: implement action permission
-
+                if (mCheckmarkHelper.isAllChecked()) {
+                    PermissionLabelDialogFragment.showForResult(getChildFragmentManager(), PermissionLabelDialogFragment.TYPE_PERMISSIONS, mProvider.getPeopleListOptions(), R.id.action_permission);
+                } else {
+                    PermissionLabelDialogFragment.showForResult(getChildFragmentManager(), PermissionLabelDialogFragment.TYPE_PERMISSIONS, mList.getCheckedItemIds(), R.id.action_permission);
+                }
                 break;
             case R.id.action_delete:
                 if (mCheckmarkHelper.isAllChecked()) {
@@ -733,6 +744,10 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
 
     @Override
     public boolean onFragmentResult(int requestCode, int resultCode, Object data) {
+        if (resultCode != RESULT_OK) return super.onFragmentResult(requestCode, resultCode, data);
+
+        mCheckmarkHelper.setNoneChecked();
+
         switch (requestCode) {
             case R.id.action_assign:
                 if (mProvider.getPeopleListOptions().hasFilter("assigned_to")) {
@@ -754,10 +769,23 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
                     }
                 }
                 mProvider.removeAll(people);
-                mCheckmarkHelper.setNoneChecked();
                 return true;
+            case R.id.action_label:
+                if (mProvider.getPeopleListOptions().hasFilter("labels")) {
+                    mProvider.reload();
+                } else {
+                    mProvider.notifyDataSetChanged();
+                }
+                break;
+            case R.id.action_permission:
+                if (mProvider.getPeopleListOptions().hasFilter("permissions")) {
+                    mProvider.reload();
+                } else {
+                    mProvider.notifyDataSetChanged();
+                }
         }
-        return false;
+
+        return super.onFragmentResult(requestCode, resultCode, data);
     }
 }
 

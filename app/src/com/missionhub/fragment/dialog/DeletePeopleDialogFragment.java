@@ -141,7 +141,7 @@ public class DeletePeopleDialogFragment extends BaseDialogFragment {
             public Void call() throws Exception {
                 if (mFilters != null) {
                     mPeopleIds = new HashSet<Long>();
-                    mFilters.setOffset(0);
+                    mFilters.removeOffset();
                     mFilters.removeLimit();
 
                     List<Person> people = Api.listPeople(mFilters, ApiOptions.builder().include(Api.Include.organizational_permission).build()).get();

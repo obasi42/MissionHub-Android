@@ -21,13 +21,12 @@
             android:textColor="?textColorAlertDialogListItem"
             />
 
-    <ImageView
-            android:id="@+id/checkbox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:clickable="false"
-            android:focusable="false"
-            android:gravity="center_vertical"
-            android:paddingRight="12dip"
-            android:src="@drawable/btn_check_off_holo_light"/>
+    <com.missionhub.ui.widget.CheckmarkImageView
+            android:id="@android:id/checkbox"
+            android:layout_width="24dip"
+            android:layout_height="24dip"
+            android:src="@drawable/checkmark"
+            android:layout_marginRight="12dip"
+            android:gravity="center_vertical"/>
+
 </LinearLayout>

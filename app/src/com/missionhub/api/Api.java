@@ -34,6 +34,7 @@ import com.missionhub.util.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -144,6 +145,18 @@ public class Api {
         return new ApiRequest<List<Person>>(ApiOptions.builder().method(HttpRequest.METHOD_GET).url(buildUrl("people")).responseParser(peopleParser).params(params).merge(options).build());
     }
 
+    public static ApiRequest<List<Long>> listPersonIds(final ListOptions listOptions) {
+        return listPersonIds(listOptions, null);
+    }
+
+    public static ApiRequest<List<Long>> listPersonIds(final ListOptions listOptions, final ApiOptions options) {
+        final Map<String, String> params = new HashMap<String, String>();
+        listOptions.removeLimit();
+        listOptions.removeOffset();
+        listOptions.toParams(params);
+        return new ApiRequest<List<Long>>(ApiOptions.builder().method(HttpRequest.METHOD_GET).url(buildUrl("people", "ids")).responseParser(peopleIdsParser).params(params).merge(options).build());
+    }
+
     /* Permissions */
 
     public static ApiRequest<Permission> getPermission(final long permissionId) {
@@ -166,15 +179,15 @@ public class Api {
         return new ApiRequest<List<Permission>>(ApiOptions.builder().method(HttpRequest.METHOD_GET).url(buildUrl("permissions")).responseParser(permissionsParser).params(params).merge(options).build());
     }
 
-    public static ApiRequest<List<Person>> bulkUpdatePermissions(final Collection<Long> personIds, final Long addPermission, final Long removePermission, final ApiOptions options) {
+    public static ApiRequest<List<Person>> bulkUpdatePermissions(final Collection<Long> personIds, final Long addPermission, final Collection<Long> removePermissions, final ApiOptions options) {
         final Map<String, String> params = new HashMap<String, String>();
         params.put("include_archived", "true");
         params.put("filters[ids]", StringUtils.join(personIds, ","));
         if (addPermission != null) {
             params.put("add_permission", String.valueOf(addPermission));
         }
-        if (removePermission != null) {
-            params.put("remove_permission", String.valueOf(removePermission));
+        if (removePermissions != null) {
+            params.put("remove_permission", StringUtils.join(removePermissions, ","));
         }
         return new ApiRequest<List<Person>>(ApiOptions.builder().method(HttpRequest.METHOD_POST).url(buildUrl("organizational_permissions", "bulk")).responseParser(organizationalPermissionsParser).params(params).merge(options).build());
     }
@@ -447,6 +460,14 @@ public class Api {
         public List<Person> parseResponse(final ApiRequest response) throws Exception {
             final GPeople people = sGson.fromJson(response.getBody(), GPeople.class);
             return people.save(false);
+        }
+    };
+
+    private static final ApiResponseParser<List<Long>> peopleIdsParser = new ApiResponseParser<List<Long>>() {
+        @Override
+        public List<Long> parseResponse(final ApiRequest response) throws Exception {
+            final GPeople people = sGson.fromJson(response.getBody(), GPeople.class);
+            return Arrays.asList(people.people_ids);
         }
     };
 

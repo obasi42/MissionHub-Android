@@ -282,6 +282,10 @@ public class ListOptions implements Serializable {
         mOffset = offset;
     }
 
+    public void removeOffset() {
+        mOffset = null;
+    }
+
     public void advanceOffset() {
         mOffset += mLimit;
     }

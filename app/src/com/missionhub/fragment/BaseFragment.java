@@ -11,7 +11,7 @@ public abstract class BaseFragment extends Fragment implements FragmentResult {
 
     @Override
     public boolean onFragmentResult(int requestCode, int resultCode, Object data) {
-        return true;
+        return false;
     }
 
 }

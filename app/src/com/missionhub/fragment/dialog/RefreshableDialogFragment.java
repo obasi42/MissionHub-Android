@@ -106,13 +106,13 @@ public abstract class RefreshableDialogFragment extends BaseDialogFragment {
      * @param savedInstanceState
      * @return
      */
-    public View onCreateRefreshableView(LayoutInflater inflater, Bundle savedInstanceState) {
+    public View onCreateRefreshableView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return null;
     }
 
     @Override
     public final View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        final View view = onCreateRefreshableView(inflater, savedInstanceState);
+        final View view = onCreateRefreshableView(inflater, container, savedInstanceState);
         if (view == null) return super.onCreateView(inflater, container, savedInstanceState);
 
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);

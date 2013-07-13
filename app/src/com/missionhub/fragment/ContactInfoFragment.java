@@ -21,7 +21,7 @@
 //import com.missionhub.application.DrawableCache;
 //import com.missionhub.application.Session;
 //import com.missionhub.exception.ExceptionHelper;
-//import com.missionhub.fragment.dialog.ContactAssignmentDialogFragment;
+//import com.missionhub.fragment.dialog.AssignmentDialogFragment;
 //import com.missionhub.fragment.dialog.ContactLabelsDialogFragment;
 //import com.missionhub.fragment.dialog.FragmentResult;
 //import com.missionhub.model.*;
@@ -333,7 +333,7 @@
 //        mHeaderAssignment.setOnClickListener(new OnClickListener() {
 //            @Override
 //            public void onClick(final View v) {
-//                ContactAssignmentDialogFragment.showForResult(getChildFragmentManager(), mPerson, REQUEST_ASSIGNMENT);
+//                AssignmentDialogFragment.showForResult(getChildFragmentManager(), mPerson, REQUEST_ASSIGNMENT);
 //            }
 //        });
 //        mHeaderMoreText.setOnClickListener(new OnClickListener() {
