@@ -14,8 +14,6 @@ public class GAnswer {
     public long question_id;
     public String value;
 
-    public static final Object lock = new Object();
-
     /**
      * Saves the current answer to the SQLite database.
      *
@@ -27,24 +25,21 @@ public class GAnswer {
         final Callable<Answer> callable = new Callable<Answer>() {
             @Override
             public Answer call() throws Exception {
-                synchronized (lock) {
-
-                    // wrapped answer
-                    if (answer != null) {
-                        return answer.save(answerSheetId, true);
-                    }
-
-                    final AnswerDao dao = Application.getDb().getAnswerDao();
-
-                    final Answer answer = new Answer();
-                    answer.setId(id);
-                    answer.setAnswer_sheet_id(answerSheetId);
-                    answer.setQuestion_id(question_id);
-                    answer.setValue(value);
-                    dao.insertOrReplace(answer);
-
-                    return answer;
+                // wrapped answer
+                if (answer != null) {
+                    return answer.save(answerSheetId, true);
                 }
+
+                final AnswerDao dao = Application.getDb().getAnswerDao();
+
+                final Answer answer = new Answer();
+                answer.setId(id);
+                answer.setAnswer_sheet_id(answerSheetId);
+                answer.setQuestion_id(question_id);
+                answer.setValue(value);
+                dao.insertOrReplace(answer);
+
+                return answer;
             }
         };
         if (inTx) {

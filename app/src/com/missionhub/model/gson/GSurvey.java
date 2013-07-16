@@ -26,8 +26,6 @@ public class GSurvey {
     public GQuestion[] all_questions;
     public GSmsKeyword keyword;
 
-    public static final Object lock = new Object();
-
     /**
      * Saves the survey to the SQLite database.
      *
@@ -39,46 +37,44 @@ public class GSurvey {
         final Callable<Survey> callable = new Callable<Survey>() {
             @Override
             public Survey call() throws Exception {
-                synchronized (lock) {
-
-                    // wrapped survey
-                    if (survey != null) {
-                        return survey.save(true);
-                    }
-
-                    final SurveyDao dao = Application.getDb().getSurveyDao();
-
-                    final Survey survey = new Survey();
-                    survey.setId(id);
-                    survey.setTitle(title);
-                    survey.setOrganization_id(organization_id);
-                    survey.setPost_survey_message(post_survey_message);
-                    survey.setTerminology(terminology);
-                    survey.setLogin_paragraph(login_paragraph);
-                    survey.setIs_frozen(is_frozen);
-                    survey.setCreated_at(created_at);
-                    survey.setUpdated_at(updated_at);
-                    dao.insertOrReplace(survey);
-
-                    if (questions != null) {
-                        for (final GQuestion question : questions) {
-                            question.save(true);
-                        }
-                    }
-
-                    if (all_questions != null) {
-                        for (final GQuestion question : all_questions) {
-                            question.save(true);
-                        }
-                    }
-
-                    if (keyword != null) {
-                        keyword.save(true);
-                    }
-
-                    return survey;
+                // wrapped survey
+                if (survey != null) {
+                    return survey.save(true);
                 }
+
+                final SurveyDao dao = Application.getDb().getSurveyDao();
+
+                final Survey survey = new Survey();
+                survey.setId(id);
+                survey.setTitle(title);
+                survey.setOrganization_id(organization_id);
+                survey.setPost_survey_message(post_survey_message);
+                survey.setTerminology(terminology);
+                survey.setLogin_paragraph(login_paragraph);
+                survey.setIs_frozen(is_frozen);
+                survey.setCreated_at(created_at);
+                survey.setUpdated_at(updated_at);
+                dao.insertOrReplace(survey);
+
+                if (questions != null) {
+                    for (final GQuestion question : questions) {
+                        question.save(true);
+                    }
+                }
+
+                if (all_questions != null) {
+                    for (final GQuestion question : all_questions) {
+                        question.save(true);
+                    }
+                }
+
+                if (keyword != null) {
+                    keyword.save(true);
+                }
+
+                return survey;
             }
+
         };
         if (inTx) {
             return callable.call();
@@ -91,24 +87,23 @@ public class GSurvey {
         final Callable<List<Survey>> callable = new Callable<List<Survey>>() {
             @Override
             public List<Survey> call() throws Exception {
-                synchronized (lock) {
-                    final SurveyDao dao = Application.getDb().getSurveyDao();
+                final SurveyDao dao = Application.getDb().getSurveyDao();
 
-                    List<Long> oldIds = dao.queryBuilder().where(SurveyDao.Properties.Organization_id.eq(organization_id)).listKeys();
-                    for (Long id : oldIds) {
-                        dao.deleteByKey(id);
-                    }
-
-                    final List<Survey> surveys1 = new ArrayList<Survey>();
-                    for (final GSurvey gsurvey : surveys) {
-                        final Survey survey = gsurvey.save(true);
-                        if (survey != null) {
-                            surveys1.add(survey);
-                        }
-                    }
-                    return surveys1;
+                List<Long> oldIds = dao.queryBuilder().where(SurveyDao.Properties.Organization_id.eq(organization_id)).listKeys();
+                for (Long id : oldIds) {
+                    dao.deleteByKey(id);
                 }
+
+                final List<Survey> surveys1 = new ArrayList<Survey>();
+                for (final GSurvey gsurvey : surveys) {
+                    final Survey survey = gsurvey.save(true);
+                    if (survey != null) {
+                        surveys1.add(survey);
+                    }
+                }
+                return surveys1;
             }
+
         };
         if (inTx) {
             return callable.call();

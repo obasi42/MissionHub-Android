@@ -20,32 +20,29 @@ public class GLabel {
     public String created_at;
     public String updated_at;
 
-    public static final Object lock = new Object();
-
     public Label save(final boolean inTx) throws Exception {
         final Callable<Label> callable = new Callable<Label>() {
             @Override
             public Label call() throws Exception {
-                synchronized (lock) {
 
-                    // wrapped label
-                    if (label != null) {
-                        label.save(true);
-                    }
-
-                    final LabelDao dao = Application.getDb().getLabelDao();
-
-                    final Label label = new Label();
-                    label.setId(id);
-                    label.setOrganization_id(organization_id);
-                    label.setName(name);
-                    label.setI18n(i18n);
-                    label.setCreated_at(created_at);
-                    label.setUpdated_at(updated_at);
-                    dao.insertOrReplace(label);
-
-                    return label;
+                // wrapped label
+                if (label != null) {
+                    label.save(true);
                 }
+
+                final LabelDao dao = Application.getDb().getLabelDao();
+
+                final Label label = new Label();
+                label.setId(id);
+                label.setOrganization_id(organization_id);
+                label.setName(name);
+                label.setI18n(i18n);
+                label.setCreated_at(created_at);
+                label.setUpdated_at(updated_at);
+                dao.insertOrReplace(label);
+
+                return label;
+
             }
         };
         if (inTx) {
@@ -59,23 +56,22 @@ public class GLabel {
         final Callable<List<Label>> callable = new Callable<List<Label>>() {
             @Override
             public List<Label> call() throws Exception {
-                synchronized (lock) {
-                    final LabelDao dao = Application.getDb().getLabelDao();
-                    List<Long> oldIds = dao.queryBuilder().where(LabelDao.Properties.Organization_id.eq(organization_id)).listKeys();
-                    for (Long id : oldIds) {
-                        dao.deleteByKey(id);
-                    }
-
-                    final List<Label> lbls = new ArrayList<Label>();
-                    for (final GLabel Label : labels) {
-                        final Label label = Label.save(true);
-                        if (label != null) {
-                            lbls.add(label);
-                        }
-                    }
-                    return lbls;
+                final LabelDao dao = Application.getDb().getLabelDao();
+                List<Long> oldIds = dao.queryBuilder().where(LabelDao.Properties.Organization_id.eq(organization_id)).listKeys();
+                for (Long id : oldIds) {
+                    dao.deleteByKey(id);
                 }
+
+                final List<Label> lbls = new ArrayList<Label>();
+                for (final GLabel Label : labels) {
+                    final Label label = Label.save(true);
+                    if (label != null) {
+                        lbls.add(label);
+                    }
+                }
+                return lbls;
             }
+
         };
         if (inTx) {
             return callable.call();

@@ -21,9 +21,6 @@ public class GAddress {
     public String zip;
     public String address_type;
 
-    public static final Object lock = new Object();
-    public static final Object allLock = new Object();
-
     /**
      * Saves the current address to the SQLite database.
      *
@@ -35,28 +32,25 @@ public class GAddress {
         final Callable<Address> callable = new Callable<Address>() {
             @Override
             public Address call() throws Exception {
-                synchronized (lock) {
-
-                    // wrapped address
-                    if (address != null) {
-                        return address.save(personId, true);
-                    }
-
-                    // add new address
-                    final Address address = new Address();
-                    address.setId(id);
-                    address.setPerson_id(personId);
-                    address.setAddress1(address1);
-                    address.setAddress2(address2);
-                    address.setCity(city);
-                    address.setState(state);
-                    address.setCountry(country);
-                    address.setZip(zip);
-                    address.setAddress_type(address_type);
-
-                    Application.getDb().getAddressDao().insert(address);
-                    return address;
+                // wrapped address
+                if (address != null) {
+                    return address.save(personId, true);
                 }
+
+                // add new address
+                final Address address = new Address();
+                address.setId(id);
+                address.setPerson_id(personId);
+                address.setAddress1(address1);
+                address.setAddress2(address2);
+                address.setCity(city);
+                address.setState(state);
+                address.setCountry(country);
+                address.setZip(zip);
+                address.setAddress_type(address_type);
+
+                Application.getDb().getAddressDao().insert(address);
+                return address;
             }
         };
         if (inTx) {
@@ -70,27 +64,25 @@ public class GAddress {
         final Callable<List<Address>> callable = new Callable<List<Address>>() {
             @Override
             public List<Address> call() throws Exception {
-                synchronized (allLock) {
-                    final AddressDao dao = Application.getDb().getAddressDao();
+                final AddressDao dao = Application.getDb().getAddressDao();
 
-                    // delete old addresses
-                    List<Long> keys = dao.queryBuilder().where(AddressDao.Properties.Person_id.eq(personId)).listKeys();
-                    for (Long key : keys) {
-                        dao.deleteByKey(key);
-                    }
-
-                    // save the new address
-                    final List<Address> addrs = new ArrayList<Address>();
-                    for (final GAddress address : addresses) {
-                        final Address a = address.save(personId, true);
-                        if (a != null) {
-                            addrs.add(a);
-                        }
-                    }
-
-                    return addrs;
+                // delete old addresses
+                List<Long> keys = dao.queryBuilder().where(AddressDao.Properties.Person_id.eq(personId)).listKeys();
+                for (Long key : keys) {
+                    dao.deleteByKey(key);
                 }
+
+                // save the new address
+                final List<Address> addrs = new ArrayList<Address>();
+                for (final GAddress address : addresses) {
+                    final Address a = address.save(personId, true);
+                    if (a != null) {
+                        addrs.add(a);
+                    }
+                }
+                return addrs;
             }
+
         };
         if (inTx) {
             return callable.call();

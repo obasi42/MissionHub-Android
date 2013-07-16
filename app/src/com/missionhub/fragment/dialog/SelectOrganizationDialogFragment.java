@@ -311,6 +311,7 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
 
     @Override
     public void onDestroy() {
+        Log.e("DESTROY", "ON DESTROY");
         try {
             mSetTask.cancel(true);
         } catch (Exception e) { /* ignore */ }

@@ -15,8 +15,6 @@ public class GUser {
     public String created_at;
     public String updated_at;
 
-    public static final Object lock = new Object();
-
     /**
      * Saves the user to the SQLite database.
      *
@@ -28,36 +26,34 @@ public class GUser {
         final Callable<User> callable = new Callable<User>() {
             @Override
             public User call() throws Exception {
-                synchronized (lock) {
 
-                    // wrapped user
-                    if (user != null) {
-                        user.save(personId, true);
-                    }
-
-                    final UserDao dao = Application.getDb().getUserDao();
-
-                    User user = dao.load(id);
-
-                    boolean insert = false;
-                    if (user == null) {
-                        user = new User();
-                        insert = true;
-                    }
-                    user.setId(id);
-                    user.setPerson_id(personId);
-                    user.setPrimary_organization_id(primary_organization_id);
-                    user.setCreated_at(created_at);
-                    user.setUpdated_at(updated_at);
-
-                    if (insert) {
-                        dao.insert(user);
-                    } else {
-                        dao.update(user);
-                    }
-
-                    return user;
+                // wrapped user
+                if (user != null) {
+                    user.save(personId, true);
                 }
+
+                final UserDao dao = Application.getDb().getUserDao();
+
+                User user = dao.load(id);
+
+                boolean insert = false;
+                if (user == null) {
+                    user = new User();
+                    insert = true;
+                }
+                user.setId(id);
+                user.setPerson_id(personId);
+                user.setPrimary_organization_id(primary_organization_id);
+                user.setCreated_at(created_at);
+                user.setUpdated_at(updated_at);
+
+                if (insert) {
+                    dao.insert(user);
+                } else {
+                    dao.update(user);
+                }
+
+                return user;
             }
         };
         if (inTx) {

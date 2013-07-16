@@ -24,8 +24,6 @@ public class GQuestion {
     public String created_at;
     public String updated_at;
 
-    public static final Object lock = new Object();
-
     /**
      * Saves the question to the SQLite database.
      *
@@ -37,33 +35,32 @@ public class GQuestion {
         final Callable<Question> callable = new Callable<Question>() {
             @Override
             public Question call() throws Exception {
-                synchronized (lock) {
-                    // wrapped question
-                    if (question != null) {
-                        question.save(true);
-                    }
-
-                    final QuestionDao dao = Application.getDb().getQuestionDao();
-
-                    final Question question = new Question();
-                    question.setId(id);
-                    question.setKind(kind);
-                    question.setStyle(style);
-                    question.setLabel(label);
-                    question.setContent(content);
-                    question.setObject_name(object_name);
-                    question.setAttribute_name(attribute_name);
-                    question.setWeb_only(web_only);
-                    question.setTrigger_words(trigger_words);
-                    question.setNotify_via(notify_via);
-                    question.setHidden(hidden);
-                    question.setCreated_at(created_at);
-                    question.setUpdated_at(updated_at);
-                    dao.insertOrReplace(question);
-
-                    return question;
+                // wrapped question
+                if (question != null) {
+                    question.save(true);
                 }
+
+                final QuestionDao dao = Application.getDb().getQuestionDao();
+
+                final Question question = new Question();
+                question.setId(id);
+                question.setKind(kind);
+                question.setStyle(style);
+                question.setLabel(label);
+                question.setContent(content);
+                question.setObject_name(object_name);
+                question.setAttribute_name(attribute_name);
+                question.setWeb_only(web_only);
+                question.setTrigger_words(trigger_words);
+                question.setNotify_via(notify_via);
+                question.setHidden(hidden);
+                question.setCreated_at(created_at);
+                question.setUpdated_at(updated_at);
+                dao.insertOrReplace(question);
+
+                return question;
             }
+
         };
         if (inTx) {
             return callable.call();

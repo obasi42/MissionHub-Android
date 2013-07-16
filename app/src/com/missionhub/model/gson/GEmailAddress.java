@@ -19,8 +19,6 @@ public class GEmailAddress {
     public String created_at;
     public String updated_at;
 
-    public static final Object lock = new Object();
-
     /**
      * Saves the email address to the SQLite database.
      *
@@ -32,25 +30,22 @@ public class GEmailAddress {
         final Callable<EmailAddress> callable = new Callable<EmailAddress>() {
             @Override
             public EmailAddress call() throws Exception {
-                synchronized (lock) {
-
-                    // wrapped address
-                    if (email_address != null) {
-                        email_address.save(true);
-                    }
-
-                    final EmailAddressDao dao = Application.getDb().getEmailAddressDao();
-                    final EmailAddress address = new EmailAddress();
-                    address.setId(id);
-                    address.setEmail(email);
-                    address.setPerson_id(person_id);
-                    address.setPrimary(primary);
-                    address.setCreated_at(created_at);
-                    address.setUpdated_at(updated_at);
-                    dao.insertOrReplace(address);
-
-                    return address;
+                // wrapped address
+                if (email_address != null) {
+                    email_address.save(true);
                 }
+
+                final EmailAddressDao dao = Application.getDb().getEmailAddressDao();
+                final EmailAddress address = new EmailAddress();
+                address.setId(id);
+                address.setEmail(email);
+                address.setPerson_id(person_id);
+                address.setPrimary(primary);
+                address.setCreated_at(created_at);
+                address.setUpdated_at(updated_at);
+                dao.insertOrReplace(address);
+
+                return address;
             }
         };
         if (inTx) {
@@ -73,26 +68,24 @@ public class GEmailAddress {
         final Callable<List<EmailAddress>> callable = new Callable<List<EmailAddress>>() {
             @Override
             public List<EmailAddress> call() throws Exception {
-                synchronized (lock) {
-                    final EmailAddressDao dao = Application.getDb().getEmailAddressDao();
+                final EmailAddressDao dao = Application.getDb().getEmailAddressDao();
 
-                    // delete current address
-                    List<Long> keys = dao.queryBuilder().where(EmailAddressDao.Properties.Person_id.eq(personId)).listKeys();
-                    for (Long key : keys) {
-                        dao.deleteByKey(key);
-                    }
-
-                    // save the new address
-                    final List<EmailAddress> emails = new ArrayList<EmailAddress>();
-                    for (final GEmailAddress address : addresses) {
-                        final EmailAddress ea = address.save(true);
-                        if (ea != null) {
-                            emails.add(ea);
-                        }
-                    }
-
-                    return emails;
+                // delete current address
+                List<Long> keys = dao.queryBuilder().where(EmailAddressDao.Properties.Person_id.eq(personId)).listKeys();
+                for (Long key : keys) {
+                    dao.deleteByKey(key);
                 }
+
+                // save the new address
+                final List<EmailAddress> emails = new ArrayList<EmailAddress>();
+                for (final GEmailAddress address : addresses) {
+                    final EmailAddress ea = address.save(true);
+                    if (ea != null) {
+                        emails.add(ea);
+                    }
+                }
+
+                return emails;
             }
         };
         if (inTx) {

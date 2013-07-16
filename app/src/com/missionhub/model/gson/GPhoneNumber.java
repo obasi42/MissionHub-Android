@@ -22,8 +22,6 @@ public class GPhoneNumber {
     public String created_at;
     public String updated_at;
 
-    public static final Object lock = new Object();
-
     /**
      * Saves the phone number to the SQLite database.
      *
@@ -35,29 +33,27 @@ public class GPhoneNumber {
         final Callable<PhoneNumber> callable = new Callable<PhoneNumber>() {
             @Override
             public PhoneNumber call() throws Exception {
-                synchronized (lock) {
-
-                    // wrapped number
-                    if (phone_number != null) {
-                        return phone_number.save(true);
-                    }
-
-                    final PhoneNumberDao dao = Application.getDb().getPhoneNumberDao();
-
-                    final PhoneNumber num = new PhoneNumber();
-                    num.setId(id);
-                    num.setPerson_id(person_id);
-                    num.setNumber(number);
-                    num.setLocation(location);
-                    num.setPrimary(primary);
-                    num.setTxt_to_email(txt_to_email);
-                    num.setEmail_updated_at(email_updated_at);
-                    num.setCreated_at(created_at);
-                    num.setUpdated_at(updated_at);
-                    dao.insertOrReplace(num);
-
-                    return num;
+                // wrapped number
+                if (phone_number != null) {
+                    return phone_number.save(true);
                 }
+
+                final PhoneNumberDao dao = Application.getDb().getPhoneNumberDao();
+
+                final PhoneNumber num = new PhoneNumber();
+                num.setId(id);
+                num.setPerson_id(person_id);
+                num.setNumber(number);
+                num.setLocation(location);
+                num.setPrimary(primary);
+                num.setTxt_to_email(txt_to_email);
+                num.setEmail_updated_at(email_updated_at);
+                num.setCreated_at(created_at);
+                num.setUpdated_at(updated_at);
+                dao.insertOrReplace(num);
+
+                return num;
+
             }
         };
         if (inTx) {
@@ -80,26 +76,25 @@ public class GPhoneNumber {
         final Callable<List<PhoneNumber>> callable = new Callable<List<PhoneNumber>>() {
             @Override
             public List<PhoneNumber> call() throws Exception {
-                synchronized (lock) {
-                    final PhoneNumberDao dao = Application.getDb().getPhoneNumberDao();
+                final PhoneNumberDao dao = Application.getDb().getPhoneNumberDao();
 
-                    // delete current number
-                    List<Long> keys = dao.queryBuilder().where(PhoneNumberDao.Properties.Person_id.eq(personId)).listKeys();
-                    for (Long key : keys) {
-                        dao.deleteByKey(key);
-                    }
-
-                    // save the new number
-                    final List<PhoneNumber> nums = new ArrayList<PhoneNumber>();
-                    for (final GPhoneNumber number : numbers) {
-                        final PhoneNumber num = number.save(true);
-                        if (num != null) {
-                            nums.add(num);
-                        }
-                    }
-
-                    return nums;
+                // delete current number
+                List<Long> keys = dao.queryBuilder().where(PhoneNumberDao.Properties.Person_id.eq(personId)).listKeys();
+                for (Long key : keys) {
+                    dao.deleteByKey(key);
                 }
+
+                // save the new number
+                final List<PhoneNumber> nums = new ArrayList<PhoneNumber>();
+                for (final GPhoneNumber number : numbers) {
+                    final PhoneNumber num = number.save(true);
+                    if (num != null) {
+                        nums.add(num);
+                    }
+                }
+
+                return nums;
+
             }
         };
         if (inTx) {

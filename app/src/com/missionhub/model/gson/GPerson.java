@@ -57,8 +57,6 @@ public class GPerson {
 
     public HashMultimap<Long, String> _answers; // used by AddContactDialog
 
-    public static final Object lock = new Object();
-
     /**
      * Saves the person to the SQLite database.
      *
@@ -70,169 +68,167 @@ public class GPerson {
         final Callable<Person> callable = new Callable<Person>() {
             @Override
             public Person call() throws Exception {
-                synchronized (lock) {
-
-                    // wrapped person
-                    if (person != null) {
-                        return person.save(true);
-                    }
-
-                    final DaoSession session = Application.getDb();
-                    final PersonDao dao = session.getPersonDao();
-                    //long orgId = Session.getInstance().getOrganizationId();
-
-                    boolean insert = false;
-                    Person person = dao.load(id);
-
-                    if (person == null) {
-                        person = new Person();
-                        insert = true;
-                    }
-                    person.setId(id);
-
-                    if (first_name != null) {
-                        person.setFirst_name(first_name);
-                    }
-                    if (last_name != null) {
-                        person.setLast_name(last_name);
-                    }
-                    if (gender != null) {
-                        person.setGender(gender);
-                    }
-                    if (campus != null) {
-                        person.setCampus(campus);
-                    }
-                    if (year_in_school != null) {
-                        person.setYear_in_school(year_in_school);
-                    }
-                    if (major != null) {
-                        person.setMajor(major);
-                    }
-                    if (minor != null) {
-                        person.setMinor(minor);
-                    }
-                    if (birth_date != null) {
-                        person.setBirth_date(birth_date);
-                    }
-                    if (date_became_christian != null) {
-                        person.setDate_became_christian(date_became_christian);
-                    }
-                    if (graduation_date != null) {
-                        person.setGraduation_date(graduation_date);
-                    }
-                    if (picture != null) {
-                        person.setPicture(picture);
-                    }
-                    if (user_id != null) {
-                        person.setUser_id(user_id);
-                    }
-                    if (fb_uid != null) {
-                        person.setFb_uid(fb_uid);
-                    }
-                    if (created_at != null) {
-                        person.setCreated_at(created_at);
-                    }
-                    if (updated_at != null) {
-                        person.setUpdated_at(updated_at);
-                    }
-
-                    if (insert) {
-                        dao.insert(person);
-                    } else {
-                        dao.update(person);
-                    }
-
-                    if (phone_numbers != null) {
-                        GPhoneNumber.replaceAll(phone_numbers, id, true);
-                    }
-
-                    if (email_addresses != null) {
-                        GEmailAddress.replaceAll(email_addresses, id, true);
-                    }
-
-                    if (contact_assignments != null) {
-                        Set<Long> orgIds = new HashSet<Long>();
-                        for (GContactAssignment assignment : contact_assignments) {
-                            orgIds.add(assignment.organization_id);
-                        }
-                        orgIds.add(Session.getInstance().getOrganizationId());
-
-                        List<Long> keys = session.getContactAssignmentDao().queryBuilder().where(ContactAssignmentDao.Properties.Assigned_to_id.eq(id), ContactAssignmentDao.Properties.Organization_id.in(orgIds)).listKeys();
-                        for (Long key : keys) {
-                            session.getContactAssignmentDao().deleteByKey(key);
-                        }
-
-                        for (final GContactAssignment assignment : contact_assignments) {
-                            assignment.save(true);
-                        }
-                    }
-
-                    if (assigned_tos != null) {
-                        Set<Long> orgIds = new HashSet<Long>();
-                        for (GContactAssignment assignment : assigned_tos) {
-                            orgIds.add(assignment.organization_id);
-                        }
-                        orgIds.add(Session.getInstance().getOrganizationId());
-
-                        List<Long> keys = session.getContactAssignmentDao().queryBuilder().where(ContactAssignmentDao.Properties.Person_id.eq(id), ContactAssignmentDao.Properties.Organization_id.in(orgIds)).listKeys();
-                        for (Long key : keys) {
-                            session.getContactAssignmentDao().deleteByKey(key);
-                        }
-
-                        for (final GContactAssignment assignment : assigned_tos) {
-                            assignment.save(true);
-                        }
-                    }
-
-                    if (answer_sheets != null) {
-                        final List<AnswerSheet> oldSheets = Application.getDb().getAnswerSheetDao().queryBuilder().where(AnswerSheetDao.Properties.Person_id.eq(id)).list();
-                        for (final AnswerSheet oldSheet : oldSheets) {
-                            oldSheet.deleteWithRelations();
-                        }
-                        for (final GAnswerSheet sheet : answer_sheets) {
-                            sheet.save(id, true);
-                        }
-                    }
-
-                    if (all_organizational_permissions != null) {
-                        final List<Long> oldKeys = Application.getDb().getOrganizationalPermissionDao().queryBuilder().where(OrganizationalPermissionDao.Properties.Person_id.eq(id)).listKeys();
-                        for (long key : oldKeys) {
-                            Application.getDb().getOrganizationalPermissionDao().deleteByKey(key);
-                        }
-                        for (GOrganizationalPermission perm : all_organizational_permissions) {
-                            perm.save(true);
-                        }
-                    }
-
-                    if (all_organization_and_children != null) {
-                        for (GOrganization organization : all_organization_and_children) {
-                            organization.save(true);
-                        }
-                    }
-
-                    if (interactions != null) {
-                        GInteraction.replaceAll(interactions, id, true);
-                    }
-
-                    if (organizational_labels != null) {
-                        GOrganizationalLabel.replaceAll(organizational_labels, id, true);
-                    }
-
-                    if (addresses != null) {
-                        GAddress.replaceAll(addresses, id, true);
-                    }
-
-                    if (user != null) {
-                        user.save(id, true);
-                    }
-
-                    if (organizational_permission != null) {
-                        GOrganizationalPermission.replace(organizational_permission, true);
-                    }
-
-                    return person;
+                // wrapped person
+                if (person != null) {
+                    return person.save(true);
                 }
+
+                final DaoSession session = Application.getDb();
+                final PersonDao dao = session.getPersonDao();
+                //long orgId = Session.getInstance().getOrganizationId();
+
+                boolean insert = false;
+                Person person = dao.load(id);
+
+                if (person == null) {
+                    person = new Person();
+                    insert = true;
+                }
+                person.setId(id);
+
+                if (first_name != null) {
+                    person.setFirst_name(first_name);
+                }
+                if (last_name != null) {
+                    person.setLast_name(last_name);
+                }
+                if (gender != null) {
+                    person.setGender(gender);
+                }
+                if (campus != null) {
+                    person.setCampus(campus);
+                }
+                if (year_in_school != null) {
+                    person.setYear_in_school(year_in_school);
+                }
+                if (major != null) {
+                    person.setMajor(major);
+                }
+                if (minor != null) {
+                    person.setMinor(minor);
+                }
+                if (birth_date != null) {
+                    person.setBirth_date(birth_date);
+                }
+                if (date_became_christian != null) {
+                    person.setDate_became_christian(date_became_christian);
+                }
+                if (graduation_date != null) {
+                    person.setGraduation_date(graduation_date);
+                }
+                if (picture != null) {
+                    person.setPicture(picture);
+                }
+                if (user_id != null) {
+                    person.setUser_id(user_id);
+                }
+                if (fb_uid != null) {
+                    person.setFb_uid(fb_uid);
+                }
+                if (created_at != null) {
+                    person.setCreated_at(created_at);
+                }
+                if (updated_at != null) {
+                    person.setUpdated_at(updated_at);
+                }
+
+                if (insert) {
+                    dao.insert(person);
+                } else {
+                    dao.update(person);
+                }
+
+                if (phone_numbers != null) {
+                    GPhoneNumber.replaceAll(phone_numbers, id, true);
+                }
+
+                if (email_addresses != null) {
+                    GEmailAddress.replaceAll(email_addresses, id, true);
+                }
+
+                if (contact_assignments != null) {
+                    Set<Long> orgIds = new HashSet<Long>();
+                    for (GContactAssignment assignment : contact_assignments) {
+                        orgIds.add(assignment.organization_id);
+                    }
+                    orgIds.add(Session.getInstance().getOrganizationId());
+
+                    List<Long> keys = session.getContactAssignmentDao().queryBuilder().where(ContactAssignmentDao.Properties.Assigned_to_id.eq(id), ContactAssignmentDao.Properties.Organization_id.in(orgIds)).listKeys();
+                    for (Long key : keys) {
+                        session.getContactAssignmentDao().deleteByKey(key);
+                    }
+
+                    for (final GContactAssignment assignment : contact_assignments) {
+                        assignment.save(true);
+                    }
+                }
+
+                if (assigned_tos != null) {
+                    Set<Long> orgIds = new HashSet<Long>();
+                    for (GContactAssignment assignment : assigned_tos) {
+                        orgIds.add(assignment.organization_id);
+                    }
+                    orgIds.add(Session.getInstance().getOrganizationId());
+
+                    List<Long> keys = session.getContactAssignmentDao().queryBuilder().where(ContactAssignmentDao.Properties.Person_id.eq(id), ContactAssignmentDao.Properties.Organization_id.in(orgIds)).listKeys();
+                    for (Long key : keys) {
+                        session.getContactAssignmentDao().deleteByKey(key);
+                    }
+
+                    for (final GContactAssignment assignment : assigned_tos) {
+                        assignment.save(true);
+                    }
+                }
+
+                if (answer_sheets != null) {
+                    final List<AnswerSheet> oldSheets = Application.getDb().getAnswerSheetDao().queryBuilder().where(AnswerSheetDao.Properties.Person_id.eq(id)).list();
+                    for (final AnswerSheet oldSheet : oldSheets) {
+                        oldSheet.deleteWithRelations();
+                    }
+                    for (final GAnswerSheet sheet : answer_sheets) {
+                        sheet.save(id, true);
+                    }
+                }
+
+                if (all_organizational_permissions != null) {
+                    final List<Long> oldKeys = Application.getDb().getOrganizationalPermissionDao().queryBuilder().where(OrganizationalPermissionDao.Properties.Person_id.eq(id)).listKeys();
+                    for (long key : oldKeys) {
+                        Application.getDb().getOrganizationalPermissionDao().deleteByKey(key);
+                    }
+                    for (GOrganizationalPermission perm : all_organizational_permissions) {
+                        perm.save(true);
+                    }
+                }
+
+                if (all_organization_and_children != null) {
+                    for (GOrganization organization : all_organization_and_children) {
+                        organization.save(true);
+                    }
+                }
+
+                if (interactions != null) {
+                    GInteraction.replaceAll(interactions, id, true);
+                }
+
+                if (organizational_labels != null) {
+                    GOrganizationalLabel.replaceAll(organizational_labels, id, true);
+                }
+
+                if (addresses != null) {
+                    GAddress.replaceAll(addresses, id, true);
+                }
+
+                if (user != null) {
+                    user.save(id, true);
+                }
+
+                if (organizational_permission != null) {
+                    GOrganizationalPermission.replace(organizational_permission, true);
+                }
+
+                return person;
             }
+
         };
         if (inTx) {
             return callable.call();

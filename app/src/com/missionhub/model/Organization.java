@@ -277,20 +277,22 @@ public class Organization implements com.missionhub.model.TimestampedEntity {
     }
 
     // KEEP METHODS - put your custom methods here
-    public synchronized void refreshAll() {
+    public void refreshAll() {
         refresh();
         resetLabelList();
         resetInteractionList();
         resetInteractionTypeList();
         resetSurveys();
         resetKeywords();
-        mAllInteractionTypes = null;
-        mAllLabels = null;
-        mSubOrganizations = null;
-        mAllSubOrganizations = null;
-        mParent = null;
-        mUsersAdmins = null;
-        mAllUsersAdmins = null;
+        synchronized (this) {
+            mAllInteractionTypes = null;
+            mAllLabels = null;
+            mSubOrganizations = null;
+            mAllSubOrganizations = null;
+            mParent = null;
+            mUsersAdmins = null;
+            mAllUsersAdmins = null;
+        }
     }
 
     public List<Organization> getSubOrganizations() {
@@ -298,11 +300,14 @@ public class Organization implements com.missionhub.model.TimestampedEntity {
             if (myDao == null) {
                 throw new DaoException("Entity is detached from DAO context");
             }
+
+            List<Organization> subOrgs = myDao.queryBuilder() //
+                    .where(OrganizationDao.Properties.Status.eq("active")) //
+                    .whereOr(OrganizationDao.Properties.Ancestry.eq(getId()), OrganizationDao.Properties.Ancestry.eq(getAncestry() + "/" + getId())) //
+                    .orderAsc(OrganizationDao.Properties.Name).list();
+
             synchronized (this) {
-                mSubOrganizations = myDao.queryBuilder() //
-                        .where(OrganizationDao.Properties.Status.eq("active")) //
-                        .whereOr(OrganizationDao.Properties.Ancestry.eq(getId()), OrganizationDao.Properties.Ancestry.eq(getAncestry() + "/" + getId())) //
-                        .orderAsc(OrganizationDao.Properties.Name).list();
+                mSubOrganizations = subOrgs;
             }
         }
         return mSubOrganizations;
@@ -310,7 +315,6 @@ public class Organization implements com.missionhub.model.TimestampedEntity {
 
     public List<Organization> getAllSubOrganizations() {
         if (mAllSubOrganizations == null) {
-            synchronized (this) {
                 List<Organization> orgs = myDao.queryBuilder() //
                         .where(OrganizationDao.Properties.Status.eq("active")) //
                         .whereOr(
@@ -328,6 +332,7 @@ public class Organization implements com.missionhub.model.TimestampedEntity {
                     }
                     filteredOrgs.add(org);
                 }
+                synchronized (this) {
                 mAllSubOrganizations = filteredOrgs;
             }
         }
@@ -339,8 +344,10 @@ public class Organization implements com.missionhub.model.TimestampedEntity {
             throw new DaoException("Entity is detached from DAO context");
         }
         if (mAllLabels == null) {
+            List<Label> labels = daoSession.getLabelDao().queryBuilder().where(LabelDao.Properties.Organization_id.in(0, getId())).list();
+
             synchronized (this) {
-                mAllLabels = SortUtils.sortLabels(daoSession.getLabelDao().queryBuilder().where(LabelDao.Properties.Organization_id.in(0, getId())).list(), true);
+                mAllLabels = SortUtils.sortLabels(labels, true);
             }
         }
         return mAllLabels;
@@ -351,8 +358,10 @@ public class Organization implements com.missionhub.model.TimestampedEntity {
             throw new DaoException("Entity is detached from DAO context");
         }
         if (mAllInteractionTypes == null) {
+            List<InteractionType> types = daoSession.getInteractionTypeDao().queryBuilder().where(InteractionTypeDao.Properties.Organization_id.in(0, getId())).list();
+
             synchronized (this) {
-                mAllInteractionTypes = SortUtils.sortInteractionTypes(daoSession.getInteractionTypeDao().queryBuilder().where(InteractionTypeDao.Properties.Organization_id.in(0, getId())).list(), true);
+                mAllInteractionTypes = SortUtils.sortInteractionTypes(types, true);
             }
         }
         return mAllInteractionTypes;
@@ -363,11 +372,12 @@ public class Organization implements com.missionhub.model.TimestampedEntity {
             if (myDao == null) {
                 throw new DaoException("Entity is detached from DAO context");
             }
-            synchronized (this) {
-                if (StringUtils.isNotEmpty(getAncestry())) {
-                    List<String> ancestors = Arrays.asList(getAncestry().trim().split("/"));
-                    long organizationId = Long.parseLong(ancestors.get(ancestors.size() - 1).trim());
-                    mParent = myDao.load(organizationId);
+            if (StringUtils.isNotEmpty(getAncestry())) {
+                List<String> ancestors = Arrays.asList(getAncestry().trim().split("/"));
+                long organizationId = Long.parseLong(ancestors.get(ancestors.size() - 1).trim());
+                Organization organization = myDao.load(organizationId);
+                synchronized (this) {
+                    mParent = organization;
                 }
             }
         }
@@ -380,16 +390,16 @@ public class Organization implements com.missionhub.model.TimestampedEntity {
                 throw new DaoException("Entity is detached from DAO context");
             }
             HashSet<Person> people = new HashSet<Person>();
+            final List<OrganizationalPermission> permissions = daoSession.getOrganizationalPermissionDao().queryBuilder().where(OrganizationalPermissionDao.Properties.Organization_id.eq(getId()), OrganizationalPermissionDao.Properties.Permission_id.in(Permission.ADMIN, Permission.USER)).list();
+            for (OrganizationalPermission permission : permissions) {
+                if (permission != null && permission.getPerson() != null) {
+                    people.add(permission.getPerson());
+                }
+            }
+            if (Session.getInstance().getPerson().isAdminOrUser(getId())) {
+                people.add(Session.getInstance().getPerson());
+            }
             synchronized (this) {
-                final List<OrganizationalPermission> permissions = daoSession.getOrganizationalPermissionDao().queryBuilder().where(OrganizationalPermissionDao.Properties.Organization_id.eq(getId()), OrganizationalPermissionDao.Properties.Permission_id.in(Permission.ADMIN, Permission.USER)).list();
-                for (OrganizationalPermission permission : permissions) {
-                    if (permission != null && permission.getPerson() != null) {
-                        people.add(permission.getPerson());
-                    }
-                }
-                if (Session.getInstance().getPerson().isAdminOrUser(getId())) {
-                    people.add(Session.getInstance().getPerson());
-                }
                 mUsersAdmins = SortUtils.sortPeople(people, true);
             }
         }
@@ -402,7 +412,7 @@ public class Organization implements com.missionhub.model.TimestampedEntity {
                 throw new DaoException("Entity is detached from DAO context");
             }
             HashSet<Person> people = new HashSet<Person>();
-            synchronized (this) {
+
                 Organization current = this;
                 while (true) {
                     final List<OrganizationalPermission> permissions = daoSession.getOrganizationalPermissionDao().queryBuilder().where(OrganizationalPermissionDao.Properties.Organization_id.eq(current.getId()), OrganizationalPermissionDao.Properties.Permission_id.in(Permission.ADMIN, Permission.USER)).list();
@@ -417,6 +427,7 @@ public class Organization implements com.missionhub.model.TimestampedEntity {
                         break;
                     }
                 }
+            synchronized (this) {
                 mAllUsersAdmins = SortUtils.sortPeople(people, true);
             }
         }

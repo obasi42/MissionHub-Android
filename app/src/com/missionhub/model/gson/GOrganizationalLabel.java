@@ -27,8 +27,6 @@ public class GOrganizationalLabel {
 
     public GLabel label;
 
-    public static final Object lock = new Object();
-
     /**
      * Saves an organizational role to the SQLite database.
      *
@@ -40,38 +38,37 @@ public class GOrganizationalLabel {
         final Callable<OrganizationalLabel> callable = new Callable<OrganizationalLabel>() {
             @Override
             public OrganizationalLabel call() throws Exception {
-                synchronized (lock) {
-                    // wrapped label
-                    if (organizational_label != null) {
-                        organizational_label.save(true);
-                    }
-
-                    final OrganizationalLabelDao dao = Application.getDb().getOrganizationalLabelDao();
-
-                    if (removed_date != null) {
-                        dao.deleteByKey(id);
-                        return null;
-                    }
-
-                    final OrganizationalLabel orglabel = new OrganizationalLabel();
-                    orglabel.setId(id);
-                    orglabel.setPerson_id(person_id);
-                    orglabel.setOrganization_id(organization_id);
-                    orglabel.setAdded_by_id(added_by_id);
-                    orglabel.setLabel_id(label_id);
-                    orglabel.setStart_date(start_date);
-                    orglabel.setCreated_at(created_at);
-                    orglabel.setUpdated_at(updated_at);
-
-                    if (label != null) {
-                        label.save(true);
-                    }
-
-                    dao.insertOrReplace(orglabel);
-
-                    return orglabel;
+                // wrapped label
+                if (organizational_label != null) {
+                    organizational_label.save(true);
                 }
+
+                final OrganizationalLabelDao dao = Application.getDb().getOrganizationalLabelDao();
+
+                if (removed_date != null) {
+                    dao.deleteByKey(id);
+                    return null;
+                }
+
+                final OrganizationalLabel orglabel = new OrganizationalLabel();
+                orglabel.setId(id);
+                orglabel.setPerson_id(person_id);
+                orglabel.setOrganization_id(organization_id);
+                orglabel.setAdded_by_id(added_by_id);
+                orglabel.setLabel_id(label_id);
+                orglabel.setStart_date(start_date);
+                orglabel.setCreated_at(created_at);
+                orglabel.setUpdated_at(updated_at);
+
+                if (label != null) {
+                    label.save(true);
+                }
+
+                dao.insertOrReplace(orglabel);
+
+                return orglabel;
             }
+
         };
         if (inTx) {
             return callable.call();
@@ -84,30 +81,29 @@ public class GOrganizationalLabel {
         final Callable<List<OrganizationalLabel>> callable = new Callable<List<OrganizationalLabel>>() {
             @Override
             public List<OrganizationalLabel> call() throws Exception {
-                synchronized (lock) {
-                    final OrganizationalLabelDao dao = Application.getDb().getOrganizationalLabelDao();
+                final OrganizationalLabelDao dao = Application.getDb().getOrganizationalLabelDao();
 
 
-                    Set<Long> orgIds = new HashSet<Long>();
-                    for (GOrganizationalLabel label : labels) {
-                        orgIds.add(label.organization_id);
-                    }
-                    orgIds.add(Session.getInstance().getOrganizationId());
-                    List<Long> oldIds = dao.queryBuilder().where(OrganizationalLabelDao.Properties.Organization_id.in(orgIds), OrganizationalLabelDao.Properties.Person_id.eq(personId)).listKeys();
-                    for (Long id : oldIds) {
-                        dao.deleteByKey(id);
-                    }
-
-                    final List<OrganizationalLabel> lbls = new ArrayList<OrganizationalLabel>();
-                    for (final GOrganizationalLabel glabel : labels) {
-                        final OrganizationalLabel label = glabel.save(true);
-                        if (label != null) {
-                            lbls.add(label);
-                        }
-                    }
-                    return lbls;
+                Set<Long> orgIds = new HashSet<Long>();
+                for (GOrganizationalLabel label : labels) {
+                    orgIds.add(label.organization_id);
                 }
+                orgIds.add(Session.getInstance().getOrganizationId());
+                List<Long> oldIds = dao.queryBuilder().where(OrganizationalLabelDao.Properties.Organization_id.in(orgIds), OrganizationalLabelDao.Properties.Person_id.eq(personId)).listKeys();
+                for (Long id : oldIds) {
+                    dao.deleteByKey(id);
+                }
+
+                final List<OrganizationalLabel> lbls = new ArrayList<OrganizationalLabel>();
+                for (final GOrganizationalLabel glabel : labels) {
+                    final OrganizationalLabel label = glabel.save(true);
+                    if (label != null) {
+                        lbls.add(label);
+                    }
+                }
+                return lbls;
             }
+
         };
         if (inTx) {
             return callable.call();

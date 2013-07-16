@@ -91,7 +91,7 @@ public class Session implements OnAccountsUpdateListener {
     /**
      * @return the singleton instance of the session
      */
-    public synchronized static Session getInstance() {
+    public static Session getInstance() {
         if (sSession == null) {
             sSession = new Session();
         }
@@ -120,7 +120,7 @@ public class Session implements OnAccountsUpdateListener {
         return findAccount(mPersonId, 0);
     }
 
-    public synchronized void open() {
+    public void open() {
         long lastPersonId = SettingsManager.getSessionLastPersonId();
         if (lastPersonId > 0) {
             open(findAccount(lastPersonId, 0));
@@ -149,7 +149,7 @@ public class Session implements OnAccountsUpdateListener {
         return -1;
     }
 
-    public synchronized void open(final Account account) {
+    public  void open(final Account account) {
         if (mOpenTask != null) return;
 
         mOpenTask = new SafeAsyncTask<Void>() {
@@ -258,7 +258,7 @@ public class Session implements OnAccountsUpdateListener {
     /**
      * Closes the session
      */
-    public synchronized void close() {
+    public void close() {
         if (mCloseTask != null) return;
 
         mCloseTask = new SafeAsyncTask<Void>() {
@@ -360,7 +360,7 @@ public class Session implements OnAccountsUpdateListener {
      *
      * @return
      */
-    public synchronized Long getPersonId() {
+    public Long getPersonId() {
         return mPersonId;
     }
 
@@ -369,14 +369,14 @@ public class Session implements OnAccountsUpdateListener {
      *
      * @return
      */
-    public synchronized long getOrganizationId() {
+    public long getOrganizationId() {
         if (mOrganizationId <= 0) {
             return getPrimaryOrganizationId();
         }
         return mOrganizationId;
     }
 
-    public synchronized Organization getOrganization() {
+    public Organization getOrganization() {
         return Application.getDb().getOrganizationDao().load(getOrganizationId());
     }
 
@@ -386,21 +386,21 @@ public class Session implements OnAccountsUpdateListener {
      *
      * @param organizationId
      */
-    public synchronized void setOrganizationId(final long organizationId, boolean async) throws Exception {
+    public void setOrganizationId(final long organizationId, boolean async) throws Exception {
         if (organizationId != getOrganizationId()) {
+
             if (getPerson().isAdminOrUser(organizationId)) {
-                mOrganizationId = organizationId;
+               mOrganizationId = organizationId;
             } else {
                 Application.showToast(R.string.session_no_longer_admin_or_user, Toast.LENGTH_LONG);
                 mOrganizationId = getPrimaryOrganizationId();
             }
-            SettingsManager.setSessionOrganizationId(getPersonId(), mOrganizationId);
-            Application.postEvent(new OnOrganizationChangedEvent(mOrganizationId));
-
             FutureTask<Void> future = updateCurrentOrganization(true);
             if (!async) {
                 future.get();
             }
+            SettingsManager.setSessionOrganizationId(getPersonId(), mOrganizationId);
+            Application.postEvent(new OnOrganizationChangedEvent(mOrganizationId));
         }
     }
 
@@ -409,7 +409,7 @@ public class Session implements OnAccountsUpdateListener {
      *
      * @return
      */
-    public synchronized long getPrimaryOrganizationId() {
+    public long getPrimaryOrganizationId() {
         try {
             return Application.getDb().getUserDao().queryBuilder().where(UserDao.Properties.Person_id.eq(mPersonId)).unique().getPrimary_organization_id();
         } catch (final Exception e) {
@@ -425,7 +425,7 @@ public class Session implements OnAccountsUpdateListener {
      *
      * @return
      */
-    public synchronized String getAccessToken() throws AuthenticatorException, OperationCanceledException, IOException {
+    public String getAccessToken() throws AuthenticatorException, OperationCanceledException, IOException {
         return mAccountManager.blockingGetAuthToken(mAccount, Authenticator.ACCOUNT_TYPE, true);
     }
 

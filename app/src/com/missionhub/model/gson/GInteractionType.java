@@ -10,8 +10,6 @@ import java.util.concurrent.Callable;
 
 public class GInteractionType {
 
-    public static final Object lock = new Object();
-
     public GInteractionType interaction_type;
 
     public long id;
@@ -33,28 +31,25 @@ public class GInteractionType {
         final Callable<InteractionType> callable = new Callable<InteractionType>() {
             @Override
             public InteractionType call() throws Exception {
-                synchronized (lock) {
-
-                    // wrapped type
-                    if (interaction_type != null) {
-                        interaction_type.save(true);
-                    }
-
-                    final InteractionTypeDao dao = Application.getDb().getInteractionTypeDao();
-
-                    final InteractionType type = new InteractionType();
-                    type.setId(id);
-                    type.setOrganization_id(organization_id);
-                    type.setName(name);
-                    type.setI18n(i18n);
-                    type.setIcon(icon);
-                    type.setCreated_at(created_at);
-                    type.setUpdated_at(updated_at);
-
-                    dao.insertOrReplace(type);
-
-                    return type;
+                // wrapped type
+                if (interaction_type != null) {
+                    interaction_type.save(true);
                 }
+
+                final InteractionTypeDao dao = Application.getDb().getInteractionTypeDao();
+
+                final InteractionType type = new InteractionType();
+                type.setId(id);
+                type.setOrganization_id(organization_id);
+                type.setName(name);
+                type.setI18n(i18n);
+                type.setIcon(icon);
+                type.setCreated_at(created_at);
+                type.setUpdated_at(updated_at);
+
+                dao.insertOrReplace(type);
+
+                return type;
             }
         };
         if (inTx) {
@@ -72,26 +67,24 @@ public class GInteractionType {
         final Callable<List<InteractionType>> callable = new Callable<List<InteractionType>>() {
             @Override
             public List<InteractionType> call() throws Exception {
-                synchronized (lock) {
-                    final InteractionTypeDao dao = Application.getDb().getInteractionTypeDao();
+                final InteractionTypeDao dao = Application.getDb().getInteractionTypeDao();
 
-                    // delete current types
-                    List<Long> keys = dao.queryBuilder().where(InteractionTypeDao.Properties.Organization_id.in(orgIds)).listKeys();
-                    for (Long key : keys) {
-                        dao.deleteByKey(key);
-                    }
-
-                    // save the new types
-                    final List<InteractionType> interactionTypes = new ArrayList<InteractionType>();
-                    for (final GInteractionType gType : types) {
-                        final InteractionType type = gType.save(true);
-                        if (type != null) {
-                            interactionTypes.add(type);
-                        }
-                    }
-
-                    return interactionTypes;
+                // delete current types
+                List<Long> keys = dao.queryBuilder().where(InteractionTypeDao.Properties.Organization_id.in(orgIds)).listKeys();
+                for (Long key : keys) {
+                    dao.deleteByKey(key);
                 }
+
+                // save the new types
+                final List<InteractionType> interactionTypes = new ArrayList<InteractionType>();
+                for (final GInteractionType gType : types) {
+                    final InteractionType type = gType.save(true);
+                    if (type != null) {
+                        interactionTypes.add(type);
+                    }
+                }
+
+                return interactionTypes;
             }
         };
         if (inTx) {

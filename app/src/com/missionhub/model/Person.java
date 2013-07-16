@@ -577,7 +577,6 @@ public class Person implements com.missionhub.model.TimestampedEntity {
     // KEEP METHODS - put your custom methods here
     public SetMultimap<Long, Long> getLabels() {
         if (mLabels == null) {
-            synchronized (this) {
                 final SetMultimap<Long, Long> labelsTemp = Multimaps.synchronizedSetMultimap(HashMultimap.<Long, Long>create());
                 resetOrganizationalLabelList();
                 try {
@@ -589,6 +588,7 @@ public class Person implements com.missionhub.model.TimestampedEntity {
                 } catch (final DaoException e) {
                     getLabels();
                 }
+            synchronized (this) {
                 mLabels = labelsTemp;
             }
         }
@@ -615,7 +615,6 @@ public class Person implements com.missionhub.model.TimestampedEntity {
 
     public Map<Long, Long> getBasicPermissions() {
         if (mPermissions == null) {
-            synchronized (this) {
                 resetOrganizationalPermissionList();
 
                 final Map<Long, Long> temp = Collections.synchronizedMap(new HashMap<Long, Long>());
@@ -625,6 +624,7 @@ public class Person implements com.missionhub.model.TimestampedEntity {
                     permission.refresh();
                     temp.put(permission.getOrganization_id(), permission.getPermission_id());
                 }
+                synchronized (this) {
                 mPermissions = temp;
             }
         }
@@ -816,22 +816,21 @@ public class Person implements com.missionhub.model.TimestampedEntity {
      */
     public TreeDataStructure<Long> getOrganizationHierarchy() {
         if (mOrganizationHierarchy == null) {
-            synchronized (this) {
-                if (daoSession == null) {
-                    throw new DaoException("Entity is detached from DAO context");
-                }
+            if (daoSession == null) {
+                throw new DaoException("Entity is detached from DAO context");
+            }
 
-                // build a tree from organization ancestry
-                final TreeDataStructure<Long> tree = new TreeDataStructure<Long>(0l);
+            // build a tree from organization ancestry
+            final TreeDataStructure<Long> tree = new TreeDataStructure<Long>(0l);
 
-                final List<Organization> organizations = Application.getDb()
-                        .getOrganizationDao()
-                        .queryBuilder()
-                        .where(new WhereCondition.StringCondition(OrganizationDao.Properties.Id.columnName + " IN " + "(SELECT " + OrganizationalPermissionDao.TABLENAME + "."
-                                + OrganizationalPermissionDao.Properties.Organization_id.columnName + " FROM " + OrganizationalPermissionDao.TABLENAME + " WHERE " + OrganizationalPermissionDao.TABLENAME + "."
-                                + OrganizationalPermissionDao.Properties.Person_id.columnName + " = " + getId() + " AND " + OrganizationalPermissionDao.TABLENAME + "."
-                                + OrganizationalPermissionDao.Properties.Permission_id.columnName + " IN (" + Permission.ADMIN + "," + Permission.USER + ")" + ")")).orderAsc(OrganizationDao.Properties.Name).build()
-                        .list();
+            final List<Organization> organizations = Application.getDb()
+                    .getOrganizationDao()
+                    .queryBuilder()
+                    .where(new WhereCondition.StringCondition(OrganizationDao.Properties.Id.columnName + " IN " + "(SELECT " + OrganizationalPermissionDao.TABLENAME + "."
+                            + OrganizationalPermissionDao.Properties.Organization_id.columnName + " FROM " + OrganizationalPermissionDao.TABLENAME + " WHERE " + OrganizationalPermissionDao.TABLENAME + "."
+                            + OrganizationalPermissionDao.Properties.Person_id.columnName + " = " + getId() + " AND " + OrganizationalPermissionDao.TABLENAME + "."
+                            + OrganizationalPermissionDao.Properties.Permission_id.columnName + " IN (" + Permission.ADMIN + "," + Permission.USER + ")" + ")")).orderAsc(OrganizationDao.Properties.Name).build()
+                    .list();
 
                 for (final Organization organization : organizations) {
                     recursiveBuildOrganizationHierarchy(tree, organization);
@@ -842,6 +841,7 @@ public class Person implements com.missionhub.model.TimestampedEntity {
                         }
                     }
                 }
+                synchronized (this) {
 
                 mOrganizationHierarchy = tree;
             }
@@ -877,7 +877,7 @@ public class Person implements com.missionhub.model.TimestampedEntity {
     /**
      * @return the person's full first and last name
      */
-    public synchronized String getName() {
+    public String getName() {
         String name = "";
         if (StringUtils.isNotEmpty(getFirst_name())) {
             name += getFirst_name();
@@ -888,14 +888,14 @@ public class Person implements com.missionhub.model.TimestampedEntity {
         return name.trim();
     }
 
-    public synchronized Address getCurrentAddress() {
+    public Address getCurrentAddress() {
         for (final Address address : getAddressList()) {
             return address;
         }
         return null;
     }
 
-    public synchronized void deleteWithRelations() {
+    public void deleteWithRelations() {
         if (daoSession == null) {
             throw new DaoException("Entity is detached from DAO context");
         }
@@ -912,7 +912,7 @@ public class Person implements com.missionhub.model.TimestampedEntity {
         delete();
     }
 
-    public synchronized GPerson getGModel() {
+    public GPerson getGModel() {
         final GPerson p = new GPerson();
 
         p.id = getId();
@@ -948,13 +948,15 @@ public class Person implements com.missionhub.model.TimestampedEntity {
         mStatuses = null;
     }
 
-    public synchronized FollowupStatus getStatus() {
+    public FollowupStatus getStatus() {
         return getStatus(Session.getInstance().getOrganizationId());
     }
 
-    public synchronized FollowupStatus getStatus(final long organizationId) {
-        if (mStatuses == null) {
-            mStatuses = new HashMap<Long, FollowupStatus>();
+    public FollowupStatus getStatus(final long organizationId) {
+        synchronized (this) {
+            if (mStatuses == null) {
+                mStatuses = new HashMap<Long, FollowupStatus>();
+            }
         }
 
         if (mStatuses.get(organizationId) == null) {
@@ -965,21 +967,26 @@ public class Person implements com.missionhub.model.TimestampedEntity {
             OrganizationalPermission permission = daoSession.getOrganizationalPermissionDao().queryBuilder().where(OrganizationalPermissionDao.Properties.Organization_id.eq(organizationId),
                     OrganizationalPermissionDao.Properties.Person_id.eq(id)).limit(1).unique();
 
-            if (permission != null) {
-                mStatuses.put(organizationId, FollowupStatus.parse(permission.getFollowup_status()));
+            synchronized (this) {
+                if (permission != null) {
+                    mStatuses.put(organizationId, FollowupStatus.parse(permission.getFollowup_status()));
+                }
             }
         }
         return mStatuses.get(organizationId);
     }
 
-    public synchronized PhoneNumber getPrimaryPhoneNumber() {
+    public PhoneNumber getPrimaryPhoneNumber() {
         if (mPrimaryPhoneNumber != null) return mPrimaryPhoneNumber;
 
         if (daoSession == null) {
             throw new DaoException("Entity is detached from DAO context");
         }
 
-        mPrimaryPhoneNumber = daoSession.getPhoneNumberDao().queryBuilder().where(PhoneNumberDao.Properties.Person_id.eq(getId()), PhoneNumberDao.Properties.Primary.eq(true)).limit(1).unique();
+        PhoneNumber number = daoSession.getPhoneNumberDao().queryBuilder().where(PhoneNumberDao.Properties.Person_id.eq(getId()), PhoneNumberDao.Properties.Primary.eq(true)).limit(1).unique();
+        synchronized (this) {
+            mPrimaryPhoneNumber = number;
+        }
         return mPrimaryPhoneNumber;
     }
 
@@ -987,14 +994,17 @@ public class Person implements com.missionhub.model.TimestampedEntity {
         mPrimaryPhoneNumber = null;
     }
 
-    public synchronized EmailAddress getPrimaryEmailAddress() {
+    public EmailAddress getPrimaryEmailAddress() {
         if (mPrimaryEmailAddress != null) return mPrimaryEmailAddress;
 
         if (daoSession == null) {
             throw new DaoException("Entity is detached from DAO context");
         }
 
-        mPrimaryEmailAddress = daoSession.getEmailAddressDao().queryBuilder().where(EmailAddressDao.Properties.Person_id.eq(getId()), EmailAddressDao.Properties.Primary.eq(true)).limit(1).unique();
+        EmailAddress address = daoSession.getEmailAddressDao().queryBuilder().where(EmailAddressDao.Properties.Person_id.eq(getId()), EmailAddressDao.Properties.Primary.eq(true)).limit(1).unique();
+        synchronized (this) {
+            mPrimaryEmailAddress = address;
+        }
         return mPrimaryEmailAddress;
     }
 
@@ -1002,24 +1012,29 @@ public class Person implements com.missionhub.model.TimestampedEntity {
         mPrimaryEmailAddress = null;
     }
 
-    public synchronized ContactAssignment getContactAssignment() {
+    public ContactAssignment getContactAssignment() {
         return getContactAssignment(Session.getInstance().getOrganizationId());
     }
 
-    public synchronized ContactAssignment getContactAssignment(final long organizationId) {
-        if (mContactAssignments == null) {
-            mContactAssignments = new HashMap<Long, ContactAssignment>();
+    public ContactAssignment getContactAssignment(final long organizationId) {
+        synchronized (this) {
+            if (mContactAssignments == null) {
+                mContactAssignments = new HashMap<Long, ContactAssignment>();
+            }
         }
 
         if (mContactAssignments.get(organizationId) == null) {
             if (daoSession == null) {
                 throw new DaoException("Entity is detached from DAO context");
             }
-            mContactAssignments.put(
-                    organizationId,
-                    Application.getDb().getContactAssignmentDao().queryBuilder()
-                            .where(ContactAssignmentDao.Properties.Person_id.eq(getId()), ContactAssignmentDao.Properties.Organization_id.eq(Session.getInstance().getOrganizationId()))
-                            .orderDesc(ContactAssignmentDao.Properties.Updated_at).limit(1).unique());
+
+            ContactAssignment assignment = Application.getDb().getContactAssignmentDao().queryBuilder()
+                    .where(ContactAssignmentDao.Properties.Person_id.eq(getId()), ContactAssignmentDao.Properties.Organization_id.eq(Session.getInstance().getOrganizationId()))
+                    .orderDesc(ContactAssignmentDao.Properties.Updated_at).limit(1).unique();
+
+            synchronized (this) {
+                mContactAssignments.put(organizationId, assignment);
+            }
         }
         return mContactAssignments.get(organizationId);
     }
@@ -1028,7 +1043,7 @@ public class Person implements com.missionhub.model.TimestampedEntity {
         mContactAssignments = null;
     }
 
-    public synchronized Gender getGenderEnum() {
+    public Gender getGenderEnum() {
         if (StringUtils.isEmpty(getGender())) {
             return null;
         }
@@ -1039,7 +1054,7 @@ public class Person implements com.missionhub.model.TimestampedEntity {
         }
     }
 
-    public synchronized void refreshAll() {
+    public void refreshAll() {
         refresh();
 
         resetAddressList();

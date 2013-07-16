@@ -28,8 +28,6 @@ public class GOrganization {
     public GLabel[] labels;
     public GInteractionType[] interaction_types;
 
-    public static final Object lock = new Object();
-
     /**
      * Saves the organization to the SQLite database.
      *
@@ -41,78 +39,77 @@ public class GOrganization {
         final Callable<Organization> callable = new Callable<Organization>() {
             @Override
             public Organization call() throws Exception {
-                synchronized (lock) {
-                    // wrapped organization
-                    if (organization != null) {
-                        return organization.save(true);
-                    }
-
-                    boolean update = true;
-                    final OrganizationDao dao = Application.getDb().getOrganizationDao();
-
-                    Organization org = dao.load(id);
-                    if (org == null) {
-                        org = new Organization();
-                        update = false;
-                    }
-                    org.setId(id);
-                    org.setName(name);
-                    org.setTerminology(terminology);
-                    org.setAncestry(ancestry);
-                    org.setShow_sub_orgs(show_sub_orgs);
-                    org.setStatus(status);
-                    org.setCreated_at(created_at);
-                    org.setUpdated_at(updated_at);
-
-                    if (update) {
-                        dao.update(org);
-                    } else {
-                        dao.insert(org);
-                    }
-
-                    if (contacts != null) {
-                        for (final GPerson person : contacts) {
-                            person.save(true);
-                        }
-                    }
-
-                    if (admins != null) {
-                        for (final GPerson person : admins) {
-                            person.save(true);
-                        }
-                    }
-
-                    if (users != null) {
-                        for (final GPerson person : users) {
-                            person.save(true);
-                        }
-                    }
-
-                    if (people != null) {
-                        for (final GPerson person : people) {
-                            person.save(true);
-                        }
-                    }
-
-                    if (surveys != null) {
-                        GSurvey.replaceAll(surveys, id, true);
-                    }
-
-                    if (keywords != null) {
-                        GSmsKeyword.replaceAll(keywords, id, true);
-                    }
-
-                    if (labels != null) {
-                        GLabel.replaceAll(labels, id, true);
-                    }
-
-                    if (interaction_types != null) {
-                        GInteractionType.replaceAll(interaction_types, true);
-                    }
-
-                    return org;
+                // wrapped organization
+                if (organization != null) {
+                    return organization.save(true);
                 }
+
+                boolean update = true;
+                final OrganizationDao dao = Application.getDb().getOrganizationDao();
+
+                Organization org = dao.load(id);
+                if (org == null) {
+                    org = new Organization();
+                    update = false;
+                }
+                org.setId(id);
+                org.setName(name);
+                org.setTerminology(terminology);
+                org.setAncestry(ancestry);
+                org.setShow_sub_orgs(show_sub_orgs);
+                org.setStatus(status);
+                org.setCreated_at(created_at);
+                org.setUpdated_at(updated_at);
+
+                if (update) {
+                    dao.update(org);
+                } else {
+                    dao.insert(org);
+                }
+
+                if (contacts != null) {
+                    for (final GPerson person : contacts) {
+                        person.save(true);
+                    }
+                }
+
+                if (admins != null) {
+                    for (final GPerson person : admins) {
+                        person.save(true);
+                    }
+                }
+
+                if (users != null) {
+                    for (final GPerson person : users) {
+                        person.save(true);
+                    }
+                }
+
+                if (people != null) {
+                    for (final GPerson person : people) {
+                        person.save(true);
+                    }
+                }
+
+                if (surveys != null) {
+                    GSurvey.replaceAll(surveys, id, true);
+                }
+
+                if (keywords != null) {
+                    GSmsKeyword.replaceAll(keywords, id, true);
+                }
+
+                if (labels != null) {
+                    GLabel.replaceAll(labels, id, true);
+                }
+
+                if (interaction_types != null) {
+                    GInteractionType.replaceAll(interaction_types, true);
+                }
+
+                return org;
             }
+
         };
         if (inTx) {
             return callable.call();
