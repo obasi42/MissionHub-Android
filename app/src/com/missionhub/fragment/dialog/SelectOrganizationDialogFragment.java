@@ -7,7 +7,6 @@ import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.missionhub.R;
 import com.missionhub.application.Application;
@@ -26,10 +25,10 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.holoeverywhere.app.AlertDialog;
 import org.holoeverywhere.app.Dialog;
-import org.holoeverywhere.widget.FrameLayout;
 import org.holoeverywhere.widget.TextView;
 import org.holoeverywhere.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -44,6 +43,7 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
     private SafeAsyncTask<Void> mTask;
     private OrganizationDrillDownItem mCurrentItem;
     private SafeAsyncTask<Void> mSetTask;
+    private SafeAsyncTask<List<DrillDownItem>> mBuildTask;
 
     public SelectOrganizationDialogFragment() {
     }
@@ -116,32 +116,58 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
         return builder;
     }
 
-    private synchronized void rebuildAdapter() {
+    private void rebuildAdapter() {
         if (isDetached() || isRemoving()) return;
 
-        mAdapter.setNotifyOnChange(false);
-        mAdapter.clear();
+        try {
+            mBuildTask.cancel(true);
+        } catch (Exception e) { /* ignore */ }
 
-        List<Long> favorites = getPrivilegedFavorites();
-        if (favorites.size() > 0) {
-            DrillDownItem favoritesHeader = new HeaderDrillDownItem(getString(R.string.select_organization_favorites));
-            mAdapter.addRootItem(favoritesHeader);
+        mBuildTask = new SafeAsyncTask<List<DrillDownItem>> () {
 
-            for (Long favorite : favorites) {
-                Organization org = Application.getDb().getOrganizationDao().load(favorite);
-                if (org != null) {
-                    mAdapter.addRootItem(new OrganizationDrillDownItem(org.getId(), org.getName(), null));
+            @Override
+            public List<DrillDownItem> call() throws Exception {
+                List<DrillDownItem> roots = new ArrayList<DrillDownItem>();
+
+                List<Long> favorites = getPrivilegedFavorites();
+                if (favorites.size() > 0) {
+                    DrillDownItem favoritesHeader = new HeaderDrillDownItem(getString(R.string.select_organization_favorites));
+                    roots.add(favoritesHeader);
+
+                    for (Long favorite : favorites) {
+                        Organization org = Application.getDb().getOrganizationDao().load(favorite);
+                        if (org != null) {
+                            roots.add(new OrganizationDrillDownItem(org.getId(), org.getName(), null));
+                        }
+                    }
+                    DrillDownItem favoritesDivider = new HeaderDrillDownItem(getString(R.string.select_organization_all_organizations));
+                    roots.add(favoritesDivider);
                 }
+
+                mCurrentItem = null;
+
+                rebuildAdapterR(roots, Session.getInstance().getPerson().getOrganizationHierarchy(), null);
+
+                return roots;
             }
-            DrillDownItem favoritesDivider = new HeaderDrillDownItem(getString(R.string.select_organization_all_organizations));
-            mAdapter.addRootItem(favoritesDivider);
-        }
 
-        mCurrentItem = null;
+            @Override
+            protected void onSuccess(List<DrillDownItem> roots) throws Exception {
+                mAdapter.setNotifyOnChange(false);
+                mAdapter.clear();
+                mAdapter.addRootItems(roots);
+                mAdapter.notifyDataSetChanged();
+                mAdapter.setCurrentItem(mCurrentItem);
+            }
 
-        rebuildAdapterR(Session.getInstance().getPerson().getOrganizationHierarchy(), null);
-
-        mAdapter.setCurrentItem(mCurrentItem);
+            @Override
+            protected void onFinally() throws RuntimeException {
+                mBuildTask = null;
+                updateUIState();
+            }
+        };
+        updateUIState();
+        mBuildTask.execute();
     }
 
     private List<Long> getPrivilegedFavorites() {
@@ -181,21 +207,21 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
         }
     }
 
-    private synchronized void rebuildAdapterR(final TreeDataStructure<Long> tree, final OrganizationDrillDownItem parent) {
+    private void rebuildAdapterR(List<DrillDownItem> roots, final TreeDataStructure<Long> tree, final OrganizationDrillDownItem parent) {
         for (final TreeDataStructure<Long> subTree : tree.getSubTrees()) {
             final long organizationId = subTree.getHead();
             final Organization org = Application.getDb().getOrganizationDao().load(organizationId);
             if (org != null) {
                 OrganizationDrillDownItem item = new OrganizationDrillDownItem(org.getId(), org.getName(), parent);
                 if (parent == null) {
-                    mAdapter.addRootItem(item);
+                    roots.add(item);
                 }
                 if (mAdapter.getCurrentItem() != null && mAdapter.getCurrentItem().getId() == item.getId()) {
                     mCurrentItem = item;
                 }
-                rebuildAdapterR(subTree, item);
+                rebuildAdapterR(roots, subTree, item);
             } else {
-                rebuildAdapterR(subTree, parent);
+                rebuildAdapterR(roots, subTree, parent);
             }
         }
     }
@@ -311,11 +337,13 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
 
     @Override
     public void onDestroy() {
-        Log.e("DESTROY", "ON DESTROY");
+        try {
+            mBuildTask.cancel(true);
+        } catch (Exception e) { /* ignore */ }
         try {
             mSetTask.cancel(true);
         } catch (Exception e) { /* ignore */ }
-        try{
+        try {
             mTask.cancel(true);
         } catch (Exception e) { /* ignore */ }
         super.onDestroy();
@@ -358,12 +386,18 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
     }
 
     private void updateUIState() {
-        if (mSetTask != null) {
+        if (mSetTask != null || mBuildTask != null) {
             mDrilldown.setVisibility(View.GONE);
             mAction.setVisibility(View.VISIBLE);
-            mActionText.setText("Loading organization...");
-            setButtonEnabled(Dialog.BUTTON_NEUTRAL, false);
             hideRefresh();
+
+            if (mSetTask != null) {
+                mActionText.setText("Loading organization...");
+                setButtonEnabled(Dialog.BUTTON_NEUTRAL, false);
+            } else {
+                mActionText.setText("Loading organizations...");
+                setButtonEnabled(Dialog.BUTTON_NEUTRAL, true);
+            }
         } else {
             mDrilldown.setVisibility(View.VISIBLE);
             mAction.setVisibility(View.GONE);

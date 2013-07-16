@@ -24,7 +24,6 @@ import com.missionhub.authenticator.AuthenticatorActivity;
 import com.missionhub.event.FacebookEvent;
 import com.missionhub.event.OnOrganizationChangedEvent;
 import com.missionhub.event.SessionEvent;
-import com.missionhub.exception.ExceptionHelper;
 import com.missionhub.model.Organization;
 import com.missionhub.model.Person;
 import com.missionhub.model.UserDao;
@@ -35,7 +34,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.holoeverywhere.widget.Toast;
 
 import java.io.IOException;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 
 public class Session implements OnAccountsUpdateListener {
@@ -149,7 +147,7 @@ public class Session implements OnAccountsUpdateListener {
         return -1;
     }
 
-    public  void open(final Account account) {
+    public void open(final Account account) {
         if (mOpenTask != null) return;
 
         mOpenTask = new SafeAsyncTask<Void>() {
@@ -390,7 +388,7 @@ public class Session implements OnAccountsUpdateListener {
         if (organizationId != getOrganizationId()) {
 
             if (getPerson().isAdminOrUser(organizationId)) {
-               mOrganizationId = organizationId;
+                mOrganizationId = organizationId;
             } else {
                 Application.showToast(R.string.session_no_longer_admin_or_user, Toast.LENGTH_LONG);
                 mOrganizationId = getPrimaryOrganizationId();
