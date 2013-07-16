@@ -1,6 +1,10 @@
 package com.missionhub.application;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.util.Log;
+
+import com.missionhub.authenticator.Authenticator;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
@@ -18,7 +22,7 @@ public class UpgradeManager {
     /* Dynamic Upgrade Methods */
     /*=========================*/
 
-    public boolean toV83() {
+    public boolean toV84() {
         // wipe everything from MH v1
         clearApplicationData();
         return true;
@@ -90,6 +94,17 @@ public class UpgradeManager {
                     deleteDir(new File(appDir, s));
                     Log.d(TAG, "Deleted " + appDir.getAbsolutePath() + "/" + s);
                 }
+            }
+        }
+        deleteAccounts();
+    }
+
+    private void deleteAccounts() {
+        AccountManager am = AccountManager.get(Application.getContext());
+        Account[] accounts = am.getAccountsByType(Authenticator.ACCOUNT_TYPE);
+        if (accounts != null) {
+            for(Account account : accounts) {
+                am.removeAccount(account, null, null);
             }
         }
     }
