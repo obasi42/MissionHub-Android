@@ -8,6 +8,8 @@ import java.util.concurrent.Callable;
 
 public class GContactAssignment {
 
+    GContactAssignment contact_assignment;
+
     public long id;
     public long person_id;
     public long assigned_to_id;
@@ -33,6 +35,12 @@ public class GContactAssignment {
             @Override
             public ContactAssignment call() throws Exception {
                 synchronized (lock) {
+
+                    // wrapped assignment
+                    if (contact_assignment != null) {
+                        return contact_assignment.save(true);
+                    }
+
                     final ContactAssignmentDao dao = Application.getDb().getContactAssignmentDao();
 
                     if (deleted_at != null) {

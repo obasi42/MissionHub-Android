@@ -279,6 +279,11 @@ public class Organization implements com.missionhub.model.TimestampedEntity {
     // KEEP METHODS - put your custom methods here
     public synchronized void refreshAll() {
         refresh();
+        resetLabelList();
+        resetInteractionList();
+        resetInteractionTypeList();
+        resetSurveys();
+        resetKeywords();
         mAllInteractionTypes = null;
         mAllLabels = null;
         mSubOrganizations = null;

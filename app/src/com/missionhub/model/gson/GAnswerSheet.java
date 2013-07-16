@@ -8,6 +8,8 @@ import java.util.concurrent.Callable;
 
 public class GAnswerSheet {
 
+    public GAnswerSheet answer_sheet;
+
     public long id;
     public long survey_id;
     public String created_at;
@@ -31,6 +33,12 @@ public class GAnswerSheet {
             @Override
             public AnswerSheet call() throws Exception {
                 synchronized (lock) {
+
+                    // wrapped sheet
+                    if (answer_sheet != null) {
+                        answer_sheet.save(personId, true);
+                    }
+
                     final AnswerSheetDao dao = Application.getDb().getAnswerSheetDao();
 
                     final AnswerSheet sheet = new AnswerSheet();

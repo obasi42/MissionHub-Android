@@ -11,6 +11,8 @@ import java.util.concurrent.Callable;
 
 public class GLabel {
 
+    public GLabel label;
+
     public long id;
     public long organization_id;
     public String name;
@@ -25,6 +27,12 @@ public class GLabel {
             @Override
             public Label call() throws Exception {
                 synchronized (lock) {
+
+                    // wrapped label
+                    if (label != null) {
+                        label.save(true);
+                    }
+
                     final LabelDao dao = Application.getDb().getLabelDao();
 
                     final Label label = new Label();

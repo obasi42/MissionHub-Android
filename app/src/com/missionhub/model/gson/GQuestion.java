@@ -8,6 +8,8 @@ import java.util.concurrent.Callable;
 
 public class GQuestion {
 
+    public GQuestion question;
+
     public long id;
     public String kind;
     public String style;
@@ -36,6 +38,11 @@ public class GQuestion {
             @Override
             public Question call() throws Exception {
                 synchronized (lock) {
+                    // wrapped question
+                    if (question != null) {
+                        question.save(true);
+                    }
+
                     final QuestionDao dao = Application.getDb().getQuestionDao();
 
                     final Question question = new Question();

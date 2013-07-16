@@ -10,6 +10,8 @@ import java.util.concurrent.Callable;
 
 public class GSurvey {
 
+    public GSurvey survey;
+
     public long id;
     public String title;
     public long organization_id;
@@ -38,6 +40,12 @@ public class GSurvey {
             @Override
             public Survey call() throws Exception {
                 synchronized (lock) {
+
+                    // wrapped survey
+                    if (survey != null) {
+                        return survey.save(true);
+                    }
+
                     final SurveyDao dao = Application.getDb().getSurveyDao();
 
                     final Survey survey = new Survey();

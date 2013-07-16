@@ -9,6 +9,8 @@ import java.util.concurrent.Callable;
 
 public class GOrganizationalPermission {
 
+    public GOrganizationalPermission organizational_permission;
+
     public long id;
     public long person_id;
     public long permission_id;
@@ -35,6 +37,12 @@ public class GOrganizationalPermission {
             @Override
             public OrganizationalPermission call() throws Exception {
                 synchronized (lock) {
+
+                    // wrapped permission
+                    if (organizational_permission != null) {
+                        organizational_permission.save(true);
+                    }
+
                     final OrganizationalPermissionDao dao = Application.getDb().getOrganizationalPermissionDao();
 
                     if (archive_date != null) {

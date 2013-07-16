@@ -10,6 +10,8 @@ import java.util.concurrent.Callable;
 
 public class GPhoneNumber {
 
+    public GPhoneNumber phone_number;
+
     public long id;
     public long person_id;
     public String number;
@@ -34,6 +36,12 @@ public class GPhoneNumber {
             @Override
             public PhoneNumber call() throws Exception {
                 synchronized (lock) {
+
+                    // wrapped number
+                    if (phone_number != null) {
+                        return phone_number.save(true);
+                    }
+
                     final PhoneNumberDao dao = Application.getDb().getPhoneNumberDao();
 
                     final PhoneNumber num = new PhoneNumber();

@@ -24,8 +24,10 @@ import com.missionhub.authenticator.AuthenticatorActivity;
 import com.missionhub.event.FacebookEvent;
 import com.missionhub.event.OnOrganizationChangedEvent;
 import com.missionhub.event.SessionEvent;
+import com.missionhub.exception.ExceptionHelper;
 import com.missionhub.model.Organization;
 import com.missionhub.model.Person;
+import com.missionhub.model.UserDao;
 import com.missionhub.util.SafeAsyncTask;
 
 import org.acra.ACRA;
@@ -33,6 +35,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.holoeverywhere.widget.Toast;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 
 public class Session implements OnAccountsUpdateListener {
@@ -383,7 +386,7 @@ public class Session implements OnAccountsUpdateListener {
      *
      * @param organizationId
      */
-    public synchronized void setOrganizationId(final long organizationId) {
+    public synchronized void setOrganizationId(final long organizationId, boolean async) throws Exception {
         if (organizationId != getOrganizationId()) {
             if (getPerson().isAdminOrUser(organizationId)) {
                 mOrganizationId = organizationId;
@@ -393,7 +396,11 @@ public class Session implements OnAccountsUpdateListener {
             }
             SettingsManager.setSessionOrganizationId(getPersonId(), mOrganizationId);
             Application.postEvent(new OnOrganizationChangedEvent(mOrganizationId));
-            updateCurrentOrganization(true);
+
+            FutureTask<Void> future = updateCurrentOrganization(true);
+            if (!async) {
+                future.get();
+            }
         }
     }
 
@@ -404,7 +411,7 @@ public class Session implements OnAccountsUpdateListener {
      */
     public synchronized long getPrimaryOrganizationId() {
         try {
-            return getPerson().getPrimaryOrganizationId();
+            return Application.getDb().getUserDao().queryBuilder().where(UserDao.Properties.Person_id.eq(mPersonId)).unique().getPrimary_organization_id();
         } catch (final Exception e) {
             Log.e(TAG, e.getMessage(), e);
             /* ignore */
@@ -504,21 +511,20 @@ public class Session implements OnAccountsUpdateListener {
 
             @Override
             public Void call() throws Exception {
-                final long organizationId = getOrganizationId();
+                long organizationId = getOrganizationId();
                 final long lastUpdated = SettingsManager.getInstance().getUserSetting(getPersonId(), "organization_" + organizationId + "_updated", 0l);
                 final long currentTime = System.currentTimeMillis() - 1000;
 
                 if (!Configuration.isSkipSessionUpdates() && (lastUpdated < System.currentTimeMillis() - mOneWeekMillis || force)) {
 
-                    Api.getOrganization(organizationId, ApiOptions.builder() //
-                            .include(Include.all_questions) //
-                                    //.include(Include.groups) //
-                            .include(Include.keywords) //
-                            .include(Include.users) //
-                            .include(Include.labels) //
-                            .include(Include.surveys) //
-                            .include(Include.organizational_permission) //
-                            .include(Include.interaction_types) //
+                    Api.getOrganization(organizationId, ApiOptions.builder()
+                            .include(Include.all_questions)
+                            .include(Include.keywords)
+                            .include(Include.users)
+                            .include(Include.labels)
+                            .include(Include.surveys)
+                            .include(Include.organizational_permission)
+                            .include(Include.interaction_types)
                             .build()).get();
 
                     getOrganization().refreshAll();

@@ -10,6 +10,8 @@ import java.util.concurrent.Callable;
 
 public class GEmailAddress {
 
+    public GEmailAddress email_address;
+
     public long id;
     public String email;
     public long person_id;
@@ -31,6 +33,11 @@ public class GEmailAddress {
             @Override
             public EmailAddress call() throws Exception {
                 synchronized (lock) {
+
+                    // wrapped address
+                    if (email_address != null) {
+                        email_address.save(true);
+                    }
 
                     final EmailAddressDao dao = Application.getDb().getEmailAddressDao();
                     final EmailAddress address = new EmailAddress();

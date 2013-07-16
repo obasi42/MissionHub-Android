@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical"
+            android:id="@+id/action"
+            android:layout_margin="28dip"
+            android:visibility="visible">
+
+        <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"/>
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:id="@+id/action_text"
+                android:fontFamily="roboto-light"
+                android:textSize="20sp"
+                android:layout_marginTop="16dip"
+                android:textColor="#808286"
+                android:text="@string/loading"/>
+    </LinearLayout>
+
+
+    <com.missionhub.ui.drilldown.DrillDownView
+            android:id="@+id/drilldown"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"/>
+
+</FrameLayout>

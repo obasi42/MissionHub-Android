@@ -8,6 +8,8 @@ import java.util.concurrent.Callable;
 
 public class GUser {
 
+    public GUser user;
+
     public long id;
     public Long primary_organization_id;
     public String created_at;
@@ -27,6 +29,12 @@ public class GUser {
             @Override
             public User call() throws Exception {
                 synchronized (lock) {
+
+                    // wrapped user
+                    if (user != null) {
+                        user.save(personId, true);
+                    }
+
                     final UserDao dao = Application.getDb().getUserDao();
 
                     User user = dao.load(id);

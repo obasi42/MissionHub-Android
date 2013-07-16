@@ -10,6 +10,8 @@ import java.util.concurrent.Callable;
 
 public class GPermission {
 
+    public GPermission permission;
+
     public long id;
     public String name;
     public String i18n;
@@ -23,6 +25,11 @@ public class GPermission {
             @Override
             public Permission call() throws Exception {
                 synchronized (lock) {
+                    // wrapped permission
+                    if (permission != null) {
+                        return permission.save(true);
+                    }
+
                     final PermissionDao dao = Application.getDb().getPermissionDao();
 
                     final Permission permission = new Permission();

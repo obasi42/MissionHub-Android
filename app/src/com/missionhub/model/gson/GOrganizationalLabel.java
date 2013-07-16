@@ -13,6 +13,8 @@ import java.util.concurrent.Callable;
 
 public class GOrganizationalLabel {
 
+    public GOrganizationalLabel organizational_label;
+
     public long id;
     public long person_id;
     public long organization_id;
@@ -39,6 +41,11 @@ public class GOrganizationalLabel {
             @Override
             public OrganizationalLabel call() throws Exception {
                 synchronized (lock) {
+                    // wrapped label
+                    if (organizational_label != null) {
+                        organizational_label.save(true);
+                    }
+
                     final OrganizationalLabelDao dao = Application.getDb().getOrganizationalLabelDao();
 
                     if (removed_date != null) {

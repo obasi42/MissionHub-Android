@@ -12,6 +12,8 @@ public class GInteractionType {
 
     public static final Object lock = new Object();
 
+    public GInteractionType interaction_type;
+
     public long id;
     public long organization_id;
     public String name;
@@ -32,6 +34,12 @@ public class GInteractionType {
             @Override
             public InteractionType call() throws Exception {
                 synchronized (lock) {
+
+                    // wrapped type
+                    if (interaction_type != null) {
+                        interaction_type.save(true);
+                    }
+
                     final InteractionTypeDao dao = Application.getDb().getInteractionTypeDao();
 
                     final InteractionType type = new InteractionType();

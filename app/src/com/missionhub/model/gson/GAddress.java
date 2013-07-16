@@ -10,6 +10,8 @@ import java.util.concurrent.Callable;
 
 public class GAddress {
 
+    public GAddress address;
+
     public long id;
     public String address1;
     public String address2;
@@ -34,6 +36,12 @@ public class GAddress {
             @Override
             public Address call() throws Exception {
                 synchronized (lock) {
+
+                    // wrapped address
+                    if (address != null) {
+                        return address.save(personId, true);
+                    }
+
                     // add new address
                     final Address address = new Address();
                     address.setId(id);

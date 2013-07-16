@@ -8,6 +8,8 @@ import java.util.concurrent.Callable;
 
 public class GOrganization {
 
+    public GOrganization organization;
+
     public long id;
     public String name;
     public String terminology;
@@ -19,7 +21,7 @@ public class GOrganization {
 
     public GPerson[] contacts;
     public GPerson[] admins;
-    public GPerson[] leaders;
+    public GPerson[] users;
     public GPerson[] people;
     public GSurvey[] surveys;
     public GSmsKeyword[] keywords;
@@ -40,6 +42,11 @@ public class GOrganization {
             @Override
             public Organization call() throws Exception {
                 synchronized (lock) {
+                    // wrapped organization
+                    if (organization != null) {
+                        return organization.save(true);
+                    }
+
                     boolean update = true;
                     final OrganizationDao dao = Application.getDb().getOrganizationDao();
 
@@ -75,8 +82,8 @@ public class GOrganization {
                         }
                     }
 
-                    if (leaders != null) {
-                        for (final GPerson person : leaders) {
+                    if (users != null) {
+                        for (final GPerson person : users) {
                             person.save(true);
                         }
                     }

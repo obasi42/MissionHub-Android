@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.missionhub.R;
 import com.missionhub.application.Application;
@@ -24,6 +25,8 @@ import com.missionhub.util.TreeDataStructure;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.holoeverywhere.app.AlertDialog;
+import org.holoeverywhere.app.Dialog;
+import org.holoeverywhere.widget.FrameLayout;
 import org.holoeverywhere.widget.TextView;
 import org.holoeverywhere.widget.Toast;
 
@@ -32,11 +35,15 @@ import java.util.List;
 
 public class SelectOrganizationDialogFragment extends RefreshableDialogFragment implements DialogInterface.OnKeyListener {
 
-    private DrillDownView mView;
+    private DrillDownView mDrilldown;
     private DrillDownAdapter mAdapter;
+
+    private View mAction;
+    private TextView mActionText;
 
     private SafeAsyncTask<Void> mTask;
     private OrganizationDrillDownItem mCurrentItem;
+    private SafeAsyncTask<Void> mSetTask;
 
     public SelectOrganizationDialogFragment() {
     }
@@ -65,22 +72,25 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
                 cancel();
             }
         });
-        mView = new DrillDownView(getSupportActivity());
+
+        View view = getLayoutInflater().inflate(R.layout.dialog_fragment_select_organization);
+        mDrilldown = (DrillDownView) view.findViewById(R.id.drilldown);
+        mAction = view.findViewById(R.id.action);
+        mActionText = (TextView) view.findViewById(R.id.action_text);
         if (mAdapter == null) {
             mAdapter = new OrganizationDrillDownAdapter(getSupportActivity());
             rebuildAdapter();
         } else {
             mAdapter.setContext(getSupportActivity());
         }
-        mView.setAdapter(mAdapter);
-        mView.setOnDrillDownItemClickListener(new DrillDownView.OnDrillDownItemClickListener() {
+        mDrilldown.setAdapter(mAdapter);
+        mDrilldown.setOnDrillDownItemClickListener(new DrillDownView.OnDrillDownItemClickListener() {
             @Override
             public void onItemClicked(DrillDownAdapter adapter, DrillDownItem item) {
-                Session.getInstance().setOrganizationId(item.getId());
-                dismiss();
+                setOrganization(item.getId());
             }
         });
-        mView.setOnDrillDownItemLongClickListener(new DrillDownView.OnDrillDownItemLongClickListener() {
+        mDrilldown.setOnDrillDownItemLongClickListener(new DrillDownView.OnDrillDownItemLongClickListener() {
             @Override
             public boolean onItemLongClicked(DrillDownAdapter adapter, DrillDownItem item) {
                 long[] favorites = getFavorites();
@@ -96,9 +106,12 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
                 return true;
             }
         });
-        builder.setView(mView);
+
+        builder.setView(view);
         builder.setCancelable(false);
         builder.setOnKeyListener(this);
+
+        updateUIState();
 
         return builder;
     }
@@ -189,8 +202,8 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
 
     @Override
     public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
-        if (mView != null && keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
-            if (!mView.pageBackward(true)) {
+        if (mDrilldown != null && keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
+            if (!mDrilldown.pageBackward(true)) {
                 cancel();
             }
             return true;
@@ -263,8 +276,6 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
             /* ignore */
         }
 
-        startRefreshAnimation();
-
         mTask = new SafeAsyncTask<Void>() {
             @Override
             public Void call() throws Exception {
@@ -274,15 +285,15 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
 
             @Override
             public void onSuccess(final Void _) {
-                if (!isDetached()) {
-                    rebuildAdapter();
-                }
+                if (isDetached() || isRemoving()) return;
+
+                rebuildAdapter();
             }
 
             @Override
             public void onFinally() {
                 mTask = null;
-                if (!isDetached()) {
+                if (!isDetached() && !isRemoving()) {
                     stopRefreshAnimation();
                 }
             }
@@ -292,12 +303,72 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
                 final ExceptionHelper eh = new ExceptionHelper(Application.getContext(), e);
                 eh.makeToast(R.string.select_organization_update_failed);
             }
-
-            @Override
-            public void onInterrupted(final Exception e) {
-            }
         };
 
+        startRefreshAnimation();
         Application.getExecutor().execute(mTask.future());
+    }
+
+    @Override
+    public void onDestroy() {
+        try {
+            mSetTask.cancel(true);
+        } catch (Exception e) { /* ignore */ }
+        try{
+            mTask.cancel(true);
+        } catch (Exception e) { /* ignore */ }
+        super.onDestroy();
+    }
+
+    private void setOrganization(final long organizationId) {
+        if (mSetTask != null) return;
+
+        try {
+            mTask.cancel(true);
+        } catch (Exception e) { /* ignore */ }
+
+        mSetTask = new SafeAsyncTask<Void>() {
+
+            @Override
+            public Void call() throws Exception {
+                Session.getInstance().setOrganizationId(organizationId, false);
+                return null;
+            }
+
+            @Override
+            protected void onSuccess(Void aVoid) throws Exception {
+                dismiss();
+            }
+
+            @Override
+            protected void onException(Exception e) throws RuntimeException {
+                ExceptionHelper eh = new ExceptionHelper(e);
+                eh.makeToast();
+            }
+
+            @Override
+            protected void onFinally() throws RuntimeException {
+                mSetTask = null;
+                updateUIState();
+            }
+        };
+        updateUIState();
+        mSetTask.execute();
+    }
+
+    private void updateUIState() {
+        if (mSetTask != null) {
+            mDrilldown.setVisibility(View.GONE);
+            mAction.setVisibility(View.VISIBLE);
+            mActionText.setText("Loading organization...");
+            setButtonEnabled(Dialog.BUTTON_NEUTRAL, false);
+            hideRefresh();
+        } else {
+            mDrilldown.setVisibility(View.VISIBLE);
+            mAction.setVisibility(View.GONE);
+            mActionText.setText(R.string.loading);
+            setButtonEnabled(Dialog.BUTTON_NEUTRAL, true);
+            showRefresh();
+        }
     }
 }

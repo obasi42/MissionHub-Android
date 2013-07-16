@@ -22,6 +22,8 @@ import java.util.concurrent.Callable;
 
 public class GPerson {
 
+    public GPerson person;
+
     public long id;
     public String first_name;
     public String last_name;
@@ -69,6 +71,12 @@ public class GPerson {
             @Override
             public Person call() throws Exception {
                 synchronized (lock) {
+
+                    // wrapped person
+                    if (person != null) {
+                        return person.save(true);
+                    }
+
                     final DaoSession session = Application.getDb();
                     final PersonDao dao = session.getPersonDao();
                     //long orgId = Session.getInstance().getOrganizationId();

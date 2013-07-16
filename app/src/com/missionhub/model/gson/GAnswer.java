@@ -8,6 +8,8 @@ import java.util.concurrent.Callable;
 
 public class GAnswer {
 
+    public GAnswer answer;
+
     public long id;
     public long question_id;
     public String value;
@@ -26,6 +28,12 @@ public class GAnswer {
             @Override
             public Answer call() throws Exception {
                 synchronized (lock) {
+
+                    // wrapped answer
+                    if (answer != null) {
+                        return answer.save(answerSheetId, true);
+                    }
+
                     final AnswerDao dao = Application.getDb().getAnswerDao();
 
                     final Answer answer = new Answer();
