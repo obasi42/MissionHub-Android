@@ -20,9 +20,9 @@ public class ApiHttpException extends ApiException {
     @Override
     public String getDialogMessage() {
         StringBuilder builder = new StringBuilder();
-        builder.append("The server returned status code: " + mCode);
+        builder.append("The server returned status code: ").append(mCode);
         if (StringUtils.isNotEmpty(mMessage)) {
-            builder.append("Message: " + mMessage);
+            builder.append("Message: ").append(mMessage);
         }
         return builder.toString();
     }

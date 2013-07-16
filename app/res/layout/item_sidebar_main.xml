@@ -3,7 +3,6 @@
         android:id="@android:id/text1"
         android:layout_width="fill_parent"
         android:layout_height="?attr/listPreferredItemHeight"
-        android:text="Main Item"
         android:singleLine="true"
         android:ellipsize="end"
         android:textColor="@color/sidebar_item_text"

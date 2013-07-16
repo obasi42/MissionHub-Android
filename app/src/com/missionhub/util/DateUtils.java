@@ -14,9 +14,6 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-/**
- * Created by croemmich on 6/28/13.
- */
 public class DateUtils {
 
     /**
@@ -52,6 +49,7 @@ public class DateUtils {
      * @param iso8601String string
      * @return date object or null
      */
+    @SuppressWarnings("deprecation")
     public static DateTime parseISO8601(final String iso8601String) {
         try {
             return new DateTime(iso8601String);

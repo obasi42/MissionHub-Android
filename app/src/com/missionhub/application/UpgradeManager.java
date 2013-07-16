@@ -119,7 +119,7 @@ public class UpgradeManager {
                 }
             }
         }
-        return dir.delete();
+        return dir != null ? dir.delete() : false;
     }
 
 }

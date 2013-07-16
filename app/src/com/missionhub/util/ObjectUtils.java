@@ -2,17 +2,12 @@ package com.missionhub.util;
 
 import java.util.Collection;
 
-/**
- * Created by croemmich on 6/28/13.
- */
 public class ObjectUtils {
 
     public static boolean isEmpty(Object object) {
         if (object == null) return true;
         if (object instanceof CharSequence && ((CharSequence) object).length() <= 0) return true;
-        if (object instanceof Collection && ((Collection) object).isEmpty()) return true;
-
-        return false;
+        return object instanceof Collection && ((Collection) object).isEmpty();
     }
 
     public static boolean isNotEmpty(Object object) {

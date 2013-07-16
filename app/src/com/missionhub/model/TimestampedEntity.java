@@ -1,8 +1,5 @@
 package com.missionhub.model;
 
-/**
- * Created by croemmich on 7/15/13.
- */
 public interface TimestampedEntity {
 
     public String getUpdated_at();

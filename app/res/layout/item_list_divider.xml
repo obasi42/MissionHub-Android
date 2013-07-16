@@ -8,6 +8,5 @@
         android:textAllCaps="true"
         android:textSize="14.0dip"
         android:textStyle="bold"
-        android:text="List Header"
         android:textColor="@color/primary_text_holo_dark"
         android:background="@color/holo_blue_light"/>

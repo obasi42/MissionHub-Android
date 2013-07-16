@@ -73,9 +73,6 @@
                 android:label="@string/about_activity_title"
                 android:name=".activity.AboutActivity"/>
         <activity
-                android:label="@string/pref_activity_title"
-                android:name=".activity.PreferencesActivity"/>
-        <activity
                 android:label="@string/contact_activity_title"
                 android:name=".activity.ProfileActivity"/>
         <activity

@@ -633,10 +633,7 @@ public class Person implements com.missionhub.model.TimestampedEntity {
 
     public boolean hasBasicPermission(long permissionId, long organizationId) {
         final Long perm = getBasicPermissions().get(organizationId);
-        if (perm != null && perm.longValue() == permissionId) {
-            return true;
-        }
-        return false;
+        return perm != null && perm.longValue() == permissionId;
     }
 
     public boolean inOrganization(long organizationId) {
@@ -886,13 +883,6 @@ public class Person implements com.missionhub.model.TimestampedEntity {
             name += (" " + getLast_name());
         }
         return name.trim();
-    }
-
-    public Address getCurrentAddress() {
-        for (final Address address : getAddressList()) {
-            return address;
-        }
-        return null;
     }
 
     public void deleteWithRelations() {

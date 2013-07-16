@@ -376,9 +376,6 @@ public class ExceptionHelper {
     }
 
     public boolean isApplicationContext() {
-        if (mContext == Application.getContext()) {
-            return true;
-        }
-        return false;
+        return mContext == Application.getContext();
     }
 }

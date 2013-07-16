@@ -6,7 +6,6 @@
     <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Some Contact"
             android:id="@android:id/text1"
             style="@style/MissionHub.InteractionDialog.TextView"
             android:layout_alignParentLeft="true"

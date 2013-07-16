@@ -95,11 +95,7 @@ public class LockableViewPager extends ViewPager {
             }
         }
 
-        if (locked) {
-            return true;
-        } else {
-            return super.arrowScroll(direction);
-        }
+        return locked || super.arrowScroll(direction);
     }
 
     public void setPagingLocked(final int lock) {

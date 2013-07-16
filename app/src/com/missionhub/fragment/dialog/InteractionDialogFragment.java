@@ -1064,9 +1064,8 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
     private boolean canDelete() {
         if (isNew()) return false;
 
-        if (mInteraction.created_by_id != Session.getInstance().getPersonId()) return false;
+        return mInteraction.created_by_id == Session.getInstance().getPersonId();
 
-        return true;
     }
 
     private boolean canEdit() {
@@ -1074,9 +1073,8 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
 
         if (Session.getInstance().isAdmin()) return true;
 
-        if (mInteraction.created_by_id == Session.getInstance().getPersonId()) return true;
+        return mInteraction.created_by_id == Session.getInstance().getPersonId();
 
-        return false;
     }
 
 }

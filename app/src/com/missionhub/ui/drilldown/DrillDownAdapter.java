@@ -121,19 +121,22 @@ public class DrillDownAdapter extends PagerAdapter implements ViewPager.OnPageCh
     }
 
     private void onItemClicked(DrillDownItem item) {
-        if (mDrillDownView != null && mDrillDownView.get() != null) {
-            mDrillDownView.get().onItemClicked(this, item);
+        final DrillDownView view = mDrillDownView.get();
+        if (view != null) {
+            view.onItemClicked(this, item);
         }
     }
 
     private void onNextClicked(DrillDownItem item) {
-        if (mDrillDownView != null && mDrillDownView.get() != null) {
-            mDrillDownView.get().onNextClicked(this, item);
+        final DrillDownView view = mDrillDownView.get();
+        if (view != null) {
+            view.onNextClicked(this, item);
         }
     }
 
     private boolean onItemLongClicked(DrillDownItem item) {
-        return mDrillDownView != null && mDrillDownView.get() != null && mDrillDownView.get().onItemLongClicked(this, item);
+        final DrillDownView view = mDrillDownView.get();
+        return view != null && view.onItemLongClicked(this, item);
     }
 
     public DrillDownItem getCurrentItem() {

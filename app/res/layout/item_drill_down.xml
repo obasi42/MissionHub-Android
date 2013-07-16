@@ -12,9 +12,7 @@
             android:layout_height="fill_parent"
             android:layout_weight="1"
             android:gravity="center_vertical"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Item Text"
-            />
+            android:textAppearance="?android:attr/textAppearanceMedium"/>
 
     <View
             android:id="@+id/divider"

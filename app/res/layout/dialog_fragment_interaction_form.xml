@@ -18,7 +18,7 @@
         <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Initiator(s)"
+                android:text="@string/interaction_form_label_initiators"
                 style="@style/MissionHub.InteractionDialog.Label"/>
 
         <TextView
@@ -31,7 +31,7 @@
         <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Interaction"
+                android:text="@string/interaction_form_label_type"
                 style="@style/MissionHub.InteractionDialog.Label"
                 android:layout_marginTop="14dip"
                 />
@@ -45,7 +45,7 @@
         <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Receiver"
+                android:text="@string/interaction_form_label_receiver"
                 style="@style/MissionHub.InteractionDialog.Label"
                 android:layout_marginTop="14dip"
                 />
@@ -60,7 +60,7 @@
         <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Visibility"
+                android:text="@string/interaction_form_label_visibility"
                 style="@style/MissionHub.InteractionDialog.Label"
                 android:layout_marginTop="14dip"
                 />
@@ -74,7 +74,7 @@
         <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Date / Time"
+                android:text="@string/interaction_form_label_datetime"
                 style="@style/MissionHub.InteractionDialog.Label"
                 android:layout_marginTop="14dip"
                 />
@@ -82,7 +82,6 @@
         <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="11 June 2013 13:47"
                 android:id="@+id/date_time"
                 style="@style/MissionHub.InteractionDialog.TextView"
                 android:background="@drawable/bg_box_caret"/>
@@ -90,7 +89,7 @@
         <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Comment"
+                android:text="@string/interaction_form_label_comment"
                 style="@style/MissionHub.InteractionDialog.Label"
                 android:layout_marginTop="14dip"/>
 

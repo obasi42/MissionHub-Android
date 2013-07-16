@@ -78,7 +78,7 @@ public class HostedProfileFragment extends HostedFragment implements TabBar.OnTa
     private TabBar mTabBar;
     private int mSelectedPagerPage = 0;
     private int mSelectedTab = R.id.tab_info;
-    private ListMultimap<Integer, Object> mCachedObjects = ArrayListMultimap.create();
+    private final ListMultimap<Integer, Object> mCachedObjects = ArrayListMultimap.create();
 
     private AnimateOnceImageLoadingListener mLoadingListener = new AnimateOnceImageLoadingListener(250);
     private SafeAsyncTask<List<Object>> mSelectTabTask;
@@ -404,9 +404,10 @@ public class HostedProfileFragment extends HostedFragment implements TabBar.OnTa
         List<Object> items = new ArrayList<Object>();
 
         Person person = Application.getDb().getPersonDao().load(mPersonId);
-        person.refresh();
 
         if (person == null) return items;
+
+        person.refresh();
 
         Gender gender = person.getGenderEnum();
         if (gender != null) {
@@ -742,7 +743,7 @@ public class HostedProfileFragment extends HostedFragment implements TabBar.OnTa
 
             @Override
             public Void call() throws Exception {
-                Person person = Api.getPerson(mPersonId, ApiOptions.builder()
+                Api.getPerson(mPersonId, ApiOptions.builder()
                         .include(Api.Include.addresses)
                         .include(Api.Include.phone_numbers)
                         .include(Api.Include.email_addresses)
@@ -860,9 +861,7 @@ public class HostedProfileFragment extends HostedFragment implements TabBar.OnTa
                         safeSet(holder.text1, ResourceUtils.getString(R.string.profile_view_facebook));
                     }
                 }
-            } else if (object instanceof EmptyItem) {
-                // do nothing
-            } else if (object instanceof TimestampedEntityItem) {
+            } else if (object instanceof TimestampedEntityItem && !(object instanceof EmptyItem)) {
                 if (((TimestampedEntityItem) object).entity instanceof Interaction) {
                     Interaction.InteractionViewCache cache = ((Interaction) ((TimestampedEntityItem) object).entity).getViewCache();
 

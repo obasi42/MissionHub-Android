@@ -103,7 +103,7 @@ public class ListOptions implements Serializable {
         final Iterator<Entry<String, Direction>> itr2 = mOrderBy.entrySet().iterator();
         while (itr2.hasNext()) {
             final Entry<String, Direction> entry = itr2.next();
-            sb.append(stripUnsafeChars(entry.getKey()) + " " + stripUnsafeChars(entry.getValue().name()));
+            sb.append(stripUnsafeChars(entry.getKey())).append(" ").append(stripUnsafeChars(entry.getValue().name()));
             if (itr2.hasNext()) {
                 sb.append(",");
             }
@@ -299,7 +299,7 @@ public class ListOptions implements Serializable {
             final Entry<String, Collection<String>> entry = itr.next();
             final Filter filter = new Filter();
             filter.key = entry.getKey();
-            filter.values = entry.getValue().toArray(new String[]{});
+            filter.values = entry.getValue().toArray(new String[entry.getValue().size()]);
             filters.add(filter);
         }
 
@@ -313,8 +313,8 @@ public class ListOptions implements Serializable {
         }
 
         final ListFilterOrderJson jsonFilter = new ListFilterOrderJson();
-        jsonFilter.filters = filters.toArray(new Filter[]{});
-        jsonFilter.orders = orders.toArray(new Order[]{});
+        jsonFilter.filters = filters.toArray(new Filter[filters.size()]);
+        jsonFilter.orders = orders.toArray(new Order[orders.size()]);
         jsonFilter.offset = mOffset;
         jsonFilter.limit = mLimit;
 
@@ -323,7 +323,7 @@ public class ListOptions implements Serializable {
 
     public static ListOptions fromJson(final String jsonString) {
         final ListFilterOrderJson json = Api.sGson.fromJson(jsonString, ListFilterOrderJson.class);
-        final HashMultimap<String, String> filters = HashMultimap.<String, String>create();
+        final HashMultimap<String, String> filters = HashMultimap.create();
         for (final Filter filter : json.filters) {
             filters.putAll(filter.key, Arrays.asList(filter.values));
         }

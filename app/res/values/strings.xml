@@ -365,4 +365,14 @@
     <string name="tag_primary">Primary</string>
     <string name="profile_view_facebook">View Facebook profile</string>
 
+    <string name="authenticator_login_with_facebook">Login with Facebook</string>
+    <string name="interaction_form_label_comment">Comment</string>
+    <string name="interaction_form_label_datetime">Date / Time</string>
+    <string name="interaction_form_label_visibility">Visibility</string>
+    <string name="interaction_form_label_receiver">Receiver</string>
+    <string name="interaction_form_label_type">Interaction</string>
+    <string name="interaction_form_label_initiators">Initiator(s)</string>
+    <string name="action_all">All</string>
+    <string name="profile_header_labels">LABELS:</string>
+
 </resources>

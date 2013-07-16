@@ -12,6 +12,5 @@
         android:paddingRight="32dip"
         android:gravity="center"
         android:textAllCaps="true"
-        android:text="SHOW MORE"
         android:background="@drawable/list_item_background"
         />

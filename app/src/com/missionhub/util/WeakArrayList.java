@@ -39,10 +39,7 @@ public class WeakArrayList<T> extends ArrayList<WeakReference<T>> {
         if (ref == null) {
             return false;
         }
-        if (ref.get() == o) {
-            return true;
-        }
-        return ref.get() != null && ref.get().equals(o);
+        return ref.get() == o || ref.get() != null && ref.get().equals(o);
     }
 
     protected boolean findRef(final Object o) {

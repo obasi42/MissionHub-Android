@@ -28,6 +28,7 @@ import com.missionhub.model.Organization;
 import com.missionhub.model.Person;
 import com.missionhub.model.UserDao;
 import com.missionhub.util.SafeAsyncTask;
+import com.missionhub.util.TaskUtils;
 
 import org.acra.ACRA;
 import org.apache.commons.lang3.StringUtils;
@@ -432,9 +433,8 @@ public class Session implements OnAccountsUpdateListener {
      */
     public FutureTask<Person> updatePerson(final boolean force) {
         if (!force && mUpdatePersonTask != null) return mUpdatePersonTask.future();
-        try {
-            mUpdatePersonTask.cancel(true);
-        } catch (Exception e) { /* ignore */ }
+
+        TaskUtils.cancel(mUpdatePersonTask);
 
         mUpdatePersonTask = new SafeAsyncTask<Person>() {
             private final long mOneDayMillis = 60 * 60 * 24 * 1000;
@@ -497,11 +497,7 @@ public class Session implements OnAccountsUpdateListener {
     }
 
     public FutureTask<Void> updateCurrentOrganization(final boolean force) {
-        try {
-            mUpdateOrganizationTask.cancel(true);
-        } catch (final Exception e) {
-            /* ignore */
-        }
+        TaskUtils.cancel(mUpdateOrganizationTask);
 
         mUpdateOrganizationTask = new SafeAsyncTask<Void>() {
 
@@ -551,11 +547,7 @@ public class Session implements OnAccountsUpdateListener {
     }
 
     private FutureTask<Void> updatePermissions(final boolean force) {
-        try {
-            mUpdatePermissionsTask.cancel(true);
-        } catch (final Exception e) {
-            /* ignore */
-        }
+        TaskUtils.cancel(mUpdatePermissionsTask);
 
         mUpdatePermissionsTask = new SafeAsyncTask<Void>() {
 
@@ -670,10 +662,7 @@ public class Session implements OnAccountsUpdateListener {
      */
     public boolean isAdmin() {
         Person p = getPerson();
-        if (p != null) {
-            return p.isAdmin();
-        }
-        return false;
+        return p != null && p.isAdmin();
     }
 
     /**
@@ -683,10 +672,7 @@ public class Session implements OnAccountsUpdateListener {
      */
     public boolean isUser() {
         Person p = getPerson();
-        if (p != null) {
-            return p.isUser();
-        }
-        return false;
+        return p != null && p.isUser();
     }
 
     /**
@@ -694,10 +680,7 @@ public class Session implements OnAccountsUpdateListener {
      */
     public boolean isAdminOrUser() {
         Person p = getPerson();
-        if (p != null) {
-            return p.isAdminOrUser();
-        }
-        return false;
+        return p != null && p.isAdminOrUser();
     }
 
     public com.facebook.Session openFacebookSession(AuthenticatorActivity activity, boolean sso) {
@@ -706,7 +689,7 @@ public class Session implements OnAccountsUpdateListener {
         com.facebook.Session.Builder builder = new com.facebook.Session.Builder(Application.getContext());
         builder.setApplicationId(Configuration.getFacebookAppId());
         com.facebook.Session session = builder.build();
-        session.setActiveSession(session);
+        com.facebook.Session.setActiveSession(session);
 
         com.facebook.Session.OpenRequest request = new com.facebook.Session.OpenRequest(activity);
         // suppress sso behavior when an account already exists and the request is not a re-auth

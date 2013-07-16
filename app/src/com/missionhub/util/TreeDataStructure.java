@@ -158,7 +158,7 @@ public class TreeDataStructure<T> {
      * @return the string
      */
     private String printTree(final int increment) {
-        String s = "";
+        String s;
         String inc = "";
         for (int i = 0; i < increment; ++i) {
             inc = inc.concat(" ");

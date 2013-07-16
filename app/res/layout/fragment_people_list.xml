@@ -42,7 +42,7 @@
                 android:id="@+id/checkmark_text"
                 android:layout_width="64dip"
                 android:layout_height="fill_parent"
-                android:text="All"
+                android:text="@string/action_all"
                 android:textColor="@color/white"
                 android:gravity="center_vertical"
                 android:textSize="18sp"

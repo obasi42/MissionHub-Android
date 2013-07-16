@@ -17,7 +17,7 @@
                 android:id="@+id/labels"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="LABELS:"
+                android:text="@string/profile_header_labels"
                 android:gravity="center"
                 android:textColor="@color/white"
                 android:textSize="16sp"
