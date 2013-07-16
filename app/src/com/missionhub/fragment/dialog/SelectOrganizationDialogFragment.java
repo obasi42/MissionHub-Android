@@ -104,7 +104,7 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
     }
 
     private synchronized void rebuildAdapter() {
-        if (isDetached()) return;
+        if (isDetached() || isRemoving()) return;
 
         mAdapter.setNotifyOnChange(false);
         mAdapter.clear();

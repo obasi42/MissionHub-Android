@@ -6,6 +6,7 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.ISODateTimeFormat;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -106,5 +107,9 @@ public class DateUtils {
         LocalTime localTime = new LocalTime().withHourOfDay(hour).withMinuteOfHour(minute);
         DateTime dateTime = localDate.toDateTime(localTime, DateTimeZone.UTC);
         return new DateTime(DateTimeZone.UTC.getMillisKeepLocal(DateTimeZone.getDefault(), dateTime.getMillis()));
+    }
+
+    public static String toISO8601(DateTime dateTime) {
+        return dateTime.toString(ISODateTimeFormat.dateTime().withZoneUTC());
     }
 }

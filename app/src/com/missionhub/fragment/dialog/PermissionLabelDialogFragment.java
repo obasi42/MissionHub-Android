@@ -23,12 +23,14 @@ import com.missionhub.ui.ObjectArrayAdapter;
 import com.missionhub.ui.widget.CheckmarkImageView;
 import com.missionhub.util.SafeAsyncTask;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.holoeverywhere.app.AlertDialog;
 import org.holoeverywhere.widget.ListView;
 import org.holoeverywhere.widget.TextView;
 import org.holoeverywhere.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -56,12 +58,17 @@ public class PermissionLabelDialogFragment extends RefreshableDialogFragment imp
     }
 
     public static PermissionLabelDialogFragment showForResult(FragmentManager fm, int type, final Person person, Integer requestCode) {
-        final List<Person> people = new ArrayList<Person>();
-        people.add(person);
-        return showForResult(fm, type, people, requestCode);
+        return showForResult(fm, type, person.getId(), requestCode);
+    }
+
+    public static PermissionLabelDialogFragment showForResult(FragmentManager fm, int type, long personId, Integer requestCode) {
+        return showForResult(fm, type, new long[]{personId}, requestCode);
     }
 
     public static PermissionLabelDialogFragment showForResult(FragmentManager fm, int type, final long[] people, Integer requestCode) {
+        final Bundle args = new Bundle();
+        args.putInt("type", type);
+        args.putSerializable("peopleIds", new HashSet<Long>(Arrays.asList(ArrayUtils.toObject(people))));
         return showForResult(fm, type, Person.getAllById(people), requestCode);
     }
 
@@ -74,14 +81,8 @@ public class PermissionLabelDialogFragment extends RefreshableDialogFragment imp
 
     public static PermissionLabelDialogFragment showForResult(FragmentManager fm, int type, final Collection<Person> people, Integer requestCode) {
         final Bundle args = new Bundle();
-
-        final HashSet<Long> peopleIds = new HashSet<Long>();
-        for (Person p : people) {
-            peopleIds.add(p.getId());
-        }
-        args.putSerializable("peopleIds", peopleIds);
+        args.putSerializable("peopleIds", new HashSet<Long>(Person.getIds(people)));
         args.putInt("type", type);
-
         return PermissionLabelDialogFragment.show(PermissionLabelDialogFragment.class, fm, args, requestCode);
     }
 

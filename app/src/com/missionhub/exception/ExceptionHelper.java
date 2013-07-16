@@ -74,6 +74,10 @@ public class ExceptionHelper {
      */
     private boolean mAppendSupport = true;
 
+    public ExceptionHelper(final Throwable throwable) {
+        this(Application.getContext(), throwable);
+    }
+
     /**
      * Creates a new ExceptionHelper object
      */
@@ -88,23 +92,31 @@ public class ExceptionHelper {
      * Shows the alert dialog
      */
     public AlertDialog show() {
-        final AlertDialog dialog = getDialog();
+        if (!isApplicationContext()) {
+            final AlertDialog dialog = getDialog();
 
-        try {
-            if (dialog != null && !dialog.isShowing())
-                dialog.show();
-        } catch (Exception e) {
-            mContext = Application.getContext();
-            makeToast();
+            try {
+                if (dialog != null && !dialog.isShowing()) {
+                    dialog.show();
+                    return dialog;
+                }
+            } catch (Exception e) { /* ignore */ }
         }
 
-        return dialog;
+        mContext = Application.getContext();
+        makeToast();
+
+        return null;
     }
 
     /**
      * Builds and returns the dialog for more modification before showing
      */
     public AlertDialog getDialog() {
+        if (isApplicationContext()) {
+            return null;
+        }
+
         if (mDialog != null && (mDialog.isShowing() || mDialog.getContext() != mContext)) {
             try {
                 mDialog.dismiss();
@@ -361,5 +373,12 @@ public class ExceptionHelper {
      */
     public void makeToast(final int failure) {
         if (mContext != null) makeToast(mContext.getString(failure));
+    }
+
+    public boolean isApplicationContext() {
+        if (mContext == Application.getContext()) {
+            return true;
+        }
+        return false;
     }
 }

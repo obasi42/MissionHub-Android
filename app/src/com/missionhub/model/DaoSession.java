@@ -57,7 +57,7 @@ import com.missionhub.model.UserSettingDao;
 
 /**
  * {@inheritDoc}
- *
+ * 
  * @see de.greenrobot.dao.AbstractDaoSession
  */
 public class DaoSession extends AbstractDaoSession {
@@ -217,7 +217,7 @@ public class DaoSession extends AbstractDaoSession {
         registerDao(Setting.class, settingDao);
         registerDao(UserSetting.class, userSettingDao);
     }
-
+    
     public void clear() {
         userDaoConfig.getIdentityScope().clear();
         personDaoConfig.getIdentityScope().clear();

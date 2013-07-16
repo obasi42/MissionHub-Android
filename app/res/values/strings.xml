@@ -85,17 +85,18 @@
     <string name="contact_already_leader">This person is already a leader</string>
     <string name="contact_role_changed">Role changed</string>
     <string name="contact_role_failed">Failed to change role</string>
-    <string name="contact_label_personal">Personal Info</string>
-    <string name="contact_label_birthday">Birthday</string>
-    <string name="contact_label_gender">Gender</string>
-    <string name="contact_label_links">Links</string>
-    <string name="contact_label_address">Address</string>
-    <string name="contact_label_labels">Labels</string>
     <string name="contact_surveys_no_key">Unknown Keyword</string>
     <string name="contact_surveys_no_q">Unknown Question</string>
     <string name="contact_surveys_no_a">Not answered</string>
     <string name="contact_surveys_updating_org">Updating organization keywords and questions
     </string>
+
+    <!-- Profile -->
+    <string name="profile_group_gender">Gender</string>
+    <string name="profile_group_phone">Phone</string>
+    <string name="profile_group_address">Address</string>
+    <string name="profile_group_email">Email</string>
+    <string name="profile_group_facebook">Facebook</string>
 
     <!-- About Activity -->
     <string name="about_activity_title">About MissionHub</string>
@@ -203,6 +204,32 @@
     <string name="interaction_type_holy_spirit_presentation">Holy Spirit Presentation</string>
     <string name="interaction_type_graduating_on_mission">Graduating on Mission</string>
     <string name="interaction_type_faculty_on_mission">Faculty on Mission</string>
+
+    <!-- Interaction Type Actions -->
+    <string name="interaction_type_action_comment">
+        <![CDATA[<b>%1$s</b> shared a comment:]]></string>
+    <string name="interaction_type_action_spiritual_conversation">
+        <![CDATA[<b>%1$s</b> initiated a spiritual conversation with <b>%2$s</b>.]]></string>
+    <string name="interaction_type_action_gospel_presentation">
+        <![CDATA[<b>%1$s</b> shared the gospel with <b>%2$s</b>.]]></string>
+    <string name="interaction_type_action_prayed_to_receive_christ">
+        <![CDATA[<b>%2$s</b> indicated a decision to receive Christ with <b>%1$s</b>.]]></string>
+    <string name="interaction_type_action_holy_spirit_presentation">
+        <![CDATA[<b>%1$s</b> shared a Holy Spirit presentation with <b>%2$s</b>.]]></string>
+    <string name="interaction_type_action_graduating_on_mission">
+        <![CDATA[<b>%1$s</b> helped <b>%2$s</b> develop a plan for graduating on mission.]]></string>
+    <string name="interaction_type_action_faculty_on_mission">
+        <![CDATA[<b>%1$s</b> helped <b>%2$s</b> develop a plan to be a faculty member on mission.]]></string>
+    <string name="interaction_type_action_unknown">
+        <![CDATA[<b>%1$s</b> interacted with <b>%2$s</b>.]]></string>
+
+    <string name="profile_label_action"><![CDATA[<b>%1$s</b> label was first applied.]]></string>
+    <string name="profile_survey_action">
+        <![CDATA[<b>%1$s</b> added new information via <b>%2$s</b> survey.]]></string>
+    <string name="interaction_comment_message">
+        <![CDATA[<b>%1$s wrote:</b> <i>\"%2$s\"</i>]]></string>
+    <string name="interaction_updated_at">
+        <![CDATA[- last updated by %1$s on %2$s at %3$s.]]></string>
 
     <!-- Genders -->
     <string name="gender_male">Male</string>
@@ -324,5 +351,18 @@
     <string name="delete_people_dialog_deleting">Deleting person(s)…</string>
     <string name="delete_people_dialog_deleted">Deleted person(s)</string>
     <string name="fragment_assignment_dialog_warning_mass">Assigning in mass filter mode.</string>
+
+    <!-- Phone Number Locations -->
+    <string name="phone_location_cell">Cell</string>
+    <string name="phone_location_mobile">Mobile</string>
+    <string name="phone_location_work">Work</string>
+
+    <!-- Address Types -->
+    <string name="address_type_current">Current</string>
+    <string name="address_type_permanent">Permanent</string>
+    <string name="address_type_emergency1">Emergency 1</string>
+    <string name="address_type_emergency2">Emergency 2</string>
+    <string name="tag_primary">Primary</string>
+    <string name="profile_view_facebook">View Facebook profile</string>
 
 </resources>

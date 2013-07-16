@@ -40,9 +40,14 @@ public class GOrganization {
             @Override
             public Organization call() throws Exception {
                 synchronized (lock) {
+                    boolean update = true;
                     final OrganizationDao dao = Application.getDb().getOrganizationDao();
 
-                    final Organization org = new Organization();
+                    Organization org = dao.load(id);
+                    if (org == null) {
+                        org = new Organization();
+                        update = false;
+                    }
                     org.setId(id);
                     org.setName(name);
                     org.setTerminology(terminology);
@@ -51,7 +56,12 @@ public class GOrganization {
                     org.setStatus(status);
                     org.setCreated_at(created_at);
                     org.setUpdated_at(updated_at);
-                    dao.insertOrReplace(org);
+
+                    if (update) {
+                        dao.update(org);
+                    } else {
+                        dao.insert(org);
+                    }
 
                     if (contacts != null) {
                         for (final GPerson person : contacts) {

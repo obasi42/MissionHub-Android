@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dip">
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tag_above"
+            android:background="#EAF1F6"
+            android:textColor="#0379AE"
+            android:paddingTop="2dip"
+            android:paddingBottom="2dip"
+            android:paddingRight="4dip"
+            android:paddingLeft="4dip"
+            android:visibility="gone"/>
+
+    <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@android:id/text1"
+            android:padding="2dip"
+            android:layout_below="@+id/tag_above"
+            android:layout_alignParentLeft="true"
+            android:layout_toLeftOf="@+id/tag_inline"
+            android:visibility="visible"/>
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tag_inline"
+            android:background="#EAF1F6"
+            android:textColor="#0379AE"
+            android:paddingTop="2dip"
+            android:paddingBottom="2dip"
+            android:paddingRight="4dip"
+            android:paddingLeft="4dip"
+            android:layout_alignTop="@android:id/text1"
+            android:layout_alignParentRight="true"
+            android:visibility="gone"/>
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:id="@android:id/text2"
+            android:padding="2dip"
+            android:layout_below="@android:id/text1"
+            android:layout_alignLeft="@android:id/text1"
+            android:layout_alignRight="@android:id/text1"
+            android:visibility="gone"/>
+
+</RelativeLayout>

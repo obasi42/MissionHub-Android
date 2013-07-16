@@ -113,7 +113,7 @@ public class BaseDialogFragment extends DialogFragment implements FragmentResult
             args = new Bundle();
         }
         try {
-            if (requestCode > 0) {
+            if (requestCode != null && requestCode != 0) {
                 args.putInt("requestCode", requestCode);
             }
             fragment.setArguments(args);

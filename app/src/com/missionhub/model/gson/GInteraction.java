@@ -1,6 +1,7 @@
 package com.missionhub.model.gson;
 
 import com.missionhub.application.Application;
+import com.missionhub.application.Session;
 import com.missionhub.model.Interaction;
 import com.missionhub.model.InteractionDao;
 import com.missionhub.model.InteractionInitiator;
@@ -10,11 +11,15 @@ import com.missionhub.util.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 public class GInteraction {
+
+    public GInteraction interaction;
 
     public long id;
     public long interaction_type_id;
@@ -51,6 +56,12 @@ public class GInteraction {
             @Override
             public Interaction call() throws Exception {
                 synchronized (lock) {
+
+                    // wrapped interaction
+                    if (interaction != null) {
+                        return interaction.save(true);
+                    }
+
                     final InteractionDao dao = Application.getDb().getInteractionDao();
                     final InteractionInitiatorDao idao = Application.getDb().getInteractionInitiatorDao();
 
@@ -135,20 +146,26 @@ public class GInteraction {
      * @return list of saved interactions
      * @throws Exception
      */
-    public static List<Interaction> replaceAll(final GInteraction[] interactions, final long receiverId, final long organization_id, final boolean inTx) throws Exception {
+    public static List<Interaction> replaceAll(final GInteraction[] interactions, final long receiverId, final boolean inTx) throws Exception {
         final Callable<List<Interaction>> callable = new Callable<List<Interaction>>() {
             @Override
             public List<Interaction> call() throws Exception {
                 synchronized (allLock) {
-
                     InteractionDao dao = Application.getDb().getInteractionDao();
 
                     // delete old interactions
-                    List<Long> oldIds = dao.queryBuilder().where(InteractionDao.Properties.Receiver_id.eq(receiverId), InteractionDao.Properties.Organization_id.eq(organization_id)).listKeys();
+                    Set<Long> orgIds = new HashSet<Long>();
+                    for (GInteraction interaction : interactions) {
+                        orgIds.add(interaction.organization_id);
+                    }
+                    orgIds.add(Session.getInstance().getOrganizationId());
+
+                    List<Long> oldIds = dao.queryBuilder().where(InteractionDao.Properties.Receiver_id.eq(receiverId), InteractionDao.Properties.Organization_id.in(orgIds)).listKeys();
                     for (long id : oldIds) {
                         dao.deleteByKey(id);
                     }
 
+                    // save new interactions
                     final List<Interaction> c = new ArrayList<Interaction>();
                     for (final GInteraction interaction : interactions) {
                         final Interaction i = interaction.save(true);

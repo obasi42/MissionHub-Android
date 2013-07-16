@@ -20,7 +20,7 @@ public class TabBar extends LinearLayout implements View.OnClickListener {
 
     private List<TabBarButton> mButtons = Collections.synchronizedList(new ArrayList<TabBarButton>());
     private int mActive = 0;
-    private OnButtonClickListener mOnClickListener;
+    private OnTabSelectedListener mListener;
 
     public TabBar(Context context) {
         super(context);
@@ -39,9 +39,9 @@ public class TabBar extends LinearLayout implements View.OnClickListener {
         setActiveTab((TabBarButton) view.getParent());
     }
 
-    private void triggerOnTabClicked(TabBarButton button) {
-        if (mOnClickListener != null) {
-            mOnClickListener.onTabClicked(mButtons.indexOf(button), button);
+    private void triggerOnTabSelected(TabBarButton button) {
+        if (mListener != null) {
+            mListener.onTabSelected(mButtons.indexOf(button), button);
         }
     }
 
@@ -49,10 +49,12 @@ public class TabBar extends LinearLayout implements View.OnClickListener {
         mActive = mButtons.indexOf(button);
 
         for (TabBarButton current : mButtons) {
+            boolean notify = !current.isActive() && button == current;
             current.setActive(button == current);
+            if (notify) {
+                triggerOnTabSelected(button);
+            }
         }
-
-        triggerOnTabClicked(button);
     }
 
     public int getActiveTab() {
@@ -100,8 +102,12 @@ public class TabBar extends LinearLayout implements View.OnClickListener {
     }
 
 
-    public static interface OnButtonClickListener {
-        public void onTabClicked(int index, TabBarButton button);
+    public static interface OnTabSelectedListener {
+        public void onTabSelected(int index, TabBarButton button);
+    }
+
+    public void setOnTabSelectedListener(OnTabSelectedListener listener) {
+        mListener = listener;
     }
 
 
@@ -159,6 +165,10 @@ public class TabBar extends LinearLayout implements View.OnClickListener {
             } else {
                 mCaretView.setVisibility(View.INVISIBLE);
             }
+        }
+
+        public boolean isActive() {
+            return mActive;
         }
 
         @Override

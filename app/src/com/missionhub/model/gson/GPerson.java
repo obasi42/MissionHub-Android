@@ -14,6 +14,7 @@ import com.missionhub.util.ObjectUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -70,7 +71,7 @@ public class GPerson {
                 synchronized (lock) {
                     final DaoSession session = Application.getDb();
                     final PersonDao dao = session.getPersonDao();
-                    long orgId = Session.getInstance().getOrganizationId();
+                    //long orgId = Session.getInstance().getOrganizationId();
 
                     boolean insert = false;
                     Person person = dao.load(id);
@@ -142,11 +143,13 @@ public class GPerson {
                     }
 
                     if (contact_assignments != null) {
-                        if (contact_assignments.length > 0) {
-                            orgId = contact_assignments[0].organization_id;
+                        Set<Long> orgIds = new HashSet<Long>();
+                        for (GContactAssignment assignment : contact_assignments) {
+                            orgIds.add(assignment.organization_id);
                         }
+                        orgIds.add(Session.getInstance().getOrganizationId());
 
-                        List<Long> keys = session.getContactAssignmentDao().queryBuilder().where(ContactAssignmentDao.Properties.Assigned_to_id.eq(id), ContactAssignmentDao.Properties.Organization_id.eq(orgId)).listKeys();
+                        List<Long> keys = session.getContactAssignmentDao().queryBuilder().where(ContactAssignmentDao.Properties.Assigned_to_id.eq(id), ContactAssignmentDao.Properties.Organization_id.in(orgIds)).listKeys();
                         for (Long key : keys) {
                             session.getContactAssignmentDao().deleteByKey(key);
                         }
@@ -157,11 +160,13 @@ public class GPerson {
                     }
 
                     if (assigned_tos != null) {
-                        if (assigned_tos.length > 0) {
-                            orgId = assigned_tos[0].organization_id;
+                        Set<Long> orgIds = new HashSet<Long>();
+                        for (GContactAssignment assignment : assigned_tos) {
+                            orgIds.add(assignment.organization_id);
                         }
+                        orgIds.add(Session.getInstance().getOrganizationId());
 
-                        List<Long> keys = session.getContactAssignmentDao().queryBuilder().where(ContactAssignmentDao.Properties.Person_id.eq(id), ContactAssignmentDao.Properties.Organization_id.eq(orgId)).listKeys();
+                        List<Long> keys = session.getContactAssignmentDao().queryBuilder().where(ContactAssignmentDao.Properties.Person_id.eq(id), ContactAssignmentDao.Properties.Organization_id.in(orgIds)).listKeys();
                         for (Long key : keys) {
                             session.getContactAssignmentDao().deleteByKey(key);
                         }
@@ -198,17 +203,11 @@ public class GPerson {
                     }
 
                     if (interactions != null) {
-                        if (interactions.length > 0) {
-                            orgId = interactions[0].organization_id;
-                        }
-                        GInteraction.replaceAll(interactions, id, orgId, true);
+                        GInteraction.replaceAll(interactions, id, true);
                     }
 
                     if (organizational_labels != null) {
-                        if (organizational_labels.length > 0) {
-                            orgId = organizational_labels[0].organization_id;
-                        }
-                        GOrganizationalLabel.replaceAll(organizational_labels, id, orgId, true);
+                        GOrganizationalLabel.replaceAll(organizational_labels, id, true);
                     }
 
                     if (addresses != null) {

@@ -128,18 +128,20 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
     private SafeAsyncTask<Void> mActionTask;
     private int mActionTaskAction;
 
-    public static void showForResult(FragmentManager fm, int requestCode) {
+    public static void showForResult(FragmentManager fm, Integer requestCode) {
         showForResult(InteractionDialogFragment.class, fm, requestCode);
     }
 
-    public static void showForResult(FragmentManager fm, long receiverId, Collection<Long> initiatorIds, int requestCode) {
+    public static void showForResult(FragmentManager fm, long receiverId, Collection<Long> initiatorIds, Integer requestCode) {
         Bundle args = new Bundle();
         args.putLong("receiverId", receiverId);
-        args.putSerializable("initiatorIds", new HashSet<Long>(initiatorIds));
+        if (initiatorIds != null) {
+            args.putSerializable("initiatorIds", new HashSet<Long>(initiatorIds));
+        }
         showForResult(InteractionDialogFragment.class, fm, args, requestCode);
     }
 
-    public static void showForResult(FragmentManager fm, long interactionId, int requestCode) {
+    public static void showForResult(FragmentManager fm, long interactionId, Integer requestCode) {
         Bundle args = new Bundle();
         args.putLong("interactionId", interactionId);
         showForResult(InteractionDialogFragment.class, fm, args, requestCode);
@@ -184,6 +186,7 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
 
         // the container view
         mIcon = (ImageView) frame.findViewById(R.id.icon);
+        mIcon.setImageResource(R.drawable.ic_action_interaction);
         mTitle = (DialogTitle) frame.findViewById(R.id.alertTitle);
         if (isNew()) {
             mTitle.setText(R.string.interaction_dialog_title_new);
@@ -376,7 +379,7 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
     private synchronized void updateDateTimeBox(boolean updatePickers) {
         if (mInteractionDateTime == null) return;
 
-        DateTime dateTime = DateUtils.parseSqlTimestamp(mInteraction.timestamp);
+        DateTime dateTime = DateUtils.parseISO8601(mInteraction.timestamp);
         if (dateTime == null) {
             dateTime = DateTime.now(DateTimeZone.UTC);
         }
@@ -706,14 +709,14 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
     @Override
     public synchronized void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
         DateTime dateTime = DateUtils.fixInstantDateTime(year, monthOfYear + 1, dayOfMonth, mTimePicker.getCurrentHour(), mTimePicker.getCurrentMinute());
-        mInteraction.timestamp = DateUtils.toSqlTimestamp(dateTime);
+        mInteraction.timestamp = DateUtils.toISO8601(dateTime);
         updateDateTimeBox(false);
     }
 
     @Override
     public synchronized void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
         DateTime dateTime = DateUtils.fixInstantDateTime(mDatePicker.getYear(), mDatePicker.getMonth() + 1, mDatePicker.getDayOfMonth(), hourOfDay, minute);
-        mInteraction.timestamp = DateUtils.toSqlTimestamp(dateTime);
+        mInteraction.timestamp = DateUtils.toISO8601(dateTime);
         updateDateTimeBox(false);
     }
 

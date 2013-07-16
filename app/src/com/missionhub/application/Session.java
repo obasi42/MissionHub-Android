@@ -6,6 +6,7 @@ import android.accounts.AuthenticatorException;
 import android.accounts.OnAccountsUpdateListener;
 import android.accounts.OperationCanceledException;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.facebook.Request;
 import com.facebook.Response;
@@ -217,7 +218,7 @@ public class Session implements OnAccountsUpdateListener {
 
                 SettingsManager.setSessionLastPersonId(mPersonId);
 
-                // update the permission
+                // update the permissions
                 Application.postEvent(new SessionEvent(mState, Application.getContext().getString(R.string.session_updating_permissions)));
                 updatePermissions(false).get();
 
@@ -405,6 +406,7 @@ public class Session implements OnAccountsUpdateListener {
         try {
             return getPerson().getPrimaryOrganizationId();
         } catch (final Exception e) {
+            Log.e(TAG, e.getMessage(), e);
             /* ignore */
         }
         return -1l;
@@ -437,7 +439,7 @@ public class Session implements OnAccountsUpdateListener {
                 final long lastUpdated = SettingsManager.getInstance().getUserSetting(getPersonId(), "person_" + getPersonId() + "_updated", 0l);
                 final long currentTime = System.currentTimeMillis() - 1000;
 
-                if (lastUpdated < System.currentTimeMillis() - mOneDayMillis || force) {
+                if (!Configuration.isSkipSessionUpdates() && (lastUpdated < System.currentTimeMillis() - mOneDayMillis || force)) {
                     Api.getPersonMe(ApiOptions.builder() //
                             .include(Include.all_organization_and_children) //
                             .include(Include.all_organizational_permissions) //
@@ -506,7 +508,7 @@ public class Session implements OnAccountsUpdateListener {
                 final long lastUpdated = SettingsManager.getInstance().getUserSetting(getPersonId(), "organization_" + organizationId + "_updated", 0l);
                 final long currentTime = System.currentTimeMillis() - 1000;
 
-                if (lastUpdated < System.currentTimeMillis() - mOneWeekMillis || force) {
+                if (!Configuration.isSkipSessionUpdates() && (lastUpdated < System.currentTimeMillis() - mOneWeekMillis || force)) {
 
                     Api.getOrganization(organizationId, ApiOptions.builder() //
                             .include(Include.all_questions) //
@@ -530,20 +532,13 @@ public class Session implements OnAccountsUpdateListener {
             }
 
             @Override
-            public void onSuccess(final Void _) {
-            }
-
-            @Override
             public void onFinally() {
                 mUpdateOrganizationTask = null;
             }
 
             @Override
             public void onException(final Exception e) {
-            }
-
-            @Override
-            public void onInterrupted(final Exception e) {
+                Log.e(TAG, e.getMessage(), e);
             }
         };
 
@@ -567,7 +562,7 @@ public class Session implements OnAccountsUpdateListener {
                 final long lastUpdated = SettingsManager.getInstance().getSetting("permissions_updated", 0l);
                 final long currentTime = System.currentTimeMillis() - 1000;
 
-                if (lastUpdated < System.currentTimeMillis() - mOneWeekMillis || force) {
+                if (!Configuration.isSkipSessionUpdates() && (lastUpdated < System.currentTimeMillis() - mOneWeekMillis || force)) {
 
                     Api.listPermissions().get();
 

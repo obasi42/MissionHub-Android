@@ -1,8 +1,22 @@
 package com.missionhub.model;
 
+import android.text.Html;
+
 import java.util.List;
 
+import com.missionhub.R;
+import com.missionhub.api.Api;
+import com.missionhub.api.ApiOptions;
+import com.missionhub.application.Application;
 import com.missionhub.model.DaoSession;
+import com.missionhub.model.generic.InteractionVisibility;
+import com.missionhub.util.DateUtils;
+import com.missionhub.util.ResourceUtils;
+
+import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
 
 import de.greenrobot.dao.DaoException;
 
@@ -11,11 +25,10 @@ import de.greenrobot.dao.DaoException;
 // KEEP INCLUDES - put your custom includes here
 import java.util.ArrayList;
 // KEEP INCLUDES END
-
 /**
  * Entity mapped to table INTERACTION.
  */
-public class Interaction {
+public class Interaction implements com.missionhub.model.TimestampedEntity {
 
     private Long id;
     private Long interaction_type_id;
@@ -29,14 +42,10 @@ public class Interaction {
     private String created_at;
     private String updated_at;
 
-    /**
-     * Used to resolve relations
-     */
+    /** Used to resolve relations */
     private transient DaoSession daoSession;
 
-    /**
-     * Used for active entity operations.
-     */
+    /** Used for active entity operations. */
     private transient InteractionDao myDao;
 
     private Person receiver;
@@ -57,6 +66,7 @@ public class Interaction {
     private List<InteractionInitiator> interactionInitiatorList;
 
     // KEEP FIELDS - put your custom fields here
+    private InteractionViewCache mViewCache;
     // KEEP FIELDS END
 
     public Interaction() {
@@ -80,9 +90,7 @@ public class Interaction {
         this.updated_at = updated_at;
     }
 
-    /**
-     * called by internal mechanisms, do not call yourself.
-     */
+    /** called by internal mechanisms, do not call yourself. */
     public void __setDaoSession(DaoSession daoSession) {
         this.daoSession = daoSession;
         myDao = daoSession != null ? daoSession.getInteractionDao() : null;
@@ -176,9 +184,7 @@ public class Interaction {
         this.updated_at = updated_at;
     }
 
-    /**
-     * To-one relationship, resolved on first access.
-     */
+    /** To-one relationship, resolved on first access. */
     public Person getReceiver() {
         Long __key = this.receiver_id;
         if (receiver__resolvedKey == null || !receiver__resolvedKey.equals(__key)) {
@@ -189,7 +195,7 @@ public class Interaction {
             Person receiverNew = targetDao.load(__key);
             synchronized (this) {
                 receiver = receiverNew;
-                receiver__resolvedKey = __key;
+            	receiver__resolvedKey = __key;
             }
         }
         return receiver;
@@ -203,9 +209,7 @@ public class Interaction {
         }
     }
 
-    /**
-     * To-one relationship, resolved on first access.
-     */
+    /** To-one relationship, resolved on first access. */
     public Organization getOrganization() {
         Long __key = this.organization_id;
         if (organization__resolvedKey == null || !organization__resolvedKey.equals(__key)) {
@@ -216,7 +220,7 @@ public class Interaction {
             Organization organizationNew = targetDao.load(__key);
             synchronized (this) {
                 organization = organizationNew;
-                organization__resolvedKey = __key;
+            	organization__resolvedKey = __key;
             }
         }
         return organization;
@@ -230,9 +234,7 @@ public class Interaction {
         }
     }
 
-    /**
-     * To-one relationship, resolved on first access.
-     */
+    /** To-one relationship, resolved on first access. */
     public Person getCreator() {
         Long __key = this.created_by_id;
         if (creator__resolvedKey == null || !creator__resolvedKey.equals(__key)) {
@@ -243,7 +245,7 @@ public class Interaction {
             Person creatorNew = targetDao.load(__key);
             synchronized (this) {
                 creator = creatorNew;
-                creator__resolvedKey = __key;
+            	creator__resolvedKey = __key;
             }
         }
         return creator;
@@ -257,9 +259,7 @@ public class Interaction {
         }
     }
 
-    /**
-     * To-one relationship, resolved on first access.
-     */
+    /** To-one relationship, resolved on first access. */
     public Person getUpdater() {
         Long __key = this.updated_by_id;
         if (updater__resolvedKey == null || !updater__resolvedKey.equals(__key)) {
@@ -270,7 +270,7 @@ public class Interaction {
             Person updaterNew = targetDao.load(__key);
             synchronized (this) {
                 updater = updaterNew;
-                updater__resolvedKey = __key;
+            	updater__resolvedKey = __key;
             }
         }
         return updater;
@@ -284,9 +284,7 @@ public class Interaction {
         }
     }
 
-    /**
-     * To-one relationship, resolved on first access.
-     */
+    /** To-one relationship, resolved on first access. */
     public InteractionType getInteractionType() {
         Long __key = this.interaction_type_id;
         if (interactionType__resolvedKey == null || !interactionType__resolvedKey.equals(__key)) {
@@ -297,7 +295,7 @@ public class Interaction {
             InteractionType interactionTypeNew = targetDao.load(__key);
             synchronized (this) {
                 interactionType = interactionTypeNew;
-                interactionType__resolvedKey = __key;
+            	interactionType__resolvedKey = __key;
             }
         }
         return interactionType;
@@ -311,9 +309,7 @@ public class Interaction {
         }
     }
 
-    /**
-     * To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity.
-     */
+    /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
     public List<InteractionInitiator> getInteractionInitiatorList() {
         if (interactionInitiatorList == null) {
             if (daoSession == null) {
@@ -322,7 +318,7 @@ public class Interaction {
             InteractionInitiatorDao targetDao = daoSession.getInteractionInitiatorDao();
             List<InteractionInitiator> interactionInitiatorListNew = targetDao._queryInteraction_InteractionInitiatorList(id);
             synchronized (this) {
-                if (interactionInitiatorList == null) {
+                if(interactionInitiatorList == null) {
                     interactionInitiatorList = interactionInitiatorListNew;
                 }
             }
@@ -330,44 +326,41 @@ public class Interaction {
         return interactionInitiatorList;
     }
 
-    /**
-     * Resets a to-many relationship, making the next get call to query for a fresh result.
-     */
+    /** Resets a to-many relationship, making the next get call to query for a fresh result. */
     public synchronized void resetInteractionInitiatorList() {
         interactionInitiatorList = null;
     }
 
-    /**
-     * Convenient call for {@link AbstractDao#delete(Object)}. Entity must attached to an entity context.
-     */
+    /** Convenient call for {@link AbstractDao#delete(Object)}. Entity must attached to an entity context. */
     public void delete() {
         if (myDao == null) {
             throw new DaoException("Entity is detached from DAO context");
-        }
+        }    
         myDao.delete(this);
     }
 
-    /**
-     * Convenient call for {@link AbstractDao#update(Object)}. Entity must attached to an entity context.
-     */
+    /** Convenient call for {@link AbstractDao#update(Object)}. Entity must attached to an entity context. */
     public void update() {
         if (myDao == null) {
             throw new DaoException("Entity is detached from DAO context");
-        }
+        }    
         myDao.update(this);
     }
 
-    /**
-     * Convenient call for {@link AbstractDao#refresh(Object)}. Entity must attached to an entity context.
-     */
+    /** Convenient call for {@link AbstractDao#refresh(Object)}. Entity must attached to an entity context. */
     public void refresh() {
         if (myDao == null) {
             throw new DaoException("Entity is detached from DAO context");
-        }
+        }    
         myDao.refresh(this);
     }
 
     // KEEP METHODS - put your custom methods here
+    public void refreshAll() {
+        refresh();
+        invalidateViewCache();
+    }
+
     public void deleteWithRelations() {
         if (daoSession == null) {
             throw new DaoException("Entity is detached from DAO context");
@@ -383,6 +376,83 @@ public class Interaction {
             ids.add(initiator.getId());
         }
         return ids.toArray(new Long[ids.size()]);
+    }
+
+    public InteractionVisibility getVisibility() {
+        return InteractionVisibility.parse(getPrivacy_setting());
+    }
+
+    public InteractionViewCache getViewCache() {
+        if (mViewCache == null) {
+            synchronized (this) {
+                mViewCache = new InteractionViewCache();
+
+                DateTime timestamp;
+                if (StringUtils.isNotEmpty(getTimestamp())) {
+                    timestamp = DateUtils.parseISO8601(getTimestamp());
+                } else {
+                    timestamp = DateUtils.parseISO8601(getCreated_at());
+                }
+                mViewCache.timestamp = timestamp.toString(DateTimeFormat.forPattern("d MMM yyyy").withZone(DateTimeZone.getDefault()));
+                mViewCache.visibility = getVisibility().toString();
+
+                List<String> initiatorNames = new ArrayList<String>();
+                List<InteractionInitiator> initiators = getInteractionInitiatorList();
+                for(InteractionInitiator initiator : initiators) {
+                    Person p  = initiator.getPerson();
+                    if (p != null) {
+                        initiatorNames.add(p.getName());
+                    }
+                }
+
+                String receiverName = "";
+                if (getReceiver() != null) {
+                    receiverName = getReceiver().getName();
+                }
+
+                InteractionType type = getInteractionType();
+                if (type != null) {
+                    mViewCache.iconResource = type.getIconResource();
+                    mViewCache.action = Html.fromHtml(type.getActionString(StringUtils.join(initiatorNames, ", "), receiverName));
+                }
+
+                if (StringUtils.isNotEmpty(getComment())) {
+                    mViewCache.comment = Html.fromHtml(String.format(ResourceUtils.getString(R.string.interaction_comment_message), StringUtils.join(initiatorNames, ", "), getComment().trim()));
+                }
+
+                DateTime updated;
+                if (StringUtils.isNotEmpty(getUpdated_at())) {
+                    updated = DateUtils.parseISO8601(getUpdated_at());
+                } else {
+                    updated = DateUtils.parseISO8601(getCreated_at());
+                }
+                String updatedTime = updated.toString(DateTimeFormat.forPattern("h:mm a").withZone(DateTimeZone.getDefault()));
+                String updatedDate = updated.toString(DateTimeFormat.forPattern("d MMM yyyy").withZone(DateTimeZone.getDefault()));
+                String updaterName;
+                if (getUpdater() != null) {
+                    updaterName = getUpdater().getName();
+                } else if (getCreator() != null) {
+                    updaterName = getCreator().getName();
+                } else {
+                    updaterName = "Unknown";
+                }
+                mViewCache.updated = String.format(ResourceUtils.getString(R.string.interaction_updated_at), updaterName, updatedDate, updatedTime);
+            }
+        }
+        return mViewCache;
+    }
+
+    public void invalidateViewCache() {
+        mViewCache = null;
+    }
+
+    public static class InteractionViewCache {
+        public int iconResource;
+        public CharSequence timestamp;
+        public CharSequence visibility;
+        public CharSequence action;
+        public CharSequence comment;
+        public CharSequence updated;
     }
     // KEEP METHODS END
 

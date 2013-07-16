@@ -8,4 +8,5 @@
         android:background="@color/white"
         android:cacheColorHint="@color/white"
         android:headerDividersEnabled="false"
-        />
+        android:dividerHeight="0dip"
+        android:divider="@null"/>

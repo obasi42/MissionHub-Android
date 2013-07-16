@@ -1,0 +1,77 @@
+<RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="16dip">
+
+    <ImageView
+            android:id="@android:id/icon"
+            android:layout_width="32dip"
+            android:layout_height="32dip"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginRight="8dip"
+            android:layout_marginLeft="16dip"
+            />
+
+    <LinearLayout
+            android:id="@android:id/content"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@android:id/icon"
+            android:orientation="vertical"
+            android:layout_marginRight="16dip"
+            android:layout_marginBottom="8dip"
+            >
+
+        <TextView
+                android:id="@+id/timestamp"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textColor="#BFBFBF"/>
+
+        <TextView
+                android:id="@+id/visibility"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:textColor="#BFBFBF"
+                android:layout_marginBottom="8dip"/>
+
+        <TextView
+                android:id="@android:id/text1"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#808183"
+                android:textSize="18sp"
+                android:layout_marginBottom="8dip"/>
+
+        <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@android:id/text2"
+                android:textSize="16sp"
+                android:textColor="#808183"
+                android:layout_marginBottom="8dip"/>
+
+        <TextView
+                android:layout_width="fill_parent"
+                android:gravity="right"
+                android:layout_height="wrap_content"
+                android:id="@+id/updated"
+                android:textSize="12sp"
+                android:textColor="#BFBFBF"
+                android:layout_marginBottom="8dip"/>
+
+    </LinearLayout>
+
+    <View
+            android:id="@+id/divider"
+            android:layout_width="fill_parent"
+            android:layout_height="1px"
+            android:background="?android:listDivider"
+            android:layout_below="@android:id/content"/>
+
+</RelativeLayout>

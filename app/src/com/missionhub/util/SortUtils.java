@@ -5,6 +5,7 @@ import com.google.common.collect.TreeMultimap;
 import com.missionhub.model.InteractionType;
 import com.missionhub.model.Label;
 import com.missionhub.model.Person;
+import com.missionhub.model.TimestampedEntity;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -73,6 +74,26 @@ public class SortUtils<T> {
             @Override
             public String getSortName(Object object) {
                 return ((Label) object).getTranslatedName();
+            }
+        });
+    }
+
+    public static <K extends TimestampedEntity> List<K> sortTimestampedEnitiesByCreated(final Collection<K> entities, final boolean asc) {
+        SortUtils<K> su = new SortUtils<K>();
+        return su.sort(entities, asc, new SortNameCallback() {
+            @Override
+            public String getSortName(Object object) {
+                return ((K) object).getCreated_at();
+            }
+        });
+    }
+
+    public static <K extends TimestampedEntity> List<K> sortTimestampedEnitiesByUpdated(final Collection<K> entities, final boolean asc) {
+        SortUtils<K> su = new SortUtils<K>();
+        return su.sort(entities, asc, new SortNameCallback() {
+            @Override
+            public String getSortName(Object object) {
+                return ((K) object).getUpdated_at();
             }
         });
     }

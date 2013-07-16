@@ -1,6 +1,16 @@
 package com.missionhub.model;
 
+import android.text.Html;
+
+import com.missionhub.R;
 import com.missionhub.model.DaoSession;
+import com.missionhub.util.DateUtils;
+import com.missionhub.util.ResourceUtils;
+
+import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
 
 import de.greenrobot.dao.DaoException;
 
@@ -8,11 +18,10 @@ import de.greenrobot.dao.DaoException;
 
 // KEEP INCLUDES - put your custom includes here
 // KEEP INCLUDES END
-
 /**
  * Entity mapped to table ORGANIZATIONAL_LABEL.
  */
-public class OrganizationalLabel {
+public class OrganizationalLabel implements com.missionhub.model.TimestampedEntity {
 
     private Long id;
     private Long person_id;
@@ -24,14 +33,10 @@ public class OrganizationalLabel {
     private String created_at;
     private String removed_date;
 
-    /**
-     * Used to resolve relations
-     */
+    /** Used to resolve relations */
     private transient DaoSession daoSession;
 
-    /**
-     * Used for active entity operations.
-     */
+    /** Used for active entity operations. */
     private transient OrganizationalLabelDao myDao;
 
     private Person person;
@@ -48,6 +53,7 @@ public class OrganizationalLabel {
 
 
     // KEEP FIELDS - put your custom fields here
+    private OrganizationalLabelViewCache mViewCache;
     // KEEP FIELDS END
 
     public OrganizationalLabel() {
@@ -69,9 +75,7 @@ public class OrganizationalLabel {
         this.removed_date = removed_date;
     }
 
-    /**
-     * called by internal mechanisms, do not call yourself.
-     */
+    /** called by internal mechanisms, do not call yourself. */
     public void __setDaoSession(DaoSession daoSession) {
         this.daoSession = daoSession;
         myDao = daoSession != null ? daoSession.getOrganizationalLabelDao() : null;
@@ -149,9 +153,7 @@ public class OrganizationalLabel {
         this.removed_date = removed_date;
     }
 
-    /**
-     * To-one relationship, resolved on first access.
-     */
+    /** To-one relationship, resolved on first access. */
     public Person getPerson() {
         Long __key = this.person_id;
         if (person__resolvedKey == null || !person__resolvedKey.equals(__key)) {
@@ -162,7 +164,7 @@ public class OrganizationalLabel {
             Person personNew = targetDao.load(__key);
             synchronized (this) {
                 person = personNew;
-                person__resolvedKey = __key;
+            	person__resolvedKey = __key;
             }
         }
         return person;
@@ -176,9 +178,7 @@ public class OrganizationalLabel {
         }
     }
 
-    /**
-     * To-one relationship, resolved on first access.
-     */
+    /** To-one relationship, resolved on first access. */
     public Organization getOrganization() {
         Long __key = this.organization_id;
         if (organization__resolvedKey == null || !organization__resolvedKey.equals(__key)) {
@@ -189,7 +189,7 @@ public class OrganizationalLabel {
             Organization organizationNew = targetDao.load(__key);
             synchronized (this) {
                 organization = organizationNew;
-                organization__resolvedKey = __key;
+            	organization__resolvedKey = __key;
             }
         }
         return organization;
@@ -203,9 +203,7 @@ public class OrganizationalLabel {
         }
     }
 
-    /**
-     * To-one relationship, resolved on first access.
-     */
+    /** To-one relationship, resolved on first access. */
     public Person getAddedByPerson() {
         Long __key = this.added_by_id;
         if (addedByPerson__resolvedKey == null || !addedByPerson__resolvedKey.equals(__key)) {
@@ -216,7 +214,7 @@ public class OrganizationalLabel {
             Person addedByPersonNew = targetDao.load(__key);
             synchronized (this) {
                 addedByPerson = addedByPersonNew;
-                addedByPerson__resolvedKey = __key;
+            	addedByPerson__resolvedKey = __key;
             }
         }
         return addedByPerson;
@@ -230,9 +228,7 @@ public class OrganizationalLabel {
         }
     }
 
-    /**
-     * To-one relationship, resolved on first access.
-     */
+    /** To-one relationship, resolved on first access. */
     public Label getLabel() {
         Long __key = this.label_id;
         if (label__resolvedKey == null || !label__resolvedKey.equals(__key)) {
@@ -243,7 +239,7 @@ public class OrganizationalLabel {
             Label labelNew = targetDao.load(__key);
             synchronized (this) {
                 label = labelNew;
-                label__resolvedKey = __key;
+            	label__resolvedKey = __key;
             }
         }
         return label;
@@ -257,37 +253,62 @@ public class OrganizationalLabel {
         }
     }
 
-    /**
-     * Convenient call for {@link AbstractDao#delete(Object)}. Entity must attached to an entity context.
-     */
+    /** Convenient call for {@link AbstractDao#delete(Object)}. Entity must attached to an entity context. */
     public void delete() {
         if (myDao == null) {
             throw new DaoException("Entity is detached from DAO context");
-        }
+        }    
         myDao.delete(this);
     }
 
-    /**
-     * Convenient call for {@link AbstractDao#update(Object)}. Entity must attached to an entity context.
-     */
+    /** Convenient call for {@link AbstractDao#update(Object)}. Entity must attached to an entity context. */
     public void update() {
         if (myDao == null) {
             throw new DaoException("Entity is detached from DAO context");
-        }
+        }    
         myDao.update(this);
     }
 
-    /**
-     * Convenient call for {@link AbstractDao#refresh(Object)}. Entity must attached to an entity context.
-     */
+    /** Convenient call for {@link AbstractDao#refresh(Object)}. Entity must attached to an entity context. */
     public void refresh() {
         if (myDao == null) {
             throw new DaoException("Entity is detached from DAO context");
-        }
+        }    
         myDao.refresh(this);
     }
 
     // KEEP METHODS - put your custom methods here
+    public synchronized void invalidateViewCache() {
+        mViewCache = null;
+    }
+
+    public OrganizationalLabelViewCache getViewCache() {
+        if (mViewCache == null) {
+            synchronized (this) {
+                mViewCache = new OrganizationalLabelViewCache();
+
+                DateTime timestamp = null;
+                if (StringUtils.isNotEmpty(getUpdated_at())) {
+                    timestamp = DateUtils.parseISO8601(getUpdated_at());
+                } else if (StringUtils.isNotEmpty(getCreated_at())) {
+                    timestamp = DateUtils.parseISO8601(getCreated_at());
+                }
+                if (timestamp != null) {
+                    mViewCache.timestamp = timestamp.toString(DateTimeFormat.forPattern("d MMM yyyy h:mm a").withZone(DateTimeZone.getDefault()));
+                }
+
+                if (getLabel() != null) {
+                    mViewCache.action = Html.fromHtml(String.format(ResourceUtils.getString(R.string.profile_label_action), getLabel().getTranslatedName()));
+                }
+            }
+        }
+        return mViewCache;
+    }
+
+    public class OrganizationalLabelViewCache {
+        public CharSequence timestamp;
+        public CharSequence action;
+    }
     // KEEP METHODS END
 
 }

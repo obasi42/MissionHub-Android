@@ -1,11 +1,14 @@
 package com.missionhub.model.gson;
 
 import com.missionhub.application.Application;
+import com.missionhub.application.Session;
 import com.missionhub.model.OrganizationalLabel;
 import com.missionhub.model.OrganizationalLabelDao;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 public class GOrganizationalLabel {
@@ -70,14 +73,20 @@ public class GOrganizationalLabel {
         }
     }
 
-    public static List<OrganizationalLabel> replaceAll(final GOrganizationalLabel[] labels, final long personId, final long organization_id, final boolean inTx) throws Exception {
+    public static List<OrganizationalLabel> replaceAll(final GOrganizationalLabel[] labels, final long personId, final boolean inTx) throws Exception {
         final Callable<List<OrganizationalLabel>> callable = new Callable<List<OrganizationalLabel>>() {
             @Override
             public List<OrganizationalLabel> call() throws Exception {
                 synchronized (lock) {
                     final OrganizationalLabelDao dao = Application.getDb().getOrganizationalLabelDao();
 
-                    List<Long> oldIds = dao.queryBuilder().where(OrganizationalLabelDao.Properties.Organization_id.eq(organization_id), OrganizationalLabelDao.Properties.Person_id.eq(personId)).listKeys();
+
+                    Set<Long> orgIds = new HashSet<Long>();
+                    for (GOrganizationalLabel label : labels) {
+                        orgIds.add(label.organization_id);
+                    }
+                    orgIds.add(Session.getInstance().getOrganizationId());
+                    List<Long> oldIds = dao.queryBuilder().where(OrganizationalLabelDao.Properties.Organization_id.in(orgIds), OrganizationalLabelDao.Properties.Person_id.eq(personId)).listKeys();
                     for (Long id : oldIds) {
                         dao.deleteByKey(id);
                     }
