@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 
+import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
@@ -109,6 +110,11 @@ public class HostedProfileFragment extends HostedFragment implements TabBar.OnTa
         setHasOptionsMenu(true);
 
         Application.registerEventSubscriber(this, OnOrganizationChangedEvent.class);
+    }
+
+    @Override
+    public void onPrepareActionBar(ActionBar actionBar) {
+        actionBar.setTitle("Profile");
     }
 
     @SuppressWarnings("unused")
