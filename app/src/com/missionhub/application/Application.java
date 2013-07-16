@@ -72,12 +72,19 @@ public class Application extends org.holoeverywhere.app.Application {
     private static final String DB_NAME = "missionhub.db";
 
     /**
+     * Initialize the static context
+     */
+    public Application() {
+        sApplication = this;
+    }
+
+    /**
      * called when the application is created.
      */
     @Override
-    public synchronized void onCreate() {
-        super.onCreate();
+    public void onCreate() {
         sApplication = this;
+        super.onCreate();
 
         UpgradeManager.doUpgrade();
 
@@ -147,7 +154,7 @@ public class Application extends org.holoeverywhere.app.Application {
     /**
      * @return the singleton instance of the application
      */
-    public synchronized static Application getInstance() {
+    public static Application getInstance() {
         return sApplication;
     }
 
@@ -163,9 +170,11 @@ public class Application extends org.holoeverywhere.app.Application {
      *
      * @return
      */
-    public synchronized static ExecutorService getExecutor() {
+    public static ExecutorService getExecutor() {
         if (sExecutorService == null) {
-            sExecutorService = Executors.newCachedThreadPool();
+            synchronized (Application.class) {
+                sExecutorService = Executors.newCachedThreadPool();
+            }
         }
         return sExecutorService;
     }
@@ -189,10 +198,12 @@ public class Application extends org.holoeverywhere.app.Application {
     /**
      * @return the raw sqlite database for the application context
      */
-    public synchronized static SQLiteDatabase getRawDb() {
+    public static SQLiteDatabase getRawDb() {
         if (mDb == null) {
             final OpenHelper helper = new MissionHubOpenHelper(getContext(), DB_NAME, null);
-            mDb = helper.getWritableDatabase();
+            synchronized (Application.class) {
+                mDb = helper.getWritableDatabase();
+            }
         }
         return mDb;
     }
@@ -200,21 +211,25 @@ public class Application extends org.holoeverywhere.app.Application {
     /**
      * Closes the database entirely
      */
-    public synchronized static void closeDb() {
-        mDaoSession = null;
-        if (mDb != null) {
-            mDb.close();
-            mDb = null;
+    public static void closeDb() {
+        synchronized (Application.class) {
+            mDaoSession = null;
+            if (mDb != null) {
+                mDb.close();
+                mDb = null;
+            }
         }
     }
 
     /**
      * @return the database database session for the application context
      */
-    public synchronized static DaoSession getDb() {
+    public static DaoSession getDb() {
         if (mDaoSession == null) {
             final DaoMaster daoMaster = new DaoMaster(getRawDb());
-            mDaoSession = daoMaster.newSession();
+            synchronized (Application.class) {
+                mDaoSession = daoMaster.newSession();
+            }
         }
         return mDaoSession;
     }
@@ -226,8 +241,10 @@ public class Application extends org.holoeverywhere.app.Application {
      */
     public boolean deleteDatabase() {
         getRawDb().close();
-        mDaoSession = null;
-        mDb = null;
+        synchronized (Application.class) {
+            mDaoSession = null;
+            mDb = null;
+        }
         return deleteDatabase(DB_NAME);
     }
 
@@ -318,7 +335,7 @@ public class Application extends org.holoeverywhere.app.Application {
 
     public static Tracker getTracker() {
         if (Configuration.isAnalyticsEnabled()) {
-            return GoogleAnalytics.getInstance(sApplication).getDefaultTracker();
+            return GoogleAnalytics.getInstance(getContext()).getDefaultTracker();
         }
         return null;
     }
