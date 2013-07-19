@@ -13,6 +13,7 @@ import com.missionhub.R;
 import com.missionhub.api.Api;
 import com.missionhub.api.Api.Include;
 import com.missionhub.api.ApiOptions;
+import com.missionhub.api.ApiRequest;
 import com.missionhub.api.PeopleListOptions;
 import com.missionhub.application.Application;
 import com.missionhub.application.Session;
@@ -249,17 +250,21 @@ public class AssignmentDialogFragment extends RefreshableDialogFragment implemen
         }
         mAssignTask = new SafeAsyncTask<Void>() {
 
+            public ApiRequest<?> mApiRequest;
+
             @Override
             public Void call() throws Exception {
                 List<Long> personIds;
                 if (mPeople != null) {
                     personIds = new ArrayList<Long>(Person.getIds(mPeople));
                 } else {
-                    personIds = Api.listPersonIds(mFilters).get();
+                    mApiRequest = Api.listPersonIds(mFilters);
+                    personIds = (List<Long>) mApiRequest.get();
                 }
 
                 if (leader == null) {
-                    Api.bulkDeleteContactAssignments(personIds).get();
+                    mApiRequest = Api.bulkDeleteContactAssignments(personIds);
+                    mApiRequest.get();
                 } else {
                     final List<GContactAssignment> assignments = new ArrayList<GContactAssignment>();
                     for (final Long id : personIds) {
@@ -277,7 +282,8 @@ public class AssignmentDialogFragment extends RefreshableDialogFragment implemen
 
                         assignments.add(assignment);
                     }
-                    Api.bulkUpdateContactAssignments(assignments).get();
+                    mApiRequest = Api.bulkUpdateContactAssignments(assignments);
+                    mApiRequest.get();
                 }
                 return null;
             }
@@ -290,6 +296,9 @@ public class AssignmentDialogFragment extends RefreshableDialogFragment implemen
 
             @Override
             public void onFinally() {
+                if (mApiRequest != null) {
+                    mApiRequest.disconnect();
+                }
                 mAssignTask = null;
                 updateProgressView();
             }
@@ -337,13 +346,16 @@ public class AssignmentDialogFragment extends RefreshableDialogFragment implemen
 
         mRefreshLeadersTask = new SafeAsyncTask<Void>() {
 
+            public ApiRequest<Organization> mApiRequest;
+
             @Override
             public Void call() throws Exception {
-                Organization org = Api.getOrganization(Session.getInstance().getOrganizationId(), ApiOptions.builder()
+                mApiRequest = Api.getOrganization(Session.getInstance().getOrganizationId(), ApiOptions.builder()
                         .include(Include.users)
                         .include(Include.organizational_permission)
-                        .build()).get();
+                        .build());
 
+                Organization org = mApiRequest.get();
                 org.refreshAll();
                 return null;
             }
@@ -355,6 +367,9 @@ public class AssignmentDialogFragment extends RefreshableDialogFragment implemen
 
             @Override
             public void onFinally() {
+                if (mApiRequest != null) {
+                    mApiRequest.disconnect();
+                }
                 mRefreshLeadersTask = null;
                 updateRefreshIcon();
             }

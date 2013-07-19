@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.missionhub.api.Api;
 import com.missionhub.api.ApiOptions;
+import com.missionhub.api.ApiRequest;
 import com.missionhub.api.PeopleListOptions;
 import com.missionhub.model.Person;
 import com.missionhub.util.SafeAsyncTask;
@@ -109,16 +110,20 @@ public class ApiPeopleListProvider extends DynamicPeopleListProvider {
     public Collection<Person> loadMore() {
         synchronized (getLock()) {
             mTask = new SafeAsyncTask<List<Person>>() {
+                private ApiRequest<List<Person>> mRequest;
+
                 @Override
                 public List<Person> call() throws Exception {
-                    List<Person> people = Api.listPeople(mOptions, ApiOptions.builder()
+                    mRequest = Api.listPeople(mOptions, ApiOptions.builder()
                             .include(Api.Include.assigned_tos)
                             .include(Api.Include.current_address)
                             .include(Api.Include.email_addresses)
                             .include(Api.Include.organizational_permission)
                             .include(Api.Include.organizational_labels)
                             .include(Api.Include.phone_numbers)
-                            .build()).get();
+                            .build());
+
+                    List<Person> people = mRequest.get();
 
                     // init the view cache
                     if (people != null) {
@@ -143,6 +148,9 @@ public class ApiPeopleListProvider extends DynamicPeopleListProvider {
 
                 @Override
                 public void onFinally() {
+                    if (mRequest != null) {
+                        mRequest.disconnect();
+                    }
                     if (isCanceled()) return;
                     synchronized (getLock()) {
                         mTask = null;
@@ -155,11 +163,6 @@ public class ApiPeopleListProvider extends DynamicPeopleListProvider {
                     if (isCanceled()) return;
                     setPaused(true);
                     ApiPeopleListProvider.this.onException(e);
-                }
-
-                @Override
-                public void onInterrupted(final Exception e) {
-
                 }
             };
             setLoading(true);

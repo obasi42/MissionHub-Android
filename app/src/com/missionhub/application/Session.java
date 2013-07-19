@@ -18,6 +18,7 @@ import com.missionhub.api.Api;
 import com.missionhub.api.Api.Include;
 import com.missionhub.api.ApiException;
 import com.missionhub.api.ApiOptions;
+import com.missionhub.api.ApiRequest;
 import com.missionhub.api.InvalidFacebookTokenException;
 import com.missionhub.authenticator.Authenticator;
 import com.missionhub.authenticator.AuthenticatorActivity;
@@ -25,6 +26,7 @@ import com.missionhub.event.FacebookEvent;
 import com.missionhub.event.OnOrganizationChangedEvent;
 import com.missionhub.event.SessionEvent;
 import com.missionhub.model.Organization;
+import com.missionhub.model.Permission;
 import com.missionhub.model.Person;
 import com.missionhub.model.UserDao;
 import com.missionhub.util.SafeAsyncTask;
@@ -35,6 +37,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.holoeverywhere.widget.Toast;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.FutureTask;
 
 public class Session implements OnAccountsUpdateListener {
@@ -152,6 +155,10 @@ public class Session implements OnAccountsUpdateListener {
         if (mOpenTask != null) return;
 
         mOpenTask = new SafeAsyncTask<Void>() {
+            public FutureTask<Void> organziationTask;
+            public FutureTask<Person> personTask;
+            public FutureTask<Void> permissionTask;
+
             @Override
             public Void call() throws Exception {
                 setAndPostState(SessionState.OPENING);
@@ -222,15 +229,18 @@ public class Session implements OnAccountsUpdateListener {
 
                 // update the permissions
                 Application.postEvent(new SessionEvent(mState, Application.getContext().getString(R.string.session_updating_permissions)));
-                updatePermissions(false).get();
+                permissionTask = updatePermissions(false);
+                permissionTask.get();
 
                 // update the person
                 Application.postEvent(new SessionEvent(mState, Application.getContext().getString(R.string.session_updating_person)));
-                updatePerson(false).get();
+                personTask = updatePerson(false);
+                personTask.get();
 
                 // update the current organization
                 Application.postEvent(new SessionEvent(mState, Application.getContext().getString(R.string.session_updating_current_organization)));
-                updateCurrentOrganization(false).get();
+                organziationTask = updateCurrentOrganization(false);
+                organziationTask.get();
 
                 setAndPostState(SessionState.OPEN);
                 return null;
@@ -242,12 +252,8 @@ public class Session implements OnAccountsUpdateListener {
             }
 
             @Override
-            public void onInterrupted(Exception e) {
-                // do nothing
-            }
-
-            @Override
             public void onFinally() {
+                TaskUtils.cancel(permissionTask, personTask, organziationTask);
                 mOpenTask = null;
             }
         };
@@ -267,18 +273,10 @@ public class Session implements OnAccountsUpdateListener {
                 mPersonId = -1;
                 mOrganizationId = -1;
                 mAccount = null;
-                try {
-                    mOpenTask.cancel(true);
-                } catch (Exception e) { /* ignore */ }
-                try {
-                    mUpdatePersonTask.cancel(true);
-                } catch (Exception e) { /* ignore */ }
-                try {
-                    mUpdatePermissionsTask.cancel(true);
-                } catch (Exception e) { /* ignore */ }
-                try {
-                    mUpdateOrganizationTask.cancel(true);
-                } catch (Exception e) { /* ignore */ }
+                TaskUtils.cancel(mOpenTask);
+                TaskUtils.cancel(mUpdatePersonTask);
+                TaskUtils.cancel(mUpdatePermissionsTask);
+                TaskUtils.cancel(mUpdateOrganizationTask);
 
                 if (Configuration.isACRAEnabled()) {
                     try {
@@ -439,6 +437,7 @@ public class Session implements OnAccountsUpdateListener {
 
         mUpdatePersonTask = new SafeAsyncTask<Person>() {
             private final long mOneDayMillis = 60 * 60 * 24 * 1000;
+            public ApiRequest<Person> mApiRequest;
 
             @Override
             public Person call() throws Exception {
@@ -446,7 +445,7 @@ public class Session implements OnAccountsUpdateListener {
                 final long currentTime = System.currentTimeMillis() - 1000;
 
                 if (!Configuration.isSkipSessionUpdates() && (lastUpdated < System.currentTimeMillis() - mOneDayMillis || force)) {
-                    Api.getPersonMe(ApiOptions.builder() //
+                    mApiRequest = Api.getPersonMe(ApiOptions.builder() //
                             .include(Include.all_organization_and_children) //
                             .include(Include.all_organizational_permissions) //
                             .include(Include.answer_sheets) //
@@ -458,7 +457,8 @@ public class Session implements OnAccountsUpdateListener {
                             .include(Include.interactions) //
                             .include(Include.user) //
                             .include(Include.organizational_labels)
-                            .build()).get(); //
+                            .build());
+                    mApiRequest.get();
 
                     SettingsManager.getInstance().setUserSetting(getPersonId(), "person_" + getPersonId() + "_updated", currentTime);
                 }
@@ -482,15 +482,14 @@ public class Session implements OnAccountsUpdateListener {
 
             @Override
             public void onFinally() {
+                if (mApiRequest != null) {
+                    mApiRequest.disconnect();
+                }
                 mUpdatePersonTask = null;
             }
 
             @Override
             public void onException(final Exception e) {
-            }
-
-            @Override
-            public void onInterrupted(final Exception e) {
             }
         };
         Application.getExecutor().execute(mUpdatePersonTask.future());
@@ -507,6 +506,7 @@ public class Session implements OnAccountsUpdateListener {
         mUpdateOrganizationTask = new SafeAsyncTask<Void>() {
 
             private final long mOneWeekMillis = 60 * 60 * 24 * 7 * 1000;
+            public ApiRequest<Organization> mApiRequest;
 
             @Override
             public Void call() throws Exception {
@@ -515,7 +515,7 @@ public class Session implements OnAccountsUpdateListener {
 
                 if (!Configuration.isSkipSessionUpdates() && (lastUpdated < System.currentTimeMillis() - mOneWeekMillis || force)) {
 
-                    Organization org = Api.getOrganization(organizationId, ApiOptions.builder()
+                    mApiRequest = Api.getOrganization(organizationId, ApiOptions.builder()
                             .include(Include.all_questions)
                             .include(Include.keywords)
                             .include(Include.users)
@@ -523,7 +523,9 @@ public class Session implements OnAccountsUpdateListener {
                             .include(Include.surveys)
                             .include(Include.organizational_permission)
                             .include(Include.interaction_types)
-                            .build()).get();
+                            .build());
+
+                    Organization org = mApiRequest.get();
 
                     org.refreshAll();
                     getPerson().refreshAll();
@@ -537,6 +539,9 @@ public class Session implements OnAccountsUpdateListener {
 
             @Override
             public void onFinally() {
+                if (mApiRequest != null) {
+                    mApiRequest.disconnect();
+                }
                 mUpdateOrganizationTask = null;
             }
 
@@ -556,6 +561,7 @@ public class Session implements OnAccountsUpdateListener {
         mUpdatePermissionsTask = new SafeAsyncTask<Void>() {
 
             private final long mOneWeekMillis = 60 * 60 * 24 * 7 * 1000;
+            public ApiRequest<List<Permission>> mApiRequest;
 
             @Override
             public Void call() throws Exception {
@@ -563,8 +569,8 @@ public class Session implements OnAccountsUpdateListener {
                 final long currentTime = System.currentTimeMillis() - 1000;
 
                 if (!Configuration.isSkipSessionUpdates() && (lastUpdated < System.currentTimeMillis() - mOneWeekMillis || force)) {
-
-                    Api.listPermissions().get();
+                    mApiRequest = Api.listPermissions();
+                    mApiRequest.get();
 
                     SettingsManager.getInstance().setSetting("permissions_updated", currentTime);
                 }
@@ -578,6 +584,9 @@ public class Session implements OnAccountsUpdateListener {
 
             @Override
             public void onFinally() {
+                if (mApiRequest != null) {
+                    mApiRequest.disconnect();
+                }
                 mUpdatePermissionsTask = null;
             }
 

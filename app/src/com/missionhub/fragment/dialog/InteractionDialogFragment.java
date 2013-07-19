@@ -21,6 +21,7 @@ import android.widget.ImageView;
 import com.actionbarsherlock.widget.SearchView;
 import com.missionhub.R;
 import com.missionhub.api.Api;
+import com.missionhub.api.ApiRequest;
 import com.missionhub.api.PeopleListOptions;
 import com.missionhub.application.Application;
 import com.missionhub.application.Session;
@@ -68,6 +69,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.FutureTask;
 
 public class InteractionDialogFragment extends BaseDialogFragment implements ViewPager.OnPageChangeListener, DialogInterface.OnKeyListener, DatePicker.OnDateChangedListener, TimePicker.OnTimeChangedListener, PeopleListView.OnPersonCheckedListener, SearchHelper.OnSearchQueryChangedListener {
 
@@ -903,9 +905,12 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
         if (mRefreshInitiatorsTask != null) return;
 
         mRefreshInitiatorsTask = new SafeAsyncTask<Void>() {
+            public FutureTask<Void> mTask;
+
             @Override
             public Void call() throws Exception {
-                Session.getInstance().updateCurrentOrganization(true).get();
+                mTask = Session.getInstance().updateCurrentOrganization(true);
+                mTask.get();
                 return null;
             }
 
@@ -921,6 +926,7 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
 
             @Override
             public void onFinally() {
+                TaskUtils.cancel(mTask);
                 mRefreshInitiatorsTask = null;
                 updateRefreshState();
             }
@@ -988,19 +994,22 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
 
         mActionTask = new SafeAsyncTask<Void>() {
 
+            public ApiRequest<?> mApiRequest;
+
             @Override
             public Void call() throws Exception {
                 switch (action) {
                     case ACTION_CREATE:
-                        Api.createInteraction(mInteraction).get();
+                        mApiRequest = Api.createInteraction(mInteraction);
                         break;
                     case ACTION_UPDATE:
-                        Api.updateInteraction(mInteraction).get();
+                        mApiRequest = Api.updateInteraction(mInteraction);
                         break;
                     case ACTION_DELETE:
-                        Api.deleteInteraction(mInteraction.id).get();
+                        mApiRequest = Api.deleteInteraction(mInteraction.id);
                         break;
                 }
+                mApiRequest.get();
                 return null;
             }
 
@@ -1025,6 +1034,9 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
 
             @Override
             protected void onFinally() throws RuntimeException {
+                if (mApiRequest != null) {
+                    mApiRequest.disconnect();
+                }
                 mActionTask = null;
                 updateActionState();
             }

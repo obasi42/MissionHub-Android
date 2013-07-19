@@ -10,6 +10,7 @@ import android.view.View;
 import com.missionhub.R;
 import com.missionhub.api.Api;
 import com.missionhub.api.ApiOptions;
+import com.missionhub.api.ApiRequest;
 import com.missionhub.api.PeopleListOptions;
 import com.missionhub.application.Application;
 import com.missionhub.exception.ExceptionHelper;
@@ -137,6 +138,8 @@ public class DeletePeopleDialogFragment extends BaseDialogFragment {
 
         mTask = new SafeAsyncTask<Void>() {
 
+            public ApiRequest<?> mApiRequest;
+
             @Override
             public Void call() throws Exception {
                 if (mFilters != null) {
@@ -144,7 +147,8 @@ public class DeletePeopleDialogFragment extends BaseDialogFragment {
                     mFilters.removeOffset();
                     mFilters.removeLimit();
 
-                    List<Person> people = Api.listPeople(mFilters, ApiOptions.builder().include(Api.Include.organizational_permission).build()).get();
+                    mApiRequest = Api.listPeople(mFilters, ApiOptions.builder().include(Api.Include.organizational_permission).build());
+                    List<Person> people = (List<Person>) mApiRequest.get();
                     for (Person person : people) {
                         if (!person.isAdmin()) {
                             mPeopleIds.add(person.getId());
@@ -154,7 +158,8 @@ public class DeletePeopleDialogFragment extends BaseDialogFragment {
                 ensureData();
 
                 for (Long mPeopleId : (Iterable<Long>) mPeopleIds) {
-                    Api.deletePerson(mPeopleId).get();
+                    mApiRequest = Api.deletePerson(mPeopleId);
+                    mApiRequest.get();
                 }
                 return null;
             }
@@ -174,6 +179,9 @@ public class DeletePeopleDialogFragment extends BaseDialogFragment {
 
             @Override
             protected void onFinally() throws RuntimeException {
+                if (mApiRequest != null) {
+                    mApiRequest.disconnect();
+                }
                 mTask = null;
                 updateView();
             }

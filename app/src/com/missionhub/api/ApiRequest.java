@@ -1,5 +1,7 @@
 package com.missionhub.api;
 
+import android.util.Log;
+
 import com.github.kevinsawicki.http.HttpRequest;
 import com.missionhub.api.Api.ApiResponseParser;
 import com.missionhub.application.Session;
@@ -196,6 +198,14 @@ public class ApiRequest<T> {
         mCode = 0;
 
         doRequest();
+    }
+
+    public void disconnect() {
+        try {
+            mRequest.disconnect();
+        } catch (Exception e) {
+            Log.e(ApiRequest.class.getSimpleName(), e.getMessage(), e);
+        }
     }
 
 }

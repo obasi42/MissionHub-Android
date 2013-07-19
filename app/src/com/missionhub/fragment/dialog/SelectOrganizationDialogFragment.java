@@ -31,6 +31,7 @@ import org.holoeverywhere.widget.Toast;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.FutureTask;
 
 public class SelectOrganizationDialogFragment extends RefreshableDialogFragment implements DialogInterface.OnKeyListener {
 
@@ -304,9 +305,12 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
         }
 
         mTask = new SafeAsyncTask<Void>() {
+            public FutureTask<Person> task;
+
             @Override
             public Void call() throws Exception {
-                Session.getInstance().updatePerson(true).get();
+                task = Session.getInstance().updatePerson(true);
+                task.get();
                 return null;
             }
 
@@ -319,6 +323,7 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
 
             @Override
             public void onFinally() {
+                TaskUtils.cancel(task);
                 mTask = null;
                 if (!isDetached() && !isRemoving()) {
                     stopRefreshAnimation();
@@ -354,9 +359,12 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
 
         mSetTask = new SafeAsyncTask<Void>() {
 
+            public FutureTask<Void> task;
+
             @Override
             public Void call() throws Exception {
-                Session.getInstance().updateOrganization(organizationId, true).get();
+                task = Session.getInstance().updateOrganization(organizationId, true);
+                task.get();
                 return null;
             }
 
@@ -376,6 +384,9 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
 
             @Override
             protected void onFinally() throws RuntimeException {
+                if (task != null) {
+                    TaskUtils.cancel(task);
+                }
                 mSetTask = null;
                 updateUIState();
             }

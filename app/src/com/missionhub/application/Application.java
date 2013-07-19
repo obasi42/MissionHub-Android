@@ -173,7 +173,7 @@ public class Application extends org.holoeverywhere.app.Application {
     public static ExecutorService getExecutor() {
         if (sExecutorService == null) {
             synchronized (Application.class) {
-                sExecutorService = Executors.newCachedThreadPool();
+                sExecutorService = Executors.newFixedThreadPool(25);
             }
         }
         return sExecutorService;

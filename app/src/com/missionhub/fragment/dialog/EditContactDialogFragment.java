@@ -11,6 +11,7 @@ import com.missionhub.R;
 import com.missionhub.api.Api;
 import com.missionhub.api.Api.Include;
 import com.missionhub.api.ApiOptions;
+import com.missionhub.api.ApiRequest;
 import com.missionhub.application.Application;
 import com.missionhub.exception.ExceptionHelper;
 import com.missionhub.model.Person;
@@ -286,16 +287,19 @@ public class EditContactDialogFragment extends BaseDialogFragment {
 
         mTask = new SafeAsyncTask<Person>() {
 
+            public ApiRequest<Person> mApiRequest;
+
             @Override
             public Person call() throws Exception {
-                return Api.createPerson(mPerson, ApiOptions.builder() //
+                mApiRequest = Api.createPerson(mPerson, ApiOptions.builder() //
                         .include(Include.contact_assignments) //
                         .include(Include.addresses) //
                         .include(Include.email_addresses) //
                         .include(Include.phone_numbers) //
                         .include(Include.organizational_permission) //
                         .include(Include.organizational_labels) //
-                        .build()).get();
+                        .build());
+                return mApiRequest.get();
             }
 
             @Override
@@ -306,6 +310,9 @@ public class EditContactDialogFragment extends BaseDialogFragment {
 
             @Override
             public void onFinally() {
+                if (mApiRequest != null) {
+                    mApiRequest.disconnect();
+                }
                 mTask = null;
                 updateUI();
             }

@@ -12,6 +12,7 @@ import android.widget.AdapterView;
 import com.missionhub.R;
 import com.missionhub.api.Api;
 import com.missionhub.api.ApiOptions;
+import com.missionhub.api.ApiRequest;
 import com.missionhub.api.PeopleListOptions;
 import com.missionhub.application.Application;
 import com.missionhub.application.Session;
@@ -343,6 +344,8 @@ public class PermissionLabelDialogFragment extends RefreshableDialogFragment imp
 
         mSaveTask = new SafeAsyncTask<Void>() {
 
+            public ApiRequest<?> mApiRequest;
+
             @Override
             public Void call() throws Exception {
 
@@ -359,27 +362,29 @@ public class PermissionLabelDialogFragment extends RefreshableDialogFragment imp
 
                 List<Long> personIds;
                 if (mFilters != null) {
-                    personIds = Api.listPersonIds(mFilters).get();
+                    mApiRequest = Api.listPersonIds(mFilters);
+                    personIds = (List<Long>) mApiRequest.get();
                 } else {
                     personIds = new ArrayList<Long>(Person.getIds(mPeople));
                 }
 
                 switch (mType) {
                     case TYPE_LABELS:
-                        Api.bulkUpdateLabels(personIds, add, remove, ApiOptions.builder().include(Api.Include.organizational_labels).build()).get();
+                        mApiRequest = Api.bulkUpdateLabels(personIds, add, remove, ApiOptions.builder().include(Api.Include.organizational_labels).build());
                         break;
                     case TYPE_PERMISSIONS:
                         Long permission = null;
                         if (!add.isEmpty()) {
                             permission = add.iterator().next();
                         }
-                        Api.bulkUpdatePermissions(personIds, permission, remove, ApiOptions.builder().include(Api.Include.organizational_permission).build()).get();
+                        mApiRequest = Api.bulkUpdatePermissions(personIds, permission, remove, ApiOptions.builder().include(Api.Include.organizational_permission).build());
                         for (Person p : Person.getAllById(personIds)) {
                             p.resetPermissionCache();
                             p.invalidateViewCache();
                         }
                         break;
                 }
+                mApiRequest.get();
                 return null;
             }
 
@@ -399,6 +404,9 @@ public class PermissionLabelDialogFragment extends RefreshableDialogFragment imp
 
             @Override
             public void onFinally() {
+                if (mApiRequest != null) {
+                    mApiRequest.disconnect();
+                }
                 mSaveTask = null;
                 updateUIState();
             }
@@ -432,16 +440,19 @@ public class PermissionLabelDialogFragment extends RefreshableDialogFragment imp
         } catch (Exception e) { /* ignore */ }
 
         mRefreshTask = new SafeAsyncTask<Void>() {
+            public ApiRequest<?> mApiRequest;
+
             @Override
             public Void call() throws Exception {
                 switch (mType) {
                     case TYPE_LABELS:
-                        Api.listLabels().get();
+                        mApiRequest = Api.listLabels();
                         break;
                     case TYPE_PERMISSIONS:
-                        Api.listPermissions().get();
+                        mApiRequest = Api.listPermissions();
                         break;
                 }
+                mApiRequest.get();
                 return null;
             }
 
@@ -458,6 +469,9 @@ public class PermissionLabelDialogFragment extends RefreshableDialogFragment imp
 
             @Override
             protected void onFinally() throws RuntimeException {
+                if (mApiRequest != null) {
+                    mApiRequest.disconnect();
+                }
                 mRefreshTask = null;
                 updateUIState();
             }

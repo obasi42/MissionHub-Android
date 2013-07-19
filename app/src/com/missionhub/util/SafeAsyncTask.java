@@ -4,13 +4,14 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
+import com.missionhub.application.Application;
+
 import java.io.InterruptedIOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 
 /**
@@ -30,7 +31,7 @@ import java.util.concurrent.FutureTask;
  */
 public abstract class SafeAsyncTask<ResultT> implements Callable<ResultT> {
     public static final int DEFAULT_POOL_SIZE = 25;
-    protected static final Executor DEFAULT_EXECUTOR = Executors.newFixedThreadPool(DEFAULT_POOL_SIZE);
+    //protected static final Executor DEFAULT_EXECUTOR = Executors.newFixedThreadPool(DEFAULT_POOL_SIZE);
 
     protected Handler handler;
     protected Executor executor;
@@ -43,7 +44,7 @@ public abstract class SafeAsyncTask<ResultT> implements Callable<ResultT> {
      * Handler to new Handler()
      */
     public SafeAsyncTask() {
-        this.executor = DEFAULT_EXECUTOR;
+        this.executor = Application.getExecutor();
     }
 
     /**
@@ -51,7 +52,7 @@ public abstract class SafeAsyncTask<ResultT> implements Callable<ResultT> {
      */
     public SafeAsyncTask(Handler handler) {
         this.handler = handler;
-        this.executor = DEFAULT_EXECUTOR;
+        this.executor = Application.getExecutor();
     }
 
     /**
@@ -147,7 +148,7 @@ public abstract class SafeAsyncTask<ResultT> implements Callable<ResultT> {
      * @param e an InterruptedException or InterruptedIOException
      */
     protected void onInterrupted(Exception e) {
-        Log.e(SafeAsyncTask.class.getSimpleName(), e.getMessage(), e);
+
     }
 
     /**

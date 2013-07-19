@@ -19,6 +19,7 @@ import com.google.common.collect.ListMultimap;
 import com.missionhub.R;
 import com.missionhub.api.Api;
 import com.missionhub.api.ApiOptions;
+import com.missionhub.api.ApiRequest;
 import com.missionhub.application.Application;
 import com.missionhub.application.Session;
 import com.missionhub.event.OnOrganizationChangedEvent;
@@ -741,9 +742,11 @@ public class HostedProfileFragment extends HostedFragment implements TabBar.OnTa
 
         mUpdateTask = new SafeAsyncTask<Void>() {
 
+            public ApiRequest<Person> mApiRequest;
+
             @Override
             public Void call() throws Exception {
-                Api.getPerson(mPersonId, ApiOptions.builder()
+                mApiRequest = Api.getPerson(mPersonId, ApiOptions.builder()
                         .include(Api.Include.addresses)
                         .include(Api.Include.phone_numbers)
                         .include(Api.Include.email_addresses)
@@ -753,7 +756,8 @@ public class HostedProfileFragment extends HostedFragment implements TabBar.OnTa
                         .include(Api.Include.organizational_labels)
                         .include(Api.Include.organizational_permission)
                         .include(Api.Include.interactions)
-                        .build()).get();
+                        .build());
+                mApiRequest.get();
                 return null;
             }
 
@@ -772,6 +776,9 @@ public class HostedProfileFragment extends HostedFragment implements TabBar.OnTa
 
             @Override
             protected void onFinally() throws RuntimeException {
+                if (mApiRequest != null) {
+                    mApiRequest.disconnect();
+                }
                 mUpdateTask = null;
                 updateRefreshState();
             }

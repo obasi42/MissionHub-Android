@@ -1,19 +1,33 @@
 package com.missionhub.util;
 
-import com.missionhub.ui.drilldown.DrillDownItem;
-
-import java.util.List;
+import java.util.concurrent.FutureTask;
 
 public class TaskUtils {
 
-    public static boolean cancel(SafeAsyncTask ... tasks) {
+    public static boolean cancel(SafeAsyncTask... tasks) {
         boolean ok = true;
-        for(SafeAsyncTask task : tasks) {
+        for (SafeAsyncTask task : tasks) {
             try {
                 if (task != null) {
                     ok = task.cancel(true) && ok;
                 }
-            } catch (Exception e) { ok = false; }
+            } catch (Exception e) {
+                ok = false;
+            }
+        }
+        return ok;
+    }
+
+    public static boolean cancel(FutureTask... tasks) {
+        boolean ok = true;
+        for (FutureTask task : tasks) {
+            try {
+                if (task != null) {
+                    ok = task.cancel(true) && ok;
+                }
+            } catch (Exception e) {
+                ok = false;
+            }
         }
         return ok;
     }
