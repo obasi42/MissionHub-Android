@@ -1,6 +1,5 @@
 package com.missionhub.exception;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
@@ -10,6 +9,7 @@ import android.webkit.WebViewClient;
 import com.missionhub.R;
 import com.missionhub.application.Application;
 
+import org.holoeverywhere.app.AlertDialog;
 import org.holoeverywhere.widget.Toast;
 
 import java.net.UnknownHostException;
