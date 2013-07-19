@@ -195,18 +195,36 @@ public abstract class DynamicPeopleListProvider extends PeopleListProvider {
     public void setLoading(boolean loading) {
         synchronized (getLock()) {
             mLoading = loading;
-            setNotifyOnChange(false);
-            remove(mLoadingItem);
-            if (mLoading) {
-                add(mLoadingItem);
-            }
-            remove(mEmptyItem);
-            if (!mLoading && isEmpty()) {
-                add(mEmptyItem);
-            }
-            notifyDataSetChanged();
+            updateLoadingEmptyItems(true);
             onLoading(loading);
         }
+    }
+
+    private void updateLoadingEmptyItems(boolean notify) {
+        setNotifyOnChange(false);
+        super.remove(mLoadingItem);
+        if (isLoading()) {
+            super.add(mLoadingItem);
+        }
+        super.remove(mEmptyItem);
+        if (!isLoading() && isEmpty()) {
+            super.add(mEmptyItem);
+        }
+        if (notify) {
+            notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    public void remove(final Object object) {
+        super.remove(object);
+        updateLoadingEmptyItems(true);
+    }
+
+    @Override
+    public void removeAll(Collection objects) {
+        super.removeAll(objects);
+        updateLoadingEmptyItems(true);
     }
 
     /**

@@ -539,4 +539,19 @@ public abstract class ObjectArrayAdapter<T> extends BaseAdapter {
             return positions;
         }
     }
+
+    /**
+     * Removes all items from the list with in the list of given ids
+     * @param ids
+     */
+    public void removeAllById(Collection<Long> ids) {
+        synchronized (getLock()) {
+            List<Integer> positions = getPositionById(ids);
+            List<T> remove = new ArrayList<T>();
+            for (Integer position : positions) {
+                remove.add(getItem(position));
+            }
+            removeAll(remove);
+        }
+    }
 }

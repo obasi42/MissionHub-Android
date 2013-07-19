@@ -54,9 +54,7 @@ import org.holoeverywhere.widget.AdapterView;
 import org.holoeverywhere.widget.Spinner;
 import org.holoeverywhere.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
 
@@ -760,15 +758,7 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
                 }
                 return true;
             case R.id.action_delete:
-                HashSet<Long> personIds = (HashSet<Long>) data;
-                List<Person> people = new ArrayList<Person>();
-                for (Long id : personIds) {
-                    Person person = Application.getDb().getPersonDao().load(id);
-                    if (person != null) {
-                        people.add(person);
-                    }
-                }
-                mProvider.removeAll(people);
+                mProvider.removeAllById((HashSet<Long>) data);
                 return true;
             case R.id.action_label:
                 if (mProvider.getPeopleListOptions().hasFilter("labels")) {
