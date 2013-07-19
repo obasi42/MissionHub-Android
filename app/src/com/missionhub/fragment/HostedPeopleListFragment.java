@@ -6,6 +6,8 @@ import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.Html;
+import android.text.Layout;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,6 +47,7 @@ import com.missionhub.ui.SearchHelper;
 import com.missionhub.ui.widget.CheckmarkImageView;
 import com.missionhub.util.IntentHelper;
 import com.missionhub.util.SafeAsyncTask;
+import com.missionhub.util.TaskUtils;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.PauseOnScrollListener;
 
@@ -78,6 +81,11 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
     private SearchHelper mSearchHelper;
     private CheckmarkHelper mCheckmarkHelper = new CheckmarkHelper();
     private ActionMode mActionMode;
+
+    private View mFilterIndicator;
+    private TextView mFilterIndicatorText;
+    private TextView mFilterIndicatorClear;
+    private SafeAsyncTask<String> mIndicatorTask;
 
     public HostedPeopleListFragment() {
         // empty fragment constructor
@@ -116,6 +124,7 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
         }
         mProvider.setPeopleListOptions(options);
         Application.getEventBus().postSticky(new OnHostedListOptionsChangedEvent(mProvider.getPeopleListOptions()));
+        refreshIndicator();
     }
 
     @SuppressWarnings("unused")
@@ -123,6 +132,17 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
         if (mProvider == null) return;
 
         mProvider.reload();
+    }
+
+    private void clearFilters() {
+        if (mProvider == null) return;
+
+        PeopleListOptions options = mProvider.getPeopleListOptions();
+        options.clearFilters();
+        mSearchHelper.clear();
+        mProvider.setPeopleListOptions(options);
+        Application.getEventBus().postSticky(new OnHostedListOptionsChangedEvent(mProvider.getPeopleListOptions()));
+        refreshIndicator();
     }
 
     @Override
@@ -146,6 +166,32 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
         mList.setOnPersonClickListener(this);
         mList.setOnPersonCheckedListener(mCheckmarkHelper);
         mList.setOnScrollListener(new PauseOnScrollListener(ImageLoader.getInstance(), false, true));
+
+        // set up the filter indicator
+        mFilterIndicator = view.findViewById(R.id.filter_indicator);
+        mFilterIndicatorText = (TextView) view.findViewById(R.id.filter_indicator_text);
+        mFilterIndicatorText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Layout layout = mFilterIndicatorText.getLayout();
+                if (layout != null) {
+                    if (layout.getLineCount() > 0) {
+                        if (layout.getEllipsisCount(layout.getLineCount() - 1) > 0) {
+                            mFilterIndicatorText.setSingleLine(false);
+                            return;
+                        }
+                    }
+                }
+                mFilterIndicatorText.setSingleLine(true);
+            }
+        });
+        mFilterIndicatorClear = (TextView) view.findViewById(R.id.filter_indicator_clear);
+        mFilterIndicatorClear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                clearFilters();
+            }
+        });
 
         // set up the list controller
         mSearchView = (SearchView) view.findViewById(R.id.search);
@@ -189,6 +235,7 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
             startActionMode(true);
         }
         mCheckmarkHelper.refreshCheckedState();
+        refreshIndicator();
 
         getHost().getPullToRefreshAttacher().setRefreshableView(mList, this);
     }
@@ -332,6 +379,7 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
             options.removeFilter("name_or_email_like");
         }
         mProvider.setPeopleListOptions(options);
+        refreshIndicator();
     }
 
     private SimpleSpinnerAdapter buildDisplaySpinner(Context context) {
@@ -531,7 +579,6 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
     }
 
     public class CheckmarkHelper extends DataSetObserver implements PeopleListView.OnPersonCheckedListener, View.OnClickListener {
-        private Context mContext;
         private boolean mAllChecked;
         private CheckAllDialog mDialog;
 
@@ -776,6 +823,37 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
         }
 
         return super.onFragmentResult(requestCode, resultCode, data);
+    }
+
+    private void refreshIndicator() {
+        if (mProvider == null || mFilterIndicator == null) return;
+        final PeopleListOptions options = mProvider.getPeopleListOptions();
+
+        TaskUtils.cancel(mIndicatorTask);
+
+        mIndicatorTask = new SafeAsyncTask<String>() {
+            @Override
+            public String call() throws Exception {
+                return options.toHumanString();
+            }
+
+            @Override
+            protected void onSuccess(String s) throws Exception {
+                if (!StringUtils.isEmpty(s)) {
+                    mFilterIndicatorText.setText(Html.fromHtml(s));
+                    mFilterIndicator.setVisibility(View.VISIBLE);
+                } else {
+                    mFilterIndicator.setVisibility(View.GONE);
+                }
+            }
+        };
+        mIndicatorTask.execute();
+    }
+
+    @Override
+    public void onDestroy() {
+        TaskUtils.cancel(mIndicatorTask);
+        super.onDestroy();
     }
 }
 

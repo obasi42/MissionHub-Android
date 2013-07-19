@@ -64,6 +64,35 @@
 
     </LinearLayout>
 
+    <RelativeLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/filter_indicator"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dip"
+            android:background="#C5EAF8">
+
+        <TextView
+                android:id="@+id/filter_indicator_text"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_toLeftOf="@+id/filter_indicator_clear"
+                android:layout_marginRight="8dip"
+                android:singleLine="true"/>
+
+        <TextView
+                android:id="@+id/filter_indicator_clear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Clear Filters"
+                android:gravity="center_vertical"
+                android:layout_alignTop="@+id/filter_indicator_text"
+                android:layout_alignParentRight="true"
+                android:layout_alignBottom="@+id/filter_indicator_text"
+                android:fontFamily="roboto-boldcondensed"/>
+
+    </RelativeLayout>
+
     <com.missionhub.people.PeopleListView
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"

@@ -1,10 +1,19 @@
 package com.missionhub.api;
 
+import com.missionhub.application.Application;
+import com.missionhub.model.InteractionType;
+import com.missionhub.model.Label;
+import com.missionhub.model.Permission;
+import com.missionhub.model.Person;
 import com.missionhub.model.generic.FollowupStatus;
 import com.missionhub.model.generic.Gender;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 public class PeopleListOptions extends ListOptions implements Serializable {
@@ -121,6 +130,74 @@ public class PeopleListOptions extends ListOptions implements Serializable {
     @Override
     public Object clone() {
         return new PeopleListOptions((ListOptions) super.clone());
+    }
+
+    public String toHumanString() {
+        List<String> parts = new ArrayList<String>();
+
+        // query
+        String search = getFilterValue("name_or_email_like");
+        if (StringUtils.isNotEmpty(search)) {
+            parts.add("matching <b>" + search + "</b>");
+        }
+
+        // assigned tos
+        Collection<String> assignedTos = new ArrayList<String>();
+        Collection<String> assignedToIds = getFilterValues("assigned_to");
+        for (String personId : assignedToIds) {
+            Person p = Application.getDb().getPersonDao().load(Long.parseLong(personId));
+            if (p != null) {
+                assignedTos.add("<b>" + p.getName() + "</b>");
+            }
+        }
+        if (!assignedTos.isEmpty()) {
+            parts.add("assigned to " + StringUtils.join(assignedTos, " or "));
+        }
+
+        // labels
+        Collection<String> labels = new ArrayList<String>();
+        Collection<String> labelIds = getFilterValues("labels");
+        for (String labelId : labelIds) {
+            Label l = Application.getDb().getLabelDao().load(Long.parseLong(labelId));
+            if (l != null) {
+                labels.add("<b>" + l.getTranslatedName() + "</b>");
+            }
+        }
+        if (!labels.isEmpty()) {
+            parts.add("labeled with " + StringUtils.join(labels, " or "));
+        }
+
+        // interaction types
+        Collection<String> interactions = new ArrayList<String>();
+        Collection<String> interactionTypeIds = getFilterValues("interactions");
+        for (String typeId : interactionTypeIds) {
+            InteractionType type = Application.getDb().getInteractionTypeDao().load(Long.parseLong(typeId));
+            if (type != null) {
+                interactions.add("<b>" + type.getTranslatedName() + "</b>");
+            }
+        }
+        if (!interactions.isEmpty()) {
+            parts.add("with interactions: " + StringUtils.join(interactions, " or "));
+        }
+
+        // persmission
+        Collection<String> permissions = new ArrayList<String>();
+        Collection<String> permissionIds = getFilterValues("permissions");
+        for (String permissionId : permissionIds) {
+            Permission permission = Application.getDb().getPermissionDao().load(Long.parseLong(permissionId));
+            if (permission != null) {
+                permissions.add("<b>" + permission.getTranslatedName() + "</b> permissions");
+            }
+        }
+        if (!permissions.isEmpty()) {
+            parts.add("with " + StringUtils.join(permissions, " or "));
+        }
+
+        if (parts.isEmpty()) {
+            return "";
+        } else {
+            return "Showing contacts " + StringUtils.join(parts, " and ");
+        }
     }
 
 }

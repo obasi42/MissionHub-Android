@@ -88,4 +88,13 @@ public class SearchHelper implements SearchView.OnQueryTextListener, View.OnFocu
     public interface OnSearchQueryChangedListener {
         public void onSearchQueryChanged(String query);
     }
+
+    public void clear() {
+        SearchView view = getSearchView();
+        if (view != null) {
+            mSearchQuery = "";
+            view.setQuery(mSearchQuery, false);
+            clearFocus();
+        }
+    }
 }
