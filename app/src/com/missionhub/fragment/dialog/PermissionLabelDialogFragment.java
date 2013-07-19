@@ -314,13 +314,19 @@ public class PermissionLabelDialogFragment extends RefreshableDialogFragment imp
         }
         if (mList != null && mProgress != null) {
             if (mSaveTask != null) {
+                setCancelable(false);
+                hideRefresh();
                 mProgress.setVisibility(View.VISIBLE);
                 mListContainer.setVisibility(View.GONE);
                 setButtonEnabled(AlertDialog.BUTTON_POSITIVE, false);
+                setButtonEnabled(AlertDialog.BUTTON_NEGATIVE, false);
             } else {
+                setCancelable(true);
+                showRefresh();
                 mProgress.setVisibility(View.GONE);
                 mListContainer.setVisibility(View.VISIBLE);
                 setButtonEnabled(AlertDialog.BUTTON_POSITIVE, true);
+                setButtonEnabled(AlertDialog.BUTTON_NEGATIVE, true);
             }
         }
     }
