@@ -689,7 +689,7 @@ public class HostedProfileFragment extends HostedFragment implements TabBar.OnTa
 
         @Override
         public boolean isEnabled() {
-            return true;
+            return false;
         }
 
         @Override
