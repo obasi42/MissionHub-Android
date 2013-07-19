@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 
@@ -18,13 +17,14 @@ import com.missionhub.model.Person;
 import com.missionhub.ui.drilldown.DrillDownAdapter;
 import com.missionhub.ui.drilldown.DrillDownItem;
 import com.missionhub.ui.drilldown.DrillDownView;
+import com.missionhub.util.ResourceUtils;
 import com.missionhub.util.SafeAsyncTask;
+import com.missionhub.util.TaskUtils;
 import com.missionhub.util.TreeDataStructure;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.holoeverywhere.app.AlertDialog;
-import org.holoeverywhere.app.Dialog;
 import org.holoeverywhere.widget.TextView;
 import org.holoeverywhere.widget.Toast;
 
@@ -55,6 +55,7 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setCancelable(false);
         onRefresh();
     }
 
@@ -182,7 +183,7 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
                 }
             }
         } catch (Exception e) {
-            Log.e("SelectOrg", e.getMessage(), e);
+            Application.trackException(Thread.currentThread().getName(), e, false);
         }
         return privilegedFavorites;
     }
@@ -337,36 +338,34 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
 
     @Override
     public void onDestroy() {
-        try {
-            mBuildTask.cancel(true);
-        } catch (Exception e) { /* ignore */ }
-        try {
-            mSetTask.cancel(true);
-        } catch (Exception e) { /* ignore */ }
-        try {
-            mTask.cancel(true);
-        } catch (Exception e) { /* ignore */ }
+        TaskUtils.cancel(mBuildTask, mSetTask, mTask);
         super.onDestroy();
     }
 
     private void setOrganization(final long organizationId) {
         if (mSetTask != null) return;
 
-        try {
-            mTask.cancel(true);
-        } catch (Exception e) { /* ignore */ }
+        if (organizationId == Session.getInstance().getOrganizationId()) {
+            Application.showToast(ResourceUtils.getString(R.string.select_organization_already_current), Toast.LENGTH_SHORT);
+            return;
+        }
+
+        TaskUtils.cancel(mTask);
 
         mSetTask = new SafeAsyncTask<Void>() {
 
             @Override
             public Void call() throws Exception {
-                Session.getInstance().setOrganizationId(organizationId, false);
+                Session.getInstance().updateOrganization(organizationId, true).get();
                 return null;
             }
 
             @Override
             protected void onSuccess(Void aVoid) throws Exception {
-                dismiss();
+                if (!isCanceled()) {
+                    Session.getInstance().setOrganizationId(organizationId, false, false);
+                    dismiss();
+                }
             }
 
             @Override
@@ -386,24 +385,27 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
     }
 
     private void updateUIState() {
-        if (mSetTask != null || mBuildTask != null) {
+        if (mSetTask != null || (mBuildTask != null && (mAdapter == null || mAdapter.isEmpty()))) {
             mDrilldown.setVisibility(View.GONE);
             mAction.setVisibility(View.VISIBLE);
             hideRefresh();
 
             if (mSetTask != null) {
-                mActionText.setText("Loading organization...");
-                setButtonEnabled(Dialog.BUTTON_NEUTRAL, false);
+                mActionText.setText(ResourceUtils.getString(R.string.select_organization_loading_organization));
             } else {
-                mActionText.setText("Loading organizations...");
-                setButtonEnabled(Dialog.BUTTON_NEUTRAL, true);
+                mActionText.setText(ResourceUtils.getString(R.string.select_organization_loading_organizations));
             }
         } else {
             mDrilldown.setVisibility(View.VISIBLE);
             mAction.setVisibility(View.GONE);
             mActionText.setText(R.string.loading);
-            setButtonEnabled(Dialog.BUTTON_NEUTRAL, true);
             showRefresh();
         }
+    }
+
+    @Override
+    public void cancel() {
+        TaskUtils.cancel(mSetTask);
+        super.cancel();
     }
 }

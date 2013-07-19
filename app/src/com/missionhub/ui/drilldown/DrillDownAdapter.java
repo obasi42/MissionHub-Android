@@ -256,6 +256,10 @@ public class DrillDownAdapter extends PagerAdapter implements ViewPager.OnPageCh
         return view;
     }
 
+    public boolean isEmpty() {
+        return mRootItems.isEmpty();
+    }
+
     private static class ViewHolder {
         public TextView mText1;
         public View mDivider;

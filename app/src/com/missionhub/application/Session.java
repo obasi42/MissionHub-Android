@@ -385,18 +385,19 @@ public class Session implements OnAccountsUpdateListener {
      *
      * @param organizationId
      */
-    public void setOrganizationId(final long organizationId, boolean async) throws Exception {
+    public void setOrganizationId(final long organizationId, boolean updateOrganization, boolean async) throws Exception {
         if (organizationId != getOrganizationId()) {
-
             if (getPerson().isAdminOrUser(organizationId)) {
                 mOrganizationId = organizationId;
             } else {
                 Application.showToast(R.string.session_no_longer_admin_or_user, Toast.LENGTH_LONG);
                 mOrganizationId = getPrimaryOrganizationId();
             }
-            FutureTask<Void> future = updateCurrentOrganization(true);
-            if (!async) {
-                future.get();
+            if (updateOrganization) {
+                FutureTask<Void> future = updateCurrentOrganization(true);
+                if (!async) {
+                    future.get();
+                }
             }
             SettingsManager.setSessionOrganizationId(getPersonId(), mOrganizationId);
             Application.postEvent(new OnOrganizationChangedEvent(mOrganizationId));
@@ -497,6 +498,10 @@ public class Session implements OnAccountsUpdateListener {
     }
 
     public FutureTask<Void> updateCurrentOrganization(final boolean force) {
+        return updateOrganization(getOrganizationId(), force);
+    }
+
+    public FutureTask<Void> updateOrganization(final long organizationId, final boolean force) {
         TaskUtils.cancel(mUpdateOrganizationTask);
 
         mUpdateOrganizationTask = new SafeAsyncTask<Void>() {
@@ -505,13 +510,12 @@ public class Session implements OnAccountsUpdateListener {
 
             @Override
             public Void call() throws Exception {
-                long organizationId = getOrganizationId();
                 final long lastUpdated = SettingsManager.getInstance().getUserSetting(getPersonId(), "organization_" + organizationId + "_updated", 0l);
                 final long currentTime = System.currentTimeMillis() - 1000;
 
                 if (!Configuration.isSkipSessionUpdates() && (lastUpdated < System.currentTimeMillis() - mOneWeekMillis || force)) {
 
-                    Api.getOrganization(organizationId, ApiOptions.builder()
+                    Organization org = Api.getOrganization(organizationId, ApiOptions.builder()
                             .include(Include.all_questions)
                             .include(Include.keywords)
                             .include(Include.users)
@@ -521,7 +525,7 @@ public class Session implements OnAccountsUpdateListener {
                             .include(Include.interaction_types)
                             .build()).get();
 
-                    getOrganization().refreshAll();
+                    org.refreshAll();
                     getPerson().refreshAll();
                     getPerson().getOrganizationHierarchy();
 
