@@ -5,6 +5,12 @@
               android:id="@+id/parentPanel"
               android:orientation="vertical">
 
+    <!-- add an edit text until HoloEverywhere bug gets fixed. -->
+    <EditText
+            android:layout_width="0dip"
+            android:layout_height="0dip"
+            android:visibility="gone"/>
+
     <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

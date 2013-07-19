@@ -8,9 +8,9 @@ import android.support.v4.app.FragmentManager;
 import com.missionhub.util.FragmentUtils;
 
 import org.holoeverywhere.app.Activity;
-import org.holoeverywhere.app.DialogFragment;
+import org.holoeverywhere.app.AlertDialogFragment;
 
-public class BaseDialogFragment extends DialogFragment implements FragmentResult {
+public class BaseDialogFragment extends AlertDialogFragment implements FragmentResult {
 
     private boolean mSetResult = false;
     private int mRequestCode = Integer.MIN_VALUE;
