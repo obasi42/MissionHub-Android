@@ -43,6 +43,7 @@ import com.missionhub.ui.widget.SelectableListView;
 import com.missionhub.util.DateUtils;
 import com.missionhub.util.SafeAsyncTask;
 import com.missionhub.util.SortUtils;
+import com.missionhub.util.TaskUtils;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -150,7 +151,6 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setCancelable(false);
 
         // register for time change ticks to keep the time box up to date
         IntentFilter intentFilter = new IntentFilter();
@@ -177,6 +177,7 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
     @Override
     public void onDestroy() {
         Application.getContext().unregisterReceiver(mTimeChangedReceiver);
+        TaskUtils.cancel(mRefreshInitiatorsTask, mRebuildInitiatorsProviderTask);
         super.onDestroy();
     }
 
@@ -523,11 +524,13 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
             mButton1.setEnabled(false);
             mButton2.setEnabled(false);
             mButton3.setEnabled(false);
+            setCancelable(false);
             return;
         } else {
             mButton1.setEnabled(true);
             mButton2.setEnabled(true);
             mButton3.setEnabled(true);
+            setCancelable(true);
         }
 
         switch (mState) {
@@ -839,7 +842,7 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
     @Override
     public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
         if (mViewPager != null && keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
-            if (!mViewPager.pageBackward(true)) {
+            if (!mViewPager.pageBackward(true) && isCancelable()) {
                 cancel();
             }
             return true;
