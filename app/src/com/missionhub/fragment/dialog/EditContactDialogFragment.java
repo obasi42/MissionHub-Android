@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.RadioGroup;
 
 import com.missionhub.R;
@@ -19,6 +20,7 @@ import com.missionhub.model.gson.GPerson;
 import com.missionhub.model.gson.GPhoneNumber;
 import com.missionhub.util.ObjectUtils;
 import com.missionhub.util.SafeAsyncTask;
+import com.missionhub.util.TaskUtils;
 
 import org.apache.commons.lang3.StringUtils;
 import org.holoeverywhere.app.AlertDialog;
@@ -52,6 +54,11 @@ public class EditContactDialogFragment extends BaseDialogFragment {
      * the dialog save button
      */
     private Button mSaveButton;
+
+    /**
+     * the dialog cancel button
+     */
+    private Button mCancelButton;
 
     /**
      * the person data holder
@@ -138,9 +145,7 @@ public class EditContactDialogFragment extends BaseDialogFragment {
         });
         builder.setBlockDismiss(true);
 
-        if (mTask != null) {
-            showProgress();
-        }
+        updateUI();
 
         return builder.create();
     }
@@ -159,9 +164,8 @@ public class EditContactDialogFragment extends BaseDialogFragment {
         super.onResume();
         if (getDialog() != null) {
             mSaveButton = ((AlertDialog) getDialog()).getButton(DialogInterface.BUTTON_POSITIVE);
-            if (mTask != null) {
-                mSaveButton.setEnabled(false);
-            }
+            mCancelButton = ((AlertDialog) getDialog()).getButton(DialogInterface.BUTTON_NEUTRAL);
+            updateUI();
         }
     }
 
@@ -278,7 +282,7 @@ public class EditContactDialogFragment extends BaseDialogFragment {
             return;
         }
 
-        showProgress();
+        hideKeyboard();
 
         mTask = new SafeAsyncTask<Person>() {
 
@@ -303,13 +307,13 @@ public class EditContactDialogFragment extends BaseDialogFragment {
             @Override
             public void onFinally() {
                 mTask = null;
+                updateUI();
             }
 
             @Override
             public void onException(final Exception e) {
                 final ExceptionHelper eh = new ExceptionHelper(Application.getContext(), e);
                 eh.makeToast(R.string.add_contact_failed);
-                hideProgress();
             }
 
             @Override
@@ -318,15 +322,14 @@ public class EditContactDialogFragment extends BaseDialogFragment {
             }
 
         };
+        updateUI();
         Application.getExecutor().execute(mTask.future());
     }
 
     @Override
-    public void onCancel(final DialogInterface dialog) {
-        try {
-            mTask.cancel(true);
-        } catch (Exception e) { /* ignore */ }
-        super.onCancel(dialog);
+    public void onDestroy() {
+        TaskUtils.cancel(mTask);
+        super.onDestroy();
     }
 
     public void showProgress() {
@@ -334,8 +337,9 @@ public class EditContactDialogFragment extends BaseDialogFragment {
         mForm.setVisibility(View.GONE);
         mProgress.setVisibility(View.VISIBLE);
 
-        if (mSaveButton != null) {
+        if (mSaveButton != null && mCancelButton != null) {
             mSaveButton.setEnabled(false);
+            mCancelButton.setEnabled(false);
         }
     }
 
@@ -344,8 +348,9 @@ public class EditContactDialogFragment extends BaseDialogFragment {
         mProgress.setVisibility(View.GONE);
         mForm.setVisibility(View.VISIBLE);
 
-        if (mSaveButton != null) {
+        if (mSaveButton != null && mCancelButton != null) {
             mSaveButton.setEnabled(true);
+            mCancelButton.setEnabled(true);
         }
     }
 
@@ -367,5 +372,19 @@ public class EditContactDialogFragment extends BaseDialogFragment {
     public int getIndexOfTitle(final String title, final int titleResources) {
         final String[] ids = getResources().getStringArray(titleResources);
         return Arrays.asList(ids).indexOf(title);
+    }
+
+    private void hideKeyboard() {
+        getSupportActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+    }
+
+    private void updateUI() {
+        if (mTask != null) {
+            setCancelable(false);
+            showProgress();
+        } else {
+            setCancelable(true);
+            hideProgress();
+        }
     }
 }
