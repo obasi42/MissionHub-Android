@@ -257,16 +257,16 @@ public class GPerson {
             for (int i = 0; i < phone_numbers.length; i++) {
                 final GPhoneNumber number = phone_numbers[i];
                 if (number.id > 0) {
-                    params.put("person[phone_numbers_attributes][" + i + "][id]", String.valueOf(number.id));
+                    params.put("person[phone_numbers][" + i + "][id]", String.valueOf(number.id));
                 }
                 if (ObjectUtils.isNotEmpty(number.number)) {
-                    params.put("person[phone_numbers_attributes][" + i + "][number]", number.number);
+                    params.put("person[phone_numbers][" + i + "][number]", number.number);
                 }
                 if (ObjectUtils.isNotEmpty(number.location)) {
-                    params.put("person[phone_numbers_attributes][" + i + "][location]", number.location);
+                    params.put("person[phone_numbers][" + i + "][location]", number.location);
                 }
                 if (ObjectUtils.isNotEmpty(number.primary)) {
-                    params.put("person[phone_numbers_attributes][" + i + "][primary]", String.valueOf(number.primary));
+                    params.put("person[phone_numbers][" + i + "][primary]", String.valueOf(number.primary));
                 }
             }
         }
@@ -275,16 +275,16 @@ public class GPerson {
             for (int i = 0; i < email_addresses.length; i++) {
                 final GEmailAddress address = email_addresses[i];
                 if (address.id > 0) {
-                    params.put("person[email_addresses_attributes][" + i + "][id]", String.valueOf(address.id));
+                    params.put("person[email_addresses][" + i + "][id]", String.valueOf(address.id));
                 }
                 if (address.id > 0 && StringUtils.isEmpty(address.email)) {
-                    params.put("person[email_addresses_attributes][" + i + "][_destroy]", String.valueOf(true));
+                    params.put("person[email_addresses][" + i + "][_destroy]", String.valueOf(true));
                 } else {
                     if (ObjectUtils.isNotEmpty(address.email)) {
-                        params.put("person[email_addresses_attributes][" + i + "][email]", address.email);
+                        params.put("person[email_addresses][" + i + "][email]", address.email);
                     }
                     if (ObjectUtils.isNotEmpty(address.primary)) {
-                        params.put("person[email_addresses_attributes][" + i + "][primary]", String.valueOf(address.primary));
+                        params.put("person[email_addresses][" + i + "][primary]", String.valueOf(address.primary));
                     }
                 }
             }
@@ -294,31 +294,31 @@ public class GPerson {
             for (int i = 0; i < addresses.length; i++) {
                 final GAddress address = addresses[i];
                 if (address.id > 0) {
-                    params.put("person[addresses_attributes][" + i + "][id]", String.valueOf(address.id));
+                    params.put("person[addresses][" + i + "][id]", String.valueOf(address.id));
                 }
                 if (address.id > 0 && StringUtils.isEmpty(address.address1)) {
-                    params.put("person[addresses_attributes][" + i + "][_destroy]", String.valueOf(true));
+                    params.put("person[addresses][" + i + "][_destroy]", String.valueOf(true));
                 } else {
                     if (ObjectUtils.isNotEmpty(address.address1)) {
-                        params.put("person[address_attributes][" + i + "][address1]", address.address1);
+                        params.put("person[addresses][" + i + "][address1]", address.address1);
                     }
                     if (ObjectUtils.isNotEmpty(address.address2)) {
-                        params.put("person[address_attributes][" + i + "][address2]", address.address2);
+                        params.put("person[addresses][" + i + "][address2]", address.address2);
                     }
                     if (ObjectUtils.isNotEmpty(address.city)) {
-                        params.put("person[address_attributes][" + i + "][city]", address.city);
+                        params.put("person[addresses][" + i + "][city]", address.city);
                     }
                     if (ObjectUtils.isNotEmpty(address.country)) {
-                        params.put("person[address_attributes][" + i + "][country]", address.country);
+                        params.put("person[addresses][" + i + "][country]", address.country);
                     }
                     if (ObjectUtils.isNotEmpty(address.state)) {
-                        params.put("person[address_attributes][" + i + "][state]", address.state);
+                        params.put("person[addresses][" + i + "][state]", address.state);
                     }
                     if (ObjectUtils.isNotEmpty(address.zip)) {
-                        params.put("person[address_attributes][" + i + "][zip]", address.zip);
+                        params.put("person[addresses][" + i + "][zip]", address.zip);
                     }
                     if (ObjectUtils.isNotEmpty(address.address_type)) {
-                        params.put("person[address_attributes][" + i + "][address_type]", address.address_type);
+                        params.put("person[addresses][" + i + "][address_type]", address.address_type);
                     }
                 }
             }

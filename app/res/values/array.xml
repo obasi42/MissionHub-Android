@@ -655,5 +655,17 @@
         <item>Zambia</item>
         <item>Zimbabwe</item>
     </string-array>
+    <string-array name="address_types_ids">
+        <item>current</item>
+        <item>permanent</item>
+        <item>emergency1</item>
+        <item>emergency2</item>
+    </string-array>
+    <string-array name="address_types_titles">
+        <item>Current</item>
+        <item>Permanent</item>
+        <item>Emergency 1</item>
+        <item>Emergency 2</item>
+    </string-array>
 
 </resources>

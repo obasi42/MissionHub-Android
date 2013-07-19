@@ -177,6 +177,11 @@
                     android:hint="@string/add_contact_address_zip"
                     android:inputType="numberDecimal|textPostalAddress"
                     android:singleLine="true"/>
+
+            <Spinner
+                    android:id="@+id/address_type"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
         </LinearLayout>
     </ScrollView>
 

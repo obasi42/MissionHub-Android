@@ -70,6 +70,7 @@ public class EditContactDialogFragment extends BaseDialogFragment {
     private Spinner mAddressState;
     private Spinner mAddressCountry;
     private EditText mAddressZip;
+    private Spinner mAddressType;
 
     public EditContactDialogFragment() {
     }
@@ -92,6 +93,7 @@ public class EditContactDialogFragment extends BaseDialogFragment {
         mAddressState = (Spinner) view.findViewById(R.id.address_state);
         mAddressCountry = (Spinner) view.findViewById(R.id.address_country);
         mAddressZip = (EditText) view.findViewById(R.id.address_zip);
+        mAddressType = (Spinner) view.findViewById(R.id.address_type);
 
         final ArrayAdapter<CharSequence> phoneAdapter = ArrayAdapter.createFromResource(getSupportActivity(), R.array.phone_location_titles, R.layout.simple_spinner_item);
         // Specify the layout to use when the list of choices appears
@@ -105,6 +107,10 @@ public class EditContactDialogFragment extends BaseDialogFragment {
         final ArrayAdapter<CharSequence> countryAdapter = ArrayAdapter.createFromResource(getSupportActivity(), R.array.country_titles, R.layout.simple_spinner_item);
         countryAdapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
         mAddressCountry.setAdapter(countryAdapter);
+
+        final ArrayAdapter<CharSequence> addressTypeAdapter = ArrayAdapter.createFromResource(getSupportActivity(), R.array.address_types_titles, R.layout.simple_spinner_item);
+        addressTypeAdapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
+        mAddressType.setAdapter(addressTypeAdapter);
 
         if (mPerson == null) {
             mPerson = new GPerson();
@@ -219,6 +225,11 @@ public class EditContactDialogFragment extends BaseDialogFragment {
                 } else {
                     mAddressZip.setText("");
                 }
+                if (address.address_type != null) {
+                    mAddressType.setSelection(getIndexOfId(address.address_type, R.array.address_types_ids));
+                } else {
+                    mAddressType.setSelection(0);
+                }
             }
         }
     }
@@ -252,6 +263,7 @@ public class EditContactDialogFragment extends BaseDialogFragment {
             address.country = getIdFromTitle(mAddressCountry.getSelectedItem().toString(), R.array.country_titles, R.array.country_ids);
             address.zip = mAddressZip.getText().toString();
             person.addresses = new GAddress[]{address};
+            address.address_type = getIdFromTitle(mAddressType.getSelectedItem().toString(), R.array.address_types_titles, R.array.address_types_ids);
         }
     }
 
