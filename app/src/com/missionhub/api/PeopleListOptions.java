@@ -1,5 +1,6 @@
 package com.missionhub.api;
 
+import com.missionhub.R;
 import com.missionhub.application.Application;
 import com.missionhub.model.InteractionType;
 import com.missionhub.model.Label;
@@ -7,6 +8,7 @@ import com.missionhub.model.Permission;
 import com.missionhub.model.Person;
 import com.missionhub.model.generic.FollowupStatus;
 import com.missionhub.model.generic.Gender;
+import com.missionhub.util.ResourceUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -138,7 +140,7 @@ public class PeopleListOptions extends ListOptions implements Serializable {
         // query
         String search = getFilterValue("name_or_email_like");
         if (StringUtils.isNotEmpty(search)) {
-            parts.add("matching <b>" + search + "</b>");
+            parts.add(ResourceUtils.getString(R.string.list_options_matching) + " <b>" + search + "</b>");
         }
 
         // assigned tos
@@ -151,7 +153,7 @@ public class PeopleListOptions extends ListOptions implements Serializable {
             }
         }
         if (!assignedTos.isEmpty()) {
-            parts.add("assigned to " + StringUtils.join(assignedTos, " or "));
+            parts.add(ResourceUtils.getString(R.string.list_options_assigned_to) + " " + StringUtils.join(assignedTos, " " + ResourceUtils.getString(R.string.list_options_or) + " "));
         }
 
         // labels
@@ -164,7 +166,7 @@ public class PeopleListOptions extends ListOptions implements Serializable {
             }
         }
         if (!labels.isEmpty()) {
-            parts.add("labeled with " + StringUtils.join(labels, " or "));
+            parts.add(ResourceUtils.getString(R.string.list_options_labeled_with) + " " + StringUtils.join(labels, " " + ResourceUtils.getString(R.string.list_options_or) + " "));
         }
 
         // interaction types
@@ -177,7 +179,7 @@ public class PeopleListOptions extends ListOptions implements Serializable {
             }
         }
         if (!interactions.isEmpty()) {
-            parts.add("with interactions: " + StringUtils.join(interactions, " or "));
+            parts.add(ResourceUtils.getString(R.string.list_options_with_interactions) + " " + StringUtils.join(interactions, " " + ResourceUtils.getString(R.string.list_options_or) + " "));
         }
 
         // persmission
@@ -186,17 +188,17 @@ public class PeopleListOptions extends ListOptions implements Serializable {
         for (String permissionId : permissionIds) {
             Permission permission = Application.getDb().getPermissionDao().load(Long.parseLong(permissionId));
             if (permission != null) {
-                permissions.add("<b>" + permission.getTranslatedName() + "</b> permissions");
+                permissions.add("<b>" + permission.getTranslatedName() + "</b> " + ResourceUtils.getString(R.string.list_options_permissions));
             }
         }
         if (!permissions.isEmpty()) {
-            parts.add("with " + StringUtils.join(permissions, " or "));
+            parts.add(" " + ResourceUtils.getString(R.string.list_options_with) + " " + StringUtils.join(permissions, " " + ResourceUtils.getString(R.string.list_options_or) + " "));
         }
 
         if (parts.isEmpty()) {
             return "";
         } else {
-            return "Showing contacts " + StringUtils.join(parts, " and ");
+            return ResourceUtils.getString(R.string.list_options_showing_contacts) + " " + StringUtils.join(parts, " " + ResourceUtils.getString(R.string.list_options_and) + " ");
         }
     }
 
