@@ -286,7 +286,8 @@
     <string name="select_organization_added">Added to Favorites</string>
     <string name="select_organization_title">Select Organization</string>
     <string name="select_organization_update_failed">Updating Organizations Failed</string>
-    <string name="select_organization_already_current">This is already your current organization.</string>
+    <string name="select_organization_already_current">This is already your current organization.
+    </string>
 
     <!-- Time Ago -->
     <string name="time_ago_hour">about an hour</string>
@@ -389,5 +390,6 @@
     <string name="list_options_labeled_with">labeled with</string>
     <string name="list_options_with_interactions">with interactions:</string>
     <string name="list_options_matching">matching</string>
+    <string name="action_press_to_quit">Press once more to quit MissionHub.</string>
 
 </resources>
