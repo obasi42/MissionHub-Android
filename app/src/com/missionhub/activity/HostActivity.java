@@ -29,6 +29,8 @@ import com.missionhub.fragment.SidebarFragment;
 import com.missionhub.fragment.dialog.SelectOrganizationDialogFragment;
 import com.missionhub.util.IntentHelper;
 
+import org.holoeverywhere.widget.Toast;
+
 import uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefreshAttacher;
 
 public class HostActivity extends BaseAuthenticatedActivity implements FragmentManager.OnBackStackChangedListener {
@@ -42,6 +44,7 @@ public class HostActivity extends BaseAuthenticatedActivity implements FragmentM
 
     private int mLeftDrawerId = R.id.left_drawer;
     private boolean mTabletSidebarStatic = true;
+    private long mBackCooldown;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -186,7 +189,14 @@ public class HostActivity extends BaseAuthenticatedActivity implements FragmentM
         if (isMenuOpen()) {
             closeMenu();
         } else {
-            super.onBackPressed();
+            if (!getSupportFragmentManager().popBackStackImmediate()) {
+                if (mBackCooldown + 4000 > System.currentTimeMillis()) {
+                    finish();
+                } else {
+                    mBackCooldown = System.currentTimeMillis();
+                    Application.showToast(getString(R.string.action_press_to_quit), Toast.LENGTH_SHORT);
+                }
+            }
         }
     }
 
