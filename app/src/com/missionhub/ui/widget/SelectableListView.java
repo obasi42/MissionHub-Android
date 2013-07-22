@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
-import android.util.SparseBooleanArray;
 import android.view.MotionEvent;
 import android.view.SoundEffectConstants;
 import android.view.View;
@@ -208,13 +207,8 @@ public class SelectableListView extends ListView {
 
     @Override
     public synchronized void clearChoices() {
-        SparseBooleanArray positions = getCheckedItemPositions();
-        for (int i = 0; i < positions.size(); i++) {
-            if (positions.valueAt(i)) {
-                setItemChecked(i, false);
-            }
-        }
         super.clearChoices();
+        updateOnScreenCheckedViews();
         if (mOnItemCheckedListener != null) {
             mOnItemCheckedListener.onAllUnchecked();
         }
@@ -271,5 +265,17 @@ public class SelectableListView extends ListView {
 
     public void setSelectionMode(int mode) {
         mMode = mode;
+    }
+
+    private synchronized void updateOnScreenCheckedViews() {
+        if (getCheckedItemPositions() == null) return;
+        final int firstPos = getFirstVisiblePosition();
+        final int count = getChildCount();
+        for (int i = 0; i < count; i++) {
+            final View child = getChildAt(i);
+            final int position = firstPos + i;
+            final boolean value = getCheckedItemPositions().get(position);
+            setStateOnView(child, value);
+        }
     }
 }
