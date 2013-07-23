@@ -23,12 +23,10 @@
             android:layout_height="50dip"
             android:id="@+id/avatar"
             android:scaleType="centerCrop"
-            android:src="@drawable/default_contact"
             android:layout_marginRight="14dip"
             android:layout_centerVertical="true"
             android:layout_toRightOf="@+id/checkmark"
-            android:duplicateParentState="true"
-            />
+            android:duplicateParentState="true"/>
 
     <TextView
             android:layout_toRightOf="@+id/avatar"
@@ -42,6 +40,5 @@
             android:paddingLeft="10dip"
             android:ellipsize="end"
             android:singleLine="true"
-            android:textStyle="bold"
-            />
+            android:textStyle="bold"/>
 </com.missionhub.ui.widget.CheckableRelativeLayout>

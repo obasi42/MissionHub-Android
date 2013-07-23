@@ -4,58 +4,59 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        >
+        android:orientation="vertical">
 
     <View
             android:layout_width="fill_parent"
             android:layout_height="9dip"
-            android:background="@drawable/contact_header_divider"
-            />
+            android:background="@drawable/contact_header_divider"/>
 
-    <com.missionhub.ui.widget.TabBar
-            android:id="@+id/tabbar"
+    <FrameLayout
             android:layout_width="fill_parent"
             android:layout_height="60dip"
             android:minHeight="60dip"
             android:background="@drawable/tab_bar_background">
 
-        <view
-                class="com.missionhub.ui.widget.TabBar$TabBarButton"
-                android:id="@+id/tab_info"
-                android:layout_width="wrap_content"
+        <com.missionhub.ui.widget.TabBar
+                android:id="@+id/tabbar"
+                android:layout_width="@dimen/profile_header_width"
                 android:layout_height="fill_parent"
-                android:layout_weight="1"
-                app:tb_title="Info"
-                />
+                android:layout_gravity="center_horizontal">
 
-        <view
-                class="com.missionhub.ui.widget.TabBar$TabBarButton"
-                android:id="@+id/tab_interactions"
-                android:layout_width="wrap_content"
-                android:layout_height="fill_parent"
-                android:layout_weight="1"
-                app:tb_title="Interactions"
-                />
+            <view
+                    class="com.missionhub.ui.widget.TabBar$TabBarButton"
+                    android:id="@+id/tab_info"
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:layout_weight="1"
+                    app:tb_title="Info"/>
 
-        <view
-                class="com.missionhub.ui.widget.TabBar$TabBarButton"
-                android:id="@+id/tab_surveys"
-                android:layout_width="wrap_content"
-                android:layout_height="fill_parent"
-                android:layout_weight="1"
-                app:tb_title="Surveys"
-                />
+            <view
+                    class="com.missionhub.ui.widget.TabBar$TabBarButton"
+                    android:id="@+id/tab_interactions"
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:layout_weight="1"
+                    app:tb_title="Interactions"/>
 
-        <view
-                class="com.missionhub.ui.widget.TabBar$TabBarButton"
-                android:id="@+id/tab_all"
-                android:layout_width="wrap_content"
-                android:layout_height="fill_parent"
-                android:layout_weight="1"
-                app:tb_title="All"
-                />
+            <view
+                    class="com.missionhub.ui.widget.TabBar$TabBarButton"
+                    android:id="@+id/tab_surveys"
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:layout_weight="1"
+                    app:tb_title="Surveys"/>
 
-    </com.missionhub.ui.widget.TabBar>
+            <view
+                    class="com.missionhub.ui.widget.TabBar$TabBarButton"
+                    android:id="@+id/tab_all"
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:layout_weight="1"
+                    app:tb_title="All"/>
+
+        </com.missionhub.ui.widget.TabBar>
+
+    </FrameLayout>
 
 </LinearLayout>

@@ -96,6 +96,7 @@ public class PersonAdapterViewProvider implements AdapterViewProvider {
         safeSet(holder.text1, person.getName());
 
         holder.text2.setOnClickListener(null);
+        holder.text2.setClickable(false);
         Person.PersonViewCache mCache = person.getViewCache();
 
         switch (mLine2) {
@@ -107,11 +108,17 @@ public class PersonAdapterViewProvider implements AdapterViewProvider {
                 break;
             case EMAIL:
                 safeSet(holder.text2, mCache.email);
-                holder.text2.setOnClickListener(mCache.emailClickListener);
+                if (mCache.emailClickListener != null) {
+                    holder.text2.setOnClickListener(mCache.emailClickListener);
+                    holder.text2.setClickable(true);
+                }
                 break;
             case PHONE:
                 safeSet(holder.text2, mCache.phone);
-                holder.text2.setOnClickListener(mCache.phoneClickListener);
+                if (mCache.phoneClickListener != null) {
+                    holder.text2.setOnClickListener(mCache.phoneClickListener);
+                    holder.text2.setClickable(true);
+                }
                 break;
             case PERMISSION:
                 safeSet(holder.text2, mCache.permission);
