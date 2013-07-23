@@ -1,13 +1,33 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
              android:id="@+id/container"
-             android:layout_width="fill_parent"
-             android:layout_height="fill_parent">
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:background="@color/light_gray">
 
-    <ProgressBar
-            android:id="@android:id/progress"
-            style="?android:attr/progressBarStyleLarge"
-            android:layout_width="wrap_content"
+    <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"/>
+            android:orientation="vertical"
+            android:id="@+id/index_container"
+            android:paddingTop="8dip"
+            android:paddingLeft="16dip"
+            android:paddingRight="16dip"
+            android:paddingBottom="8dip">
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="roboto-light"
+                android:textSize="18dip"
+                android:text="Select a survey from the list below to begin."
+                android:layout_marginBottom="8dip"/>
+
+        <ListView
+                android:id="@android:id/list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_box"/>
+
+    </LinearLayout>
 
 </FrameLayout>

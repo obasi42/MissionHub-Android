@@ -25,6 +25,8 @@
     <string name="action_labels">Labels</string>
     <string name="action_done">Done</string>
     <string name="action_record_interaction">Record Interaction</string>
+    <string name="action_press_to_quit">Press once more to quit MissionHub.</string>
+    <string name="action_index">Index</string>
 
     <!-- Main Menu -->
     <string name="menu_surveys">Surveys</string>
@@ -390,6 +392,6 @@
     <string name="list_options_labeled_with">labeled with</string>
     <string name="list_options_with_interactions">with interactions:</string>
     <string name="list_options_matching">matching</string>
-    <string name="action_press_to_quit">Press once more to quit MissionHub.</string>
+    <string name="surveys_no_surveys">This organization does not have any surveys.</string>
 
 </resources>

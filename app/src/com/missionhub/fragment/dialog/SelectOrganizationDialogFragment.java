@@ -37,10 +37,8 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
 
     private DrillDownView mDrilldown;
     private DrillDownAdapter mAdapter;
-
     private View mAction;
     private TextView mActionText;
-
     private SafeAsyncTask<Void> mTask;
     private OrganizationDrillDownItem mCurrentItem;
     private SafeAsyncTask<Void> mSetTask;
@@ -125,7 +123,7 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
             mBuildTask.cancel(true);
         } catch (Exception e) { /* ignore */ }
 
-        mBuildTask = new SafeAsyncTask<List<DrillDownItem>> () {
+        mBuildTask = new SafeAsyncTask<List<DrillDownItem>>() {
 
             @Override
             public List<DrillDownItem> call() throws Exception {
@@ -237,63 +235,6 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
             return true;
         }
         return getSupportActivity().dispatchKeyEvent(event);
-    }
-
-    public static class OrganizationDrillDownAdapter extends DrillDownAdapter {
-
-        public OrganizationDrillDownAdapter(Context context) {
-            super(context);
-        }
-
-        public View createItemView(final DrillDownItem item, View convertView) {
-            View view = convertView;
-            if (item instanceof HeaderDrillDownItem) {
-                HeaderViewHolder holder;
-                if (view == null) {
-                    holder = new HeaderViewHolder();
-                    view = getLayoutInflater().inflate(R.layout.item_list_divider, null);
-                    holder.text1 = (TextView) view.findViewById(android.R.id.text1);
-                    view.setTag(holder);
-                } else {
-                    holder = (HeaderViewHolder) view.getTag();
-                }
-                if (StringUtils.isNotEmpty(item.getText())) {
-                    holder.text1.setText(item.getText());
-                    holder.text1.setVisibility(View.VISIBLE);
-                } else {
-                    holder.text1.setVisibility(View.GONE);
-                }
-            } else {
-                view = super.createItemView(item, convertView);
-            }
-            return view;
-        }
-
-        public static class HeaderViewHolder {
-            public TextView text1;
-        }
-
-    }
-
-    public static class OrganizationDrillDownItem extends DrillDownItem {
-        private final long mOrganizationId;
-
-        public OrganizationDrillDownItem(long organizationId, CharSequence text, DrillDownItem parent) {
-            super(text, parent);
-            mOrganizationId = organizationId;
-        }
-
-        @Override
-        public int getId() {
-            return (int) mOrganizationId;
-        }
-    }
-
-    public static class HeaderDrillDownItem extends DrillDownItem {
-        public HeaderDrillDownItem(CharSequence text) {
-            super(text);
-            setEnabled(false);
-        }
     }
 
     @Override
@@ -418,5 +359,62 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
     public void cancel() {
         TaskUtils.cancel(mSetTask);
         super.cancel();
+    }
+
+    public static class OrganizationDrillDownAdapter extends DrillDownAdapter {
+
+        public OrganizationDrillDownAdapter(Context context) {
+            super(context);
+        }
+
+        public View createItemView(final DrillDownItem item, View convertView) {
+            View view = convertView;
+            if (item instanceof HeaderDrillDownItem) {
+                HeaderViewHolder holder;
+                if (view == null) {
+                    holder = new HeaderViewHolder();
+                    view = getLayoutInflater().inflate(R.layout.item_list_divider, null);
+                    holder.text1 = (TextView) view.findViewById(android.R.id.text1);
+                    view.setTag(holder);
+                } else {
+                    holder = (HeaderViewHolder) view.getTag();
+                }
+                if (StringUtils.isNotEmpty(item.getText())) {
+                    holder.text1.setText(item.getText());
+                    holder.text1.setVisibility(View.VISIBLE);
+                } else {
+                    holder.text1.setVisibility(View.GONE);
+                }
+            } else {
+                view = super.createItemView(item, convertView);
+            }
+            return view;
+        }
+
+        public static class HeaderViewHolder {
+            public TextView text1;
+        }
+
+    }
+
+    public static class OrganizationDrillDownItem extends DrillDownItem {
+        private final long mOrganizationId;
+
+        public OrganizationDrillDownItem(long organizationId, CharSequence text, DrillDownItem parent) {
+            super(text, parent);
+            mOrganizationId = organizationId;
+        }
+
+        @Override
+        public int getId() {
+            return (int) mOrganizationId;
+        }
+    }
+
+    public static class HeaderDrillDownItem extends DrillDownItem {
+        public HeaderDrillDownItem(CharSequence text) {
+            super(text);
+            setEnabled(false);
+        }
     }
 }

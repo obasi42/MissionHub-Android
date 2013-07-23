@@ -8,9 +8,14 @@ import com.missionhub.activity.HostActivity;
 import com.missionhub.event.ChangeHostFragmentEvent;
 import com.missionhub.util.FragmentUtils;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 public abstract class HostedFragment extends BaseFragment {
 
     private ChangeHostFragmentEvent.OnFragmentChangedCallback mCallback;
+    private Set<String> mProgress = Collections.synchronizedSet(new HashSet<String>());
 
     public HostedFragment() {
     }
@@ -30,6 +35,13 @@ public abstract class HostedFragment extends BaseFragment {
             mCallback.onFragmentChanged(this);
             mCallback = null;
         }
+        getHost().setProgress(this, mProgress);
+    }
+
+    @Override
+    public void onPause() {
+        getHost().removeProgress(this);
+        super.onPause();
     }
 
     public void setOnFragmentChangedCallback(ChangeHostFragmentEvent.OnFragmentChangedCallback callback) {
@@ -66,5 +78,32 @@ public abstract class HostedFragment extends BaseFragment {
 
     public HostActivity getHost() {
         return (HostActivity) getSupportActivity();
+    }
+
+    public void showProgress(String task) {
+        mProgress.add(task);
+        if (getHost() != null) {
+            getHost().setProgress(this, mProgress);
+        }
+    }
+
+    public void hideProgress(String task) {
+        mProgress.remove(task);
+        if (getHost() != null) {
+            getHost().setProgress(this, mProgress);
+        }
+    }
+
+    boolean hasProgress() {
+        return !mProgress.isEmpty();
+    }
+
+    public void onProgressStateChanged(boolean progress) {
+    }
+
+    public void closeMenu() {
+        if (getHost() != null) {
+            getHost().closeMenu();
+        }
     }
 }

@@ -13,6 +13,9 @@ import android.view.View;
 
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.Window;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import com.missionhub.R;
 import com.missionhub.application.Application;
 import com.missionhub.application.Session;
@@ -31,20 +34,21 @@ import com.missionhub.util.IntentHelper;
 
 import org.holoeverywhere.widget.Toast;
 
+import java.util.Set;
+
 import uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefreshAttacher;
 
 public class HostActivity extends BaseAuthenticatedActivity implements FragmentManager.OnBackStackChangedListener {
 
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
-
     private HostedFragment mCurrentFragment;
     private SidebarFragment mSidebarFragment;
     private PullToRefreshAttacher mPullToRefreshHelper;
-
     private int mLeftDrawerId = R.id.left_drawer;
     private boolean mTabletSidebarStatic = true;
     private long mBackCooldown;
+    private Multimap<String, String> mProgress = Multimaps.synchronizedMultimap(HashMultimap.<String, String>create());
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -335,5 +339,38 @@ public class HostActivity extends BaseAuthenticatedActivity implements FragmentM
     public void _setCurrentFragment(HostedFragment currentFragment) {
         mCurrentFragment = currentFragment;
         Application.postEvent(new OnHostFragmentChangedEvent(mCurrentFragment));
+    }
+
+    public void removeProgress(HostedFragment hostedFragment) {
+        mProgress.removeAll(getProgressKey(hostedFragment));
+        updateProgressVisibility();
+        hostedFragment.onProgressStateChanged(false);
+        supportInvalidateOptionsMenu();
+    }
+
+    public void setProgress(HostedFragment hostedFragment, Set<String> progress) {
+        mProgress.removeAll(getProgressKey(hostedFragment));
+        if (progress != null && !progress.isEmpty()) {
+            mProgress.putAll(getProgressKey(hostedFragment), progress);
+        }
+        updateProgressVisibility();
+        if (mProgress.containsKey(getProgressKey(hostedFragment))) {
+            hostedFragment.onProgressStateChanged(true);
+        } else {
+            hostedFragment.onProgressStateChanged(false);
+        }
+        supportInvalidateOptionsMenu();
+    }
+
+    public void updateProgressVisibility() {
+        if (mProgress.isEmpty()) {
+            setSupportProgressBarIndeterminateVisibility(false);
+        } else {
+            setSupportProgressBarIndeterminateVisibility(true);
+        }
+    }
+
+    private String getProgressKey(HostedFragment fragment) {
+        return Integer.toHexString(System.identityHashCode(fragment));
     }
 }

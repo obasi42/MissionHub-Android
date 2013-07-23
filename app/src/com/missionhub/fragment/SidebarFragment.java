@@ -126,7 +126,7 @@ public class SidebarFragment extends Fragment implements AdapterView.OnItemClick
 
                 final HostedFragment hostedFragment = getHostActivity().getCurrentFragment();
 
-                List<Survey> surveys = Session.getInstance().getOrganization().getSurveys();
+                List<Survey> surveys = Session.getInstance().getOrganization().getSortedSurveys();
 
                 // top level item
                 if (hostedFragment instanceof HostedSurveysFragment) {
