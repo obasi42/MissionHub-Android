@@ -9,7 +9,7 @@
     <packaging>apk</packaging>
 
     <parent>
-        <version>2.5-SNAPSHOT</version>
+        <version>2.6-SNAPSHOT</version>
         <groupId>com.missionhub</groupId>
         <artifactId>parent</artifactId>
     </parent>
