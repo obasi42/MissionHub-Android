@@ -3,4 +3,7 @@
 
     <dimen name="listview_item_padding">8.0dip</dimen>
     <dimen name="listview_item_min_height">48.0dip</dimen>
+
+    <dimen name="profile_header_width">-1dip</dimen>
+    <dimen name="profile_item_width">-1dip</dimen>
 </resources>

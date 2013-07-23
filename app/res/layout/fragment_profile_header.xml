@@ -7,7 +7,8 @@
         android:id="@+id/header"
         android:orientation="vertical"
         android:layout_width="fill_parent"
-        android:layout_height="209dip">
+        android:layout_height="209dip"
+        android:background="@drawable/bg_linen">
 
     <ProgressBar
             android:layout_width="wrap_content"
@@ -16,17 +17,16 @@
             android:layout_gravity="center"/>
 
     <ImageView
-            android:layout_width="fill_parent"
+            android:layout_width="@dimen/profile_header_width"
             android:layout_height="fill_parent"
             android:scaleType="centerCrop"
             android:id="@+id/avatar"
-            />
+            android:layout_gravity="center_horizontal"/>
 
     <com.missionhub.ui.widget.LockableViewPager
             android:id="@+id/pager"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            />
+            android:layout_height="fill_parent"/>
 
     <com.viewpagerindicator.CirclePageIndicator
             android:id="@+id/indicator"
@@ -42,6 +42,5 @@
             app:pageColor="#797777"
             app:strokeColor="#797777"
             app:strokeWidth="1dp"
-            app:centered="false"
-            />
+            app:centered="false"/>
 </FrameLayout>

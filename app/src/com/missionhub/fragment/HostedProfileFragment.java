@@ -357,8 +357,8 @@ public class HostedProfileFragment extends HostedFragment implements TabBar.OnTa
         DisplayImageOptions options = new DisplayImageOptions.Builder()
                 .cacheInMemory(true)
                 .cacheOnDisc(true)
-                .showImageForEmptyUri(R.drawable.default_contact)
-                .showImageOnFail(R.drawable.default_contact)
+                .showImageForEmptyUri(R.drawable.ic_default_contact_full)
+                .showImageOnFail(R.drawable.ic_default_contact_full)
                 .build();
         ImageLoader.getInstance().displayImage(picture, mAvatar, options, mLoadingListener);
 

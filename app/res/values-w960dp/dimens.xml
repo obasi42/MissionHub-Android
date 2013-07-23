@@ -1,0 +1,6 @@
+<resources>
+    <dimen name="sidebar_width">280dip</dimen>
+
+    <dimen name="profile_header_width">550dip</dimen>
+    <dimen name="profile_item_width">620dip</dimen>
+</resources>

@@ -4,7 +4,9 @@
                                                   android:layout_height="64dip"
                                                   android:gravity="center_vertical"
                                                   android:paddingLeft="14dip"
-                                                  android:background="@drawable/list_item_background">
+                                                  android:background="@drawable/list_item_background"
+
+        >
 
     <ImageView
             android:layout_width="24dip"
@@ -28,43 +30,43 @@
             android:duplicateParentState="true"/>
 
     <LinearLayout
-            android:orientation="vertical"
+            android:orientation="horizontal"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:layout_centerVertical="true"
             android:layout_toRightOf="@+id/avatar"
-            android:duplicateParentState="true">
+            android:layout_alignParentTop="true"
+            android:gravity="center_vertical"
+            android:layout_marginRight="14dip">
 
         <TextView
-                android:layout_width="fill_parent"
-                android:layout_height="0dip"
-                android:background="@drawable/person_item_name_background_state"
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
                 android:id="@android:id/text1"
-                android:maxLines="1"
                 android:textSize="18sp"
                 android:textColor="#808286"
-                android:paddingTop="4dip"
-                android:paddingBottom="4dip"
-                android:paddingLeft="10dip"
-                android:paddingRight="14dip"
                 android:ellipsize="end"
                 android:singleLine="true"
                 android:layout_weight="1"
-                android:textStyle="bold"
-                android:duplicateParentState="true"/>
+                android:textStyle="bold"/>
+
+        <View
+                android:layout_height="fill_parent"
+                android:layout_width="1px"
+                android:background="?android:listDivider"
+                android:layout_marginLeft="24dip"
+                android:layout_marginRight="24dip"
+                />
 
         <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="0dip"
                 android:layout_height="wrap_content"
                 android:id="@android:id/text2"
                 android:textColor="#808286"
                 android:gravity="center_vertical"
-                android:paddingLeft="18dip"
-                android:layout_marginRight="14dip"
                 android:textSize="18sp"
-                android:layout_marginBottom="7dip"
-                android:duplicateParentState="true"
                 android:ellipsize="end"
-                android:singleLine="true"/>
+                android:singleLine="true"
+                android:layout_weight="1"
+                />
     </LinearLayout>
 </com.missionhub.ui.widget.CheckableRelativeLayout>
