@@ -27,6 +27,7 @@
     <string name="action_record_interaction">Record Interaction</string>
     <string name="action_press_to_quit">Press once more to quit MissionHub.</string>
     <string name="action_index">Index</string>
+    <string name="action_followup_status">Followup Status</string>
 
     <!-- Main Menu -->
     <string name="menu_surveys">Surveys</string>
@@ -94,6 +95,8 @@
     </string>
 
     <!-- Profile -->
+    <string name="profile_group_followup_status">Followup Status</string>
+    <string name="profile_group_assigned_to">Assigned To</string>
     <string name="profile_group_gender">Gender</string>
     <string name="profile_group_phone">Phone</string>
     <string name="profile_group_address">Address</string>
@@ -280,6 +283,9 @@
     <string name="assignment_server_error">Server returned error</string>
     <string name="assignment_failed">Failed to assign contact(s)</string>
     <string name="assignment_progress">Please wait. Performing assignment…</string>
+    <string name="assignment_unassigned">Unassigned</string>
+    <string name="assignment_me">Me</string>
+    <string name="assignment_leaders">Leaders</string>
 
     <!-- Select Organization Dialog -->
     <string name="select_organization_favorites">Favorites</string>
@@ -380,9 +386,9 @@
     <string name="profile_header_labels">LABELS:</string>
     <string name="select_organization_loading_organization">Loading organization...</string>
     <string name="select_organization_loading_organizations">Loading organizations...</string>
-    <string name="people_list_clear_filters">Clear Filters</string>
 
     <!-- List Options (Filter Indicator) -->
+    <string name="list_options_clear_filters">Clear Filters</string>
     <string name="list_options_showing_contacts">Showing contacts</string>
     <string name="list_options_and">and</string>
     <string name="list_options_with">with</string>
@@ -392,6 +398,9 @@
     <string name="list_options_labeled_with">labeled with</string>
     <string name="list_options_with_interactions">with interactions:</string>
     <string name="list_options_matching">matching</string>
+
+    <!-- Surveys -->
     <string name="surveys_no_surveys">This organization does not have any surveys.</string>
+    <string name="display_labels">Labels</string>
 
 </resources>

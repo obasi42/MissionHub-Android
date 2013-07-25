@@ -103,7 +103,7 @@ public class UpgradeManager {
         AccountManager am = AccountManager.get(Application.getContext());
         Account[] accounts = am.getAccountsByType(Authenticator.ACCOUNT_TYPE);
         if (accounts != null) {
-            for(Account account : accounts) {
+            for (Account account : accounts) {
                 am.removeAccount(account, null, null);
             }
         }

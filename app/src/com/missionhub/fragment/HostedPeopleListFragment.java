@@ -28,11 +28,11 @@ import com.missionhub.event.OnOrganizationChangedEvent;
 import com.missionhub.event.OnSidebarItemClickedEvent;
 import com.missionhub.exception.ExceptionHelper;
 import com.missionhub.fragment.dialog.AssignmentDialogFragment;
+import com.missionhub.fragment.dialog.BulkUpdateDialogFragment;
 import com.missionhub.fragment.dialog.CheckAllDialog;
 import com.missionhub.fragment.dialog.DeletePeopleDialogFragment;
 import com.missionhub.fragment.dialog.EditContactDialogFragment;
 import com.missionhub.fragment.dialog.InteractionDialogFragment;
-import com.missionhub.fragment.dialog.PermissionLabelDialogFragment;
 import com.missionhub.model.InteractionType;
 import com.missionhub.model.Label;
 import com.missionhub.model.Permission;
@@ -86,6 +86,7 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
     private TextView mFilterIndicatorText;
     private TextView mFilterIndicatorClear;
     private SafeAsyncTask<String> mIndicatorTask;
+    private int mOrderSpinnerVisibility;
 
     public HostedPeopleListFragment() {
         // empty fragment constructor
@@ -243,8 +244,14 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
     @Override
     public void onResume() {
         super.onResume();
-
+        mOrderSpinner.setVisibility(mOrderSpinnerVisibility);
         getHost().getPullToRefreshAttacher().setRefreshableView(mList, this);
+    }
+
+    @Override
+    public void onPause() {
+        mOrderSpinnerVisibility = mOrderSpinner.getVisibility();
+        super.onPause();
     }
 
     @Override
@@ -387,6 +394,7 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
         adapter.add(new StringRunnableItem(R.string.display_status, new Runnable() {
             @Override
             public void run() {
+                mOrderSpinner.setVisibility(View.VISIBLE);
                 mProvider.setDisplay(PersonAdapterViewProvider.Display.STATUS);
                 ((StringRunnableItem) mOrderSpinner.getSelectedItem()).run();
             }
@@ -394,6 +402,7 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
         adapter.add(new StringRunnableItem(R.string.display_gender, new Runnable() {
             @Override
             public void run() {
+                mOrderSpinner.setVisibility(View.VISIBLE);
                 mProvider.setDisplay(PersonAdapterViewProvider.Display.GENDER);
                 ((StringRunnableItem) mOrderSpinner.getSelectedItem()).run();
             }
@@ -401,13 +410,24 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
         adapter.add(new StringRunnableItem(R.string.display_permission, new Runnable() {
             @Override
             public void run() {
+                mOrderSpinner.setVisibility(View.VISIBLE);
                 mProvider.setDisplay(PersonAdapterViewProvider.Display.PERMISSION);
                 ((StringRunnableItem) mOrderSpinner.getSelectedItem()).run();
+            }
+        }));
+        adapter.add(new StringRunnableItem(R.string.display_labels, new Runnable() {
+            @Override
+            public void run() {
+                mProvider.setDisplay(PersonAdapterViewProvider.Display.LABELS);
+                mOrderSpinner.setSelection(0, false); // no filters for labels
+                ((StringRunnableItem) mOrderSpinner.getSelectedItem()).run();
+                mOrderSpinner.setVisibility(View.GONE);
             }
         }));
         adapter.add(new StringRunnableItem(R.string.display_phone, new Runnable() {
             @Override
             public void run() {
+                mOrderSpinner.setVisibility(View.VISIBLE);
                 mProvider.setDisplay(PersonAdapterViewProvider.Display.PHONE);
                 ((StringRunnableItem) mOrderSpinner.getSelectedItem()).run();
             }
@@ -415,6 +435,7 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
         adapter.add(new StringRunnableItem(R.string.display_email, new Runnable() {
             @Override
             public void run() {
+                mOrderSpinner.setVisibility(View.VISIBLE);
                 mProvider.setDisplay(PersonAdapterViewProvider.Display.EMAIL);
                 ((StringRunnableItem) mOrderSpinner.getSelectedItem()).run();
             }
@@ -732,16 +753,16 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
                 break;
             case R.id.action_label:
                 if (mCheckmarkHelper.isAllChecked()) {
-                    PermissionLabelDialogFragment.showForResult(getChildFragmentManager(), PermissionLabelDialogFragment.TYPE_LABELS, mProvider.getPeopleListOptions(), R.id.action_label);
+                    BulkUpdateDialogFragment.showForResult(getChildFragmentManager(), BulkUpdateDialogFragment.TYPE_LABELS, mProvider.getPeopleListOptions(), R.id.action_label);
                 } else {
-                    PermissionLabelDialogFragment.showForResult(getChildFragmentManager(), PermissionLabelDialogFragment.TYPE_LABELS, mList.getCheckedItemIds(), R.id.action_label);
+                    BulkUpdateDialogFragment.showForResult(getChildFragmentManager(), BulkUpdateDialogFragment.TYPE_LABELS, mList.getCheckedItemIds(), R.id.action_label);
                 }
                 break;
             case R.id.action_permission:
                 if (mCheckmarkHelper.isAllChecked()) {
-                    PermissionLabelDialogFragment.showForResult(getChildFragmentManager(), PermissionLabelDialogFragment.TYPE_PERMISSIONS, mProvider.getPeopleListOptions(), R.id.action_permission);
+                    BulkUpdateDialogFragment.showForResult(getChildFragmentManager(), BulkUpdateDialogFragment.TYPE_PERMISSIONS, mProvider.getPeopleListOptions(), R.id.action_permission);
                 } else {
-                    PermissionLabelDialogFragment.showForResult(getChildFragmentManager(), PermissionLabelDialogFragment.TYPE_PERMISSIONS, mList.getCheckedItemIds(), R.id.action_permission);
+                    BulkUpdateDialogFragment.showForResult(getChildFragmentManager(), BulkUpdateDialogFragment.TYPE_PERMISSIONS, mList.getCheckedItemIds(), R.id.action_permission);
                 }
                 break;
             case R.id.action_delete:

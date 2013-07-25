@@ -84,7 +84,7 @@
                 android:id="@+id/filter_indicator_clear"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/people_list_clear_filters"
+                android:text="@string/list_options_clear_filters"
                 android:gravity="center_vertical"
                 android:layout_alignTop="@+id/filter_indicator_text"
                 android:layout_alignParentRight="true"

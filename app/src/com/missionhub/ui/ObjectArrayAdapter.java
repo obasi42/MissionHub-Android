@@ -542,6 +542,7 @@ public abstract class ObjectArrayAdapter<T> extends BaseAdapter {
 
     /**
      * Removes all items from the list with in the list of given ids
+     *
      * @param ids
      */
     public void removeAllById(Collection<Long> ids) {

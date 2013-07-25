@@ -25,11 +25,12 @@ import com.missionhub.application.Session;
 import com.missionhub.event.OnOrganizationChangedEvent;
 import com.missionhub.exception.ExceptionHelper;
 import com.missionhub.fragment.dialog.AssignmentDialogFragment;
+import com.missionhub.fragment.dialog.BulkUpdateDialogFragment;
 import com.missionhub.fragment.dialog.DeletePeopleDialogFragment;
 import com.missionhub.fragment.dialog.InteractionDialogFragment;
-import com.missionhub.fragment.dialog.PermissionLabelDialogFragment;
 import com.missionhub.model.Address;
 import com.missionhub.model.AnswerSheet;
+import com.missionhub.model.ContactAssignment;
 import com.missionhub.model.EmailAddress;
 import com.missionhub.model.Interaction;
 import com.missionhub.model.Label;
@@ -38,6 +39,7 @@ import com.missionhub.model.OrganizationalLabelDao;
 import com.missionhub.model.Person;
 import com.missionhub.model.PhoneNumber;
 import com.missionhub.model.TimestampedEntity;
+import com.missionhub.model.generic.FollowupStatus;
 import com.missionhub.model.generic.Gender;
 import com.missionhub.ui.AnimateOnceImageLoadingListener;
 import com.missionhub.ui.ObjectArrayAdapter;
@@ -231,10 +233,10 @@ public class HostedProfileFragment extends HostedFragment implements TabBar.OnTa
                 AssignmentDialogFragment.showForResult(getChildFragmentManager(), new long[]{mPersonId}, R.id.action_assign);
                 return true;
             case R.id.action_label:
-                PermissionLabelDialogFragment.showForResult(getChildFragmentManager(), PermissionLabelDialogFragment.TYPE_LABELS, mPersonId, R.id.action_label);
+                BulkUpdateDialogFragment.showForResult(getChildFragmentManager(), BulkUpdateDialogFragment.TYPE_LABELS, mPersonId, R.id.action_label);
                 return true;
             case R.id.action_permission:
-                PermissionLabelDialogFragment.showForResult(getChildFragmentManager(), PermissionLabelDialogFragment.TYPE_PERMISSIONS, mPersonId, R.id.action_label);
+                BulkUpdateDialogFragment.showForResult(getChildFragmentManager(), BulkUpdateDialogFragment.TYPE_PERMISSIONS, mPersonId, R.id.action_label);
                 return true;
             case R.id.action_interaction:
                 InteractionDialogFragment.showForResult(getChildFragmentManager(), mPersonId, null, R.id.action_interaction);
@@ -270,6 +272,11 @@ public class HostedProfileFragment extends HostedFragment implements TabBar.OnTa
                     return true;
                 case R.id.action_delete:
                     getHost().onBackPressed();
+                    return true;
+                case R.id.action_assign:
+                case R.id.action_followup_status:
+                    clearObjectCache(R.id.tab_info);
+                    notifyPersonChanged();
                     return true;
             }
         }
@@ -410,6 +417,19 @@ public class HostedProfileFragment extends HostedFragment implements TabBar.OnTa
 
         person.refresh();
 
+        person.resetStatus();
+        FollowupStatus status = person.getStatus(Session.getInstance().getOrganizationId());
+        if (status != null) {
+            items.add(new InfoGroup(R.string.profile_group_followup_status));
+            items.add(new InfoItem(status));
+        }
+
+        person.resetContactAssignments();
+        ContactAssignment assignment = person.getContactAssignment(Session.getInstance().getOrganizationId());
+        if (assignment == null) assignment = new ContactAssignment();
+        items.add(new InfoGroup(R.string.profile_group_assigned_to));
+        items.add(new InfoItem(assignment));
+
         Gender gender = person.getGenderEnum();
         if (gender != null) {
             items.add(new InfoGroup(R.string.profile_group_gender));
@@ -536,7 +556,11 @@ public class HostedProfileFragment extends HostedFragment implements TabBar.OnTa
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         Object item = adapterView.getItemAtPosition(i);
-        if (item instanceof Runnable) {
+        if (item instanceof InfoItem && ((InfoItem) item).object instanceof FollowupStatus) {
+            BulkUpdateDialogFragment.showForResult(getChildFragmentManager(), BulkUpdateDialogFragment.TYPE_FOLLOWUP_STATUS, mPersonId, R.id.action_followup_status);
+        } else if (item instanceof InfoItem && ((InfoItem) item).object instanceof ContactAssignment) {
+            AssignmentDialogFragment.showForResult(getChildFragmentManager(), new long[]{mPersonId}, R.id.action_assign);
+        } else if (item instanceof Runnable) {
             ((Runnable) item).run();
         }
     }
@@ -600,7 +624,7 @@ public class HostedProfileFragment extends HostedFragment implements TabBar.OnTa
                 mLabels.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        PermissionLabelDialogFragment.showForResult(getChildFragmentManager(), PermissionLabelDialogFragment.TYPE_LABELS, mPersonId, R.id.action_label);
+                        BulkUpdateDialogFragment.showForResult(getChildFragmentManager(), BulkUpdateDialogFragment.TYPE_LABELS, mPersonId, R.id.action_label);
                     }
                 });
             } else {
@@ -643,6 +667,8 @@ public class HostedProfileFragment extends HostedFragment implements TabBar.OnTa
 
         @Override
         public boolean isEnabled() {
+            if (object instanceof FollowupStatus) return true;
+            if (object instanceof ContactAssignment) return true;
             return getRunnable() != null;
         }
 
@@ -793,10 +819,6 @@ public class HostedProfileFragment extends HostedFragment implements TabBar.OnTa
             super(context, 4);
         }
 
-        public ProfileObjectAdapter(Context context, int maxViewTypes) {
-            super(context, maxViewTypes);
-        }
-
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             Object object = getItem(position);
@@ -843,7 +865,20 @@ public class HostedProfileFragment extends HostedFragment implements TabBar.OnTa
                 holder.text2.setVisibility(View.GONE);
                 holder.tagInline.setVisibility(View.GONE);
 
-                if (item.object instanceof Gender) {
+                if (item.object instanceof FollowupStatus) {
+                    safeSet(holder.text1, item.object.toString());
+                } else if (item.object instanceof ContactAssignment) {
+                    if (((ContactAssignment) item.object).getId() == null) {
+                        safeSet(holder.text1, ResourceUtils.getString(R.string.assignment_unassigned));
+                    } else {
+                        Person leader = ((ContactAssignment) item.object).getPerson_assigned_to();
+                        if (leader != null) {
+                            safeSet(holder.text1, leader.getName());
+                        } else {
+                            safeSet(holder.text1, "Unknown Leader");
+                        }
+                    }
+                } else if (item.object instanceof Gender) {
                     safeSet(holder.text1, item.object.toString());
                 } else if (item.object instanceof EmailAddress) {
                     EmailAddress.EmailAddressViewCache cache = ((EmailAddress) item.object).getViewCache();

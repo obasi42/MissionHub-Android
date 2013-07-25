@@ -20,6 +20,7 @@ import com.missionhub.exception.ExceptionHelper;
 import com.missionhub.model.Label;
 import com.missionhub.model.Permission;
 import com.missionhub.model.Person;
+import com.missionhub.model.generic.FollowupStatus;
 import com.missionhub.ui.ObjectArrayAdapter;
 import com.missionhub.ui.widget.CheckmarkImageView;
 import com.missionhub.util.SafeAsyncTask;
@@ -38,10 +39,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class PermissionLabelDialogFragment extends RefreshableDialogFragment implements AdapterView.OnItemClickListener {
+public class BulkUpdateDialogFragment extends RefreshableDialogFragment implements AdapterView.OnItemClickListener {
 
     public static final int TYPE_LABELS = 0;
     public static final int TYPE_PERMISSIONS = 1;
+    public static final int TYPE_FOLLOWUP_STATUS = 2;
     private HashSet<Person> mPeople;
     private PeopleListOptions mFilters;
     private int mType = TYPE_LABELS;
@@ -55,36 +57,36 @@ public class PermissionLabelDialogFragment extends RefreshableDialogFragment imp
     private View mProgress;
     private TextView mProgressText;
 
-    public PermissionLabelDialogFragment() {
+    public BulkUpdateDialogFragment() {
     }
 
-    public static PermissionLabelDialogFragment showForResult(FragmentManager fm, int type, final Person person, Integer requestCode) {
+    public static BulkUpdateDialogFragment showForResult(FragmentManager fm, int type, final Person person, Integer requestCode) {
         return showForResult(fm, type, person.getId(), requestCode);
     }
 
-    public static PermissionLabelDialogFragment showForResult(FragmentManager fm, int type, long personId, Integer requestCode) {
+    public static BulkUpdateDialogFragment showForResult(FragmentManager fm, int type, long personId, Integer requestCode) {
         return showForResult(fm, type, new long[]{personId}, requestCode);
     }
 
-    public static PermissionLabelDialogFragment showForResult(FragmentManager fm, int type, final long[] people, Integer requestCode) {
+    public static BulkUpdateDialogFragment showForResult(FragmentManager fm, int type, final long[] people, Integer requestCode) {
         final Bundle args = new Bundle();
         args.putInt("type", type);
         args.putSerializable("peopleIds", new HashSet<Long>(Arrays.asList(ArrayUtils.toObject(people))));
         return showForResult(fm, type, Person.getAllById(people), requestCode);
     }
 
-    public static PermissionLabelDialogFragment showForResult(FragmentManager fm, int type, final PeopleListOptions filters, Integer requestCode) {
+    public static BulkUpdateDialogFragment showForResult(FragmentManager fm, int type, final PeopleListOptions filters, Integer requestCode) {
         final Bundle args = new Bundle();
         args.putSerializable("filters", filters);
         args.putInt("type", type);
-        return PermissionLabelDialogFragment.show(PermissionLabelDialogFragment.class, fm, args, requestCode);
+        return BulkUpdateDialogFragment.show(BulkUpdateDialogFragment.class, fm, args, requestCode);
     }
 
-    public static PermissionLabelDialogFragment showForResult(FragmentManager fm, int type, final Collection<Person> people, Integer requestCode) {
+    public static BulkUpdateDialogFragment showForResult(FragmentManager fm, int type, final Collection<Person> people, Integer requestCode) {
         final Bundle args = new Bundle();
         args.putSerializable("peopleIds", new HashSet<Long>(Person.getIds(people)));
         args.putInt("type", type);
-        return PermissionLabelDialogFragment.show(PermissionLabelDialogFragment.class, fm, args, requestCode);
+        return BulkUpdateDialogFragment.show(BulkUpdateDialogFragment.class, fm, args, requestCode);
     }
 
     @Override
@@ -118,12 +120,14 @@ public class PermissionLabelDialogFragment extends RefreshableDialogFragment imp
                 title.setIcon(R.drawable.ic_action_permissions);
                 title.setTitle(R.string.action_permissions);
                 break;
+            case TYPE_FOLLOWUP_STATUS:
+                title.setTitle(R.string.action_followup_status);
         }
     }
 
     @Override
     public AlertDialog.Builder onCreateRefreshableDialog(final Bundle savedInstanceState) {
-        final View view = getSupportActivity().getLayoutInflater().inflate(R.layout.fragment_permissions_labels_dialog, null);
+        final View view = getSupportActivity().getLayoutInflater().inflate(R.layout.dialog_fragment_generic_list, null);
         mProgress = view.findViewById(R.id.progress_container);
         mProgressText = (TextView) view.findViewById(android.R.id.text1);
         mWarning = (TextView) view.findViewById(R.id.warning);
@@ -164,6 +168,9 @@ public class PermissionLabelDialogFragment extends RefreshableDialogFragment imp
                 mProgressText.setText("Saving labels");
                 mWarning.setText("Setting labels in mass assign mode.");
                 break;
+            case TYPE_FOLLOWUP_STATUS:
+                mProgressText.setText("Saving followup statuses");
+                mWarning.setText("Setting followup statuses in mass assign mode.");
         }
 
         if (mFilters != null) {
@@ -229,6 +236,23 @@ public class PermissionLabelDialogFragment extends RefreshableDialogFragment imp
                         items.add(new Item(Permission.getPermission(Permission.USER), determineCheckboxState(permissionCounts, Permission.USER)));
                         items.add(new Item(Permission.getPermission(Permission.NO_PERMISSIONS), determineCheckboxState(permissionCounts, Permission.NO_PERMISSIONS)));
                         break;
+                    case TYPE_FOLLOWUP_STATUS:
+                        final HashMap<Long, Integer> statusCounts = new HashMap<Long, Integer>(); // status id, count of people having permission
+                        if (mPeople != null) {
+                            for (Person p : mPeople) {
+                                p.resetStatus();
+                                FollowupStatus status = p.getStatus(Session.getInstance().getOrganizationId());
+                                Integer count = statusCounts.get((long) status.ordinal());
+                                if (count == null) {
+                                    count = 0;
+                                }
+                                statusCounts.put((long) status.ordinal(), count + 1);
+                            }
+                        }
+                        for (FollowupStatus status : FollowupStatus.values()) {
+                            items.add(new Item(status, determineCheckboxState(statusCounts, status.ordinal())));
+                        }
+                        break;
                 }
                 return items;
             }
@@ -285,6 +309,7 @@ public class PermissionLabelDialogFragment extends RefreshableDialogFragment imp
                 }
                 break;
             case TYPE_PERMISSIONS:
+            case TYPE_FOLLOWUP_STATUS:
                 synchronized (mAdapter.getLock()) {
                     if (item.state == CheckmarkImageView.STATE_NONE || item.state == CheckmarkImageView.STATE_SOME) {
                         for (Item i : mAdapter.getObjects()) {
@@ -293,7 +318,7 @@ public class PermissionLabelDialogFragment extends RefreshableDialogFragment imp
                         item.state = CheckmarkImageView.STATE_ALL;
                     } else if (item.state == CheckmarkImageView.STATE_ALL) {
                         for (Item i : mAdapter.getObjects()) {
-                            if (i.getId() == Permission.NO_PERMISSIONS) {
+                            if ((mType == TYPE_PERMISSIONS && i.getId() == Permission.NO_PERMISSIONS) || (mType == TYPE_FOLLOWUP_STATUS && i.getId() == FollowupStatus.uncontacted.ordinal())) {
                                 i.state = CheckmarkImageView.STATE_ALL;
                             } else {
                                 i.state = CheckmarkImageView.STATE_NONE;
@@ -329,6 +354,9 @@ public class PermissionLabelDialogFragment extends RefreshableDialogFragment imp
                 setButtonEnabled(AlertDialog.BUTTON_POSITIVE, true);
                 setButtonEnabled(AlertDialog.BUTTON_NEGATIVE, true);
             }
+        }
+        if (mType == TYPE_FOLLOWUP_STATUS) {
+            hideRefresh();
         }
     }
 
@@ -383,6 +411,18 @@ public class PermissionLabelDialogFragment extends RefreshableDialogFragment imp
                             p.invalidateViewCache();
                         }
                         break;
+                    case TYPE_FOLLOWUP_STATUS:
+                        FollowupStatus status = null;
+                        if (!add.isEmpty()) {
+                            status = FollowupStatus.values()[add.iterator().next().intValue()];
+                        }
+                        mApiRequest = Api.bulkUpdatePermissions(personIds, status, ApiOptions.builder().include(Api.Include.organizational_permission).build());
+                        for (Person p : Person.getAllById(personIds)) {
+                            p.resetStatus();
+                            p.resetPermissionCache();
+                            p.invalidateViewCache();
+                        }
+                        break;
                 }
                 mApiRequest.get();
                 return null;
@@ -396,7 +436,9 @@ public class PermissionLabelDialogFragment extends RefreshableDialogFragment imp
                         break;
                     case TYPE_PERMISSIONS:
                         Application.showToast("Permissions updated", Toast.LENGTH_SHORT);
-
+                        break;
+                    case TYPE_FOLLOWUP_STATUS:
+                        Application.showToast("Followup Status updated", Toast.LENGTH_SHORT);
                         break;
                 }
                 dismiss();
@@ -508,6 +550,8 @@ public class PermissionLabelDialogFragment extends RefreshableDialogFragment imp
                 return ((Label) object).getId();
             } else if (object instanceof Permission) {
                 return ((Permission) object).getId();
+            } else if (object instanceof FollowupStatus) {
+                return ((FollowupStatus) object).ordinal();
             }
             throw new RuntimeException("Cannot get id from object");
         }
@@ -542,6 +586,8 @@ public class PermissionLabelDialogFragment extends RefreshableDialogFragment imp
                 text1 = ((Label) object).getTranslatedName();
             } else if (object instanceof Permission) {
                 text1 = ((Permission) object).getTranslatedName();
+            } else if (object instanceof FollowupStatus) {
+                text1 = object.toString();
             }
             holder.text1.setText(text1);
             holder.checkmark.setCheckmarkState(item.state);

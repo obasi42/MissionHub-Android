@@ -16,6 +16,7 @@ import com.missionhub.model.Organization;
 import com.missionhub.model.Permission;
 import com.missionhub.model.Person;
 import com.missionhub.model.Survey;
+import com.missionhub.model.generic.FollowupStatus;
 import com.missionhub.model.gson.GAnswerSheet;
 import com.missionhub.model.gson.GContactAssignment;
 import com.missionhub.model.gson.GContactAssignments;
@@ -188,6 +189,16 @@ public class Api {
         }
         if (removePermissions != null) {
             params.put("remove_permission", StringUtils.join(removePermissions, ","));
+        }
+        return new ApiRequest<List<Person>>(ApiOptions.builder().method(HttpRequest.METHOD_POST).url(buildUrl("organizational_permissions", "bulk")).responseParser(organizationalPermissionsParser).params(params).merge(options).build());
+    }
+
+    public static ApiRequest<List<Person>> bulkUpdatePermissions(final Collection<Long> personIds, final FollowupStatus status, final ApiOptions options) {
+        final Map<String, String> params = new HashMap<String, String>();
+        params.put("include_archived", "true");
+        params.put("filters[ids]", StringUtils.join(personIds, ","));
+        if (status != null) {
+            params.put("followup_status", status.name());
         }
         return new ApiRequest<List<Person>>(ApiOptions.builder().method(HttpRequest.METHOD_POST).url(buildUrl("organizational_permissions", "bulk")).responseParser(organizationalPermissionsParser).params(params).merge(options).build());
     }

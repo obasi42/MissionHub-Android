@@ -23,5 +23,6 @@
     <item name="action_text" type="id"/>
     <item name="action_interaction" type="id"/>
     <item name="action_index" type="id"/>
+    <item name="action_followup_status" type="id"/>
 
 </resources>

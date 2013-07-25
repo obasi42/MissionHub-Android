@@ -40,7 +40,7 @@ public class PersonAdapterViewProvider implements AdapterViewProvider {
      * The valid display options
      */
     public static enum Display {
-        NAME, STATUS, GENDER, EMAIL, PHONE, PERMISSION
+        NAME, STATUS, GENDER, EMAIL, PHONE, PERMISSION, LABELS
     }
 
     /**
@@ -122,6 +122,9 @@ public class PersonAdapterViewProvider implements AdapterViewProvider {
                 break;
             case PERMISSION:
                 safeSet(holder.text2, mCache.permission);
+                break;
+            case LABELS:
+                safeSet(holder.text2, mCache.labels);
                 break;
             default:
                 safeSet(holder.text2, null);

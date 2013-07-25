@@ -26,6 +26,7 @@ import com.missionhub.model.gson.GContactAssignment;
 import com.missionhub.ui.AnimateOnceImageLoadingListener;
 import com.missionhub.ui.ObjectArrayAdapter;
 import com.missionhub.util.DisplayUtils;
+import com.missionhub.util.ResourceUtils;
 import com.missionhub.util.SafeAsyncTask;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -203,12 +204,15 @@ public class AssignmentDialogFragment extends RefreshableDialogFragment implemen
                     objects.add(new MeItem(Session.getInstance().getPerson()));
                 }
 
-                objects.add(new DividerItem("Leaders"));
-
                 List<Person> leaders = Session.getInstance().getOrganization().getUsersAdmins();
+
                 leaders.remove(Session.getInstance().getPerson());
                 if (mPeople != null) {
                     leaders.removeAll(mPeople);
+                }
+
+                if (!leaders.isEmpty()) {
+                    objects.add(new DividerItem(ResourceUtils.getString(R.string.assignment_leaders)));
                 }
 
                 for (Person person : leaders) {
@@ -480,7 +484,7 @@ public class AssignmentDialogFragment extends RefreshableDialogFragment implemen
                 ImageLoader.getInstance().displayImage(item.leader.getPictureUrl(mPicturePx, mPicturePx), holder.icon, mImageLoaderOptions, mImageLoadingListener);
             } else if (object instanceof MeItem) {
                 final MeItem item = (MeItem) object;
-                holder.text1.setText("Me");
+                holder.text1.setText(ResourceUtils.getString(R.string.assignment_me));
                 ImageLoader.getInstance().displayImage(item.me.getPictureUrl(mPicturePx, mPicturePx), holder.icon, mImageLoaderOptions, mImageLoadingListener);
             } else if (object instanceof DividerItem) {
                 final DividerItem item = (DividerItem) object;
@@ -491,7 +495,7 @@ public class AssignmentDialogFragment extends RefreshableDialogFragment implemen
                     holder.text1.setVisibility(View.GONE);
                 }
             } else if (object instanceof NoneItem) {
-                holder.text1.setText("Unassigned");
+                holder.text1.setText(ResourceUtils.getString(R.string.assignment_unassigned));
                 holder.icon.setImageResource(R.drawable.ic_cancel);
             }
             return view;
