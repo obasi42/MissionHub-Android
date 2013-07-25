@@ -9,14 +9,19 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListAdapter;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.Volley;
 import com.missionhub.model.Person;
+import com.missionhub.ui.NetworkImageOnScrollListener;
 import com.missionhub.ui.widget.SelectableListView;
 import com.missionhub.ui.widget.SelectableListView.OnItemCheckedListener;
+import com.missionhub.util.LruBitmapCache;
 
 /**
  * A generic ListView for displaying people.
  */
-public class PeopleListView extends SelectableListView implements OnItemCheckedListener, OnItemClickListener, OnItemLongClickListener, AbsListView.OnScrollListener {
+public class PeopleListView extends SelectableListView implements OnItemCheckedListener, OnItemClickListener, OnItemLongClickListener, AbsListView.OnScrollListener, NetworkImageOnScrollListener.ImageLoaderProvider {
 
     /**
      * The android logging tag
@@ -42,6 +47,14 @@ public class PeopleListView extends SelectableListView implements OnItemCheckedL
      * the person list provider
      */
     private PeopleListProvider mProvider;
+    /**
+     * The Volley Request Queue
+     */
+    private RequestQueue mRequestQueue;
+    /**
+     * The Volley Image Loader
+     */
+    private ImageLoader mImageLoader;
 
     /**
      * Construct a new PeopleListView with default styling.
@@ -251,6 +264,26 @@ public class PeopleListView extends SelectableListView implements OnItemCheckedL
         mProvider = provider;
         mProvider.setPeopleList(this);
         super.setAdapter(mProvider);
+    }
+
+    @Override
+    public ImageLoader getImageLoader() {
+        if (mImageLoader == null) {
+            synchronized (this) {
+                mImageLoader = new ImageLoader(getVolleyRequestQueue(), LruBitmapCache.getInstance());
+            }
+        }
+        return mImageLoader;
+    }
+
+    @Override
+    public RequestQueue getVolleyRequestQueue() {
+        if (mRequestQueue == null) {
+            synchronized (this) {
+                mRequestQueue = Volley.newRequestQueue(getContext());
+            }
+        }
+        return mRequestQueue;
     }
 
     /**

@@ -239,8 +239,10 @@ public class AuthenticatorActivity extends BaseActivity {
                 mAccountAuthenticatorResponse.onError(AccountManager.ERROR_CODE_CANCELED, "canceled");
             }
         } else {
-            Intent intent = new Intent(this, HostActivity.class);
-            startActivity(intent);
+            if (Session.getInstance().isOpen()) {
+                Intent intent = new Intent(this, HostActivity.class);
+                startActivity(intent);
+            }
         }
         super.finish();
     }

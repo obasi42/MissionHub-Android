@@ -14,6 +14,9 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.Volley;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.missionhub.R;
@@ -41,7 +44,7 @@ import com.missionhub.model.PhoneNumber;
 import com.missionhub.model.TimestampedEntity;
 import com.missionhub.model.generic.FollowupStatus;
 import com.missionhub.model.generic.Gender;
-import com.missionhub.ui.AnimateOnceImageLoadingListener;
+import com.missionhub.ui.AnimatedNetworkImageView;
 import com.missionhub.ui.ObjectArrayAdapter;
 import com.missionhub.ui.ViewArrayPagerAdapter;
 import com.missionhub.ui.widget.ParallaxListView;
@@ -49,11 +52,10 @@ import com.missionhub.ui.widget.TabBar;
 import com.missionhub.util.DisplayUtils;
 import com.missionhub.util.FragmentUtils;
 import com.missionhub.util.IntentHelper;
+import com.missionhub.util.LruBitmapCache;
 import com.missionhub.util.ResourceUtils;
 import com.missionhub.util.SafeAsyncTask;
 import com.missionhub.util.SortUtils;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
 import com.viewpagerindicator.CirclePageIndicator;
 
 import org.apache.commons.lang3.StringUtils;
@@ -74,7 +76,7 @@ public class HostedProfileFragment extends HostedFragment implements TabBar.OnTa
     private ParallaxListView mListView;
     private ProfileObjectAdapter mAdapter;
 
-    private ImageView mAvatar;
+    private AnimatedNetworkImageView mAvatar;
     private ViewPager mPager;
     private CirclePageIndicator mIndicator;
     private HeaderPagerAdapter mPagerAdapter;
@@ -83,11 +85,13 @@ public class HostedProfileFragment extends HostedFragment implements TabBar.OnTa
     private int mSelectedTab = R.id.tab_info;
     private final ListMultimap<Integer, Object> mCachedObjects = ArrayListMultimap.create();
 
-    private AnimateOnceImageLoadingListener mLoadingListener = new AnimateOnceImageLoadingListener(250);
     private SafeAsyncTask<List<Object>> mSelectTabTask;
     private SafeAsyncTask<Void> mUpdateTask;
     private long mLastUpdate;
     private MenuItem mRefeshMenuItem;
+
+    private RequestQueue mVolley;
+    private ImageLoader mProfileImageLoader;
 
     public HostedProfileFragment() {
     }
@@ -139,6 +143,9 @@ public class HostedProfileFragment extends HostedFragment implements TabBar.OnTa
     public void onAttach(final Activity activity) {
         super.onAttach(activity);
 
+        mVolley = Volley.newRequestQueue(activity);
+        mProfileImageLoader = new ImageLoader(mVolley, LruBitmapCache.getInstance());
+
         if (getArguments() != null) {
             mPersonId = getArguments().getLong("personId", -1);
         }
@@ -160,7 +167,7 @@ public class HostedProfileFragment extends HostedFragment implements TabBar.OnTa
         mListView.setOnItemClickListener(this);
 
         View headerView = inflater.inflate(R.layout.fragment_profile_header, mListView, false);
-        mAvatar = (ImageView) headerView.findViewById(R.id.avatar);
+        mAvatar = (AnimatedNetworkImageView) headerView.findViewById(R.id.avatar);
         mPager = (ViewPager) headerView.findViewById(R.id.pager);
         mIndicator = (CirclePageIndicator) headerView.findViewById(R.id.indicator);
 
@@ -361,13 +368,10 @@ public class HostedProfileFragment extends HostedFragment implements TabBar.OnTa
         // The avatar
         DisplayMetrics metrics = DisplayUtils.getRealDisplayMetrics(getSupportActivity());
         String picture = person.getPictureUrl(metrics.widthPixels, metrics.heightPixels);
-        DisplayImageOptions options = new DisplayImageOptions.Builder()
-                .cacheInMemory(true)
-                .cacheOnDisc(true)
-                .showImageForEmptyUri(R.drawable.ic_default_contact_full)
-                .showImageOnFail(R.drawable.ic_default_contact_full)
-                .build();
-        ImageLoader.getInstance().displayImage(picture, mAvatar, options, mLoadingListener);
+
+        mAvatar.setEmptyImageResId(R.drawable.ic_default_contact_full);
+        mAvatar.setErrorImageResId(R.drawable.ic_default_contact_full);
+        mAvatar.setImageUrl(picture, mProfileImageLoader);
 
         mPagerAdapter.notifyPersonChanged();
         setSelectedTab(mSelectedTab);

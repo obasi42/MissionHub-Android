@@ -748,4 +748,8 @@ public class Session implements OnAccountsUpdateListener {
             session.closeAndClearTokenInformation();
         }
     }
+
+    public boolean isOpen() {
+        return mState == SessionState.OPEN;
+    }
 }

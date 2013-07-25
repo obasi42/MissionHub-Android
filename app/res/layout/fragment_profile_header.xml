@@ -16,7 +16,7 @@
             android:id="@+id/progressBar"
             android:layout_gravity="center"/>
 
-    <ImageView
+    <com.missionhub.ui.AnimatedNetworkImageView
             android:layout_width="@dimen/profile_header_width"
             android:layout_height="fill_parent"
             android:scaleType="centerCrop"

@@ -7,8 +7,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ImageView;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.Volley;
 import com.missionhub.R;
 import com.missionhub.api.Api;
 import com.missionhub.api.Api.Include;
@@ -23,13 +25,12 @@ import com.missionhub.model.ContactAssignmentDao;
 import com.missionhub.model.Organization;
 import com.missionhub.model.Person;
 import com.missionhub.model.gson.GContactAssignment;
-import com.missionhub.ui.AnimateOnceImageLoadingListener;
+import com.missionhub.ui.AnimatedNetworkImageView;
 import com.missionhub.ui.ObjectArrayAdapter;
 import com.missionhub.util.DisplayUtils;
+import com.missionhub.util.LruBitmapCache;
 import com.missionhub.util.ResourceUtils;
 import com.missionhub.util.SafeAsyncTask;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
 
 import org.apache.commons.lang3.StringUtils;
 import org.holoeverywhere.LayoutInflater;
@@ -449,14 +450,23 @@ public class AssignmentDialogFragment extends RefreshableDialogFragment implemen
     private static class AssignmentListAdapter extends ObjectArrayAdapter {
 
         final int mPicturePx = Math.round(DisplayUtils.dpToPixel(50));
-        final DisplayImageOptions mImageLoaderOptions;
-        final AnimateOnceImageLoadingListener mImageLoadingListener;
+        private RequestQueue mVolley;
+        private ImageLoader mImageLoader;
 
         public AssignmentListAdapter(final Context context) {
             super(context);
+            createImageLoader(context);
+        }
 
-            mImageLoaderOptions = DisplayUtils.getContactImageDisplayOptions();
-            mImageLoadingListener = new AnimateOnceImageLoadingListener(250);
+        @Override
+        public void setContext(Context context) {
+            createImageLoader(context);
+            super.setContext(context);
+        }
+
+        private void createImageLoader(Context context) {
+            mVolley = Volley.newRequestQueue(context);
+            mImageLoader = new ImageLoader(mVolley, LruBitmapCache.getInstance());
         }
 
         @Override
@@ -471,7 +481,7 @@ public class AssignmentDialogFragment extends RefreshableDialogFragment implemen
                 } else {
                     view = getLayoutInflater().inflate(R.layout.item_assignment, parent, false);
                 }
-                holder.icon = (ImageView) view.findViewById(android.R.id.icon);
+                holder.icon = (AnimatedNetworkImageView) view.findViewById(android.R.id.icon);
                 holder.text1 = (TextView) view.findViewById(android.R.id.text1);
                 view.setTag(holder);
             } else {
@@ -481,11 +491,19 @@ public class AssignmentDialogFragment extends RefreshableDialogFragment implemen
             if (object instanceof LeaderItem) {
                 final LeaderItem item = (LeaderItem) object;
                 holder.text1.setText(item.leader.getName());
-                ImageLoader.getInstance().displayImage(item.leader.getPictureUrl(mPicturePx, mPicturePx), holder.icon, mImageLoaderOptions, mImageLoadingListener);
+
+                holder.icon.setEmptyImageResId(R.drawable.ic_default_contact);
+                holder.icon.setDefaultImageResId(R.drawable.ic_default_contact);
+                holder.icon.setErrorImageResId(R.drawable.ic_default_contact);
+                holder.icon.setImageUrl(item.leader.getPictureUrl(mPicturePx, mPicturePx), mImageLoader);
             } else if (object instanceof MeItem) {
                 final MeItem item = (MeItem) object;
                 holder.text1.setText(ResourceUtils.getString(R.string.assignment_me));
-                ImageLoader.getInstance().displayImage(item.me.getPictureUrl(mPicturePx, mPicturePx), holder.icon, mImageLoaderOptions, mImageLoadingListener);
+
+                holder.icon.setEmptyImageResId(R.drawable.ic_default_contact);
+                holder.icon.setDefaultImageResId(R.drawable.ic_default_contact);
+                holder.icon.setErrorImageResId(R.drawable.ic_default_contact);
+                holder.icon.setImageUrl(item.me.getPictureUrl(mPicturePx, mPicturePx), mImageLoader);
             } else if (object instanceof DividerItem) {
                 final DividerItem item = (DividerItem) object;
                 if (StringUtils.isNotEmpty(item.title)) {
@@ -508,7 +526,7 @@ public class AssignmentDialogFragment extends RefreshableDialogFragment implemen
 
         private class ViewHolder {
             public TextView text1;
-            public ImageView icon;
+            public AnimatedNetworkImageView icon;
         }
     }
 }
