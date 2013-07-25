@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <version>2.6-SNAPSHOT</version>
+    <version>2.5</version>
     <groupId>com.missionhub</groupId>
     <artifactId>parent</artifactId>
     <packaging>pom</packaging>
@@ -13,41 +15,42 @@
     <inceptionYear>2011</inceptionYear>
 
     <scm>
-		<url>https://github.com/CruGlobal/MissionHub-Android</url>
-		<connection>scm:git:git://github.com/CruGlobal/MissionHub-Android.git</connection>
-		<developerConnection>scm:git:git@github.com:CruGlobal/MissionHub-Android.git</developerConnection>
-	</scm>
+        <url>https://github.com/CruGlobal/MissionHub-Android</url>
+        <connection>scm:git:git://github.com/CruGlobal/MissionHub-Android.git</connection>
+        <developerConnection>scm:git:git@github.com:CruGlobal/MissionHub-Android.git
+        </developerConnection>
+    </scm>
 
-	<developers>
-		<developer>
-			<name>Chris Roemmich</name>
-			<email>chris.roemmich@cojourners.com</email>
-			<id>croemmich</id>
-			<url>https://cr-wd.com</url>
-			<timezone>-6</timezone>
-			<roles>
-				<role>developer</role>
-			</roles>
-		</developer>
-	</developers>
+    <developers>
+        <developer>
+            <name>Chris Roemmich</name>
+            <email>chris.roemmich@cojourners.com</email>
+            <id>croemmich</id>
+            <url>https://cr-wd.com</url>
+            <timezone>-6</timezone>
+            <roles>
+                <role>developer</role>
+            </roles>
+        </developer>
+    </developers>
 
-	<licenses>
-		<license>
-			<name>Apache License Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-			<distribution>repo</distribution>
-		</license>
-	</licenses>
+    <licenses>
+        <license>
+            <name>Apache License Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
-	<organization>
-		<name>Cru Global</name>
-		<url>http://www.cru.org</url>
-	</organization>
+    <organization>
+        <name>Cru Global</name>
+        <url>http://www.cru.org</url>
+    </organization>
 
-	<issueManagement>
-		<system>JIRA</system>
-		<url>http://jira.uscm.org</url>
-	</issueManagement>
+    <issueManagement>
+        <system>JIRA</system>
+        <url>http://jira.uscm.org</url>
+    </issueManagement>
 
     <modules>
         <module>app</module>
