@@ -84,7 +84,7 @@ public class PeopleListProvider extends ObjectArrayAdapter {
      */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        return onGetViewProvider().getView(this, position, convertView, parent);
+        return getAdapterViewProvider().getView(this, position, convertView, parent);
     }
 
     /**
@@ -99,22 +99,14 @@ public class PeopleListProvider extends ObjectArrayAdapter {
     /**
      * Returns the view provider to be used to create views for the list items.
      *
-     * @return The view provider
-     */
-    public AdapterViewProvider onGetViewProvider() {
-        if (mAdapterViewProvider == null) {
-            mAdapterViewProvider = onCreateViewProvider();
-        }
-        return mAdapterViewProvider;
-    }
-
-
-    /**
-     * Returns the current adapter view provider
-     *
      * @return the view provider
      */
     public AdapterViewProvider getAdapterViewProvider() {
+        if (mAdapterViewProvider == null) {
+            synchronized (getLock()) {
+                mAdapterViewProvider = onCreateViewProvider();
+            }
+        }
         return mAdapterViewProvider;
     }
 
@@ -124,7 +116,9 @@ public class PeopleListProvider extends ObjectArrayAdapter {
      * @param adapterViewProvider The view provider
      */
     public void setAdapterViewProvider(AdapterViewProvider adapterViewProvider) {
-        mAdapterViewProvider = adapterViewProvider;
+        synchronized (getLock()) {
+            mAdapterViewProvider = adapterViewProvider;
+        }
         notifyDataSetChanged();
     }
 

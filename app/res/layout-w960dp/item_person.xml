@@ -19,7 +19,7 @@
             android:layout_marginBottom="8dip"
             android:duplicateParentState="true"/>
 
-    <ImageView
+    <com.missionhub.ui.AnimatedNetworkImageView
             android:layout_width="50dip"
             android:layout_height="50dip"
             android:id="@+id/avatar"

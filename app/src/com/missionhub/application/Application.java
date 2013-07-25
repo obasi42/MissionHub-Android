@@ -2,7 +2,6 @@ package com.missionhub.application;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.google.analytics.tracking.android.GoogleAnalytics;
@@ -13,15 +12,8 @@ import com.missionhub.model.DaoMaster;
 import com.missionhub.model.DaoMaster.OpenHelper;
 import com.missionhub.model.DaoSession;
 import com.missionhub.model.MissionHubOpenHelper;
+import com.missionhub.util.LruBitmapCache;
 import com.missionhub.util.NetworkUtils;
-import com.nostra13.universalimageloader.cache.disc.impl.LimitedAgeDiscCache;
-import com.nostra13.universalimageloader.cache.memory.MemoryCacheAware;
-import com.nostra13.universalimageloader.cache.memory.impl.LRULimitedMemoryCache;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
-import com.nostra13.universalimageloader.utils.StorageUtils;
 
 import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
@@ -120,35 +112,7 @@ public class Application extends org.holoeverywhere.app.Application {
         NetworkUtils.disableConnectionReuseIfNecessary();
         NetworkUtils.enableHttpResponseCache(this);
 
-        // setup the image loader
-        initImageLoader();
-
         registerEventSubscriber(this, ToastEvent.class);
-    }
-
-    private void initImageLoader() {
-        DisplayImageOptions.Builder defaultOptions = new DisplayImageOptions.Builder();
-        defaultOptions.cacheInMemory(true);
-        if (Configuration.isCacheFileEnabled()) {
-            defaultOptions.cacheOnDisc(true);
-        }
-
-        int memoryCacheSize = (int) (Runtime.getRuntime().maxMemory() / 8);
-        MemoryCacheAware<String, Bitmap> memoryCache = new LRULimitedMemoryCache(memoryCacheSize);
-
-        ImageLoaderConfiguration.Builder config = new ImageLoaderConfiguration.Builder(this);
-        config.defaultDisplayImageOptions(defaultOptions.build());
-        config.memoryCache(memoryCache);
-        config.threadPoolSize(3);
-        config.threadPriority(Thread.NORM_PRIORITY - 2);
-        config.tasksProcessingOrder(QueueProcessingType.LIFO);
-
-        if (Configuration.isCacheFileEnabled()) {
-            LimitedAgeDiscCache diskCache = new LimitedAgeDiscCache(StorageUtils.getCacheDirectory(this), Configuration.getCacheFileAge());
-            config.discCache(diskCache);
-        }
-
-        ImageLoader.getInstance().init(config.build());
     }
 
     /**
@@ -186,6 +150,9 @@ public class Application extends org.holoeverywhere.app.Application {
     @Override
     public void onLowMemory() {
         super.onLowMemory();
+        Log.e(TAG, "****** ====== ON LOW MEMORY ====== ******");
+        LruBitmapCache.getInstance().evictAll();
+        getDb().clear();
         postEvent(new OnLowMemoryEvent());
     }
 

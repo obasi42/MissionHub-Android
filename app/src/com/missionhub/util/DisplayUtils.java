@@ -5,9 +5,7 @@ import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
 
-import com.missionhub.R;
 import com.missionhub.application.Application;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
 
 import org.holoeverywhere.app.Activity;
 
@@ -54,16 +52,6 @@ public class DisplayUtils {
             display.getMetrics(metrics);
         }
         return metrics;
-    }
-
-    public static DisplayImageOptions getContactImageDisplayOptions() {
-        return new DisplayImageOptions.Builder()
-                .cacheInMemory(true)
-                .cacheOnDisc(true)
-                .showImageForEmptyUri(R.drawable.ic_default_contact)
-                .showImageOnFail(R.drawable.ic_default_contact)
-                .showStubImage(R.drawable.ic_default_contact)
-                .build();
     }
 
     private static Context getContext() {

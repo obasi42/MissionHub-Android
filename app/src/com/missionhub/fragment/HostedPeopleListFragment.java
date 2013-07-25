@@ -48,8 +48,6 @@ import com.missionhub.ui.widget.CheckmarkImageView;
 import com.missionhub.util.IntentHelper;
 import com.missionhub.util.SafeAsyncTask;
 import com.missionhub.util.TaskUtils;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.assist.PauseOnScrollListener;
 
 import org.apache.commons.lang3.StringUtils;
 import org.holoeverywhere.LayoutInflater;
@@ -166,7 +164,7 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
         mList.setProvider(mProvider);
         mList.setOnPersonClickListener(this);
         mList.setOnPersonCheckedListener(mCheckmarkHelper);
-        mList.setOnScrollListener(new PauseOnScrollListener(ImageLoader.getInstance(), false, true));
+        //mList.setOnScrollListener(new NetworkImageOnScrollListener(false, true));
 
         // set up the filter indicator
         mFilterIndicator = view.findViewById(R.id.filter_indicator);

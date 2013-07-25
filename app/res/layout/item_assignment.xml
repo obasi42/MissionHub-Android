@@ -3,7 +3,7 @@
                 android:layout_height="wrap_content"
                 android:minHeight="58.0dip">
 
-    <ImageView
+    <com.missionhub.ui.AnimatedNetworkImageView
             android:id="@android:id/icon"
             android:layout_width="42.0dip"
             android:layout_height="42.0dip"
