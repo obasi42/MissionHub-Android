@@ -107,6 +107,8 @@ public class GOrganization {
                     GInteractionType.replaceAll(interaction_types, true);
                 }
 
+                org.refreshAll();
+
                 return org;
             }
 

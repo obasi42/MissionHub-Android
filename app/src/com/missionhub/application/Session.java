@@ -468,11 +468,6 @@ public class Session implements OnAccountsUpdateListener {
                 mAccountManager.setUserData(mAccount, Authenticator.KEY_FACEBOOK_ID, String.valueOf(getPerson().getFb_uid()));
                 mAccountManager.setUserData(mAccount, AccountManager.KEY_ACCOUNT_NAME, getPerson().getName());
 
-                getPerson().refreshAll();
-
-                // update the person's organization hierarchy, as it is too expensive to do from the ui thread.
-                getPerson().getOrganizationHierarchy();
-
                 return getPerson();
             }
 
@@ -525,9 +520,8 @@ public class Session implements OnAccountsUpdateListener {
                             .include(Include.interaction_types)
                             .build());
 
-                    Organization org = mApiRequest.get();
+                    mApiRequest.get();
 
-                    org.refreshAll();
                     getPerson().refreshAll();
                     getPerson().getOrganizationHierarchy();
 

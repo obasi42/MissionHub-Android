@@ -226,6 +226,13 @@ public class GPerson {
                     GOrganizationalPermission.replace(organizational_permission, true);
                 }
 
+                if (person.getId() == Session.getInstance().getPersonId()) {
+                    person.getOrganizationHierarchy();
+                }
+
+                person.refreshAll();
+                person.getViewCache();
+
                 return person;
             }
 
