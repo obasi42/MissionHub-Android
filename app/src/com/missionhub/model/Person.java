@@ -1139,6 +1139,7 @@ public class Person implements com.missionhub.model.TimestampedEntity {
         resetInteractionInitiatorList();
         resetAnswerSheetList();
 
+        resetLabels();
         resetStatus();
         resetPrimaryEmailAddress();
         resetPrimaryPhoneNumber();

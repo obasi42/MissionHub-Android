@@ -131,6 +131,8 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
         mProvider.setPeopleListOptions(options);
         Application.getEventBus().postSticky(new OnHostedListOptionsChangedEvent(mProvider.getPeopleListOptions()));
         refreshIndicator();
+
+        closeMenu();
     }
 
     @SuppressWarnings("unused")

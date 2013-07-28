@@ -123,15 +123,7 @@ public class ApiPeopleListProvider extends DynamicPeopleListProvider {
                             .include(Api.Include.phone_numbers)
                             .build());
 
-                    List<Person> people = mRequest.get();
-
-                    // init the view cache
-                    if (people != null) {
-                        for (Person p : people) {
-                            p.getViewCache();
-                        }
-                    }
-                    return people;
+                    return mRequest.get();
                 }
 
                 @Override
