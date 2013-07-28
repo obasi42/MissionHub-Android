@@ -110,17 +110,24 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
         Object item = event.getItem();
         PeopleListOptions options = mProvider.getPeopleListOptions();
 
+        String search = options.getFilterValue("name_or_email_like");
+
         if (item instanceof Person) {
-            options.toggle("assigned_to", ((Person) item).getId());
+            options.toggleSingle("assigned_to", ((Person) item).getId());
         } else if (item instanceof Label) {
-            options.toggle("labels", ((Label) item).getId());
+            options.toggleSingle("labels", ((Label) item).getId());
         } else if (item instanceof Permission) {
-            options.toggle("permissions", ((Permission) item).getId());
+            options.toggleSingle("permissions", ((Permission) item).getId());
         } else if (item instanceof InteractionType) {
-            options.toggle("interactions", ((InteractionType) item).getId());
+            options.toggleSingle("interactions", ((InteractionType) item).getId());
         } else {
             return;
         }
+
+        if (StringUtils.isNotEmpty(search)) {
+            options.setFilter("name_or_email_like", search);
+        }
+
         mProvider.setPeopleListOptions(options);
         Application.getEventBus().postSticky(new OnHostedListOptionsChangedEvent(mProvider.getPeopleListOptions()));
         refreshIndicator();
