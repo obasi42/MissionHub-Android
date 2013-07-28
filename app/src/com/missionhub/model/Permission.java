@@ -29,7 +29,7 @@ public class Permission implements com.missionhub.model.TimestampedEntity {
 
     // KEEP FIELDS - put your custom fields here
     public static final long ADMIN = 1;
-    public static final long USER = 4;
+    public static final long USER = 1938;
     public static final long NO_PERMISSIONS = 2;
     private String mTranslatedName;
     // KEEP FIELDS END
