@@ -2,7 +2,6 @@ package com.missionhub.model.gson;
 
 import com.google.common.collect.HashMultimap;
 import com.missionhub.application.Application;
-import com.missionhub.application.Session;
 import com.missionhub.model.AnswerSheet;
 import com.missionhub.model.AnswerSheetDao;
 import com.missionhub.model.ContactAssignmentDao;
@@ -75,7 +74,7 @@ public class GPerson {
 
                 final DaoSession session = Application.getDb();
                 final PersonDao dao = session.getPersonDao();
-                //long orgId = Session.getInstance().getOrganizationId();
+                //long orgId = Application.getSession().getOrganizationId();
 
                 boolean insert = false;
                 Person person = dao.load(id);
@@ -151,7 +150,7 @@ public class GPerson {
                     for (GContactAssignment assignment : contact_assignments) {
                         orgIds.add(assignment.organization_id);
                     }
-                    orgIds.add(Session.getInstance().getOrganizationId());
+                    orgIds.add(Application.getSession().getOrganizationId());
 
                     List<Long> keys = session.getContactAssignmentDao().queryBuilder().where(ContactAssignmentDao.Properties.Assigned_to_id.eq(id), ContactAssignmentDao.Properties.Organization_id.in(orgIds)).listKeys();
                     for (Long key : keys) {
@@ -168,7 +167,7 @@ public class GPerson {
                     for (GContactAssignment assignment : assigned_tos) {
                         orgIds.add(assignment.organization_id);
                     }
-                    orgIds.add(Session.getInstance().getOrganizationId());
+                    orgIds.add(Application.getSession().getOrganizationId());
 
                     List<Long> keys = session.getContactAssignmentDao().queryBuilder().where(ContactAssignmentDao.Properties.Person_id.eq(id), ContactAssignmentDao.Properties.Organization_id.in(orgIds)).listKeys();
                     for (Long key : keys) {
@@ -226,7 +225,7 @@ public class GPerson {
                     GOrganizationalPermission.replace(organizational_permission, true);
                 }
 
-                if (person.getId() == Session.getInstance().getPersonId()) {
+                if (person.getId().equals(Application.getSession().getPersonId())) {
                     person.getOrganizationHierarchy();
                 }
 

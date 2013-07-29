@@ -24,7 +24,6 @@ import com.missionhub.api.Api;
 import com.missionhub.api.ApiRequest;
 import com.missionhub.api.PeopleListOptions;
 import com.missionhub.application.Application;
-import com.missionhub.application.Session;
 import com.missionhub.exception.ExceptionHelper;
 import com.missionhub.model.Interaction;
 import com.missionhub.model.InteractionType;
@@ -170,7 +169,7 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
         }
 
         if (mInteraction.initiator_ids == null || mInteraction.initiator_ids.length == 0) {
-            mInteraction.initiator_ids = new Long[]{Session.getInstance().getPersonId()};
+            mInteraction.initiator_ids = new Long[]{Application.getSession().getPersonId()};
         }
 
         setStyle(DialogFragment.STYLE_NO_TITLE, getTheme());
@@ -442,7 +441,7 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
         mInteractionTypeAdapter.setNotifyOnChange(false);
         mInteractionTypeAdapter.clear();
 
-        List<InteractionType> types = Session.getInstance().getOrganization().getAllInteractionTypes();
+        List<InteractionType> types = Application.getSession().getOrganization().getAllInteractionTypes();
         for (InteractionType type : types) {
             mInteractionTypeAdapter.add(type);
         }
@@ -455,7 +454,7 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
         mInteractionVisibilityAdapter.clear();
 
         mInteractionVisibilityAdapter.add(InteractionVisibility.everyone);
-        if (Session.getInstance().getOrganization().getParent() != null) {
+        if (Application.getSession().getOrganization().getParent() != null) {
             mInteractionVisibilityAdapter.add(InteractionVisibility.parents);
         }
         mInteractionVisibilityAdapter.add(InteractionVisibility.organization);
@@ -867,8 +866,8 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
         mRebuildInitiatorsProviderTask = new SafeAsyncTask<List<Person>>() {
             @Override
             public List<Person> call() throws Exception {
-                final List<Person> people = Session.getInstance().getOrganization().getUsersAdmins();
-                final Person currentPerson = Session.getInstance().getPerson();
+                final List<Person> people = Application.getSession().getOrganization().getUsersAdmins();
+                final Person currentPerson = Application.getSession().getPerson();
                 people.remove(currentPerson);
                 people.add(0, currentPerson);
                 return people;
@@ -909,7 +908,7 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
 
             @Override
             public Void call() throws Exception {
-                mTask = Session.getInstance().updateCurrentOrganization(true);
+                mTask = Application.getSession().updateCurrentOrganization(true);
                 mTask.get();
                 return null;
             }
@@ -1079,16 +1078,16 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
     private boolean canDelete() {
         if (isNew()) return false;
 
-        return mInteraction.created_by_id == Session.getInstance().getPersonId();
+        return mInteraction.created_by_id == Application.getSession().getPersonId();
 
     }
 
     private boolean canEdit() {
         if (isNew()) return false;
 
-        if (Session.getInstance().isAdmin()) return true;
+        if (Application.getSession().isAdmin()) return true;
 
-        return mInteraction.created_by_id == Session.getInstance().getPersonId();
+        return mInteraction.created_by_id == Application.getSession().getPersonId();
 
     }
 

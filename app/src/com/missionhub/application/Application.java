@@ -64,6 +64,11 @@ public class Application extends org.holoeverywhere.app.Application {
     private static final String DB_NAME = "missionhub.db";
 
     /**
+     * the missionhub session
+     */
+    private static final Session mSession = new Session();
+
+    /**
      * Initialize the static context
      */
     public Application() {
@@ -333,5 +338,9 @@ public class Application extends org.holoeverywhere.app.Application {
         if (getTracker() != null) {
             getTracker().setStartSession(true);
         }
+    }
+
+    public static Session getSession() {
+        return mSession;
     }
 }

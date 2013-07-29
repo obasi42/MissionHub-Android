@@ -11,7 +11,6 @@ import android.widget.AdapterView.OnItemClickListener;
 
 import com.missionhub.R;
 import com.missionhub.application.Application;
-import com.missionhub.application.Session;
 import com.missionhub.application.SettingsManager;
 import com.missionhub.fragment.dialog.BaseDialogFragment;
 import com.missionhub.model.Organization;
@@ -76,7 +75,7 @@ public class PickAccountDialog extends BaseDialogFragment implements OnItemClick
                 if (aitem.account != null) {
                     holder.name.setText(aitem.account.name);
 
-                    long personId = Session.getInstance().getAccountPersonId(aitem.account);
+                    long personId = Application.getSession().getAccountPersonId(aitem.account);
                     final Organization org = Application.getDb().getOrganizationDao().load(SettingsManager.getSessionOrganizationId(personId));
                     if (org != null) {
                         holder.organization.setText(org.getName());
@@ -106,14 +105,14 @@ public class PickAccountDialog extends BaseDialogFragment implements OnItemClick
     public void onResume() {
         super.onResume();
 
-        Session.getInstance().getAccountManager().addOnAccountsUpdatedListener(this, null, false);
+        Application.getSession().getAccountManager().addOnAccountsUpdatedListener(this, null, false);
 
         refreshAccounts();
     }
 
     @Override
     public void onPause() {
-        Session.getInstance().getAccountManager().removeOnAccountsUpdatedListener(this);
+        Application.getSession().getAccountManager().removeOnAccountsUpdatedListener(this);
 
         super.onPause();
     }
@@ -122,7 +121,7 @@ public class PickAccountDialog extends BaseDialogFragment implements OnItemClick
         mAdapter.setNotifyOnChange(false);
         mAdapter.clear();
 
-        final Account[] accounts = Session.getInstance().getAllAccounts();
+        final Account[] accounts = Application.getSession().getAllAccounts();
         for (final Account account : accounts) {
             mAdapter.add(new AccountItem(account));
         }

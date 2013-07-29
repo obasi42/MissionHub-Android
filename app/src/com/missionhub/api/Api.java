@@ -7,7 +7,6 @@ import com.github.kevinsawicki.http.HttpRequest;
 import com.google.gson.Gson;
 import com.missionhub.application.Application;
 import com.missionhub.application.Configuration;
-import com.missionhub.application.Session;
 import com.missionhub.model.ContactAssignment;
 import com.missionhub.model.ContactAssignmentDao;
 import com.missionhub.model.Interaction;
@@ -444,8 +443,8 @@ public class Api {
     public static String getSurveyUrl(Survey survey) throws ApiException {
         try {
             final Map<String, String> params = new HashMap<String, String>();
-            params.put("facebook_token", Session.getInstance().getAccessToken());
-            params.put("org_id", String.valueOf(Session.getInstance().getOrganizationId()));
+            params.put("facebook_token", Application.getSession().getAccessToken());
+            params.put("org_id", String.valueOf(Application.getSession().getOrganizationId()));
             params.put("mobile", "1");
             String url = Configuration.getSurveyUrl();
             if (survey != null) {
@@ -620,10 +619,10 @@ public class Api {
 
         // add oauth token to the request if needed
         if (authenticated) {
-            headers.put(HttpRequest.HEADER_AUTHORIZATION, "Facebook " + Session.getInstance().getAccessToken());
+            headers.put(HttpRequest.HEADER_AUTHORIZATION, "Facebook " + Application.getSession().getAccessToken());
 
-            if (Session.getInstance().getOrganizationId() >= 0) {
-                params.put("organization_id", String.valueOf(Session.getInstance().getOrganizationId()));
+            if (Application.getSession().getOrganizationId() >= 0) {
+                params.put("organization_id", String.valueOf(Application.getSession().getOrganizationId()));
             }
         }
 

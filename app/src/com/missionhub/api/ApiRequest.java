@@ -4,7 +4,7 @@ import android.util.Log;
 
 import com.github.kevinsawicki.http.HttpRequest;
 import com.missionhub.api.Api.ApiResponseParser;
-import com.missionhub.application.Session;
+import com.missionhub.application.Application;
 import com.missionhub.model.gson.GErrors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -116,7 +116,7 @@ public class ApiRequest<T> {
                 /* probably not an api error ignore */
             }
             if (exception instanceof InvalidFacebookTokenException) {
-                Session.getInstance().invalidateAuthToken();
+                Application.getSession().invalidateAuthToken();
             }
             if (exception != null) {
                 throw exception;

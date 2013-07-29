@@ -18,7 +18,6 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.missionhub.R;
 import com.missionhub.application.Application;
-import com.missionhub.application.Session;
 import com.missionhub.authenticator.AuthenticatorActivity;
 import com.missionhub.event.ChangeHostFragmentEvent;
 import com.missionhub.event.DrawerClosedEvent;
@@ -89,7 +88,7 @@ public class HostActivity extends BaseAuthenticatedActivity implements FragmentM
         }
 
         // create the global pull to refresh helper
-        mPullToRefreshHelper = new PullToRefreshAttacher(this);
+        mPullToRefreshHelper = PullToRefreshAttacher.get(this);
 
         Application.registerEventSubscriber(this, ChangeHostFragmentEvent.class, OnSidebarItemClickedEvent.class);
     }
@@ -264,7 +263,7 @@ public class HostActivity extends BaseAuthenticatedActivity implements FragmentM
                     IntentHelper.openUrl(getString(R.string.main_help_url));
                     break;
                 case R.id.menu_item_logout:
-                    Session.getInstance().close();
+                    Application.getSession().close();
                     break;
                 case R.id.menu_item_organization:
                     SelectOrganizationDialogFragment.showForResult(getSupportFragmentManager(), 5);

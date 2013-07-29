@@ -1,7 +1,6 @@
 package com.missionhub.model.gson;
 
 import com.missionhub.application.Application;
-import com.missionhub.application.Session;
 import com.missionhub.model.Interaction;
 import com.missionhub.model.InteractionDao;
 import com.missionhub.model.InteractionInitiator;
@@ -152,7 +151,7 @@ public class GInteraction {
                 for (GInteraction interaction : interactions) {
                     orgIds.add(interaction.organization_id);
                 }
-                orgIds.add(Session.getInstance().getOrganizationId());
+                orgIds.add(Application.getSession().getOrganizationId());
 
                 List<Long> oldIds = dao.queryBuilder().where(InteractionDao.Properties.Receiver_id.eq(receiverId), InteractionDao.Properties.Organization_id.in(orgIds)).listKeys();
                 for (long id : oldIds) {

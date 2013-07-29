@@ -13,7 +13,6 @@ import com.missionhub.R;
 import com.missionhub.activity.HostActivity;
 import com.missionhub.api.ListOptions;
 import com.missionhub.application.Application;
-import com.missionhub.application.Session;
 import com.missionhub.event.OnHostFragmentChangedEvent;
 import com.missionhub.event.OnHostedListOptionsChangedEvent;
 import com.missionhub.event.OnOrganizationChangedEvent;
@@ -126,7 +125,7 @@ public class SidebarFragment extends Fragment implements AdapterView.OnItemClick
 
                 final HostedFragment hostedFragment = getHostActivity().getCurrentFragment();
 
-                List<Survey> surveys = Session.getInstance().getOrganization().getSortedSurveys();
+                List<Survey> surveys = Application.getSession().getOrganization().getSortedSurveys();
 
                 // top level item
                 if (hostedFragment instanceof HostedSurveysFragment) {
@@ -148,8 +147,8 @@ public class SidebarFragment extends Fragment implements AdapterView.OnItemClick
                     newItems.add(getOrCreateHeaderItem("Users", "users"));
                     SidebarListAdapter.ExpandItem userExpand = getOrCreateExpandItem("users");
 
-                    List<Person> users = Session.getInstance().getOrganization().getUsersAdmins();
-                    Person currentUser = Session.getInstance().getPerson();
+                    List<Person> users = Application.getSession().getOrganization().getUsersAdmins();
+                    Person currentUser = Application.getSession().getPerson();
                     users.remove(currentUser);
                     newItems.add(getOrCreateUserItem(currentUser));
 
@@ -169,7 +168,7 @@ public class SidebarFragment extends Fragment implements AdapterView.OnItemClick
 
                     // labels
                     newItems.add(getOrCreateHeaderItem("Labels", "labels"));
-                    List<Label> labels = Session.getInstance().getOrganization().getAllLabels();
+                    List<Label> labels = Application.getSession().getOrganization().getAllLabels();
                     SidebarListAdapter.ExpandItem labelExpand = getOrCreateExpandItem("labels");
                     int lLimit = 5;
                     if (labelExpand.isExpanded() || labels.size() < lLimit) {
@@ -186,7 +185,7 @@ public class SidebarFragment extends Fragment implements AdapterView.OnItemClick
                     }
 
                     // interactions
-                    List<InteractionType> interactionTypes = Session.getInstance().getOrganization().getAllInteractionTypes();
+                    List<InteractionType> interactionTypes = Application.getSession().getOrganization().getAllInteractionTypes();
                     if (!interactionTypes.isEmpty()) {
                         newItems.add(getOrCreateHeaderItem("Interactions", "interactions"));
                         for (InteractionType type : interactionTypes) {

@@ -87,17 +87,7 @@ public class Session implements OnAccountsUpdateListener {
     /**
      * Creates a new session object and sets up the account manager
      */
-    private Session() {
-    }
-
-    /**
-     * @return the singleton instance of the session
-     */
-    public static Session getInstance() {
-        if (sSession == null) {
-            sSession = new Session();
-        }
-        return sSession;
+    protected Session() {
     }
 
     /**

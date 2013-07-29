@@ -245,14 +245,14 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
         mCheckmarkHelper.refreshCheckedState();
         refreshIndicator();
 
-        getHost().getPullToRefreshAttacher().setRefreshableView(mList, this);
+        getHost().getPullToRefreshAttacher().addRefreshableView(mList, this);
     }
 
     @Override
     public void onResume() {
         super.onResume();
         mOrderSpinner.setVisibility(mOrderSpinnerVisibility);
-        getHost().getPullToRefreshAttacher().setRefreshableView(mList, this);
+        getHost().getPullToRefreshAttacher().addRefreshableView(mList, this);
     }
 
     @Override
