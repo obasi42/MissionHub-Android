@@ -1,7 +1,7 @@
 package com.missionhub.model.generic;
 
 import com.missionhub.R;
-import com.missionhub.application.Session;
+import com.missionhub.application.Application;
 import com.missionhub.model.Organization;
 import com.missionhub.util.ResourceUtils;
 
@@ -28,7 +28,7 @@ public enum InteractionVisibility {
                     mTranslatedName = ResourceUtils.getString(R.string.interaction_visibility_everyone);
                     break;
                 case parents:
-                    Organization parent = Session.getInstance().getOrganization().getParent();
+                    Organization parent = Application.getSession().getOrganization().getParent();
                     if (parent != null && StringUtils.isNotEmpty(parent.getName())) {
                         mTranslatedName = String.format(ResourceUtils.getString(R.string.interaction_visibility_everyone_in), parent.getName());
                     } else {
@@ -36,7 +36,7 @@ public enum InteractionVisibility {
                     }
                     break;
                 case organization:
-                    Organization organization = Session.getInstance().getOrganization();
+                    Organization organization = Application.getSession().getOrganization();
                     if (StringUtils.isNotEmpty(organization.getName())) {
                         mTranslatedName = String.format(ResourceUtils.getString(R.string.interaction_visibility_everyone_in), organization.getName());
                     } else {
@@ -44,7 +44,7 @@ public enum InteractionVisibility {
                     }
                     break;
                 case admins:
-                    Organization adminOrg = Session.getInstance().getOrganization();
+                    Organization adminOrg = Application.getSession().getOrganization();
                     if (StringUtils.isNotEmpty(adminOrg.getName())) {
                         mTranslatedName = String.format(ResourceUtils.getString(R.string.interaction_visibility_admins_in), adminOrg.getName());
                     } else {

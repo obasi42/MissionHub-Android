@@ -1,7 +1,6 @@
 package com.missionhub.model.gson;
 
 import com.missionhub.application.Application;
-import com.missionhub.application.Session;
 import com.missionhub.model.OrganizationalLabel;
 import com.missionhub.model.OrganizationalLabelDao;
 
@@ -88,7 +87,7 @@ public class GOrganizationalLabel {
                 for (GOrganizationalLabel label : labels) {
                     orgIds.add(label.organization_id);
                 }
-                orgIds.add(Session.getInstance().getOrganizationId());
+                orgIds.add(Application.getSession().getOrganizationId());
                 List<Long> oldIds = dao.queryBuilder().where(OrganizationalLabelDao.Properties.Organization_id.in(orgIds), OrganizationalLabelDao.Properties.Person_id.eq(personId)).listKeys();
                 for (Long id : oldIds) {
                     dao.deleteByKey(id);

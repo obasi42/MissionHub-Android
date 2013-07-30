@@ -15,7 +15,6 @@ import com.missionhub.api.ApiOptions;
 import com.missionhub.api.ApiRequest;
 import com.missionhub.api.PeopleListOptions;
 import com.missionhub.application.Application;
-import com.missionhub.application.Session;
 import com.missionhub.exception.ExceptionHelper;
 import com.missionhub.model.Label;
 import com.missionhub.model.Permission;
@@ -199,7 +198,7 @@ public class BulkUpdateDialogFragment extends RefreshableDialogFragment implemen
                         if (mPeople != null) {
                             for (Person p : mPeople) {
                                 p.resetLabels();
-                                final List<Long> labelIds = p.getLables(Session.getInstance().getOrganizationId());
+                                final List<Long> labelIds = p.getLables(Application.getSession().getOrganizationId());
                                 for (long labelId : labelIds) {
                                     Integer count = labelCounts.get(labelId);
                                     if (count == null) {
@@ -210,7 +209,7 @@ public class BulkUpdateDialogFragment extends RefreshableDialogFragment implemen
                             }
                         }
 
-                        final List<Label> labels = Session.getInstance().getOrganization().getAllLabels();
+                        final List<Label> labels = Application.getSession().getOrganization().getAllLabels();
                         for (Label label : labels) {
                             items.add(new Item(label, determineCheckboxState(labelCounts, label.getId())));
                         }
@@ -220,7 +219,7 @@ public class BulkUpdateDialogFragment extends RefreshableDialogFragment implemen
                         if (mPeople != null) {
                             for (Person p : mPeople) {
                                 p.resetPermissionCache();
-                                long permission = p.getPermission(Session.getInstance().getOrganizationId());
+                                long permission = p.getPermission(Application.getSession().getOrganizationId());
                                 Integer count = permissionCounts.get(permission);
                                 if (count == null) {
                                     count = 0;
@@ -229,7 +228,7 @@ public class BulkUpdateDialogFragment extends RefreshableDialogFragment implemen
                             }
                         }
                         final Item adminItem = new Item(Permission.getPermission(Permission.ADMIN), determineCheckboxState(permissionCounts, Permission.ADMIN));
-                        if (!Session.getInstance().isAdmin()) {
+                        if (!Application.getSession().isAdmin()) {
                             adminItem.setEnabled(false);
                         }
                         items.add(adminItem);
@@ -241,7 +240,7 @@ public class BulkUpdateDialogFragment extends RefreshableDialogFragment implemen
                         if (mPeople != null) {
                             for (Person p : mPeople) {
                                 p.resetStatus();
-                                FollowupStatus status = p.getStatus(Session.getInstance().getOrganizationId());
+                                FollowupStatus status = p.getStatus(Application.getSession().getOrganizationId());
                                 Integer count = statusCounts.get((long) status.ordinal());
                                 if (count == null) {
                                     count = 0;

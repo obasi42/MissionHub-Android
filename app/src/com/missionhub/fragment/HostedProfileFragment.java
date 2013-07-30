@@ -24,7 +24,6 @@ import com.missionhub.api.Api;
 import com.missionhub.api.ApiOptions;
 import com.missionhub.api.ApiRequest;
 import com.missionhub.application.Application;
-import com.missionhub.application.Session;
 import com.missionhub.event.OnOrganizationChangedEvent;
 import com.missionhub.exception.ExceptionHelper;
 import com.missionhub.fragment.dialog.AssignmentDialogFragment;
@@ -207,7 +206,7 @@ public class HostedProfileFragment extends HostedFragment implements TabBar.OnTa
         menu.add(Menu.NONE, R.id.action_label, Menu.NONE, R.string.action_labels).setIcon(R.drawable.ic_action_labels)
                 .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-        if (person != null && !(person.isAdmin() && !Session.getInstance().isAdmin())) {
+        if (person != null && !(person.isAdmin() && !Application.getSession().isAdmin())) {
             menu.add(Menu.NONE, R.id.action_permission, Menu.NONE, R.string.action_permissions).setIcon(R.drawable.ic_action_permissions)
                     .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
         }
@@ -422,14 +421,14 @@ public class HostedProfileFragment extends HostedFragment implements TabBar.OnTa
         person.refresh();
 
         person.resetStatus();
-        FollowupStatus status = person.getStatus(Session.getInstance().getOrganizationId());
+        FollowupStatus status = person.getStatus(Application.getSession().getOrganizationId());
         if (status != null) {
             items.add(new InfoGroup(R.string.profile_group_followup_status));
             items.add(new InfoItem(status));
         }
 
         person.resetContactAssignments();
-        ContactAssignment assignment = person.getContactAssignment(Session.getInstance().getOrganizationId());
+        ContactAssignment assignment = person.getContactAssignment(Application.getSession().getOrganizationId());
         if (assignment == null) assignment = new ContactAssignment();
         items.add(new InfoGroup(R.string.profile_group_assigned_to));
         items.add(new InfoItem(assignment));
@@ -486,7 +485,7 @@ public class HostedProfileFragment extends HostedFragment implements TabBar.OnTa
         if (person == null) return items;
 
         person.resetReceivedInteractions();
-        List<Interaction> interactions = person.getReceivedInteractions(Session.getInstance().getOrganizationId());
+        List<Interaction> interactions = person.getReceivedInteractions(Application.getSession().getOrganizationId());
         for (Interaction interaction : interactions) {
             interaction.invalidateViewCache();
             interaction.getViewCache();
@@ -507,7 +506,7 @@ public class HostedProfileFragment extends HostedFragment implements TabBar.OnTa
         if (person == null) return items;
 
         person.resetAnswerSheetList();
-        List<AnswerSheet> sheets = person.getAnswerSheetList(Session.getInstance().getOrganizationId());
+        List<AnswerSheet> sheets = person.getAnswerSheetList(Application.getSession().getOrganizationId());
         for (AnswerSheet sheet : sheets) {
             sheet.invalidateViewCache();
             sheet.getViewCache();
@@ -542,7 +541,7 @@ public class HostedProfileFragment extends HostedFragment implements TabBar.OnTa
 
         List<OrganizationalLabel> labels = Application.getDb().getOrganizationalLabelDao().queryBuilder().where(
                 OrganizationalLabelDao.Properties.Person_id.eq(person.getId()),
-                OrganizationalLabelDao.Properties.Organization_id.eq(Session.getInstance().getOrganizationId()),
+                OrganizationalLabelDao.Properties.Organization_id.eq(Application.getSession().getOrganizationId()),
                 OrganizationalLabelDao.Properties.Removed_date.isNull()).list();
 
         for (OrganizationalLabel label : labels) {
@@ -612,7 +611,7 @@ public class HostedProfileFragment extends HostedFragment implements TabBar.OnTa
 
                 mLabels.setVisibility(View.VISIBLE);
                 person.resetLabels();
-                List<Long> labelList = person.getLables(Session.getInstance().getOrganizationId());
+                List<Long> labelList = person.getLables(Application.getSession().getOrganizationId());
                 List<String> labelNames = new ArrayList<String>();
                 for (long id : labelList) {
                     Label label = Application.getDb().getLabelDao().load(id);

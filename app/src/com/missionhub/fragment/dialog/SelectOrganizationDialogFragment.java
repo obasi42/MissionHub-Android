@@ -9,7 +9,6 @@ import android.view.View;
 
 import com.missionhub.R;
 import com.missionhub.application.Application;
-import com.missionhub.application.Session;
 import com.missionhub.application.SettingsManager;
 import com.missionhub.exception.ExceptionHelper;
 import com.missionhub.model.Organization;
@@ -146,7 +145,7 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
 
                 mCurrentItem = null;
 
-                rebuildAdapterR(roots, Session.getInstance().getPerson().getOrganizationHierarchy(), null);
+                rebuildAdapterR(roots, Application.getSession().getPerson().getOrganizationHierarchy(), null);
 
                 return roots;
             }
@@ -175,7 +174,7 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
         final long[] favorites = getFavorites();
 
         try {
-            Person currentPerson = Session.getInstance().getPerson();
+            Person currentPerson = Application.getSession().getPerson();
             for (Long favorite : favorites) {
                 if (currentPerson.isAdminOrUser(favorite)) {
                     privilegedFavorites.add(favorite);
@@ -188,14 +187,14 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
     }
 
     private long[] getFavorites() {
-        return SettingsManager.getInstance().getUserSetting(Session.getInstance().getPersonId(), "favorite_organizations", new long[]{Session.getInstance().getPrimaryOrganizationId()});
+        return SettingsManager.getInstance().getUserSetting(Application.getSession().getPersonId(), "favorite_organizations", new long[]{Application.getSession().getPrimaryOrganizationId()});
     }
 
     private void addFavoriteOrganization(long organizationId) {
         long[] favorites = getFavorites();
         if (!ArrayUtils.contains(favorites, organizationId)) {
             favorites = ArrayUtils.add(favorites, organizationId);
-            SettingsManager.getInstance().setUserSetting(Session.getInstance().getPersonId(), "favorite_organizations", favorites);
+            SettingsManager.getInstance().setUserSetting(Application.getSession().getPersonId(), "favorite_organizations", favorites);
         }
     }
 
@@ -203,7 +202,7 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
         long[] favorites = getFavorites();
         if (ArrayUtils.contains(favorites, organizationId)) {
             favorites = ArrayUtils.removeElement(favorites, organizationId);
-            SettingsManager.getInstance().setUserSetting(Session.getInstance().getPersonId(), "favorite_organizations", favorites);
+            SettingsManager.getInstance().setUserSetting(Application.getSession().getPersonId(), "favorite_organizations", favorites);
         }
     }
 
@@ -250,7 +249,7 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
 
             @Override
             public Void call() throws Exception {
-                task = Session.getInstance().updatePerson(true);
+                task = Application.getSession().updatePerson(true);
                 task.get();
                 return null;
             }
@@ -291,7 +290,7 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
     private void setOrganization(final long organizationId) {
         if (mSetTask != null) return;
 
-        if (organizationId == Session.getInstance().getOrganizationId()) {
+        if (organizationId == Application.getSession().getOrganizationId()) {
             Application.showToast(ResourceUtils.getString(R.string.select_organization_already_current), Toast.LENGTH_SHORT);
             return;
         }
@@ -304,7 +303,7 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
 
             @Override
             public Void call() throws Exception {
-                task = Session.getInstance().updateOrganization(organizationId, true);
+                task = Application.getSession().updateOrganization(organizationId, true);
                 task.get();
                 return null;
             }
@@ -312,7 +311,7 @@ public class SelectOrganizationDialogFragment extends RefreshableDialogFragment 
             @Override
             protected void onSuccess(Void aVoid) throws Exception {
                 if (!isCanceled()) {
-                    Session.getInstance().setOrganizationId(organizationId, false, false);
+                    Application.getSession().setOrganizationId(organizationId, false, false);
                     dismiss();
                 }
             }

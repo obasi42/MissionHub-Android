@@ -319,7 +319,7 @@ public class EditContactDialogFragment extends BaseDialogFragment {
 
             @Override
             public void onException(final Exception e) {
-                final ExceptionHelper eh = new ExceptionHelper(Application.getContext(), e);
+                final ExceptionHelper eh = new ExceptionHelper(e);
                 eh.makeToast(R.string.add_contact_failed);
             }
 

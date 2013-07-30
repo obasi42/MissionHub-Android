@@ -10,7 +10,6 @@ public class ApiException extends MissionHubException implements ExceptionHelper
 
     private static final long serialVersionUID = 1L;
 
-    private String mTitle;
     private String mCode;
 
     public ApiException() {
@@ -30,10 +29,6 @@ public class ApiException extends MissionHubException implements ExceptionHelper
         super(cause);
     }
 
-    public String getTitle() {
-        return mTitle;
-    }
-
     public String getCode() {
         return mCode;
     }
@@ -47,7 +42,7 @@ public class ApiException extends MissionHubException implements ExceptionHelper
 
     @Override
     public String getDialogTitle() {
-        return getTitle();
+        return null;
     }
 
     @Override

@@ -9,6 +9,7 @@ import android.webkit.WebViewClient;
 import com.missionhub.R;
 import com.missionhub.application.Application;
 
+import org.apache.commons.lang3.StringUtils;
 import org.holoeverywhere.app.AlertDialog;
 import org.holoeverywhere.widget.Toast;
 
@@ -83,8 +84,7 @@ public class ExceptionHelper {
      */
     public ExceptionHelper(final Context context, final Throwable throwable) {
         mContext = context;
-        if (mContext == null) return;
-        mTitle = context.getString(R.string.exception_helper_error);
+        mTitle = getContext().getString(R.string.exception_helper_error);
         setThrowable(throwable);
     }
 
@@ -103,9 +103,7 @@ public class ExceptionHelper {
             } catch (Exception e) { /* ignore */ }
         }
 
-        mContext = Application.getContext();
         makeToast();
-
         return null;
     }
 
@@ -117,15 +115,15 @@ public class ExceptionHelper {
             return null;
         }
 
-        if (mDialog != null && (mDialog.isShowing() || mDialog.getContext() != mContext)) {
+        if (mDialog != null && (mDialog.isShowing() || mDialog.getContext() != getContext())) {
             try {
                 mDialog.dismiss();
             } catch (Exception e) { /* ignore */ }
             mDialog = null;
         }
 
-        if (mContext != null && mDialog == null) {
-            final AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        if (!isApplicationContext() && mDialog == null) {
+            final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 
             builder.setTitle(mTitle);
             builder.setMessage(mMessage);
@@ -224,7 +222,7 @@ public class ExceptionHelper {
         mThrowable = throwable;
 
         // unwrap the exception if possible
-        while (mThrowable.getCause() != null) {
+        while (!(mThrowable instanceof ExceptionHelperException) && mThrowable.getCause() != null) {
             mThrowable = mThrowable.getCause();
         }
 
@@ -328,7 +326,7 @@ public class ExceptionHelper {
     public void setIcon(final int resource) {
         if (resource == 0 || resource == -1) setIcon(null);
 
-        setIcon(mContext.getResources().getDrawable(resource));
+        setIcon(getContext().getResources().getDrawable(resource));
     }
 
     /**
@@ -352,8 +350,7 @@ public class ExceptionHelper {
      * Shows a toast with the data from the exception
      */
     public void makeToast() {
-        if (mContext != null)
-            Toast.makeText(mContext, getTitle() + "\n\n" + getMessage(), Toast.LENGTH_LONG).show();
+        makeToast(null);
     }
 
     /**
@@ -362,8 +359,18 @@ public class ExceptionHelper {
      * @param failure a failure message to be displayed with the exception data.
      */
     public void makeToast(final String failure) {
-        if (mContext != null)
-            Toast.makeText(mContext, failure + "\n" + getTitle() + "\n\n" + getMessage(), Toast.LENGTH_LONG).show();
+        StringBuilder sb = new StringBuilder();
+        if (StringUtils.isNotEmpty(failure)) {
+            sb.append(failure).append("\n");
+        }
+        if (StringUtils.isNotEmpty(getTitle())) {
+            sb.append(getTitle()).append("\n\n");
+        }
+        if (StringUtils.isNotEmpty(getMessage())) {
+            sb.append(getMessage());
+        }
+
+        Toast.makeText(getContext(), sb.toString(), Toast.LENGTH_LONG).show();
     }
 
     /**
@@ -372,10 +379,17 @@ public class ExceptionHelper {
      * @param failure a failure message to be displayed before the exception data.
      */
     public void makeToast(final int failure) {
-        if (mContext != null) makeToast(mContext.getString(failure));
+        makeToast(getContext().getString(failure));
     }
 
     public boolean isApplicationContext() {
-        return mContext == Application.getContext();
+        return getContext() == Application.getContext();
+    }
+
+    public Context getContext() {
+        if (mContext == null) {
+            mContext = Application.getContext();
+        }
+        return mContext;
     }
 }

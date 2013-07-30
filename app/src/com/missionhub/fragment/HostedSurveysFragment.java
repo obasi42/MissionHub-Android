@@ -19,7 +19,6 @@ import com.actionbarsherlock.view.MenuItem;
 import com.missionhub.R;
 import com.missionhub.api.Api;
 import com.missionhub.application.Application;
-import com.missionhub.application.Session;
 import com.missionhub.event.ChangeHostFragmentEvent;
 import com.missionhub.event.OnOrganizationChangedEvent;
 import com.missionhub.event.OnSidebarItemClickedEvent;
@@ -299,7 +298,7 @@ public class HostedSurveysFragment extends HostedFragment implements AdapterView
 
             @Override
             public Void call() throws Exception {
-                task = Session.getInstance().updateCurrentOrganization(true);
+                task = Application.getSession().updateCurrentOrganization(true);
                 task.get();
                 return null;
             }
@@ -333,7 +332,7 @@ public class HostedSurveysFragment extends HostedFragment implements AdapterView
 
             @Override
             public List<Survey> call() throws Exception {
-                return Session.getInstance().getOrganization().getSortedSurveys();
+                return Application.getSession().getOrganization().getSortedSurveys();
             }
 
             @Override

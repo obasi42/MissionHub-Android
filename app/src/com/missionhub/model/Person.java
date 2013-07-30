@@ -712,7 +712,7 @@ public class Person implements com.missionhub.model.TimestampedEntity {
     }
 
     public boolean hasPermission(long permissionId) {
-        return hasPermission(permissionId, Session.getInstance().getOrganizationId());
+        return hasPermission(permissionId, Application.getSession().getOrganizationId());
     }
 
     public long getPermission(long organizationId) {
@@ -830,7 +830,7 @@ public class Person implements com.missionhub.model.TimestampedEntity {
     }
 
     public boolean isAdminOrUser() {
-        return isAdminOrUser(Session.getInstance().getOrganizationId());
+        return isAdminOrUser(Application.getSession().getOrganizationId());
     }
 
     public boolean isAdminOrUser(final long organizationId) {
@@ -838,11 +838,11 @@ public class Person implements com.missionhub.model.TimestampedEntity {
     }
 
     public boolean isAdmin() {
-        return isAdmin(Session.getInstance().getOrganizationId());
+        return isAdmin(Application.getSession().getOrganizationId());
     }
 
     public boolean isUser() {
-        return isUser(Session.getInstance().getOrganizationId());
+        return isUser(Application.getSession().getOrganizationId());
     }
 
     public void setUser(User user) {
@@ -1018,7 +1018,7 @@ public class Person implements com.missionhub.model.TimestampedEntity {
     }
 
     public FollowupStatus getStatus() {
-        return getStatus(Session.getInstance().getOrganizationId());
+        return getStatus(Application.getSession().getOrganizationId());
     }
 
     public FollowupStatus getStatus(final long organizationId) {
@@ -1082,7 +1082,7 @@ public class Person implements com.missionhub.model.TimestampedEntity {
     }
 
     public ContactAssignment getContactAssignment() {
-        return getContactAssignment(Session.getInstance().getOrganizationId());
+        return getContactAssignment(Application.getSession().getOrganizationId());
     }
 
     public ContactAssignment getContactAssignment(final long organizationId) {
@@ -1098,7 +1098,7 @@ public class Person implements com.missionhub.model.TimestampedEntity {
             }
 
             ContactAssignment assignment = Application.getDb().getContactAssignmentDao().queryBuilder()
-                    .where(ContactAssignmentDao.Properties.Person_id.eq(getId()), ContactAssignmentDao.Properties.Organization_id.eq(Session.getInstance().getOrganizationId()))
+                    .where(ContactAssignmentDao.Properties.Person_id.eq(getId()), ContactAssignmentDao.Properties.Organization_id.eq(Application.getSession().getOrganizationId()))
                     .orderDesc(ContactAssignmentDao.Properties.Updated_at).limit(1).unique();
 
             synchronized (this) {
@@ -1190,11 +1190,11 @@ public class Person implements com.missionhub.model.TimestampedEntity {
                         };
                     }
                 }
-                Permission permission = Application.getDb().getPermissionDao().load(getPermission(Session.getInstance().getOrganizationId()));
+                Permission permission = Application.getDb().getPermissionDao().load(getPermission(Application.getSession().getOrganizationId()));
                 if (permission != null) {
                     mPersonViewCache.permission = permission.getTranslatedName();
                 }
-                List<Long> labels = getLables(Session.getInstance().getOrganizationId());
+                List<Long> labels = getLables(Application.getSession().getOrganizationId());
                 List<String> labelNames = new ArrayList<String>();
                 for (Long id : labels) {
                     Label label = Label.load(id);

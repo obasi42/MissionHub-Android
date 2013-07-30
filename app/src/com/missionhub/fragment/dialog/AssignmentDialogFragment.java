@@ -18,7 +18,6 @@ import com.missionhub.api.ApiOptions;
 import com.missionhub.api.ApiRequest;
 import com.missionhub.api.PeopleListOptions;
 import com.missionhub.application.Application;
-import com.missionhub.application.Session;
 import com.missionhub.exception.ExceptionHelper;
 import com.missionhub.model.ContactAssignment;
 import com.missionhub.model.ContactAssignmentDao;
@@ -179,12 +178,12 @@ public class AssignmentDialogFragment extends RefreshableDialogFragment implemen
                 if (mPeople != null) {
                     for (final Person person : mPeople) {
                         final List<ContactAssignment> assignments = Application.getDb().getContactAssignmentDao().queryBuilder()
-                                .where(ContactAssignmentDao.Properties.Person_id.eq(person.getId()), ContactAssignmentDao.Properties.Organization_id.eq(Session.getInstance().getOrganizationId())).list();
+                                .where(ContactAssignmentDao.Properties.Person_id.eq(person.getId()), ContactAssignmentDao.Properties.Organization_id.eq(Application.getSession().getOrganizationId())).list();
 
                         if (assignments.size() > 0) {
                             showNone = true;
                             for (final ContactAssignment assignment : assignments) {
-                                if (assignment.getAssigned_to_id().compareTo(Session.getInstance().getPersonId()) != 0) {
+                                if (assignment.getAssigned_to_id().compareTo(Application.getSession().getPersonId()) != 0) {
                                     showMe = true;
                                 }
                             }
@@ -202,12 +201,12 @@ public class AssignmentDialogFragment extends RefreshableDialogFragment implemen
                 }
 
                 if (showMe) {
-                    objects.add(new MeItem(Session.getInstance().getPerson()));
+                    objects.add(new MeItem(Application.getSession().getPerson()));
                 }
 
-                List<Person> leaders = Session.getInstance().getOrganization().getUsersAdmins();
+                List<Person> leaders = Application.getSession().getOrganization().getUsersAdmins();
 
-                leaders.remove(Session.getInstance().getPerson());
+                leaders.remove(Application.getSession().getPerson());
                 if (mPeople != null) {
                     leaders.removeAll(mPeople);
                 }
@@ -274,7 +273,7 @@ public class AssignmentDialogFragment extends RefreshableDialogFragment implemen
                     final List<GContactAssignment> assignments = new ArrayList<GContactAssignment>();
                     for (final Long id : personIds) {
                         final ContactAssignment oldAssignment = Application.getDb().getContactAssignmentDao().queryBuilder()
-                                .where(ContactAssignmentDao.Properties.Person_id.eq(id), ContactAssignmentDao.Properties.Organization_id.eq(Session.getInstance().getOrganizationId())).unique();
+                                .where(ContactAssignmentDao.Properties.Person_id.eq(id), ContactAssignmentDao.Properties.Organization_id.eq(Application.getSession().getOrganizationId())).unique();
 
                         final GContactAssignment assignment = new GContactAssignment();
                         if (oldAssignment != null) {
@@ -283,7 +282,7 @@ public class AssignmentDialogFragment extends RefreshableDialogFragment implemen
 
                         assignment.assigned_to_id = leader.getId();
                         assignment.person_id = id;
-                        assignment.organization_id = Session.getInstance().getOrganizationId();
+                        assignment.organization_id = Application.getSession().getOrganizationId();
 
                         assignments.add(assignment);
                     }
@@ -339,7 +338,7 @@ public class AssignmentDialogFragment extends RefreshableDialogFragment implemen
         if (item instanceof NoneItem) {
             doLeaderAssignment(null);
         } else if (item instanceof MeItem) {
-            doLeaderAssignment(Session.getInstance().getPerson());
+            doLeaderAssignment(Application.getSession().getPerson());
         } else if (item instanceof LeaderItem) {
             doLeaderAssignment(((LeaderItem) item).leader);
         }
@@ -355,7 +354,7 @@ public class AssignmentDialogFragment extends RefreshableDialogFragment implemen
 
             @Override
             public Void call() throws Exception {
-                mApiRequest = Api.getOrganization(Session.getInstance().getOrganizationId(), ApiOptions.builder()
+                mApiRequest = Api.getOrganization(Application.getSession().getOrganizationId(), ApiOptions.builder()
                         .include(Include.users)
                         .include(Include.organizational_permission)
                         .build());
