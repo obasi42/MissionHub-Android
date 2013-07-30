@@ -22,7 +22,7 @@ public class UpgradeManager {
     /* Dynamic Upgrade Methods */
     /*=========================*/
 
-    public boolean toV84() {
+    public boolean toV125() {
         // wipe everything from MH v1
         clearApplicationData();
         return true;
