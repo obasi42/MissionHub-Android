@@ -9,6 +9,7 @@ import com.missionhub.model.gson.GErrors;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,8 +57,13 @@ public class ApiRequest<T> {
         mRequestFinished = false;
 
         try {
-            mCode = getRequest().code();
-            mMessage = getRequest().message();
+            try {
+                mCode = getRequest().code();
+            } catch (Exception e) { /* ignore */ }
+            try {
+                mMessage = getRequest().message();
+            } catch (Exception e) { /* ignore */ }
+
             mBody = getRequest().body();
 
             checkResponse();
