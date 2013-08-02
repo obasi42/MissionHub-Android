@@ -29,6 +29,7 @@ import com.missionhub.model.Organization;
 import com.missionhub.model.Permission;
 import com.missionhub.model.Person;
 import com.missionhub.model.UserDao;
+import com.missionhub.util.ErrbitReportSender;
 import com.missionhub.util.SafeAsyncTask;
 import com.missionhub.util.TaskUtils;
 
@@ -208,8 +209,8 @@ public class Session implements OnAccountsUpdateListener {
                 // setup ACRA data
                 if (Configuration.isACRAEnabled()) {
                     try {
-                        ACRA.getErrorReporter().putCustomData("mPersonId", String.valueOf(mPersonId));
-                        ACRA.getErrorReporter().putCustomData("mOrganizationId", String.valueOf(mOrganizationId));
+                        ErrbitReportSender.putErrbitData(ErrbitReportSender.ErrbitReportField.USER_ID, String.valueOf(mPersonId));
+                        ACRA.getErrorReporter().putCustomData("MISSIONHUB_ORGANIZATION_ID", String.valueOf(mOrganizationId));
                     } catch (Exception e) { /* ignore */ }
                 }
 
@@ -270,8 +271,8 @@ public class Session implements OnAccountsUpdateListener {
 
                 if (Configuration.isACRAEnabled()) {
                     try {
-                        ACRA.getErrorReporter().removeCustomData("mPersonId");
-                        ACRA.getErrorReporter().removeCustomData("mOrganizationId");
+                        ErrbitReportSender.removeErrbitData(ErrbitReportSender.ErrbitReportField.USER_ID);
+                        ACRA.getErrorReporter().removeCustomData("MISSIONHUB_ORGANIZATION_ID");
                     } catch (Exception e) { /* ignore */ }
                 }
 

@@ -4,7 +4,9 @@ import android.content.Context;
 import android.util.Log;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -235,5 +237,13 @@ public class Configuration {
             }
         }
         return interval;
+    }
+
+    public Map<String, String> asMap() {
+        Map<String, String> properties = new HashMap<String, String>();
+        for (Map.Entry entry : sProperties.entrySet()) {
+            properties.put(String.valueOf(entry.getKey()), String.valueOf(entry.getValue()));
+        }
+        return properties;
     }
 }

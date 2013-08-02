@@ -26,9 +26,10 @@ ANALYTICS_KEY=UA-
 ANALYTICS_DEBUG=true
 ANAYLTICS_ANONYMIZE_IP=false
 
-# android crash reporter
-ACRA_ENABLED=false
-ACRA_FORM_KEY=
+# android crash reporter (errbit)
+ACRA_ENABLED=true
+ACRA_FORM_URI=errbit-host
+ACRA_FORM_KEY=errbit-api-key
 
 # facebook app id
 FACEBOOK_APP_ID=
