@@ -12,6 +12,7 @@ import com.missionhub.model.DaoMaster;
 import com.missionhub.model.DaoMaster.OpenHelper;
 import com.missionhub.model.DaoSession;
 import com.missionhub.model.MissionHubOpenHelper;
+import com.missionhub.util.ErrbitReportSender;
 import com.missionhub.util.LruBitmapCache;
 import com.missionhub.util.NetworkUtils;
 
@@ -22,6 +23,7 @@ import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
 import org.holoeverywhere.widget.Toast;
 
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -81,14 +83,12 @@ public class Application extends org.holoeverywhere.app.Application {
     @Override
     public void onCreate() {
         sApplication = this;
-        super.onCreate();
-
-        UpgradeManager.doUpgrade();
 
         if (Configuration.isACRAEnabled()) {
             try {
                 ACRAConfiguration config = ACRA.getConfig();
                 config.setFormKey(Configuration.getACRAFormKey());
+                config.setFormUri(Configuration.getACRAFormUri());
                 config.setResToastText(R.string.crash_dialog_title);
                 config.setResDialogCommentPrompt(R.string.crash_dialog_comment_prompt);
                 config.setResDialogText(R.string.crash_dialog_text);
@@ -97,10 +97,19 @@ public class Application extends org.holoeverywhere.app.Application {
                 config.setResDialogOkToast(R.string.crash_dialog_ok_toast);
                 config.setMode(ReportingInteractionMode.DIALOG);
                 ACRA.init(this);
+                ACRA.getErrorReporter().setReportSender(new ErrbitReportSender());
+                for (Map.Entry<String, String> property : Configuration.getInstance().asMap().entrySet()) {
+                    ACRA.getErrorReporter().putCustomData("CONFIGURATION_" + property.getKey(), property.getValue());
+                }
+                ErrbitReportSender.putErrbitData(ErrbitReportSender.ErrbitReportField.ENVIRONMENT_NAME, Configuration.getEnvironment().name());
             } catch (ACRAConfigurationException e) {
                 Log.e("MissionHub", e.getMessage(), e);
             }
         }
+
+        super.onCreate();
+
+        UpgradeManager.doUpgrade();
 
         if (Configuration.isAnalyticsEnabled()) {
             GoogleAnalytics ga = GoogleAnalytics.getInstance(this);
