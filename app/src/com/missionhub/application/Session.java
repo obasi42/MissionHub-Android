@@ -157,7 +157,7 @@ public class Session implements OnAccountsUpdateListener {
                 // allow logging in with a hardcoded token
                 if (Configuration.getEnvironment() == Configuration.Environment.DEVELOPMENT && StringUtils.isNotEmpty(Configuration.getLoginAs())) {
                     try {
-                        Person person = Api.getPersonMe(Configuration.getLoginAs()).get();
+                        Person person = Api.getPersonMe(Configuration.getLoginAs(), ApiOptions.builder().include(Include.user).build()).get();
                         addSystemAccount(person, Configuration.getLoginAs());
                     } catch (ApiException exception) {
                         setAndPostException(exception);
@@ -171,7 +171,7 @@ public class Session implements OnAccountsUpdateListener {
                 if (facebookId > 0 && personId <= 0) {
                     final String authToken = getAccountManager().peekAuthToken(account, Authenticator.ACCOUNT_TYPE);
                     try {
-                        Person person = Api.getPersonMe(authToken).get();
+                        Person person = Api.getPersonMe(authToken, ApiOptions.builder().include(Include.user).build()).get();
                         addSystemAccount(person, authToken);
                         personId = person.getId();
                     } catch (InvalidFacebookTokenException exception) {
