@@ -373,7 +373,7 @@ public class Interaction implements com.missionhub.model.TimestampedEntity {
         List<Long> ids = new ArrayList<Long>();
         List<InteractionInitiator> initiators = getInteractionInitiatorList();
         for (InteractionInitiator initiator : initiators) {
-            ids.add(initiator.getId());
+            ids.add(initiator.getPerson_id());
         }
         return ids.toArray(new Long[ids.size()]);
     }

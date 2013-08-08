@@ -73,9 +73,22 @@ import java.util.concurrent.FutureTask;
 public class InteractionDialogFragment extends BaseDialogFragment implements ViewPager.OnPageChangeListener, DialogInterface.OnKeyListener, DatePicker.OnDateChangedListener, TimePicker.OnTimeChangedListener, PeopleListView.OnPersonCheckedListener, SearchHelper.OnSearchQueryChangedListener {
 
     public static final String TAG = InteractionDialogFragment.class.getSimpleName();
-
+    private static final int STATE_FORM = 0;
+    private static final int STATE_DATE_TIME = 1;
+    private static final int STATE_RECEIVER = 2;
+    private static final int STATE_INITIATORS = 3;
+    private static final int ACTION_CREATE = 0;
+    private static final int ACTION_UPDATE = 1;
+    private static final int ACTION_DELETE = 2;
+    private final BroadcastReceiver mTimeChangedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (mInteraction != null && StringUtils.isEmpty(mInteraction.timestamp)) {
+                updateDateTimeBox(true);
+            }
+        }
+    };
     private GInteraction mInteraction = new GInteraction();
-
     private ImageView mIcon;
     private DialogTitle mTitle;
     private ImageView mRefresh;
@@ -86,9 +99,7 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
     private Button mButton1;
     private Button mButton2;
     private Button mButton3;
-
     private ViewArrayPagerAdapter mPagerAdaper;
-
     // interaction form
     private View mInteractionForm;
     private TextView mInteractionInitiators;
@@ -99,12 +110,10 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
     private SpinnerAdapter<InteractionVisibility> mInteractionVisibilityAdapter;
     private TextView mInteractionDateTime;
     private EditText mInteractionComment;
-
     // date/time form
     private View mDateTimeView;
     private DatePicker mDatePicker;
     private TimePicker mTimePicker;
-
     // people list form
     private View mPeopleView;
     private TextView mPeopleListTitle;
@@ -113,20 +122,9 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
     private PeopleListView mPeopleListView;
     private ApiPeopleListProvider mReceiverPeopleListProvider;
     private PeopleListProvider mInitiatorsPeopleListProvider;
-
     private SafeAsyncTask<Void> mRefreshInitiatorsTask;
-
-    private static final int STATE_FORM = 0;
-    private static final int STATE_DATE_TIME = 1;
-    private static final int STATE_RECEIVER = 2;
-    private static final int STATE_INITIATORS = 3;
-
     private int mState = STATE_FORM;
     private SafeAsyncTask<List<Person>> mRebuildInitiatorsProviderTask;
-
-    private static final int ACTION_CREATE = 0;
-    private static final int ACTION_UPDATE = 1;
-    private static final int ACTION_DELETE = 2;
     private SafeAsyncTask<Void> mActionTask;
     private int mActionTaskAction;
 
@@ -190,7 +188,7 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
         mIcon = (ImageView) frame.findViewById(R.id.icon);
         mIcon.setImageResource(R.drawable.ic_action_interaction);
         mTitle = (DialogTitle) frame.findViewById(R.id.alertTitle);
-        if (isNew()) {
+        if (mInteraction.isNew()) {
             mTitle.setText(R.string.interaction_dialog_title_new);
         } else {
             mTitle.setText(R.string.interaction_dialog_title_edit);
@@ -351,11 +349,11 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
         List<String> names = new ArrayList<String>();
         if (mInteraction.initiator_ids != null) {
             for (long initiatorId : mInteraction.initiator_ids) {
-                Person receiver = Application.getDb().getPersonDao().load(initiatorId);
-                if (StringUtils.isNotEmpty(receiver.getName())) {
-                    names.add(receiver.getName());
+                Person initiator = Application.getDb().getPersonDao().load(initiatorId);
+                if (initiator != null && StringUtils.isNotEmpty(initiator.getName())) {
+                    names.add(initiator.getName());
                 } else {
-                    names.add("Id: " + receiver.getId());
+                    names.add("Id: " + initiatorId);
                 }
             }
         }
@@ -366,7 +364,6 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
             mInteractionInitiators.setText(StringUtils.join(names, ", "));
         }
     }
-
 
     private synchronized void updateCommentBox() {
         if (mInteractionComment == null) return;
@@ -421,7 +418,6 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
         }
         mInteractionVisibility.setSelection(0);
     }
-
 
     private synchronized void updateTypeSpinner() {
         if (mInteractionType == null || mInteractionTypeAdapter == null) return;
@@ -556,7 +552,7 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
                 });
                 mButton2.setVisibility(View.VISIBLE);
 
-                if (canDelete()) {
+                if (mInteraction.canDelete(Application.getSession().getPersonId())) {
                     mButton3.setText(R.string.action_delete);
                     mButton3.setVisibility(View.VISIBLE);
                     mButton3.setOnClickListener(new View.OnClickListener() {
@@ -771,70 +767,6 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
         updatePersonListCheckedState();
     }
 
-    private static class SpinnerAdapter<T> extends ObjectArrayAdapter<T> {
-
-        private HashMap<Integer, Drawable> mDrawableCache = new HashMap<Integer, Drawable>();
-
-        public SpinnerAdapter(Context context) {
-            super(context);
-        }
-
-        @Override
-        public void setContext(Context context) {
-            mDrawableCache.clear();
-            super.setContext(context);
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View view = convertView;
-            ViewHolder holder;
-            if (view == null) {
-                holder = new ViewHolder();
-                view = getLayoutInflater().inflate(R.layout.item_interaction_dialog_spinner, parent, false);
-                holder.text1 = (TextView) view.findViewById(android.R.id.text1);
-                holder.icon = (ImageView) view.findViewById(android.R.id.icon);
-                view.setTag(holder);
-            } else {
-                holder = (ViewHolder) view.getTag();
-            }
-
-            Object object = getItem(position);
-            if (object instanceof InteractionType) {
-                holder.text1.setText(((InteractionType) object).getTranslatedName());
-                int iconId = ((InteractionType) object).getIconResource();
-                if (iconId != 0) {
-                    Drawable drawable = mDrawableCache.get(iconId);
-                    if (drawable == null) {
-                        drawable = getContext().getResources().getDrawable(iconId);
-                        mDrawableCache.put(iconId, drawable);
-                    }
-                    holder.icon.setImageDrawable(drawable);
-                    holder.icon.setVisibility(View.VISIBLE);
-                } else {
-                    holder.icon.setVisibility(View.GONE);
-                }
-            } else if (object instanceof InteractionVisibility) {
-                holder.text1.setText(object.toString());
-            }
-            return view;
-        }
-
-        @Override
-        public View getDropDownView(final int position, final View convertView, final ViewGroup parent) {
-            return getView(position, convertView, parent);
-        }
-
-        private static class ViewHolder {
-            TextView text1;
-            ImageView icon;
-        }
-    }
-
-    public boolean isNew() {
-        return StringUtils.isEmpty(mInteraction.created_at);
-    }
-
     public void onResume() {
         super.onResume();
         getDialog().setOnKeyListener(this);
@@ -850,15 +782,6 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
         }
         return getSupportActivity().dispatchKeyEvent(event);
     }
-
-    private final BroadcastReceiver mTimeChangedReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (mInteraction != null && StringUtils.isEmpty(mInteraction.timestamp)) {
-                updateDateTimeBox(true);
-            }
-        }
-    };
 
     private void rebuildInitiatorsProvider() {
         if (mRebuildInitiatorsProviderTask != null) return;
@@ -967,10 +890,10 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
             return;
         }
 
-        if (isNew()) {
+        if (mInteraction.isNew()) {
             doAction(ACTION_CREATE);
         } else {
-            if (!canEdit()) {
+            if (!mInteraction.canEdit(Application.getSession().getPersonId())) {
                 Application.showToast(R.string.action_no_permissions, Toast.LENGTH_LONG);
                 return;
             }
@@ -979,7 +902,7 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
     }
 
     private synchronized void deleteInteraction() {
-        if (!canDelete()) {
+        if (!mInteraction.canDelete(Application.getSession().getPersonId())) {
             Application.showToast(R.string.action_no_permissions, Toast.LENGTH_LONG);
             return;
         }
@@ -1075,20 +998,64 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
         return mActionTask != null;
     }
 
-    private boolean canDelete() {
-        if (isNew()) return false;
+    private static class SpinnerAdapter<T> extends ObjectArrayAdapter<T> {
 
-        return mInteraction.created_by_id == Application.getSession().getPersonId();
+        private HashMap<Integer, Drawable> mDrawableCache = new HashMap<Integer, Drawable>();
 
-    }
+        public SpinnerAdapter(Context context) {
+            super(context);
+        }
 
-    private boolean canEdit() {
-        if (isNew()) return false;
+        @Override
+        public void setContext(Context context) {
+            mDrawableCache.clear();
+            super.setContext(context);
+        }
 
-        if (Application.getSession().isAdmin()) return true;
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View view = convertView;
+            ViewHolder holder;
+            if (view == null) {
+                holder = new ViewHolder();
+                view = getLayoutInflater().inflate(R.layout.item_interaction_dialog_spinner, parent, false);
+                holder.text1 = (TextView) view.findViewById(android.R.id.text1);
+                holder.icon = (ImageView) view.findViewById(android.R.id.icon);
+                view.setTag(holder);
+            } else {
+                holder = (ViewHolder) view.getTag();
+            }
 
-        return mInteraction.created_by_id == Application.getSession().getPersonId();
+            Object object = getItem(position);
+            if (object instanceof InteractionType) {
+                holder.text1.setText(((InteractionType) object).getTranslatedName());
+                int iconId = ((InteractionType) object).getIconResource();
+                if (iconId != 0) {
+                    Drawable drawable = mDrawableCache.get(iconId);
+                    if (drawable == null) {
+                        drawable = getContext().getResources().getDrawable(iconId);
+                        mDrawableCache.put(iconId, drawable);
+                    }
+                    holder.icon.setImageDrawable(drawable);
+                    holder.icon.setVisibility(View.VISIBLE);
+                } else {
+                    holder.icon.setVisibility(View.GONE);
+                }
+            } else if (object instanceof InteractionVisibility) {
+                holder.text1.setText(object.toString());
+            }
+            return view;
+        }
 
+        @Override
+        public View getDropDownView(final int position, final View convertView, final ViewGroup parent) {
+            return getView(position, convertView, parent);
+        }
+
+        private static class ViewHolder {
+            TextView text1;
+            ImageView icon;
+        }
     }
 
 }

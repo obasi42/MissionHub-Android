@@ -43,6 +43,7 @@ import com.missionhub.model.PhoneNumber;
 import com.missionhub.model.TimestampedEntity;
 import com.missionhub.model.generic.FollowupStatus;
 import com.missionhub.model.generic.Gender;
+import com.missionhub.model.gson.GInteraction;
 import com.missionhub.ui.AnimatedNetworkImageView;
 import com.missionhub.ui.ObjectArrayAdapter;
 import com.missionhub.ui.ViewArrayPagerAdapter;
@@ -66,15 +67,13 @@ import org.holoeverywhere.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HostedProfileFragment extends HostedFragment implements TabBar.OnTabSelectedListener, AdapterView.OnItemClickListener {
+public class HostedProfileFragment extends HostedFragment implements TabBar.OnTabSelectedListener, AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
 
     public static final String TAG = HostedProfileFragment.class.getSimpleName();
-
+    private final ListMultimap<Integer, Object> mCachedObjects = ArrayListMultimap.create();
     private long mPersonId;
-
     private ParallaxListView mListView;
     private ProfileObjectAdapter mAdapter;
-
     private AnimatedNetworkImageView mAvatar;
     private ViewPager mPager;
     private CirclePageIndicator mIndicator;
@@ -82,13 +81,10 @@ public class HostedProfileFragment extends HostedFragment implements TabBar.OnTa
     private TabBar mTabBar;
     private int mSelectedPagerPage = 0;
     private int mSelectedTab = R.id.tab_info;
-    private final ListMultimap<Integer, Object> mCachedObjects = ArrayListMultimap.create();
-
     private SafeAsyncTask<List<Object>> mSelectTabTask;
     private SafeAsyncTask<Void> mUpdateTask;
     private long mLastUpdate;
     private MenuItem mRefeshMenuItem;
-
     private RequestQueue mVolley;
     private ImageLoader mProfileImageLoader;
 
@@ -164,6 +160,7 @@ public class HostedProfileFragment extends HostedFragment implements TabBar.OnTa
         mListView = (ParallaxListView) inflater.inflate(R.layout.fragment_profile);
         mListView.setDescendantFocusability(ListView.FOCUS_AFTER_DESCENDANTS);
         mListView.setOnItemClickListener(this);
+        mListView.setOnItemLongClickListener(this);
 
         View headerView = inflater.inflate(R.layout.fragment_profile_header, mListView, false);
         mAvatar = (AnimatedNetworkImageView) headerView.findViewById(R.id.avatar);
@@ -489,7 +486,7 @@ public class HostedProfileFragment extends HostedFragment implements TabBar.OnTa
         for (Interaction interaction : interactions) {
             interaction.invalidateViewCache();
             interaction.getViewCache();
-            items.add(new TimestampedEntityItem(interaction));
+            items.add(new InteractionItem(interaction));
         }
 
         if (items.isEmpty()) {
@@ -568,81 +565,94 @@ public class HostedProfileFragment extends HostedFragment implements TabBar.OnTa
         }
     }
 
-    private class HeaderPagerAdapter extends ViewArrayPagerAdapter {
-
-        private Context mContext;
-        private View mPageName;
-        private View mPageLabels;
-
-        private TextView mName;
-        private TextView mLabels;
-
-        public HeaderPagerAdapter(Context context) {
-            setContext(context);
+    @Override
+    public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+        Object item = adapterView.getItemAtPosition(i);
+        if (item instanceof InteractionItem) {
+            InteractionDialogFragment.showForResult(getChildFragmentManager(), ((Interaction) ((InteractionItem) item).entity).getId(), R.id.action_interaction);
+            return true;
         }
+        return false;
+    }
 
-        public void setContext(Context context) {
-            mContext = context;
-            rebuild();
-        }
+    public void updatePerson() {
+        if (mPersonId <= 0) return;
+        if (mUpdateTask != null) return;
 
-        public void rebuild() {
-            setNotifyOnChange(false);
-            clear();
+        mUpdateTask = new SafeAsyncTask<Void>() {
 
-            LayoutInflater inflater = LayoutInflater.from(mContext);
-            mPageName = inflater.inflate(R.layout.fragment_profile_header_page_name);
-            mName = (TextView) mPageName.findViewById(R.id.name);
-            mPageLabels = inflater.inflate(R.layout.fragment_profile_header_page_labels);
-            mLabels = (TextView) mPageLabels.findViewById(R.id.labels_text);
-            notifyPersonChanged();
+            public ApiRequest<Person> mApiRequest;
 
-            addView(mPageName);
-            addView(mPageLabels);
-            notifyDataSetChanged();
-        }
+            @Override
+            public Void call() throws Exception {
+                mApiRequest = Api.getPerson(mPersonId, ApiOptions.builder()
+                        .include(Api.Include.addresses)
+                        .include(Api.Include.phone_numbers)
+                        .include(Api.Include.email_addresses)
+                        .include(Api.Include.assigned_tos)
+                        .include(Api.Include.answer_sheets)
+                        .include(Api.Include.answers)
+                        .include(Api.Include.organizational_labels)
+                        .include(Api.Include.organizational_permission)
+                        .include(Api.Include.interactions)
+                        .build());
+                mApiRequest.get();
+                return null;
+            }
 
-        public void notifyPersonChanged() {
-            Person person = Application.getDb().getPersonDao().load(mPersonId);
+            @Override
+            protected void onSuccess(Void _) throws Exception {
+                mLastUpdate = System.currentTimeMillis();
+                clearObjectCache();
+                notifyPersonChanged();
+            }
 
-            if (person != null) {
-                mName.setText(person.getName());
-                mName.setVisibility(View.VISIBLE);
+            @Override
+            protected void onException(Exception e) throws RuntimeException {
+                ExceptionHelper ex = new ExceptionHelper(e);
+                ex.makeToast();
+            }
 
-                mLabels.setVisibility(View.VISIBLE);
-                person.resetLabels();
-                List<Long> labelList = person.getLables(Application.getSession().getOrganizationId());
-                List<String> labelNames = new ArrayList<String>();
-                for (long id : labelList) {
-                    Label label = Application.getDb().getLabelDao().load(id);
-                    if (label != null) {
-                        labelNames.add(label.getTranslatedName());
-                    }
+            @Override
+            protected void onFinally() throws RuntimeException {
+                if (mApiRequest != null) {
+                    mApiRequest.disconnect();
                 }
-                if (labelNames.isEmpty()) {
-                    mLabels.setText("No Labels");
-                } else {
-                    mLabels.setText(StringUtils.join(labelNames, "  •  "));
-                }
-                mLabels.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        BulkUpdateDialogFragment.showForResult(getChildFragmentManager(), BulkUpdateDialogFragment.TYPE_LABELS, mPersonId, R.id.action_label);
-                    }
-                });
-            } else {
-                mName.setVisibility(View.GONE);
-                mLabels.setVisibility(View.GONE);
+                mUpdateTask = null;
+                updateRefreshState();
+            }
+        };
+        updateRefreshState();
+        mUpdateTask.execute();
+    }
+
+    public void updateRefreshState() {
+        if (mUpdateTask != null || mSelectTabTask != null) {
+            if (getSupportActivity() != null) {
+                getSupportActivity().setProgressBarIndeterminateVisibility(true);
+            }
+            if (mRefeshMenuItem != null) {
+                mRefeshMenuItem.setEnabled(false);
+            }
+        } else {
+            if (getSupportActivity() != null) {
+                getSupportActivity().setProgressBarIndeterminateVisibility(false);
+            }
+            if (mRefeshMenuItem != null) {
+                mRefeshMenuItem.setEnabled(true);
             }
         }
     }
 
-    private class InfoGroup extends ObjectArrayAdapter.DisabledItem {
-        CharSequence mText1;
-
-        public InfoGroup(int resourceId) {
-            mText1 = ResourceUtils.getString(resourceId);
-        }
+    @Override
+    public void onDestroy() {
+        try {
+            mSelectTabTask.cancel(true);
+        } catch (Exception e) { /* ignore */ }
+        try {
+            mUpdateTask.cancel(true);
+        } catch (Exception e) { /* ignore */ }
+        super.onDestroy();
     }
 
     private static class InfoItem implements Runnable, ObjectArrayAdapter.SupportEnable {
@@ -743,6 +753,24 @@ public class HostedProfileFragment extends HostedFragment implements TabBar.OnTa
         }
     }
 
+    private static class InteractionItem extends TimestampedEntityItem {
+
+        private Boolean enabled;
+
+        public InteractionItem(Interaction interaction) {
+            super(interaction);
+        }
+
+        @Override
+        public boolean isEnabled() {
+            if (enabled == null) {
+                GInteraction interaction = GInteraction.from((Interaction) entity);
+                enabled = interaction.canEdit(Application.getSession().getPersonId()) || interaction.canDelete(Application.getSession().getPersonId());
+            }
+            return enabled;
+        }
+    }
+
     private static class EmptyItem extends TimestampedEntityItem {
 
         public EmptyItem() {
@@ -763,57 +791,6 @@ public class HostedProfileFragment extends HostedFragment implements TabBar.OnTa
         public String getCreated_at() {
             return null;
         }
-    }
-
-    public void updatePerson() {
-        if (mPersonId <= 0) return;
-        if (mUpdateTask != null) return;
-
-        mUpdateTask = new SafeAsyncTask<Void>() {
-
-            public ApiRequest<Person> mApiRequest;
-
-            @Override
-            public Void call() throws Exception {
-                mApiRequest = Api.getPerson(mPersonId, ApiOptions.builder()
-                        .include(Api.Include.addresses)
-                        .include(Api.Include.phone_numbers)
-                        .include(Api.Include.email_addresses)
-                        .include(Api.Include.assigned_tos)
-                        .include(Api.Include.answer_sheets)
-                        .include(Api.Include.answers)
-                        .include(Api.Include.organizational_labels)
-                        .include(Api.Include.organizational_permission)
-                        .include(Api.Include.interactions)
-                        .build());
-                mApiRequest.get();
-                return null;
-            }
-
-            @Override
-            protected void onSuccess(Void _) throws Exception {
-                mLastUpdate = System.currentTimeMillis();
-                clearObjectCache();
-                notifyPersonChanged();
-            }
-
-            @Override
-            protected void onException(Exception e) throws RuntimeException {
-                ExceptionHelper ex = new ExceptionHelper(e);
-                ex.makeToast();
-            }
-
-            @Override
-            protected void onFinally() throws RuntimeException {
-                if (mApiRequest != null) {
-                    mApiRequest.disconnect();
-                }
-                mUpdateTask = null;
-                updateRefreshState();
-            }
-        };
-        updateRefreshState();
-        mUpdateTask.execute();
     }
 
     public static class ProfileObjectAdapter extends ObjectArrayAdapter<Object> {
@@ -972,32 +949,79 @@ public class HostedProfileFragment extends HostedFragment implements TabBar.OnTa
         }
     }
 
-    public void updateRefreshState() {
-        if (mUpdateTask != null || mSelectTabTask != null) {
-            if (getSupportActivity() != null) {
-                getSupportActivity().setProgressBarIndeterminateVisibility(true);
-            }
-            if (mRefeshMenuItem != null) {
-                mRefeshMenuItem.setEnabled(false);
-            }
-        } else {
-            if (getSupportActivity() != null) {
-                getSupportActivity().setProgressBarIndeterminateVisibility(false);
-            }
-            if (mRefeshMenuItem != null) {
-                mRefeshMenuItem.setEnabled(true);
+    private class HeaderPagerAdapter extends ViewArrayPagerAdapter {
+
+        private Context mContext;
+        private View mPageName;
+        private View mPageLabels;
+        private TextView mName;
+        private TextView mLabels;
+
+        public HeaderPagerAdapter(Context context) {
+            setContext(context);
+        }
+
+        public void setContext(Context context) {
+            mContext = context;
+            rebuild();
+        }
+
+        public void rebuild() {
+            setNotifyOnChange(false);
+            clear();
+
+            LayoutInflater inflater = LayoutInflater.from(mContext);
+            mPageName = inflater.inflate(R.layout.fragment_profile_header_page_name);
+            mName = (TextView) mPageName.findViewById(R.id.name);
+            mPageLabels = inflater.inflate(R.layout.fragment_profile_header_page_labels);
+            mLabels = (TextView) mPageLabels.findViewById(R.id.labels_text);
+            notifyPersonChanged();
+
+            addView(mPageName);
+            addView(mPageLabels);
+            notifyDataSetChanged();
+        }
+
+        public void notifyPersonChanged() {
+            Person person = Application.getDb().getPersonDao().load(mPersonId);
+
+            if (person != null) {
+                mName.setText(person.getName());
+                mName.setVisibility(View.VISIBLE);
+
+                mLabels.setVisibility(View.VISIBLE);
+                person.resetLabels();
+                List<Long> labelList = person.getLables(Application.getSession().getOrganizationId());
+                List<String> labelNames = new ArrayList<String>();
+                for (long id : labelList) {
+                    Label label = Application.getDb().getLabelDao().load(id);
+                    if (label != null) {
+                        labelNames.add(label.getTranslatedName());
+                    }
+                }
+                if (labelNames.isEmpty()) {
+                    mLabels.setText("No Labels");
+                } else {
+                    mLabels.setText(StringUtils.join(labelNames, "  •  "));
+                }
+                mLabels.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        BulkUpdateDialogFragment.showForResult(getChildFragmentManager(), BulkUpdateDialogFragment.TYPE_LABELS, mPersonId, R.id.action_label);
+                    }
+                });
+            } else {
+                mName.setVisibility(View.GONE);
+                mLabels.setVisibility(View.GONE);
             }
         }
     }
 
-    @Override
-    public void onDestroy() {
-        try {
-            mSelectTabTask.cancel(true);
-        } catch (Exception e) { /* ignore */ }
-        try {
-            mUpdateTask.cancel(true);
-        } catch (Exception e) { /* ignore */ }
-        super.onDestroy();
+    private class InfoGroup extends ObjectArrayAdapter.DisabledItem {
+        CharSequence mText1;
+
+        public InfoGroup(int resourceId) {
+            mText1 = ResourceUtils.getString(resourceId);
+        }
     }
 }
