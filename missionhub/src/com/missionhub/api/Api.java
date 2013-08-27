@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.github.kevinsawicki.http.HttpRequest;
 import com.google.gson.Gson;
+import com.missionhub.BuildConfig;
 import com.missionhub.application.Application;
 import com.missionhub.application.Configuration;
 import com.missionhub.model.ContactAssignment;
@@ -648,7 +649,7 @@ public class Api {
     }
 
     private void logRequest(String url, String method, Map<String, String> headers, Map<String, String> params) {
-        if (Configuration.getEnvironment() == Configuration.Environment.DEVELOPMENT) {
+        if (BuildConfig.ENVIRONMENT == BuildConfig.Environment.DEVELOPMENT) {
             Log.i(TAG, method + " " + url);
             if (headers != null) {
                 Log.d(TAG, "==== headers ====");

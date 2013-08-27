@@ -4,9 +4,6 @@ ENVIRONMENT=development
 # facebook token of the user to login as, requires development environment
 LOGIN_AS=
 
-# the market the application is deployed to. values: play|amazon|nook
-MARKET=play
-
 # missionhub api
 API_URL=https://www.missionhub.com/apis
 API_VERSION=v3

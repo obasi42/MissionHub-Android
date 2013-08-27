@@ -13,6 +13,7 @@ import com.facebook.Response;
 import com.facebook.Session.StatusCallback;
 import com.facebook.SessionLoginBehavior;
 import com.facebook.model.GraphUser;
+import com.missionhub.BuildConfig;
 import com.missionhub.R;
 import com.missionhub.api.Api;
 import com.missionhub.api.Api.Include;
@@ -155,7 +156,7 @@ public class Session implements OnAccountsUpdateListener {
                 setAndPostState(SessionState.OPENING);
 
                 // allow logging in with a hardcoded token
-                if (Configuration.getEnvironment() == Configuration.Environment.DEVELOPMENT && StringUtils.isNotEmpty(Configuration.getLoginAs())) {
+                if (BuildConfig.ENVIRONMENT == BuildConfig.Environment.DEVELOPMENT && StringUtils.isNotEmpty(Configuration.getLoginAs())) {
                     try {
                         Person person = Api.getPersonMe(Configuration.getLoginAs(), ApiOptions.builder().include(Include.user).build()).get();
                         addSystemAccount(person, Configuration.getLoginAs());

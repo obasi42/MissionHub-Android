@@ -69,26 +69,8 @@ public class Configuration {
         return Configuration.getInstance().sProperties.getProperty("FACEBOOK_APP_ID", "");
     }
 
-    public static enum Environment {
-        DEVELOPMENT, TEST, PRODUCTION
-    }
-
-    public static Environment getEnvironment() {
-        final String env = Configuration.getInstance().sProperties.getProperty("ENVIRONMENT", Environment.PRODUCTION.name());
-        return Environment.valueOf(env.toUpperCase(Locale.US));
-    }
-
     public static String getLoginAs() {
         return Configuration.getInstance().sProperties.getProperty("LOGIN_AS", null);
-    }
-
-    public static enum Market {
-        PLAY, AMAZON, NOOK
-    }
-
-    public static Market getMarket() {
-        final String market = Configuration.getInstance().sProperties.getProperty("MARKET", Market.PLAY.name());
-        return Market.valueOf(market.toUpperCase(Locale.US));
     }
 
     public static String getApiUrl() {

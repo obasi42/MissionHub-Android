@@ -30,6 +30,9 @@ android {
         versionName getVersionName()
         minSdkVersion 8
         targetSdkVersion 18
+
+        buildConfig "public static enum Market { PLAY, AMAZON, BN };" , \
+                    "public static enum Environment { DEVELOPMENT, STAGING, PRODUCTION };"
     }
 
     sourceSets {
@@ -43,23 +46,30 @@ android {
 
     signingConfigs { release }
 
+    productFlavors {
+        google {
+            buildConfig "public final static Market MARKET = Market.PLAY;"
+        }
+        amazon {
+            buildConfig "private final static Market MARKET = Market.AMAZON;"
+        }
+        bn {
+            buildConfig "private final static Market MARKET = MARKET.BN;"
+        }
+    }
+
     buildTypes {
         release {
             runProguard true
             proguardFile 'proguard.txt'
             signingConfig signingConfigs.release
+            buildConfig "public final static Environment ENVIRONMENT = Environment.PRODUCTION;"
         }
-    }
-
-    productFlavors {
-        google {
-
+        staging {
+            buildConfig "public final static Environment ENVIRONMENT = Environment.STAGING;"
         }
-        amazon {
-
-        }
-        barnesAndNoble {
-
+        debug {
+            buildConfig "public final static Environment ENVIRONMENT = Environment.DEVELOPMENT;;"
         }
     }
 }

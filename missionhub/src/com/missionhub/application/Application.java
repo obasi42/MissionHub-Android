@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.google.analytics.tracking.android.GoogleAnalytics;
 import com.google.analytics.tracking.android.Tracker;
+import com.missionhub.BuildConfig;
 import com.missionhub.R;
 import com.missionhub.event.ToastEvent;
 import com.missionhub.model.DaoMaster;
@@ -101,7 +102,7 @@ public class Application extends org.holoeverywhere.app.Application {
                 for (Map.Entry<String, String> property : Configuration.getInstance().asMap().entrySet()) {
                     ACRA.getErrorReporter().putCustomData("CONFIGURATION_" + property.getKey(), property.getValue());
                 }
-                ErrbitReportSender.putErrbitData(ErrbitReportSender.ErrbitReportField.ENVIRONMENT_NAME, Configuration.getEnvironment().name());
+                ErrbitReportSender.putErrbitData(ErrbitReportSender.ErrbitReportField.ENVIRONMENT_NAME, BuildConfig.ENVIRONMENT.name());
             } catch (ACRAConfigurationException e) {
                 Log.e("MissionHub", e.getMessage(), e);
             }
