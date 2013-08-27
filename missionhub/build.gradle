@@ -34,7 +34,7 @@ android {
         targetSdkVersion 18
 
         buildConfig "public static enum Market { PLAY, AMAZON, BN };" , \
-                    "public static enum Environment { DEVELOPMENT, STAGING, PRODUCTION };"
+                    "public static enum Environment { DEVELOPMENT, PRODUCTION };"
     }
 
     sourceSets {
@@ -67,13 +67,6 @@ android {
             proguardFile 'proguard.txt'
             signingConfig signingConfigs.release
             buildConfig "public final static Environment ENVIRONMENT = Environment.PRODUCTION;"
-        }
-        staging {
-            runProguard true
-            proguardFile getDefaultProguardFile('proguard-android.txt')
-            proguardFile 'proguard.txt'
-            signingConfig signingConfigs.release
-            buildConfig "public final static Environment ENVIRONMENT = Environment.STAGING;"
         }
         debug {
             buildConfig "public final static Environment ENVIRONMENT = Environment.DEVELOPMENT;"
