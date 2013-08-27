@@ -1,0 +1,75 @@
+apply plugin: 'android'
+
+dependencies {
+    compile 'com.android.support:support-v4:18.0.+'
+    compile 'com.actionbarsherlock:actionbarsherlock:4.4.0@aar'
+    compile 'org.holoeverywhere:holoeverywhere:1.6.8@aar'
+    compile 'org.holoeverywhere:addon-preferences:1.6.8@aar'
+    compile "com.viewpagerindicator:viewpagerindicator:2.4.1@aar"
+    compile "com.facebook.android:facebook:3.5@aar"
+    compile 'com.google.android.analytics:analytics:3'
+    compile 'com.google.code.gson:gson:2.2.4'
+    compile 'com.google.guava:guava:14.0.1'
+    compile 'greenrobot:greendao:1.3.0-MH'
+    compile 'de.greenrobot:eventbus:2.0.2'
+    compile 'ch.acra:acra-mh:5.0.0-SNAPSHOT'
+    compile 'com.github.kevinsawicki:http-request:5.4.1'
+    compile 'org.apache.commons:commons-lang3:3.1'
+    compile 'com.googlecode.libphonenumber:libphonenumber:5.7'
+    compile 'com.github.chrisbanes.actionbarpulltorefresh:extra-abs:0.7.+'
+    compile 'joda-time:joda-time:2.2'
+    compile 'com.android.volley:volley:1.0'
+}
+
+android {
+    compileSdkVersion 18
+    buildToolsVersion '18.0.1'
+
+    defaultConfig {
+        versionCode getVersionCode()
+        versionName getVersionName()
+        minSdkVersion 8
+        targetSdkVersion 18
+    }
+
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+            java.srcDirs = ['src']
+            res.srcDirs = ['res']
+            assets.srcDirs = ['assets']
+        }
+    }
+
+    signingConfigs { release }
+
+    buildTypes {
+        release {
+            runProguard true
+            proguardFile 'proguard.txt'
+            signingConfig signingConfigs.release
+        }
+    }
+
+    productFlavors {
+        google {
+
+        }
+        amazon {
+
+        }
+        barnesAndNoble {
+
+        }
+    }
+}
+
+// Dynamic Signing
+if (project.hasProperty("signingStoreFile") && project.hasProperty("signingStorePassword") && project.hasProperty("signingKeyAlias") && project.hasProperty("signingKeyPassword")) {
+    android.signingConfigs.release.storeFile = project.signingStoreFile
+    android.signingConfigs.release.storePassword = project.signingStorePassword
+    android.signingConfigs.release.keyAlias = project.signingKeyAlias
+    android.signingConfigs.release.keyPassword = project.signingKeyPassword
+} else {
+    android.buildTypes.release.signingConfig = null
+}
