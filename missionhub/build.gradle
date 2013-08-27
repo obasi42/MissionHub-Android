@@ -83,7 +83,7 @@ android {
 
 // Dynamic Signing
 if (project.hasProperty("signingStoreFile") && project.hasProperty("signingStorePassword") && project.hasProperty("signingKeyAlias") && project.hasProperty("signingKeyPassword")) {
-    android.signingConfigs.release.storeFile = project.signingStoreFile
+    android.signingConfigs.release.storeFile = file(project.signingStoreFile)
     android.signingConfigs.release.storePassword = project.signingStorePassword
     android.signingConfigs.release.keyAlias = project.signingKeyAlias
     android.signingConfigs.release.keyPassword = project.signingKeyPassword
