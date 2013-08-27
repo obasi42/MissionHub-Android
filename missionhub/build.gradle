@@ -56,7 +56,7 @@ android {
             buildConfig "private final static Market MARKET = Market.AMAZON;"
         }
         bn {
-            buildConfig "private final static Market MARKET = MARKET.BN;"
+            buildConfig "private final static Market MARKET = Market.BN;"
         }
     }
 
