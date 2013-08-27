@@ -81,5 +81,6 @@ if (project.hasProperty("signingStoreFile") && project.hasProperty("signingStore
     android.signingConfigs.release.keyAlias = project.signingKeyAlias
     android.signingConfigs.release.keyPassword = project.signingKeyPassword
 } else {
+    logger.warn("WARNING: Invalid release signingConfig properties, signing with debug key.")
     android.buildTypes.release.signingConfig = android.buildTypes.debug.signingConfig
 }
