@@ -19,6 +19,8 @@ dependencies {
     compile 'com.github.chrisbanes.actionbarpulltorefresh:extra-abs:0.7.+'
     compile 'joda-time:joda-time:2.2'
     compile 'com.android.volley:volley:1.0'
+    compile 'com.google.code.findbugs:jsr305:2.0.1'
+    compile 'javax.inject:javax.inject:1'
 }
 
 android {
@@ -61,15 +63,20 @@ android {
     buildTypes {
         release {
             runProguard true
+            proguardFile getDefaultProguardFile('proguard-android.txt')
             proguardFile 'proguard.txt'
             signingConfig signingConfigs.release
             buildConfig "public final static Environment ENVIRONMENT = Environment.PRODUCTION;"
         }
         staging {
+            runProguard true
+            proguardFile getDefaultProguardFile('proguard-android.txt')
+            proguardFile 'proguard.txt'
+            signingConfig signingConfigs.release
             buildConfig "public final static Environment ENVIRONMENT = Environment.STAGING;"
         }
         debug {
-            buildConfig "public final static Environment ENVIRONMENT = Environment.DEVELOPMENT;;"
+            buildConfig "public final static Environment ENVIRONMENT = Environment.DEVELOPMENT;"
         }
     }
 }
@@ -81,5 +88,5 @@ if (project.hasProperty("signingStoreFile") && project.hasProperty("signingStore
     android.signingConfigs.release.keyAlias = project.signingKeyAlias
     android.signingConfigs.release.keyPassword = project.signingKeyPassword
 } else {
-    android.buildTypes.release.signingConfig = null
+    android.buildTypes.release.signingConfig = android.buildTypes.debug.signingConfig
 }

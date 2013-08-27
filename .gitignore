@@ -3,6 +3,7 @@
 *.iml
 *.ipr
 *.iws
+/classes
 
 #Other
 .DS_Store
