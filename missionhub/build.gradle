@@ -28,8 +28,6 @@ android {
     buildToolsVersion '18.0.1'
 
     defaultConfig {
-        versionCode getVersionCode()
-        versionName getVersionName()
         minSdkVersion 8
         targetSdkVersion 18
 
@@ -84,3 +82,7 @@ if (project.hasProperty("signingStoreFile") && project.hasProperty("signingStore
     logger.warn("WARNING: Invalid release signingConfig properties, signing with debug key.")
     android.buildTypes.release.signingConfig = android.buildTypes.debug.signingConfig
 }
+
+// Dynamic Versioning
+android.defaultConfig.versionCode = versionCode
+android.defaultConfig.versionName = versionName

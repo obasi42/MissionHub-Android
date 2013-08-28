@@ -8,13 +8,27 @@ buildscript {
     }
 }
 
-def getJenkinsBuildNumber() {
-    return System.getenv("BUILD_NUMBER")
+version = "2.7"
+group = "com.missionhub"
+
+allprojects {
+
+    ext {
+        buildNumber = getBuildNumber()
+        versionCode = getVersionCode()
+        versionName = getVersionName()
+        isSnapshotBuild = isSnapshotBuild()
+    }
+
+    repositories {
+        maven { url 'http://nexus.cr-wd.com/content/repositories/releases/' }
+        maven { url 'http://nexus.cr-wd.com/content/repositories/snapshots/' }
+        mavenCentral()
+    }
+
 }
 
-def isReleaseBuild() {
-    return version.contains("SNAPSHOT") == false
-}
+apply plugin: 'android-reporting'
 
 def getVersionName() {
     if (getVersionCode() == -1) {
@@ -25,21 +39,37 @@ def getVersionName() {
 }
 
 def getVersionCode() {
-    if (getJenkinsBuildNumber() != null && !("".equals(getJenkinsBuildNumber()))) {
-        return getJenkinsBuildNumber();
+    if (getBuildNumber() >= 1) {
+        return getBuildNumber();
     }
     return -1;
 }
 
-allprojects {
-    version = "2.8-SNAPSHOT"
-    group = "com.missionhub"
-
-    repositories {
-        maven { url 'http://nexus.cr-wd.com/content/repositories/releases/' }
-        maven { url 'http://nexus.cr-wd.com/content/repositories/snapshots/' }
-        mavenCentral()
+def getBuildNumber() {
+    def number = System.getenv("BUILD_NUMBER");
+    if (number != null && !("".equals(number))) {
+        return Integer.parseInt(number)
     }
+    return getNextBuildNumber()
 }
 
-apply plugin: 'android-reporting'
+def getNextBuildNumber() {
+    try {
+        def jobXml = (new XmlParser()).parse("http://mh.cr-wd.com/ci/job/MissionHub%20Android/api/xml");
+        return Integer.parseInt(jobXml.nextBuildNumber.text());
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return -1;
+}
+
+def isSnapshotBuild() {
+    return version.contains("SNAPSHOT") == true;
+}
+
+// debug vars
+println "VERSION: " + version
+println "BUILD: " + buildNumber
+println "VERSION CODE: " + versionCode
+println "VERSION NAME: " + versionName
+println "IS SNAPSHOT: " + isSnapshotBuild
