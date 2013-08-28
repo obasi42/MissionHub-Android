@@ -1,0 +1,8 @@
+# Android Stuff
+/bin
+/build
+/target
+lint.xml
+
+# MissionHub Stuff
+/assets/missionhub.properties

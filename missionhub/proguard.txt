@@ -1,0 +1,68 @@
+###############################
+## MISSIONHUB PROGUARD RULES ##
+###############################
+
+-dontobfuscate
+
+# Keep all of MH. It wouldn't be there if it wasn't needed :)
+-keep class com.missionhub.** { *; }
+-keep interface com.missionhub.** { *; }
+
+# HoloEverywhere
+-keep,allowoptimization class org.holoeverywhere.** {
+    public *;
+    protected *;
+}
+-keep,allowoptimization interface org.holoeverywhere.** { *; }
+
+# Actionbarsherlock
+-keep class android.support.v4.app.** { *; }
+-keep interface android.support.v4.app.** { *; }
+-keep class com.actionbarsherlock.** { *; }
+-keep interface com.actionbarsherlock.** { *; }
+
+# Guava
+-keepattributes Signature,RuntimeVisibleAnnotations,AnnotationDefault
+-dontwarn sun.misc.Unsafe
+-dontwarn com.google.common.collect.MinMaxPriorityQueue
+-dontwarn com.google.common.util.concurrent.ServiceManager
+
+# Joda-Time
+-dontwarn org.joda.convert.FromString
+-dontwarn org.joda.convert.ToString
+
+# EventBus
+-keepclassmembers class ** {
+    public void onEvent*(**);
+}
+
+# Facebook
+-keep class com.facebook.** {
+    *;
+}
+
+#ACRA specifics
+-keepattributes Exceptions,InnerClasses,SourceFile,LineNumberTable,SourceDir,EnclosingMethod
+-keepattributes *Annotation*
+-keep class org.acra.ACRA {
+	*;
+}
+-keep class org.acra.ReportingInteractionMode {
+    *;
+}
+-keepnames class org.acra.sender.HttpSender$** {
+    *;
+}
+-keepnames class org.acra.ReportField {
+    *;
+}
+-keep public class org.acra.ErrorReporter
+{
+    public void addCustomData(java.lang.String,java.lang.String);
+    public void putCustomData(java.lang.String,java.lang.String);
+    public void removeCustomData(java.lang.String);
+}
+-keep public class org.acra.ErrorReporter
+{
+    public void handleSilentException(java.lang.Throwable);
+}

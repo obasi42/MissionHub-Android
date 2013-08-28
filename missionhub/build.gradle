@@ -1,0 +1,88 @@
+apply plugin: 'android'
+
+dependencies {
+    compile 'com.android.support:support-v4:18.0.+'
+    compile 'com.actionbarsherlock:actionbarsherlock:4.4.0@aar'
+    compile 'org.holoeverywhere:holoeverywhere:1.6.8@aar'
+    compile 'org.holoeverywhere:addon-preferences:1.6.8@aar'
+    compile "com.viewpagerindicator:viewpagerindicator:2.4.1@aar"
+    compile "com.facebook.android:facebook:3.5@aar"
+    compile 'com.google.android.analytics:analytics:3'
+    compile 'com.google.code.gson:gson:2.2.4'
+    compile 'com.google.guava:guava:14.0.1'
+    compile 'greenrobot:greendao:1.3.0-MH'
+    compile 'de.greenrobot:eventbus:2.0.2'
+    compile 'ch.acra:acra-mh:5.0.0-SNAPSHOT'
+    compile 'com.github.kevinsawicki:http-request:5.4.1'
+    compile 'org.apache.commons:commons-lang3:3.1'
+    compile 'com.googlecode.libphonenumber:libphonenumber:5.7'
+    compile 'com.github.chrisbanes.actionbarpulltorefresh:extra-abs:0.7.+'
+    compile 'joda-time:joda-time:2.2'
+    compile 'com.android.volley:volley:1.0'
+    compile 'com.google.code.findbugs:jsr305:2.0.1'
+    compile 'javax.inject:javax.inject:1'
+}
+
+android {
+    compileSdkVersion 18
+    buildToolsVersion '18.0.1'
+
+    defaultConfig {
+        minSdkVersion 8
+        targetSdkVersion 18
+
+        buildConfig "public static enum Market { PLAY, AMAZON, BN };" , \
+                    "public static enum Environment { DEVELOPMENT, PRODUCTION };"
+    }
+
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+            java.srcDirs = ['src']
+            res.srcDirs = ['res']
+            assets.srcDirs = ['assets']
+        }
+    }
+
+    signingConfigs { release }
+
+    productFlavors {
+        google {
+            buildConfig "public final static Market MARKET = Market.PLAY;"
+        }
+        amazon {
+            buildConfig "private final static Market MARKET = Market.AMAZON;"
+        }
+        bn {
+            buildConfig "private final static Market MARKET = Market.BN;"
+        }
+    }
+
+    buildTypes {
+        release {
+            runProguard true
+            proguardFile getDefaultProguardFile('proguard-android.txt')
+            proguardFile 'proguard.txt'
+            signingConfig signingConfigs.release
+            buildConfig "public final static Environment ENVIRONMENT = Environment.PRODUCTION;"
+        }
+        debug {
+            buildConfig "public final static Environment ENVIRONMENT = Environment.DEVELOPMENT;"
+        }
+    }
+}
+
+// Dynamic Signing
+if (project.hasProperty("signingStoreFile") && project.hasProperty("signingStorePassword") && project.hasProperty("signingKeyAlias") && project.hasProperty("signingKeyPassword")) {
+    android.signingConfigs.release.storeFile = file(project.signingStoreFile)
+    android.signingConfigs.release.storePassword = project.signingStorePassword
+    android.signingConfigs.release.keyAlias = project.signingKeyAlias
+    android.signingConfigs.release.keyPassword = project.signingKeyPassword
+} else {
+    logger.warn("WARNING: Invalid release signingConfig properties, signing with debug key.")
+    android.buildTypes.release.signingConfig = android.buildTypes.debug.signingConfig
+}
+
+// Dynamic Versioning
+android.defaultConfig.versionCode = versionCode
+android.defaultConfig.versionName = versionName
