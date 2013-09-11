@@ -113,13 +113,13 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
         String search = options.getFilterValue("name_or_email_like");
 
         if (item instanceof Person) {
-            options.toggleSingle("assigned_to", ((Person) item).getId());
+            options.toggle("assigned_to", ((Person) item).getId());
         } else if (item instanceof Label) {
-            options.toggleSingle("labels", ((Label) item).getId());
+            options.toggle("labels", ((Label) item).getId());
         } else if (item instanceof Permission) {
-            options.toggleSingle("permissions", ((Permission) item).getId());
+            options.toggle("permissions", ((Permission) item).getId());
         } else if (item instanceof InteractionType) {
-            options.toggleSingle("interactions", ((InteractionType) item).getId());
+            options.toggle("interactions", ((InteractionType) item).getId());
         } else {
             return;
         }

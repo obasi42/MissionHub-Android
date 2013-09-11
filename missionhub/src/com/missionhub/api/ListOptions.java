@@ -221,14 +221,6 @@ public class ListOptions implements Serializable {
         }
     }
 
-    public void toggleSingle(final String filter, final Object newValue) {
-        String oldValue = getFilterValue(filter);
-        clearFilters();
-        if (oldValue == null || !oldValue.equals(String.valueOf(newValue))) {
-            setFilter(filter, newValue);
-        }
-    }
-
     public Map<String, Direction> getOrders() {
         return mOrderBy;
     }
