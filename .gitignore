@@ -8,4 +8,5 @@
 #Other
 .DS_Store
 tmp
-atlassian-ide-plugin.xml
+/local.properties
+/atlassian-ide-plugin.xml

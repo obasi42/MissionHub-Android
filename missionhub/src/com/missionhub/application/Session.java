@@ -49,10 +49,6 @@ public class Session implements OnAccountsUpdateListener {
      */
     public static final String TAG = Session.class.getSimpleName();
     /**
-     * the singleton instance of the session
-     */
-    private static Session sSession;
-    /**
      * the person id
      */
     private long mPersonId = -1;
