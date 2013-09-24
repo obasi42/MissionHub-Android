@@ -1,3 +1,5 @@
+apply plugin: 'versions'
+
 buildscript {
     repositories {
         mavenCentral()
@@ -5,10 +7,11 @@ buildscript {
 
     dependencies {
         classpath 'com.android.tools.build:gradle:0.5.+'
+        classpath 'com.github.ben-manes:gradle-versions-plugin:0.4'
     }
 }
 
-version = "2.7"
+version = "2.8"
 group = "com.missionhub"
 
 allprojects {

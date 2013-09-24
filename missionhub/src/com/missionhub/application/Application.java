@@ -49,17 +49,17 @@ public class Application extends org.holoeverywhere.app.Application {
     /**
      * the executor service
      */
-    private static ExecutorService sExecutorService;
+    private final ExecutorService mExecutorService = Executors.newFixedThreadPool(25);
 
     /**
      * application context's sqlite database
      */
-    private static SQLiteDatabase mDb;
+    private SQLiteDatabase mDb;
 
     /**
      * application context's database cache mSession
      */
-    private static DaoSession mDaoSession;
+    private DaoSession mDaoSession;
 
     /**
      * database name
@@ -69,7 +69,7 @@ public class Application extends org.holoeverywhere.app.Application {
     /**
      * the missionhub session
      */
-    private static final Session mSession = new Session();
+    private final Session mSession = new Session();
 
     /**
      * Initialize the static context
@@ -150,12 +150,7 @@ public class Application extends org.holoeverywhere.app.Application {
      * @return
      */
     public static ExecutorService getExecutor() {
-        if (sExecutorService == null) {
-            synchronized (Application.class) {
-                sExecutorService = Executors.newFixedThreadPool(25);
-            }
-        }
-        return sExecutorService;
+        return getInstance().mExecutorService;
     }
 
     /**
@@ -181,13 +176,13 @@ public class Application extends org.holoeverywhere.app.Application {
      * @return the raw sqlite database for the application context
      */
     public static SQLiteDatabase getRawDb() {
-        if (mDb == null) {
+        if (getInstance().mDb == null) {
             final OpenHelper helper = new MissionHubOpenHelper(getContext(), DB_NAME, null);
             synchronized (Application.class) {
-                mDb = helper.getWritableDatabase();
+                getInstance().mDb = helper.getWritableDatabase();
             }
         }
-        return mDb;
+        return getInstance().mDb;
     }
 
     /**
@@ -195,10 +190,10 @@ public class Application extends org.holoeverywhere.app.Application {
      */
     public static void closeDb() {
         synchronized (Application.class) {
-            mDaoSession = null;
-            if (mDb != null) {
-                mDb.close();
-                mDb = null;
+            getInstance().mDaoSession = null;
+            if (getInstance().mDb != null) {
+                getInstance().mDb.close();
+                getInstance().mDb = null;
             }
         }
     }
@@ -207,13 +202,13 @@ public class Application extends org.holoeverywhere.app.Application {
      * @return the database database session for the application context
      */
     public static DaoSession getDb() {
-        if (mDaoSession == null) {
+        if (getInstance().mDaoSession == null) {
             final DaoMaster daoMaster = new DaoMaster(getRawDb());
             synchronized (Application.class) {
-                mDaoSession = daoMaster.newSession();
+                getInstance().mDaoSession = daoMaster.newSession();
             }
         }
-        return mDaoSession;
+        return getInstance().mDaoSession;
     }
 
     /**
@@ -351,6 +346,6 @@ public class Application extends org.holoeverywhere.app.Application {
     }
 
     public static Session getSession() {
-        return mSession;
+        return getInstance().mSession;
     }
 }
