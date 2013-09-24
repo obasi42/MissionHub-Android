@@ -16,7 +16,7 @@ dependencies {
     compile 'com.github.kevinsawicki:http-request:5.4.1'
     compile 'org.apache.commons:commons-lang3:3.1'
     compile 'com.googlecode.libphonenumber:libphonenumber:5.8'
-    compile 'com.github.chrisbanes.actionbarpulltorefresh:extra-abs:0.7.+'
+    compile 'com.github.chrisbanes.actionbarpulltorefresh:extra-abs:0.8+'
     compile 'joda-time:joda-time:2.3'
     compile 'com.android.volley:volley:1.0'
     compile 'com.google.code.findbugs:jsr305:2.0.1'
