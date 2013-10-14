@@ -143,6 +143,7 @@ public class HostActivity extends BaseAuthenticatedActivity implements FragmentM
     public void onSessionClosed() {
         Intent intent = new Intent(this, AuthenticatorActivity.class);
         startActivity(intent);
+        finish();
     }
 
     public boolean isAtRoot() {

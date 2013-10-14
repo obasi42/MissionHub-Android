@@ -14,7 +14,21 @@ public abstract class BaseAuthenticatedActivity extends BaseActivity {
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (!Application.getSession().isOpen()) {
+            onSessionClosed();
+        }
+
         Application.registerEventSubscriber(this, SessionEvent.class);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (!Application.getSession().isOpen()) {
+            onSessionClosed();
+        }
     }
 
     @Override
