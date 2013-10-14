@@ -412,7 +412,7 @@ public class Session implements OnAccountsUpdateListener {
      * @return
      */
     public String getAccessToken() throws AuthenticatorException, OperationCanceledException, IOException {
-        return mAccountManager.blockingGetAuthToken(mAccount, Authenticator.ACCOUNT_TYPE, true);
+        return getAccountManager().blockingGetAuthToken(mAccount, Authenticator.ACCOUNT_TYPE, true);
     }
 
     /**
@@ -452,9 +452,9 @@ public class Session implements OnAccountsUpdateListener {
                 }
 
                 // update the account with new data to keep it fresh
-                mAccountManager.setUserData(mAccount, Authenticator.KEY_PERSON_ID, String.valueOf(getPerson().getId()));
-                mAccountManager.setUserData(mAccount, Authenticator.KEY_FACEBOOK_ID, String.valueOf(getPerson().getFb_uid()));
-                mAccountManager.setUserData(mAccount, AccountManager.KEY_ACCOUNT_NAME, getPerson().getName());
+                getAccountManager().setUserData(mAccount, Authenticator.KEY_PERSON_ID, String.valueOf(getPerson().getId()));
+                getAccountManager().setUserData(mAccount, Authenticator.KEY_FACEBOOK_ID, String.valueOf(getPerson().getFb_uid()));
+                getAccountManager().setUserData(mAccount, AccountManager.KEY_ACCOUNT_NAME, getPerson().getName());
 
                 return getPerson();
             }
@@ -629,7 +629,7 @@ public class Session implements OnAccountsUpdateListener {
     public void deleteAccount() {
         if (mAccount != null) {
             try {
-                mAccountManager.removeAccount(mAccount, null, null).getResult();
+                getAccountManager().removeAccount(mAccount, null, null).getResult();
                 SettingsManager.setSessionLastPersonId(-1);
                 close();
             } catch (final Exception e) {

@@ -327,6 +327,11 @@ public class Application extends org.holoeverywhere.app.Application {
         if (getTracker() != null) {
             getTracker().sendException(thread, e, fatal);
         }
+        try {
+            ACRA.getErrorReporter().handleSilentException(e);
+        } catch (Exception e2) {
+            /* ignore */
+        }
     }
 
     public static void trackEvent(String category, String action, String label) {
