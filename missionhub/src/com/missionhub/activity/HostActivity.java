@@ -142,6 +142,8 @@ public class HostActivity extends BaseAuthenticatedActivity implements FragmentM
     @Override
     public void onSessionClosed() {
         Intent intent = new Intent(this, AuthenticatorActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
         finish();
     }
