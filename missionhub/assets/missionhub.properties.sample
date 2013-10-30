@@ -28,5 +28,9 @@ ACRA_ENABLED=true
 ACRA_FORM_URI=errbit-host
 ACRA_FORM_KEY=errbit-api-key
 
+# newrelic
+NEW_RELIC_ENABLED=false
+NEW_RELIC_KEY=
+
 # facebook app id
 FACEBOOK_APP_ID=

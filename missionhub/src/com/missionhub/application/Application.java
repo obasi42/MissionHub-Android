@@ -16,6 +16,7 @@ import com.missionhub.model.MissionHubOpenHelper;
 import com.missionhub.util.ErrbitReportSender;
 import com.missionhub.util.LruBitmapCache;
 import com.missionhub.util.NetworkUtils;
+import com.newrelic.agent.android.NewRelic;
 
 import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
@@ -128,6 +129,14 @@ public class Application extends org.holoeverywhere.app.Application {
         NetworkUtils.enableHttpResponseCache(this);
 
         registerEventSubscriber(this, ToastEvent.class);
+
+        if (Configuration.isNewRelicEnabled()) {
+            try {
+                NewRelic.withApplicationToken(Configuration.getNewRelicApiKey()).start(this);
+            } catch(Exception e) {
+                Log.e("MissionHub", e.getMessage(), e);
+            }
+        }
     }
 
     /**

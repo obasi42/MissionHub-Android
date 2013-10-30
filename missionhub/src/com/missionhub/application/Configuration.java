@@ -143,21 +143,17 @@ public class Configuration {
         return Configuration.getInstance().sProperties.getProperty("ANALYTICS_KEY", "");
     }
 
-    public static boolean isErrbitEnabled() {
-        final String cache = Configuration.getInstance().sProperties.getProperty("ERRBIT_ENABLED", "false");
+    public static boolean isSkipSessionUpdates() {
+        return Boolean.parseBoolean(Configuration.getInstance().sProperties.getProperty("SKIP_SESSION_UPDATES", "false"));
+    }
+
+    public static boolean isNewRelicEnabled() {
+        final String cache = Configuration.getInstance().sProperties.getProperty("NEW_RELIC_ENABLED", "false");
         return Boolean.parseBoolean(cache);
     }
 
-    public static String getErrbitApiUrl() {
-        return stripTrailingSlash(Configuration.getInstance().sProperties.getProperty("ERRBIT_API_URL", ""));
-    }
-
-    public static String getErrbitApiKey() {
-        return Configuration.getInstance().sProperties.getProperty("ERRBIT_API_KEY", "");
-    }
-
-    public static boolean isSkipSessionUpdates() {
-        return Boolean.parseBoolean(Configuration.getInstance().sProperties.getProperty("SKIP_SESSION_UPDATES", "false"));
+    public static String getNewRelicApiKey() {
+        return stripTrailingSlash(Configuration.getInstance().sProperties.getProperty("NEW_RELIC_KEY", ""));
     }
 
     @Override
