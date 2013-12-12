@@ -2,7 +2,7 @@ apply plugin: 'android'
 apply plugin: 'newrelic'
 
 dependencies {
-    compile 'com.android.support:support-v4:18.0.+'
+    compile 'com.android.support:support-v4:19.0.+'
     compile 'com.actionbarsherlock:actionbarsherlock:4.4.0@aar'
     compile 'org.holoeverywhere:holoeverywhere:1.6.8@aar'
     compile 'org.holoeverywhere:addon-preferences:1.6.8@aar'
@@ -26,12 +26,12 @@ dependencies {
 }
 
 android {
-    compileSdkVersion 18
-    buildToolsVersion '18.0.1'
+    compileSdkVersion 19
+    buildToolsVersion '19'
 
     defaultConfig {
         minSdkVersion 8
-        targetSdkVersion 18
+        targetSdkVersion 19
 
         buildConfig "public static enum Market { PLAY, AMAZON, BN };" , \
                     "public static enum Environment { DEVELOPMENT, PRODUCTION };"
