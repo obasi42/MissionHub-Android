@@ -6,7 +6,7 @@ import com.missionhub.exception.MissionHubException;
 /**
  * All API errors extend or directly use this exception type.
  */
-public class ApiException extends MissionHubException implements ExceptionHelper.ExceptionHelperException {
+public class ApiException extends MissionHubException {
 
     private static final long serialVersionUID = 1L;
 
@@ -38,24 +38,5 @@ public class ApiException extends MissionHubException implements ExceptionHelper
             return (ApiException) e;
         }
         return new ApiException(e);
-    }
-
-    @Override
-    public String getDialogTitle() {
-        return null;
-    }
-
-    @Override
-    public String getDialogMessage() {
-        if (getCode() != null) {
-            return getMessage() + "\ncode: " + getCode();
-        } else {
-            return getMessage();
-        }
-    }
-
-    @Override
-    public int getDialogIconId() {
-        return 0;
     }
 }

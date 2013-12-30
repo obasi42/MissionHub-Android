@@ -1,8 +1,10 @@
 package com.missionhub.api;
 
+import com.missionhub.exception.ExceptionHelper;
+
 import org.apache.commons.lang3.StringUtils;
 
-public class ApiHttpException extends ApiException {
+public class ApiHttpException extends ApiException implements ExceptionHelper.ExceptionHelperException {
 
     private int mCode;
     private String mMessage;
@@ -25,6 +27,11 @@ public class ApiHttpException extends ApiException {
             builder.append("Message: ").append(mMessage);
         }
         return builder.toString();
+    }
+
+    @Override
+    public int getDialogIconId() {
+        return 0;
     }
 
 }

@@ -168,6 +168,7 @@
         and retry.
     </string>
     <string name="network_unavailable_exception_title">Offline Error</string>
+    <string name="network_server_unavailable">Could not connect to the MissionHub server. Either your internet connection is poor or the MissionHub server is currently unavailable. Please check your connection and try again.</string>
 
     <!-- Intent Helper -->
     <string name="intent_helper_no_browser">No web browser available.</string>

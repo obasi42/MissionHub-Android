@@ -649,7 +649,7 @@ public class Api {
     }
 
     private void logRequest(String url, String method, Map<String, String> headers, Map<String, String> params) {
-        if (BuildConfig.ENVIRONMENT == BuildConfig.Environment.DEVELOPMENT) {
+        if (Application.isDebug()) {
             Log.i(TAG, method + " " + url);
             if (headers != null) {
                 Log.d(TAG, "==== headers ====");

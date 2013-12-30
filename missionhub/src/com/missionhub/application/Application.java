@@ -103,7 +103,7 @@ public class Application extends org.holoeverywhere.app.Application {
                 for (Map.Entry<String, String> property : Configuration.getInstance().asMap().entrySet()) {
                     ACRA.getErrorReporter().putCustomData("CONFIGURATION_" + property.getKey(), property.getValue());
                 }
-                ErrbitReportSender.putErrbitData(ErrbitReportSender.ErrbitReportField.ENVIRONMENT_NAME, BuildConfig.ENVIRONMENT.name());
+                ErrbitReportSender.putErrbitData(ErrbitReportSender.ErrbitReportField.ENVIRONMENT_NAME, BuildConfig.FLAVOR);
             } catch (ACRAConfigurationException e) {
                 Log.e("MissionHub", e.getMessage(), e);
             }
@@ -240,12 +240,7 @@ public class Application extends org.holoeverywhere.app.Application {
      * @return
      */
     public static int getVersionCode() {
-        try {
-            return getContext().getPackageManager().getPackageInfo(getContext().getPackageName(), 0).versionCode;
-        } catch (final Exception e) {
-            /* ignore */
-        }
-        return -1;
+        return BuildConfig.VERSION_CODE;
     }
 
     /**
@@ -254,12 +249,7 @@ public class Application extends org.holoeverywhere.app.Application {
      * @return
      */
     public static String getVersionName() {
-        try {
-            return getContext().getPackageManager().getPackageInfo(getContext().getPackageName(), 0).versionName;
-        } catch (final Exception e) {
-            /* ignore */
-        }
-        return null;
+        return BuildConfig.VERSION_NAME;
     }
 
     /**
@@ -361,5 +351,18 @@ public class Application extends org.holoeverywhere.app.Application {
 
     public static Session getSession() {
         return getInstance().mSession;
+    }
+
+    public static boolean isDebug() {
+        return BuildConfig.FLAVOR.equals("debug");
+    }
+
+    public static Market getMarket() {
+        try {
+            return Market.valueOf(BuildConfig.FLAVOR.toUpperCase());
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage(), e);
+            return Market.PLAY;
+        }
     }
 }

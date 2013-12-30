@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.webkit.WebViewClient;
 
+import com.github.kevinsawicki.http.HttpRequest;
 import com.missionhub.R;
 import com.missionhub.application.Application;
 
@@ -13,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.holoeverywhere.app.AlertDialog;
 import org.holoeverywhere.widget.Toast;
 
+import java.net.ConnectException;
 import java.net.UnknownHostException;
 
 /**
@@ -254,6 +256,9 @@ public class ExceptionHelper {
         } else if (mThrowable instanceof UnknownHostException) {
             setTitle(getString(R.string.network_unavailable_exception_title));
             setMessage(getString(R.string.network_unavailable_exception));
+        } else if (mThrowable.getMessage().contains("ECONNREFUSED")) {
+            setTitle(getString(R.string.exception_helper_network_error));
+            setMessage(getString(R.string.network_server_unavailable));
         } else {
             setMessage(mThrowable.getMessage());
         }

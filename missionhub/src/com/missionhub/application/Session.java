@@ -152,7 +152,7 @@ public class Session implements OnAccountsUpdateListener {
                 setAndPostState(SessionState.OPENING);
 
                 // allow logging in with a hardcoded token
-                if (BuildConfig.ENVIRONMENT == BuildConfig.Environment.DEVELOPMENT && StringUtils.isNotEmpty(Configuration.getLoginAs())) {
+                if (Application.isDebug() && StringUtils.isNotEmpty(Configuration.getLoginAs())) {
                     try {
                         Person person = Api.getPersonMe(Configuration.getLoginAs(), ApiOptions.builder().include(Include.user).build()).get();
                         addSystemAccount(person, Configuration.getLoginAs());

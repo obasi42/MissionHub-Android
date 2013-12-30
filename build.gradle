@@ -1,14 +1,11 @@
-apply plugin: 'versions'
-
 buildscript {
     repositories {
         mavenCentral()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.6.+'
-        classpath 'com.github.ben-manes:gradle-versions-plugin:0.4'
-        classpath 'com.newrelic.agent.android:agent-gradle-plugin:2.440.0'
+        classpath 'com.android.tools.build:gradle:0.7.+'
+        classpath 'com.newrelic.agent.android:agent-gradle-plugin:3.239.0'
     }
 }
 
