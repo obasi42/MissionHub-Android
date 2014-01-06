@@ -55,7 +55,7 @@ def getBuildNumber() {
 
 def getNextBuildNumber() {
     try {
-        def jobXml = (new XmlParser()).parse("http://mh.cr-wd.com/ci/job/MissionHub%20Android/api/xml");
+        def jobXml = (new XmlParser()).parse("http://mh.cr-wd.com/ci/job/MissionHubAndroid/api/xml");
         return Integer.parseInt(jobXml.nextBuildNumber.text());
     } catch (Exception e) {
         e.printStackTrace();
