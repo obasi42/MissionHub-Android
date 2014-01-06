@@ -15,12 +15,6 @@
 }
 -keep,allowoptimization interface org.holoeverywhere.** { *; }
 
-# Actionbarsherlock
--keep class android.support.v4.app.** { *; }
--keep interface android.support.v4.app.** { *; }
--keep class com.actionbarsherlock.** { *; }
--keep interface com.actionbarsherlock.** { *; }
-
 # Guava
 -keepattributes Signature,RuntimeVisibleAnnotations,AnnotationDefault
 -dontwarn sun.misc.Unsafe
@@ -65,4 +59,9 @@
 -keep public class org.acra.ErrorReporter
 {
     public void handleSilentException(java.lang.Throwable);
+}
+
+# New Relic
+-keep class com.newrelic.** {
+    *;
 }
