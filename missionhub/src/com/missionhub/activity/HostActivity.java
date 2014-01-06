@@ -48,7 +48,7 @@ public class HostActivity extends BaseAuthenticatedActivity implements FragmentM
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+        supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_host);
