@@ -44,6 +44,14 @@
         <item name="android:windowActionBar">false</item>
     </style>
 
+    <style name="Theme.Missionhub.Init" parent="@style/Holo.Theme">
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowBackground">@drawable/background</item>
+    </style>
+
     <!-- this style is only referenced in a Light.DarkActionBar based theme -->
     <style name="Theme.Missionhub.Widget" parent="@style/Holo.Theme">
         <item name="android:popupMenuStyle">@style/PopupMenu.Missionhub</item>
