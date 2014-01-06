@@ -71,20 +71,50 @@
                 android:id="@+id/visibility"
                 android:background="@drawable/bg_box"/>
 
-        <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/interaction_form_label_datetime"
-                style="@style/MissionHub.InteractionDialog.Label"
-                android:layout_marginTop="14dip"
-                />
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dip">
 
-        <TextView
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/date_time"
+                android:text="@string/interaction_form_label_date"
+                style="@style/MissionHub.InteractionDialog.Label"
+                android:layout_weight="1" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/interaction_form_label_time"
+                style="@style/MissionHub.InteractionDialog.Label"
+                android:layout_weight="1"
+                android:layout_marginLeft="10dip"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/date"
                 style="@style/MissionHub.InteractionDialog.TextView"
-                android:background="@drawable/bg_box_caret"/>
+                android:background="@drawable/bg_box_caret"
+                android:layout_weight="1" />
+
+            <TextView
+                style="@style/MissionHub.InteractionDialog.TextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/time"
+                android:background="@drawable/bg_box_caret"
+                android:layout_weight="1"
+                android:layout_marginLeft="10dip"/>
+        </LinearLayout>
 
         <TextView
                 android:layout_width="match_parent"

@@ -9,10 +9,10 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 
-import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.Window;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
@@ -35,15 +35,12 @@ import org.holoeverywhere.widget.Toast;
 
 import java.util.Set;
 
-import uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefreshAttacher;
-
 public class HostActivity extends BaseAuthenticatedActivity implements FragmentManager.OnBackStackChangedListener {
 
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
     private HostedFragment mCurrentFragment;
     private SidebarFragment mSidebarFragment;
-    private PullToRefreshAttacher mPullToRefreshHelper;
     private int mLeftDrawerId = R.id.left_drawer;
     private boolean mTabletSidebarStatic = true;
     private long mBackCooldown;
@@ -65,12 +62,12 @@ public class HostActivity extends BaseAuthenticatedActivity implements FragmentM
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.drawable.ic_drawer, R.string.menu_open, R.string.menu_close) {
             public void onDrawerClosed(View drawerView) {
-                invalidateOptionsMenu();
+                supportInvalidateOptionsMenu();
                 Application.postEvent(new DrawerClosedEvent(drawerView));
             }
 
             public void onDrawerOpened(View drawerView) {
-                invalidateOptionsMenu();
+                supportInvalidateOptionsMenu();
                 Application.postEvent(new DrawerOpenedEvent(drawerView));
             }
         };
@@ -86,9 +83,6 @@ public class HostActivity extends BaseAuthenticatedActivity implements FragmentM
             onEventMainThread(new ChangeHostFragmentEvent(HostedPeopleListFragment.class));
             attachSidebar(false);
         }
-
-        // create the global pull to refresh helper
-        mPullToRefreshHelper = PullToRefreshAttacher.get(this);
 
         Application.registerEventSubscriber(this, ChangeHostFragmentEvent.class, OnSidebarItemClickedEvent.class);
     }
@@ -251,7 +245,7 @@ public class HostActivity extends BaseAuthenticatedActivity implements FragmentM
     public void onEventMainThread(OnSidebarItemClickedEvent event) {
         Object item = event.getItem();
         if (item instanceof Integer) {
-            switch (((Integer) item).intValue()) {
+            switch ((Integer) item) {
                 case R.id.menu_item_about:
                     Intent intent = new Intent(this, AboutActivity.class);
                     startActivity(intent);
@@ -313,10 +307,6 @@ public class HostActivity extends BaseAuthenticatedActivity implements FragmentM
             ft.commit();
         }
         mCurrentFragment = fragment;
-    }
-
-    public PullToRefreshAttacher getPullToRefreshAttacher() {
-        return mPullToRefreshHelper;
     }
 
     public void setTabletSidebarStatic(boolean tabletSidebarStatic) {

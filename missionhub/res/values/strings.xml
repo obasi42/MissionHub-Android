@@ -378,7 +378,8 @@
 
     <string name="authenticator_login_with_facebook">Login with Facebook</string>
     <string name="interaction_form_label_comment">Comment</string>
-    <string name="interaction_form_label_datetime">Date / Time</string>
+    <string name="interaction_form_label_date">Date</string>
+    <string name="interaction_form_label_time">Time</string>
     <string name="interaction_form_label_visibility">Visibility</string>
     <string name="interaction_form_label_receiver">Receiver</string>
     <string name="interaction_form_label_type">Interaction</string>

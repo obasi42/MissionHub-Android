@@ -35,7 +35,7 @@
                     android:contentDescription="@string/loading"
                     android:paddingRight="8dip"/>
 
-            <org.holoeverywhere.internal.DialogTitle
+            <Internal.DialogTitle
                     android:id="@+id/alertTitle"
                     style="@style/Holo.DialogWindowTitle"
                     android:layout_width="wrap_content"

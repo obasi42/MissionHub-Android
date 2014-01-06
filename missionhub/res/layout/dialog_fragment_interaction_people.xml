@@ -25,7 +25,7 @@
             android:focusableInTouchMode="true"
             android:descendantFocusability="beforeDescendants">
 
-        <com.actionbarsherlock.widget.SearchView
+        <android.support.v7.widget.SearchView
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/search"

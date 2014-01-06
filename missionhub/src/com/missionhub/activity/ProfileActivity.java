@@ -5,8 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
+import android.view.MenuItem;
 
-import com.actionbarsherlock.view.MenuItem;
 import com.missionhub.R;
 import com.missionhub.fragment.HostedProfileFragment;
 import com.missionhub.model.Person;

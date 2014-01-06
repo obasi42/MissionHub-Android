@@ -1,11 +1,11 @@
 package com.missionhub.activity;
 
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.actionbarsherlock.view.MenuItem;
 import com.missionhub.application.Application;
 
 public class LicensesActivity extends BaseActivity {
@@ -41,11 +41,11 @@ public class LicensesActivity extends BaseActivity {
     }
 
     @Override
-    public boolean onMenuItemSelected(final int featureId, final MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             finish();
             return true;
         }
-        return super.onMenuItemSelected(featureId, item);
+        return super.onOptionsItemSelected(item);
     }
 }

@@ -6,18 +6,19 @@ import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.ActionBar;
+import android.support.v7.view.ActionMode;
+import android.support.v7.widget.SearchView;
 import android.text.Html;
 import android.text.Layout;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.view.ActionMode;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.widget.SearchView;
 import com.missionhub.R;
 import com.missionhub.api.ListOptions;
 import com.missionhub.api.PeopleListOptions;
@@ -57,13 +58,17 @@ import org.holoeverywhere.widget.TextView;
 
 import java.util.HashSet;
 
-import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
+import uk.co.senab.actionbarpulltorefresh.extras.actionbarcompat.PullToRefreshLayout;
+import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
+import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
+
 
 public class HostedPeopleListFragment extends HostedFragment implements AdapterView.OnItemSelectedListener,
-        PeopleListView.OnPersonClickListener, DynamicPeopleListProvider.OnExceptionListener, PullToRefreshAttacher.OnRefreshListener,
+        PeopleListView.OnPersonClickListener, DynamicPeopleListProvider.OnExceptionListener, OnRefreshListener,
         SearchHelper.OnSearchQueryChangedListener, CheckAllDialog.CheckAllDialogListener, ActionMode.Callback {
 
     public static final String TAG = HostedPeopleListFragment.class.getSimpleName();
+    private PullToRefreshLayout mPullToRefreshLayout;
     private PeopleListView mList;
     private SelectableApiPeopleListProvider mProvider;
     private SearchView mSearchView;
@@ -158,6 +163,12 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
         View view = inflater.inflate(R.layout.fragment_people_list, parent, false);
 
         // set up the person list and adapter
+        mPullToRefreshLayout = (PullToRefreshLayout) view.findViewById(R.id.ptr_layout);
+        ActionBarPullToRefresh.from(getSupportActivity())
+            .allChildrenArePullable()
+            .listener(this)
+            .setup(mPullToRefreshLayout);
+
         mList = (PeopleListView) view.findViewById(android.R.id.list);
         if (mProvider == null) {
             mProvider = new SelectableApiPeopleListProvider(inflater.getContext());
@@ -244,15 +255,12 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
         }
         mCheckmarkHelper.refreshCheckedState();
         refreshIndicator();
-
-        getHost().getPullToRefreshAttacher().addRefreshableView(mList, this);
     }
 
     @Override
     public void onResume() {
         super.onResume();
         mOrderSpinner.setVisibility(mOrderSpinnerVisibility);
-        getHost().getPullToRefreshAttacher().addRefreshableView(mList, this);
     }
 
     @Override
@@ -374,8 +382,8 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
 
             @Override
             public void onFinally() {
-                if (getHost() != null) {
-                    getHost().getPullToRefreshAttacher().setRefreshComplete();
+                if (mPullToRefreshLayout != null) {
+                    mPullToRefreshLayout.setRefreshComplete();
                 }
             }
         };
@@ -697,11 +705,11 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
 
-        menu.add(Menu.NONE, R.id.action_add_contact, Menu.NONE, R.string.action_add_contact).setIcon(R.drawable.ic_action_add_contact)
-                .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        MenuItem addContact = menu.add(Menu.NONE, R.id.action_add_contact, Menu.NONE, R.string.action_add_contact).setIcon(R.drawable.ic_action_add_contact);
+        MenuItemCompat.setShowAsAction(addContact, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
 
-        menu.add(Menu.NONE, R.id.action_interaction, Menu.NONE, R.string.action_record_interaction).setIcon(R.drawable.ic_action_interaction)
-                .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        MenuItem addInteraction = menu.add(Menu.NONE, R.id.action_interaction, Menu.NONE, R.string.action_record_interaction).setIcon(R.drawable.ic_action_interaction);
+        MenuItemCompat.setShowAsAction(addInteraction, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
     }
 
     @Override
@@ -719,26 +727,26 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
 
     @Override
     public boolean onCreateActionMode(final ActionMode mode, final Menu menu) {
-        menu.add(Menu.NONE, R.id.action_assign, Menu.NONE, R.string.action_assign).setIcon(R.drawable.ic_action_assign)
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        MenuItem assign = menu.add(Menu.NONE, R.id.action_assign, Menu.NONE, R.string.action_assign).setIcon(R.drawable.ic_action_assign);
+        MenuItemCompat.setShowAsAction(assign, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 
-        menu.add(Menu.NONE, R.id.action_label, Menu.NONE, R.string.action_labels).setIcon(R.drawable.ic_action_labels)
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        MenuItem label = menu.add(Menu.NONE, R.id.action_label, Menu.NONE, R.string.action_labels).setIcon(R.drawable.ic_action_labels);
+        MenuItemCompat.setShowAsAction(label, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 
-        menu.add(Menu.NONE, R.id.action_permission, Menu.NONE, R.string.action_permissions).setIcon(R.drawable.ic_action_permissions)
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        MenuItem permission = menu.add(Menu.NONE, R.id.action_permission, Menu.NONE, R.string.action_permissions).setIcon(R.drawable.ic_action_permissions);
+        MenuItemCompat.setShowAsAction(permission, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 
-        menu.add(Menu.NONE, R.id.action_delete, Menu.NONE, R.string.action_delete).setIcon(R.drawable.ic_action_delete)
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        MenuItem delete = menu.add(Menu.NONE, R.id.action_delete, Menu.NONE, R.string.action_delete).setIcon(R.drawable.ic_action_delete);
+        MenuItemCompat.setShowAsAction(delete, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 
-//        menu.add(Menu.NONE, R.id.action_archive, Menu.NONE, R.string.action_archive).setIcon(R.drawable.ic_action_archive)
-//                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+//      MenuItem archive = menu.add(Menu.NONE, R.id.action_archive, Menu.NONE, R.string.action_archive).setIcon(R.drawable.ic_action_archive);
+//      MenuItemCompat.setShowAsAction(archive, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 
-        menu.add(Menu.NONE, R.id.action_email, Menu.NONE, R.string.action_email).setIcon(R.drawable.ic_action_email)
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        MenuItem email = menu.add(Menu.NONE, R.id.action_email, Menu.NONE, R.string.action_email).setIcon(R.drawable.ic_action_email);
+        MenuItemCompat.setShowAsAction(email, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 
-        menu.add(Menu.NONE, R.id.action_text, Menu.NONE, R.string.action_text).setIcon(R.drawable.ic_action_text)
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        MenuItem text = menu.add(Menu.NONE, R.id.action_text, Menu.NONE, R.string.action_text).setIcon(R.drawable.ic_action_text);
+        MenuItemCompat.setShowAsAction(text, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 
         return true;
     }
@@ -805,7 +813,7 @@ public class HostedPeopleListFragment extends HostedFragment implements AdapterV
 
     protected void startActionMode(boolean force) {
         if (mActionMode == null || force) {
-            mActionMode = getSupportActivity().startActionMode(this);
+            mActionMode = getSupportActivity().startSupportActionMode(this);
         }
     }
 

@@ -2,10 +2,9 @@ package com.missionhub.ui;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v7.widget.SearchView;
 import android.view.View;
 import android.view.ViewGroup;
-
-import com.actionbarsherlock.widget.SearchView;
 
 import org.apache.commons.lang3.StringUtils;
 

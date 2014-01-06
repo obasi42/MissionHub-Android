@@ -2,18 +2,19 @@ package com.missionhub.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
@@ -197,36 +198,36 @@ public class HostedProfileFragment extends HostedFragment implements TabBar.OnTa
 
         Person person = Application.getDb().getPersonDao().load(mPersonId);
 
-        menu.add(Menu.NONE, R.id.action_assign, Menu.NONE, R.string.action_assign).setIcon(R.drawable.ic_action_assign)
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        MenuItem assign = menu.add(Menu.NONE, R.id.action_assign, Menu.NONE, R.string.action_assign).setIcon(R.drawable.ic_action_assign);
+        MenuItemCompat.setShowAsAction(assign, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
 
-        menu.add(Menu.NONE, R.id.action_label, Menu.NONE, R.string.action_labels).setIcon(R.drawable.ic_action_labels)
-                .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        MenuItem label = menu.add(Menu.NONE, R.id.action_label, Menu.NONE, R.string.action_labels).setIcon(R.drawable.ic_action_labels);
+        MenuItemCompat.setShowAsAction(label, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
 
         if (person != null && !(person.isAdmin() && !Application.getSession().isAdmin())) {
-            menu.add(Menu.NONE, R.id.action_permission, Menu.NONE, R.string.action_permissions).setIcon(R.drawable.ic_action_permissions)
-                    .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+            MenuItem permission = menu.add(Menu.NONE, R.id.action_permission, Menu.NONE, R.string.action_permissions).setIcon(R.drawable.ic_action_permissions);
+            MenuItemCompat.setShowAsAction(permission, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
         }
 
-        menu.add(Menu.NONE, R.id.action_interaction, Menu.NONE, R.string.action_record_interaction).setIcon(R.drawable.ic_action_interaction)
-                .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        MenuItem interaction = menu.add(Menu.NONE, R.id.action_interaction, Menu.NONE, R.string.action_record_interaction).setIcon(R.drawable.ic_action_interaction);
+        MenuItemCompat.setShowAsAction(interaction, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
 
         if (person != null && !person.isAdmin()) {
-            menu.add(Menu.NONE, R.id.action_delete, Menu.NONE, R.string.action_delete).setIcon(R.drawable.ic_action_delete)
-                    .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+            MenuItem delete = menu.add(Menu.NONE, R.id.action_delete, Menu.NONE, R.string.action_delete).setIcon(R.drawable.ic_action_delete);
+            MenuItemCompat.setShowAsAction(delete, MenuItemCompat.SHOW_AS_ACTION_NEVER);
         }
 
-//        menu.add(Menu.NONE, R.id.action_archive, Menu.NONE, R.string.action_archive).setIcon(R.drawable.ic_action_archive)
-//                .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+//      MenuItem archive = menu.add(Menu.NONE, R.id.action_archive, Menu.NONE, R.string.action_archive).setIcon(R.drawable.ic_action_archive);
+//      MenuItemCompat.setShowAsAction(archive, MenuItemCompat.SHOW_AS_ACTION_NEVER);
 
-        menu.add(Menu.NONE, R.id.action_email, Menu.NONE, R.string.action_email).setIcon(R.drawable.ic_action_email)
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+        MenuItem email = menu.add(Menu.NONE, R.id.action_email, Menu.NONE, R.string.action_email).setIcon(R.drawable.ic_action_email);
+        MenuItemCompat.setShowAsAction(email, MenuItemCompat.SHOW_AS_ACTION_NEVER);
 
-        menu.add(Menu.NONE, R.id.action_text, Menu.NONE, R.string.action_text).setIcon(R.drawable.ic_action_text)
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+        MenuItem text = menu.add(Menu.NONE, R.id.action_text, Menu.NONE, R.string.action_text).setIcon(R.drawable.ic_action_text);
+        MenuItemCompat.setShowAsAction(text, MenuItemCompat.SHOW_AS_ACTION_NEVER);
 
-        mRefeshMenuItem = menu.add(Menu.NONE, R.id.action_refresh, Menu.NONE, R.string.action_refresh).setIcon(R.drawable.ic_action_refresh_dark)
-                .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_NEVER);
+        mRefeshMenuItem = menu.add(Menu.NONE, R.id.action_refresh, Menu.NONE, R.string.action_refresh).setIcon(R.drawable.ic_action_refresh_dark);
+        MenuItemCompat.setShowAsAction(mRefeshMenuItem, MenuItemCompat.SHOW_AS_ACTION_NEVER);
     }
 
     @Override

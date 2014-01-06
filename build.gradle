@@ -22,8 +22,7 @@ allprojects {
     }
 
     repositories {
-        maven { url 'http://nexus.cr-wd.com/content/repositories/releases/' }
-        maven { url 'http://nexus.cr-wd.com/content/repositories/snapshots/' }
+        maven { url 'http://nexus.cr-wd.com/content/repositories/missionhub/' }
         mavenCentral()
     }
 

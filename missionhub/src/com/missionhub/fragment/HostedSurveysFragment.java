@@ -4,6 +4,11 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.ActionBar;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
@@ -12,10 +17,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 import com.missionhub.R;
 import com.missionhub.api.Api;
 import com.missionhub.application.Application;
@@ -92,8 +93,8 @@ public class HostedSurveysFragment extends HostedFragment implements AdapterView
     @Override
     public void onCreateOptionsMenu(final Menu menu, final MenuInflater inflater) {
         if (mCurrentSurvey == null) {
-            MenuItem refresh = menu.add(Menu.NONE, R.id.action_refresh, Menu.NONE, getString(R.string.action_refresh)).setIcon(R.drawable.ic_action_refresh_dark)
-                    .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+            MenuItem refresh = menu.add(Menu.NONE, R.id.action_refresh, Menu.NONE, getString(R.string.action_refresh)).setIcon(R.drawable.ic_action_refresh_dark);
+            MenuItemCompat.setShowAsAction(refresh, MenuItemCompat.SHOW_AS_ACTION_ALWAYS | MenuItemCompat.SHOW_AS_ACTION_WITH_TEXT);
 
             if (hasProgress()) {
                 refresh.setEnabled(false);
@@ -102,11 +103,11 @@ public class HostedSurveysFragment extends HostedFragment implements AdapterView
             }
 
         } else {
-            menu.add(Menu.NONE, R.id.action_index, Menu.NONE, getString(R.string.action_index)).setIcon(R.drawable.ic_action_list)
-                    .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+            MenuItem index = menu.add(Menu.NONE, R.id.action_index, Menu.NONE, getString(R.string.action_index)).setIcon(R.drawable.ic_action_list);
+            MenuItemCompat.setShowAsAction(index, MenuItemCompat.SHOW_AS_ACTION_ALWAYS | MenuItemCompat.SHOW_AS_ACTION_WITH_TEXT);
 
-            menu.add(Menu.NONE, R.id.action_restart, Menu.NONE, getString(R.string.action_restart)).setIcon(R.drawable.ic_action_restart)
-                    .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+            MenuItem restart = menu.add(Menu.NONE, R.id.action_restart, Menu.NONE, getString(R.string.action_restart)).setIcon(R.drawable.ic_action_restart);
+            MenuItemCompat.setShowAsAction(restart, MenuItemCompat.SHOW_AS_ACTION_ALWAYS | MenuItemCompat.SHOW_AS_ACTION_WITH_TEXT);
         }
     }
 

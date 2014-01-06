@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -18,7 +19,6 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
-import com.actionbarsherlock.widget.SearchView;
 import com.missionhub.R;
 import com.missionhub.api.Api;
 import com.missionhub.api.ApiRequest;
@@ -41,6 +41,7 @@ import com.missionhub.ui.ViewArrayPagerAdapter;
 import com.missionhub.ui.widget.LockableViewPager;
 import com.missionhub.ui.widget.SelectableListView;
 import com.missionhub.util.DateUtils;
+import com.missionhub.util.FragmentUtils;
 import com.missionhub.util.SafeAsyncTask;
 import com.missionhub.util.SortUtils;
 import com.missionhub.util.TaskUtils;
@@ -48,16 +49,17 @@ import com.missionhub.util.TaskUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.holoeverywhere.LayoutInflater;
+import org.holoeverywhere.app.Dialog;
 import org.holoeverywhere.app.DialogFragment;
-import org.holoeverywhere.internal.DialogTitle;
 import org.holoeverywhere.widget.Button;
-import org.holoeverywhere.widget.DatePicker;
 import org.holoeverywhere.widget.EditText;
 import org.holoeverywhere.widget.ListView;
 import org.holoeverywhere.widget.Spinner;
 import org.holoeverywhere.widget.TextView;
-import org.holoeverywhere.widget.TimePicker;
 import org.holoeverywhere.widget.Toast;
+import org.holoeverywhere.widget.datetimepicker.date.DatePickerDialog;
+import org.holoeverywhere.widget.datetimepicker.time.RadialPickerLayout;
+import org.holoeverywhere.widget.datetimepicker.time.TimePickerDialog;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -70,11 +72,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.FutureTask;
 
-public class InteractionDialogFragment extends BaseDialogFragment implements ViewPager.OnPageChangeListener, DialogInterface.OnKeyListener, DatePicker.OnDateChangedListener, TimePicker.OnTimeChangedListener, PeopleListView.OnPersonCheckedListener, SearchHelper.OnSearchQueryChangedListener {
+public class InteractionDialogFragment extends BaseDialogFragment implements ViewPager.OnPageChangeListener, DialogInterface.OnKeyListener, PeopleListView.OnPersonCheckedListener, SearchHelper.OnSearchQueryChangedListener, DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
 
     public static final String TAG = InteractionDialogFragment.class.getSimpleName();
     private static final int STATE_FORM = 0;
-    private static final int STATE_DATE_TIME = 1;
     private static final int STATE_RECEIVER = 2;
     private static final int STATE_INITIATORS = 3;
     private static final int ACTION_CREATE = 0;
@@ -84,13 +85,13 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
         @Override
         public void onReceive(Context context, Intent intent) {
             if (mInteraction != null && StringUtils.isEmpty(mInteraction.timestamp)) {
-                updateDateTimeBox(true);
+                updateDateTimeBox();
             }
         }
     };
     private GInteraction mInteraction = new GInteraction();
     private ImageView mIcon;
-    private DialogTitle mTitle;
+    private Dialog.DialogTitle mTitle;
     private ImageView mRefresh;
     private Animation mRefreshAnimation;
     private View mAction;
@@ -108,12 +109,9 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
     private TextView mInteractionReceiver;
     private Spinner mInteractionVisibility;
     private SpinnerAdapter<InteractionVisibility> mInteractionVisibilityAdapter;
-    private TextView mInteractionDateTime;
+    private TextView mInteractionDate;
+    private TextView mInteractionTime;
     private EditText mInteractionComment;
-    // date/time form
-    private View mDateTimeView;
-    private DatePicker mDatePicker;
-    private TimePicker mTimePicker;
     // people list form
     private View mPeopleView;
     private TextView mPeopleListTitle;
@@ -127,6 +125,9 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
     private SafeAsyncTask<List<Person>> mRebuildInitiatorsProviderTask;
     private SafeAsyncTask<Void> mActionTask;
     private int mActionTaskAction;
+    // date/time dialogs
+    private DatePickerDialog mDatePickerDialog;
+    private TimePickerDialog mTimePickerDialog;
 
     public static void showForResult(FragmentManager fm, Integer requestCode) {
         showForResult(InteractionDialogFragment.class, fm, requestCode);
@@ -150,6 +151,7 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.setDetachChildFragments(false);
 
         // register for time change ticks to keep the time box up to date
         IntentFilter intentFilter = new IntentFilter();
@@ -187,7 +189,7 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
         // the container view
         mIcon = (ImageView) frame.findViewById(R.id.icon);
         mIcon.setImageResource(R.drawable.ic_action_interaction);
-        mTitle = (DialogTitle) frame.findViewById(R.id.alertTitle);
+        mTitle = (Dialog.DialogTitle) frame.findViewById(R.id.alertTitle);
         if (mInteraction.isNew()) {
             mTitle.setText(R.string.interaction_dialog_title_new);
         } else {
@@ -241,21 +243,22 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
             mInteractionVisibilityAdapter.setContext(getSupportActivity());
         }
         mInteractionVisibility.setAdapter(mInteractionVisibilityAdapter);
-        mInteractionDateTime = (TextView) mInteractionForm.findViewById(R.id.date_time);
-        mInteractionDateTime.setOnClickListener(new View.OnClickListener() {
+        mInteractionDate = (TextView) mInteractionForm.findViewById(R.id.date);
+        mInteractionDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setState(STATE_DATE_TIME, true);
+                openDatePicker();
             }
         });
-        mInteractionComment = (EditText) mInteractionForm.findViewById(R.id.comment);
+        mInteractionTime = (TextView) mInteractionForm.findViewById(R.id.time);
+        mInteractionTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openTimePicker();
+            }
+        });
 
-        // the date/time form
-        mDateTimeView = inflater.inflate(R.layout.dialog_fragment_interaction_datetime, mViewPager, false);
-        mDatePicker = (DatePicker) mDateTimeView.findViewById(R.id.date);
-        mDatePicker.setOnDateChangedListener(this);
-        mTimePicker = (TimePicker) mDateTimeView.findViewById(R.id.time);
-        mTimePicker.setOnTimeChangedListener(this);
+        mInteractionComment = (EditText) mInteractionForm.findViewById(R.id.comment);
 
         // the people list
         mPeopleView = inflater.inflate(R.layout.dialog_fragment_interaction_people, mViewPager, false);
@@ -375,34 +378,13 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
         }
     }
 
-    private synchronized void updateDateTimeBox(boolean updatePickers) {
-        if (mInteractionDateTime == null) return;
+    private synchronized void updateDateTimeBox() {
+        if (mInteractionDate == null || mInteractionTime == null) return;
 
-        DateTime dateTime = DateUtils.parseISO8601(mInteraction.timestamp);
-        if (dateTime == null) {
-            dateTime = DateTime.now(DateTimeZone.UTC);
-        }
+        DateTime dateTime = getDateTime();
 
-        mInteractionDateTime.setText(dateTime.toString(DateTimeFormat.forPattern("d MMM yyyy h:mm a").withZone(DateTimeZone.getDefault())));
-
-        if (updatePickers) {
-            updateDateTimePickersQuietly(dateTime);
-        }
-    }
-
-    private synchronized void updateDateTimePickersQuietly(DateTime dateTime) {
-        if (mDatePicker == null || mTimePicker == null) return;
-
-        dateTime = dateTime.toDateTime(DateTimeZone.getDefault());
-
-        mDatePicker.setOnDateChangedListener(null);
-        mDatePicker.updateDate(dateTime.getYear(), dateTime.getMonthOfYear() - 1, dateTime.getDayOfMonth());
-        mDatePicker.setOnDateChangedListener(this);
-
-        mTimePicker.setOnTimeChangedListener(null);
-        mTimePicker.setCurrentHour(dateTime.getHourOfDay());
-        mTimePicker.setCurrentMinute(dateTime.getMinuteOfHour());
-        mTimePicker.setOnTimeChangedListener(this);
+        mInteractionDate.setText(dateTime.toString(DateTimeFormat.forPattern("d MMM yyyy").withZone(DateTimeZone.getDefault())));
+        mInteractionTime.setText(dateTime.toString(DateTimeFormat.forPattern("h:mm a").withZone(DateTimeZone.getDefault())));
     }
 
     private synchronized void updateVisiblitySpinner() {
@@ -475,7 +457,7 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
     public synchronized void restoreFromInteraction() {
         updateReceiverBox();
         updateInitiatorsBox();
-        updateDateTimeBox(true);
+        updateDateTimeBox();
         updateVisiblitySpinner();
         updateTypeSpinner();
         updateCommentBox();
@@ -496,9 +478,6 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
             case STATE_FORM:
                 mViewPager.setCurrentItem(0, scroll);
                 mViewPager.setPagingLocked(LockableViewPager.LOCK_BOTH);
-                break;
-            case STATE_DATE_TIME:
-                setSecondaryPage(mDateTimeView, scroll);
                 break;
             case STATE_RECEIVER:
                 setSecondaryPage(mPeopleView, scroll);
@@ -565,7 +544,6 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
                     mButton3.setVisibility(View.GONE);
                 }
                 break;
-            case STATE_DATE_TIME:
             case STATE_RECEIVER:
             case STATE_INITIATORS:
                 mButton1.setVisibility(View.GONE);
@@ -707,18 +685,33 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
     }
 
     @Override
-    public synchronized void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-        DateTime dateTime = DateUtils.fixInstantDateTime(year, monthOfYear + 1, dayOfMonth, mTimePicker.getCurrentHour(), mTimePicker.getCurrentMinute());
+    public synchronized void onDateSet(DatePickerDialog datePickerDialog, int year, int monthOfYear, int dayOfMonth) {
+        // the onDateSet callback is called when the dialog is closed and not as a result of an actual change to the date
+        // return if the date has not actually been changed
+        if (getLocalDateTime().getYear() == year && getLocalDateTime().getMonthOfYear() == monthOfYear + 1 && getLocalDateTime().getDayOfMonth() == dayOfMonth) {
+            return;
+        }
+
+        DateTime dateTime = DateUtils.fixInstantDateTime(year, monthOfYear + 1, dayOfMonth, getLocalDateTime().getHourOfDay(), getLocalDateTime().getMinuteOfHour());
         mInteraction.timestamp = DateUtils.toISO8601(dateTime);
-        updateDateTimeBox(false);
+
+        updateDateTimeBox();
     }
 
     @Override
-    public synchronized void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
-        DateTime dateTime = DateUtils.fixInstantDateTime(mDatePicker.getYear(), mDatePicker.getMonth() + 1, mDatePicker.getDayOfMonth(), hourOfDay, minute);
+    public synchronized void onTimeSet(RadialPickerLayout radialPickerLayout, int hourOfDay, int minuteOfHour) {
+        // the onTimeSet callback is called when the dialog is closed and not as a result of an actual change to the time
+        // return if the time has not actually been changed
+        if (getLocalDateTime().getHourOfDay() == hourOfDay && getLocalDateTime().getMinuteOfDay() == minuteOfHour) {
+            return;
+        }
+
+        DateTime dateTime = DateUtils.fixInstantDateTime(getLocalDateTime().getYear(), getLocalDateTime().getMonthOfYear() + 1, getLocalDateTime().getDayOfMonth(), hourOfDay, minuteOfHour);
         mInteraction.timestamp = DateUtils.toISO8601(dateTime);
-        updateDateTimeBox(false);
+
+        updateDateTimeBox();
     }
+
 
     @Override
     public synchronized void onPersonChecked(PeopleListView list, Person person, int position, boolean checked) {
@@ -1056,6 +1049,28 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
             TextView text1;
             ImageView icon;
         }
+    }
+
+    private void openDatePicker() {
+        mDatePickerDialog = DatePickerDialog.newInstance(this, getLocalDateTime().getYear(), getLocalDateTime().getMonthOfYear() - 1, getLocalDateTime().getDayOfMonth());
+        mDatePickerDialog.show(getChildFragmentManager());
+    }
+
+    private void openTimePicker() {
+        mTimePickerDialog = TimePickerDialog.newInstance(this, getLocalDateTime().getHourOfDay(), getLocalDateTime().getMinuteOfHour(), false);
+        mTimePickerDialog.show(getChildFragmentManager());
+    }
+
+    public DateTime getDateTime() {
+        DateTime dateTime = DateUtils.parseISO8601(mInteraction.timestamp);
+        if (dateTime == null) {
+            dateTime = DateTime.now(DateTimeZone.UTC);
+        }
+        return dateTime;
+    }
+
+    public DateTime getLocalDateTime() {
+        return getDateTime().withZone(DateTimeZone.getDefault());
     }
 
 }

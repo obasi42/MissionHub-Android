@@ -18,16 +18,30 @@
         <item name="android:windowBackground">@color/white</item>
     </style>
 
-    <style name="ActionBar.Solid.Missionhub" parent="@style/Widget.Sherlock.Light.ActionBar.Solid">
+    <style name="ActionBar.Solid.Missionhub" parent="@style/Widget.AppCompat.Light.ActionBar.Solid">
         <item name="android:background">@drawable/ab_solid_missionhub</item>
         <item name="android:backgroundStacked">@drawable/ab_stacked_solid_missionhub</item>
         <item name="android:backgroundSplit">@drawable/ab_bottom_solid_missionhub</item>
         <item name="android:progressBarStyle">@style/ProgressBar.Missionhub</item>
     </style>
 
-    <style name="ActionBar.Transparent.Missionhub" parent="@style/Widget.Sherlock.Light.ActionBar">
+    <style name="ActionBar.Transparent.Missionhub" parent="@style/Widget.AppCompat.ActionBar">
         <item name="android:background">@drawable/ab_transparent_missionhub</item>
         <item name="android:progressBarStyle">@style/ProgressBar.Missionhub</item>
+    </style>
+
+    <style name="Theme.Missionhub.Translucent.NoActionBar" parent="Theme.Missionhub.Translucent">
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="android:windowActionBar">false</item>
+    </style>
+
+    <style name="Theme.Missionhub.NoActionBar" parent="Theme.Missionhub">
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="android:windowActionBar">false</item>
     </style>
 
     <!-- this style is only referenced in a Light.DarkActionBar based theme -->

@@ -1,11 +1,12 @@
 package com.missionhub.ui;
 
+import android.support.v4.view.MenuItemCompat;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
 import com.missionhub.R;
 
 import org.holoeverywhere.LayoutInflater;
@@ -25,8 +26,8 @@ public class ProgressItemHelper {
     }
 
     public void onCreateOptionsMenu(final Menu menu) {
-        mRefreshItem = menu.add(Menu.NONE, R.id.action_refresh, Menu.NONE, R.string.action_refresh).setIcon(R.drawable.ic_action_refresh)
-                .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+        mRefreshItem = menu.add(Menu.NONE, R.id.action_refresh, Menu.NONE, R.string.action_refresh).setIcon(R.drawable.ic_action_refresh);
+        MenuItemCompat.setShowAsAction(mRefreshItem, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM | MenuItemCompat.SHOW_AS_ACTION_WITH_TEXT);
         update();
     }
 
@@ -46,10 +47,10 @@ public class ProgressItemHelper {
 
         if (!mTasks.isEmpty()) {
             mRefreshView.startAnimation(mAnimation);
-            mRefreshItem.setActionView(mRefreshView);
+            MenuItemCompat.setActionView(mRefreshItem, mRefreshView);
         } else {
             mRefreshView.clearAnimation();
-            mRefreshItem.setActionView(null);
+            MenuItemCompat.setActionView(mRefreshItem, null);
         }
     }
 
