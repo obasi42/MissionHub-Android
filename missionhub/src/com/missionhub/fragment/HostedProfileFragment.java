@@ -797,7 +797,7 @@ public class HostedProfileFragment extends HostedFragment implements TabBar.OnTa
     public static class ProfileObjectAdapter extends ObjectArrayAdapter<Object> {
 
         public ProfileObjectAdapter(Context context) {
-            super(context, 4);
+            super(context, 10);
         }
 
         @Override
