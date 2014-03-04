@@ -6,12 +6,14 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.webkit.CookieManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -201,6 +203,9 @@ public class HostedSurveysFragment extends HostedFragment implements AdapterView
         }
 
         if (mWebView == null) return;
+
+        clearCookies();
+
         final SafeAsyncTask<String> task = new SafeAsyncTask<String>() {
             @Override
             public String call() throws Exception {
@@ -444,6 +449,24 @@ public class HostedSurveysFragment extends HostedFragment implements AdapterView
         public void onError(final Exception e) {
             showIndex();
             displayError(e);
+        }
+
+        @Override
+        public void onPageFinished(WebView view, String url) {
+            super.onPageFinished(view, url);
+
+            if (url.contains("survey_responses")) {
+                clearCookies();
+            }
+        }
+    }
+
+    private void clearCookies() {
+        CookieManager.getInstance().removeAllCookie();
+        if (mWebView != null) {
+            mWebView.clearCache(true);
+            mWebView.clearFormData();
+            mWebView.clearHistory();
         }
     }
 }
