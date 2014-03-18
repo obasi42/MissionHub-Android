@@ -119,7 +119,7 @@
     <string name="about_terms_url">https://www.missionhub.com/terms</string>
 
     <!-- Main Activity -->
-    <string name="main_help_url">http://blog.missionhub.com</string>
+    <string name="main_help_url">http://help.missionhub.com</string>
     <string name="main_logged_out">You have been logged out of MissionHub.</string>
     <string name="main_invalid_token">Your MissionHub authentication token is invaild. Please login
         again.
