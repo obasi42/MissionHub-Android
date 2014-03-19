@@ -25,6 +25,8 @@ dependencies {
     compile 'com.google.code.findbugs:jsr305:2.0.3'
     compile 'javax.inject:javax.inject:1'
     compile 'com.newrelic.agent.android:android-agent:3.+'
+
+    androidTestCompile 'junit:junit:3.8'
 }
 
 android {
@@ -52,6 +54,13 @@ android {
             java.srcDirs = ['src']
             res.srcDirs = ['res']
             assets.srcDirs = ['assets']
+        }
+
+        androidTest.setRoot('tests')
+        androidTest {
+            java.srcDirs = ['tests/src']
+            res.srcDirs = ['tests/res']
+            assets.srcDirs = ['tests/assets']
         }
     }
 
