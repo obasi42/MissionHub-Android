@@ -14,7 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.holoeverywhere.app.AlertDialog;
 import org.holoeverywhere.widget.Toast;
 
-import java.net.ConnectException;
+import java.lang.reflect.Type;
 import java.net.UnknownHostException;
 
 /**
@@ -219,7 +219,9 @@ public class ExceptionHelper {
     public void setThrowable(final Throwable throwable) {
         Log.e("ExceptionHelper", throwable.getMessage(), throwable);
 
-        Application.trackException(Thread.currentThread().getName(), throwable, false);
+        if (!isIgnoredThrowable(throwable)) {
+            Application.trackException(Thread.currentThread().getName(), throwable, false);
+        }
 
         mThrowable = throwable;
 
@@ -397,4 +399,20 @@ public class ExceptionHelper {
         }
         return mContext;
     }
+
+    public boolean isIgnoredThrowable(Throwable t) {
+        for(Type type : sIgnoredThrowableTypes) {
+            if (t.getClass() == type) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static final Type[] sIgnoredThrowableTypes = new Type[] {
+            com.facebook.FacebookOperationCanceledException.class,
+            HttpRequest.HttpRequestException.class,
+            com.missionhub.exception.WebViewException.class,
+    };
+
 }

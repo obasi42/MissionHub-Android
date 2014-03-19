@@ -103,7 +103,8 @@ public class Application extends org.holoeverywhere.app.Application {
                 for (Map.Entry<String, String> property : Configuration.getInstance().asMap().entrySet()) {
                     ACRA.getErrorReporter().putCustomData("CONFIGURATION_" + property.getKey(), property.getValue());
                 }
-                ErrbitReportSender.putErrbitData(ErrbitReportSender.ErrbitReportField.ENVIRONMENT_NAME, BuildConfig.FLAVOR);
+
+                ErrbitReportSender.putErrbitData(ErrbitReportSender.ErrbitReportField.ENVIRONMENT_NAME, BuildConfig.BUILD_TYPE);
             } catch (ACRAConfigurationException e) {
                 Log.e("MissionHub", e.getMessage(), e);
             }
