@@ -21,7 +21,7 @@ dependencies {
         exclude group: 'com.android.support', module: 'appcompat-v7'
     }
     compile 'joda-time:joda-time:2.3'
-    compile 'com.android:volley:1.0.2'
+    compile 'com.android:volley:1.0.3'
     compile 'com.google.code.findbugs:jsr305:2.0.3'
     compile 'javax.inject:javax.inject:1'
     compile 'com.newrelic.agent.android:android-agent:3.+'
