@@ -440,7 +440,7 @@ public class BulkUpdateDialogFragment extends RefreshableDialogFragment implemen
                         Application.showToast("Followup Status updated", Toast.LENGTH_SHORT);
                         break;
                 }
-                dismiss();
+                dismissAllowingStateLoss();
             }
 
             @Override
