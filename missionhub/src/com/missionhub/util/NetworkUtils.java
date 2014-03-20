@@ -5,12 +5,25 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
+import android.util.Log;
 
 import com.missionhub.application.Configuration;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URIUtils;
+import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.message.BasicNameValuePair;
+
 import java.io.File;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class NetworkUtils {
+
+    public static final String TAG = NetworkUtils.class.getSimpleName();
 
     /**
      * Checks if a network connection is available.
@@ -59,6 +72,24 @@ public class NetworkUtils {
             } catch (final Exception httpResponseCacheNotAvailable) {
                 /* ignore */
             }
+        }
+    }
+
+    public static String buildUrl(String scheme, String host, String path, Map<String, String> params) {
+        return buildUrl(scheme, host, path, params, true);
+    }
+
+    public static String buildUrl(String scheme, String host, String path, Map<String, String> params, boolean ignoreEmptyParams) {
+        List<NameValuePair> qparams = new ArrayList<>();
+        for (Map.Entry<String, String> entry : params.entrySet()) {
+            if (ignoreEmptyParams && StringUtils.isEmpty(entry.getValue())) continue;
+            qparams.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
+        }
+        try {
+            return URIUtils.createURI(scheme, host, -1, path, URLEncodedUtils.format(qparams, "UTF-8"), null).toString();
+        } catch (URISyntaxException e) {
+            Log.e(TAG, e.getMessage(), e);
+            return null;
         }
     }
 }

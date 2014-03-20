@@ -364,7 +364,7 @@ public class HostedProfileFragment extends HostedFragment implements TabBar.OnTa
 
         // The avatar
         DisplayMetrics metrics = DisplayUtils.getRealDisplayMetrics(getSupportActivity());
-        String picture = person.getPictureUrl(metrics.widthPixels, metrics.heightPixels);
+        String picture = person.getPictureUrl(metrics.widthPixels, -1);
 
         mAvatar.setEmptyImageResId(R.drawable.ic_default_contact_full);
         mAvatar.setErrorImageResId(R.drawable.ic_default_contact_full);

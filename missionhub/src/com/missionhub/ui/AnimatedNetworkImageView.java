@@ -16,6 +16,7 @@
 package com.missionhub.ui;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.ViewGroup.LayoutParams;
@@ -174,7 +175,9 @@ public class AnimatedNetworkImageView extends ImageView {
 
         // The pre-existing content of this view didn't match the current URL. Load the new image
         // from the network.
-        ImageContainer newContainer = mImageLoader.get(mUrl,
+
+        // update the ImageContainer to be the new bitmap container.
+        mImageContainer = mImageLoader.get(mUrl,
                 new ImageListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
@@ -213,10 +216,8 @@ public class AnimatedNetworkImageView extends ImageView {
                             setImageResource(mDefaultImageId);
                         }
                     }
-                });
-
-        // update the ImageContainer to be the new bitmap container.
-        mImageContainer = newContainer;
+                }
+        );
     }
 
     @Override
@@ -242,5 +243,18 @@ public class AnimatedNetworkImageView extends ImageView {
     protected void drawableStateChanged() {
         super.drawableStateChanged();
         invalidate();
+    }
+
+    @Override
+    protected void onMeasure(final int widthMeasureSpec, final int heightMeasureSpec) {
+        final Drawable d = this.getDrawable();
+
+        if (getScaleType() == ScaleType.CENTER_CROP && d != null) {
+            final int width = MeasureSpec.getSize(widthMeasureSpec);
+            final int height = heightMeasureSpec;
+            this.setMeasuredDimension(width, height);
+        } else {
+            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        }
     }
 }

@@ -16,7 +16,6 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
 import com.missionhub.R;
 import com.missionhub.application.Application;
-import com.missionhub.application.Session;
 import com.missionhub.model.generic.FollowupStatus;
 import com.missionhub.model.generic.Gender;
 import com.missionhub.model.gson.GAddress;
@@ -24,6 +23,7 @@ import com.missionhub.model.gson.GEmailAddress;
 import com.missionhub.model.gson.GPerson;
 import com.missionhub.model.gson.GPhoneNumber;
 import com.missionhub.util.IntentHelper;
+import com.missionhub.util.NetworkUtils;
 import com.missionhub.util.PhoneUtils;
 import com.missionhub.util.SimpleEntry;
 import com.missionhub.util.TreeDataStructure;
@@ -1215,9 +1215,14 @@ public class Person implements com.missionhub.model.TimestampedEntity {
     }
 
     public String getPictureUrl(int width, int height) {
+        String sWidth = width > 0 ? String.valueOf(width) : null;
+        String sHeight = height > 0 ? String.valueOf(height) : null;
         if (getPicture() == null || getPicture().contains("facebook.com") || getPicture().contains("fbcdn.net")) {
             if (getFb_uid() != null && getFb_uid() > 0) {
-                return "http://graph.facebook.com/" + getFb_uid() + "/picture?width=" + width + "&height=" + height;
+                HashMap<String, String> params = new HashMap<>();
+                params.put("width", sWidth);
+                params.put("height", sHeight);
+                return NetworkUtils.buildUrl("http", "graph.facebook.com", "/" + getFb_uid() + "/picture", params);
             }
         }
         return getPicture();
