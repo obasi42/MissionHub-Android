@@ -9,7 +9,7 @@ buildscript {
     }
 }
 
-version = "2.11-SNAPSHOT"
+version = "2.11"
 group = "com.missionhub"
 
 allprojects {
