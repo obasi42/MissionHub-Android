@@ -399,7 +399,6 @@ public class Session implements OnAccountsUpdateListener {
         try {
             return Application.getDb().getUserDao().queryBuilder().where(UserDao.Properties.Person_id.eq(mPersonId)).unique().getPrimary_organization_id();
         } catch (final Exception e) {
-            Log.e(TAG, e.getMessage(), e);
             /* ignore */
         }
         return -1l;
@@ -412,7 +411,7 @@ public class Session implements OnAccountsUpdateListener {
      * @return
      */
     public String getAccessToken() throws AuthenticatorException, OperationCanceledException, IOException {
-        return getAccountManager().blockingGetAuthToken(mAccount, Authenticator.ACCOUNT_TYPE, true);
+        return getAccountManager().blockingGetAuthToken(getAccount(), Authenticator.ACCOUNT_TYPE, true);
     }
 
     /**
@@ -452,9 +451,9 @@ public class Session implements OnAccountsUpdateListener {
                 }
 
                 // update the account with new data to keep it fresh
-                getAccountManager().setUserData(mAccount, Authenticator.KEY_PERSON_ID, String.valueOf(getPerson().getId()));
-                getAccountManager().setUserData(mAccount, Authenticator.KEY_FACEBOOK_ID, String.valueOf(getPerson().getFb_uid()));
-                getAccountManager().setUserData(mAccount, AccountManager.KEY_ACCOUNT_NAME, getPerson().getName());
+                getAccountManager().setUserData(getAccount(), Authenticator.KEY_PERSON_ID, String.valueOf(getPerson().getId()));
+                getAccountManager().setUserData(getAccount(), Authenticator.KEY_FACEBOOK_ID, String.valueOf(getPerson().getFb_uid()));
+                getAccountManager().setUserData(getAccount(), AccountManager.KEY_ACCOUNT_NAME, getPerson().getName());
 
                 return getPerson();
             }
@@ -627,9 +626,9 @@ public class Session implements OnAccountsUpdateListener {
      * Deletes an account for the specified person. This should not be called from the main thread.
      */
     public void deleteAccount() {
-        if (mAccount != null) {
+        if (getAccount() != null) {
             try {
-                getAccountManager().removeAccount(mAccount, null, null).getResult();
+                getAccountManager().removeAccount(getAccount(), null, null).getResult();
                 SettingsManager.setSessionLastPersonId(-1);
                 close();
             } catch (final Exception e) {
