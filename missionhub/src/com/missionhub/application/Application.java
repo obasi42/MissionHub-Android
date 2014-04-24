@@ -25,9 +25,12 @@ import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
 import org.holoeverywhere.widget.Toast;
 
+import java.net.HttpURLConnection;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import javax.net.ssl.HttpsURLConnection;
 
 import de.greenrobot.event.EventBus;
 
@@ -128,6 +131,8 @@ public class Application extends org.holoeverywhere.app.Application {
         // set up the networking
         NetworkUtils.disableConnectionReuseIfNecessary();
         NetworkUtils.enableHttpResponseCache(this);
+        HttpURLConnection.setFollowRedirects(true);
+        HttpsURLConnection.setFollowRedirects(true);
 
         registerEventSubscriber(this, ToastEvent.class);
 

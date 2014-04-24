@@ -1222,7 +1222,7 @@ public class Person implements com.missionhub.model.TimestampedEntity {
                 HashMap<String, String> params = new HashMap<>();
                 params.put("width", sWidth);
                 params.put("height", sHeight);
-                return NetworkUtils.buildUrl("http", "graph.facebook.com", "/" + getFb_uid() + "/picture", params);
+                return NetworkUtils.buildUrl("https", "graph.facebook.com", "/" + getFb_uid() + "/picture", params);
             }
         }
         return getPicture();
