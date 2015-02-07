@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.missionhub">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.missionhub"
+    android:versionCode="126">
 
     <uses-sdk
             android:minSdkVersion="8"

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.Missionhub" parent="@style/Holo.Theme.Light">
+    <style name="Theme.Missionhub" parent="@style/Holo.Theme">
         <item name="actionBarItemBackground">@drawable/selectable_background_missionhub</item>
         <item name="popupMenuStyle">@style/PopupMenu.Missionhub</item>
         <item name="dropDownListViewStyle">@style/DropDownListView.Missionhub</item>

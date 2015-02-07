@@ -31,7 +31,7 @@ dependencies {
 
 android {
     compileSdkVersion 19
-    buildToolsVersion '19.0.3'
+    buildToolsVersion '21.1.1'
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
@@ -74,7 +74,7 @@ android {
 
     buildTypes {
         release {
-            runProguard true
+            minifyEnabled true
             proguardFile getDefaultProguardFile('proguard-android.txt')
             proguardFile 'proguard.txt'
             signingConfig signingConfigs.release
