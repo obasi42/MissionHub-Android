@@ -15,6 +15,7 @@ import com.missionhub.application.Application;
 import com.missionhub.fragment.dialog.EditContactDialogFragment;
 import com.missionhub.fragment.dialog.InteractionDialogFragment;
 
+// Written by Obasi Shaw on 02/08/2015
 // Notification to be called when the phone-bearer leaves a campus.
 // To run, call GeoNotificationActivity.createNotification(context, "CAMPUS NAME"); from anywhere.
 public class GeoNotificationActivity extends BaseActivity
@@ -36,14 +37,14 @@ public class GeoNotificationActivity extends BaseActivity
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    String type = getIntent().getStringExtra("com.missionhub.geo_notif_type");
-                    if (type.equals("interact")) {
-                        InteractionDialogFragment.showForResult(getSupportFragmentManager(), R.id.action_interaction);
-                        Log.d("Testing", "Interaction");
-                    } else if (type.equals("contact")) {
-                        EditContactDialogFragment.showForResult(getSupportFragmentManager(), R.id.action_add_contact);
-                        Log.d("Testing", "Contact");
-                    }
+                }
+                String type = getIntent().getStringExtra("com.missionhub.geo_notif_type");
+                if (type.equals("interact")) {
+                    InteractionDialogFragment.showForResult(getSupportFragmentManager(), R.id.action_interaction);
+                    Log.d("Testing", "Interaction");
+                } else if (type.equals("contact")) {
+                    EditContactDialogFragment.showForResult(getSupportFragmentManager(), R.id.action_add_contact);
+                    Log.d("Testing", "Contact");
                 }
             }
         }).start();
@@ -60,8 +61,8 @@ public class GeoNotificationActivity extends BaseActivity
                 .setStyle(new NotificationCompat.BigTextStyle()
                         .bigText("I noticed you just left " + campus + ". Do you want to log an action?"))
                 .setAutoCancel(true)
-                .addAction(R.drawable.ic_action_add_contact, "New Contact", contactIntent)
-                .addAction(R.drawable.ic_action_interaction, "Interaction", interactIntent).build();
+                .addAction(R.drawable.ic_action_add_contact_white, "New Contact", contactIntent)
+                .addAction(R.drawable.ic_action_interaction_white, "Interaction", interactIntent).build();
         n.flags |= Notification.FLAG_AUTO_CANCEL;
         ((NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE)).notify(0, n);
     }
