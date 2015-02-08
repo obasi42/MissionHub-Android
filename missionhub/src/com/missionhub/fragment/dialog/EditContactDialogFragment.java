@@ -167,6 +167,14 @@ public class EditContactDialogFragment extends BaseDialogFragment {
             mSaveButton = ((AlertDialog) getDialog()).getButton(DialogInterface.BUTTON_POSITIVE);
             mCancelButton = ((AlertDialog) getDialog()).getButton(DialogInterface.BUTTON_NEUTRAL);
             updateUI();
+            getDialog().setOnDismissListener(new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    String geoClass = "com.missionhub.activity.GeoNotificationActivity";
+                    if (getActivity().getClass().getCanonicalName().contains(geoClass))
+                        getActivity().finish();
+                }
+            });
         }
     }
 
@@ -278,7 +286,7 @@ public class EditContactDialogFragment extends BaseDialogFragment {
         writeToPerson(mPerson);
 
         if (!mPerson.isValid()) {
-            Toast.makeText(getSupportActivity(), R.string.add_contact_name_required, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getSupportActivity(), R.string.add_contact_name_required, android.widget.Toast.LENGTH_SHORT).show();
             mName.requestFocus();
             return;
         }

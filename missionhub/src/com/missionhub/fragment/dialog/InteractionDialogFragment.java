@@ -41,7 +41,6 @@ import com.missionhub.ui.ViewArrayPagerAdapter;
 import com.missionhub.ui.widget.LockableViewPager;
 import com.missionhub.ui.widget.SelectableListView;
 import com.missionhub.util.DateUtils;
-import com.missionhub.util.FragmentUtils;
 import com.missionhub.util.SafeAsyncTask;
 import com.missionhub.util.SortUtils;
 import com.missionhub.util.TaskUtils;
@@ -763,6 +762,14 @@ public class InteractionDialogFragment extends BaseDialogFragment implements Vie
     public void onResume() {
         super.onResume();
         getDialog().setOnKeyListener(this);
+        getDialog().setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                String geoClass = "com.missionhub.activity.GeoNotificationActivity";
+                if (getActivity().getClass().getCanonicalName().contains(geoClass))
+                    getActivity().finish();
+            }
+        });
     }
 
     @Override

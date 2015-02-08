@@ -78,6 +78,10 @@
                 android:excludeFromRecents="true"
                 android:theme="@style/Theme.Missionhub.Translucent.NoActionBar"/>
         <activity
+            android:theme="@style/Theme.Missionhub.Translucent"
+            android:excludeFromRecents="true"
+            android:name=".activity.GeoNotificationActivity"/>
+        <activity
                 android:excludeFromRecents="true"
                 android:finishOnTaskLaunch="true"
                 android:launchMode="singleInstance"
